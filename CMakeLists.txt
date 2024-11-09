@@ -21,7 +21,7 @@ find_package(nanobind CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(Eigen3 CONFIG REQUIRED)
 
-add_subdirectory(third_party)
+add_subdirectory(src)
 
 # ==================================================================================================
 # ADD LIBS
