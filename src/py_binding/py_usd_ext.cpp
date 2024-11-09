@@ -9,6 +9,12 @@
 namespace nb = nanobind;
 using namespace nb::literals;
 
+void bind_bbox3d(nb::module_& m);
+
 NB_MODULE(py_usd_ext, m) {
     m.doc() = "python binding for usd";
+
+    auto base = m.def_submodule("base");
+    auto gf = base.def_submodule("gf");
+    bind_bbox3d(gf);
 }

@@ -26,8 +26,13 @@ add_subdirectory(src)
 # ==================================================================================================
 # ADD LIBS
 # ==================================================================================================
+set(BASE_GF_BINDINGS
+        src/py_binding/base/gf/py_bbox3d.cpp
+)
+
 
 set(BINDING_FILES
+        ${BASE_GF_BINDINGS}
         src/py_binding/py_usd_ext.cpp
 )
 
@@ -73,6 +78,7 @@ target_include_directories(py_usd_ext PRIVATE
 
 target_link_libraries(py_usd_ext PRIVATE
         fmt::fmt
+        gf
 )
 
 # ==================================================================================================
