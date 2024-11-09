@@ -23,15 +23,17 @@ PXR_NAMESPACE_OPEN_SCOPE
 // Make the template class general so that we can use the same class
 // (Gf_OstreamHelperP) on all variables and not worry about making a mistake
 template <class T>
-T Gf_OstreamHelperP(T v) { return v; }
-
-inline TfStreamFloat Gf_OstreamHelperP(float v) { 
-    return TfStreamFloat(v); 
+T Gf_OstreamHelperP(T v) {
+    return v;
 }
-inline TfStreamDouble Gf_OstreamHelperP(double v) { 
-    return TfStreamDouble(v); 
+
+inline TfStreamFloat Gf_OstreamHelperP(float v) {
+    return TfStreamFloat(v);
+}
+inline TfStreamDouble Gf_OstreamHelperP(double v) {
+    return TfStreamDouble(v);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // GF_OSTREAM_HELPERS 
+#endif  // GF_OSTREAM_HELPERS

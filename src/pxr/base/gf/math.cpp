@@ -10,9 +10,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-double
-GfMod(double a, double b)
-{
+double GfMod(double a, double b) {
     double c = fmod(a, b);
     if (a < 0)
         return c ? (b + c) : 0;
@@ -20,9 +18,7 @@ GfMod(double a, double b)
         return c;
 }
 
-float
-GfMod(float a, float b)
-{
+float GfMod(float a, float b) {
     double c = fmodf(a, b);
     if (a < 0)
         return c ? (b + c) : 0;
@@ -30,14 +26,12 @@ GfMod(float a, float b)
         return c;
 }
 
-double
-GfSmoothStep(double min, double max, double val, double slope0, double slope1)
-{
+double GfSmoothStep(double min, double max, double val, double slope0, double slope1) {
     // Implements standard hermite formulation:
-    // p(h) = (2h^3 - 3h^2 + 1)p0 + (h^3 - 2h^2 + h)m0 + 
+    // p(h) = (2h^3 - 3h^2 + 1)p0 + (h^3 - 2h^2 + h)m0 +
     //        (-2h^3 + 3h^2)p1 + (h^3 - h^2)m1;
     if (val >= max) return 1.0;
-    if (val <  min) return 0.0;
+    if (val < min) return 0.0;
 
     // Note due to above, if here, max != min
     double dv = max - min;
@@ -67,9 +61,7 @@ GfSmoothStep(double min, double max, double val, double slope0, double slope1)
     return v;
 }
 
-double
-GfSmoothRamp(double tmin, double tmax, double t, double w0, double w1)
-{
+double GfSmoothRamp(double tmin, double tmax, double t, double w0, double w1) {
     if (t <= tmin) {
         return 0.0;
     }
@@ -78,18 +70,18 @@ GfSmoothRamp(double tmin, double tmax, double t, double w0, double w1)
         return 1.0;
     }
 
-    double x = (t-tmin)/(tmax-tmin);
+    double x = (t - tmin) / (tmax - tmin);
     double xr = 2.0 - w0 - w1;
 
     if (x < w0) {
-        return (x*x)/(w0 * xr);
+        return (x * x) / (w0 * xr);
     }
 
-    if (x > (1.0 - w1) ) {
-        return (1.0 - ((1.0 - x) *  (1.0 - x))/ (w1 * xr));
+    if (x > (1.0 - w1)) {
+        return (1.0 - ((1.0 - x) * (1.0 - x)) / (w1 * xr));
     }
 
-    return (2.0 * x - w0)/xr;
+    return (2.0 * x - w0) / xr;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

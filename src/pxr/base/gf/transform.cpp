@@ -21,13 +21,11 @@ TF_REGISTRY_FUNCTION(TfType) {
 }
 // CODE_COVERAGE_ON_GCOV_BUG
 
-GfTransform &
-GfTransform::Set(const GfVec3d &scale,
-		 const GfRotation &pivotOrientation,
-		 const GfRotation &rotation,
-		 const GfVec3d &pivotPosition,
-		 const GfVec3d &translation)
-{
+GfTransform& GfTransform::Set(const GfVec3d& scale,
+                              const GfRotation& pivotOrientation,
+                              const GfRotation& rotation,
+                              const GfVec3d& pivotPosition,
+                              const GfVec3d& translation) {
     _scale = scale;
     _pivotOrientation = pivotOrientation;
     _rotation = rotation;
@@ -36,10 +34,8 @@ GfTransform::Set(const GfVec3d &scale,
 
     return *this;
 }
-    
-GfTransform &
-GfTransform::SetMatrix(const GfMatrix4d &m)
-{
+
+GfTransform& GfTransform::SetMatrix(const GfMatrix4d& m) {
     // Factor the matrix into the components, while trying to leave
     // the pivotPosition field unchanged.
 
@@ -59,8 +55,7 @@ GfTransform::SetMatrix(const GfMatrix4d &m)
     // but produces a result anyway.  We use that result regardless,
     // because singular matrices (such as zero scales) are still
     // valid for constructing Transforms.
-    mNoPivot.Factor(&shearRotMat, &_scale, &rotMat,
-                     &_translation, &projMat);
+    mNoPivot.Factor(&shearRotMat, &_scale, &rotMat, &_translation, &projMat);
 
     _rotation = rotMat.ExtractRotation();
 
@@ -73,28 +68,24 @@ GfTransform::SetMatrix(const GfMatrix4d &m)
     return *this;
 }
 
-GfTransform &
-GfTransform::SetIdentity()
-{
+GfTransform& GfTransform::SetIdentity() {
     _scale.Set(1.0, 1.0, 1.0);
     _pivotOrientation.SetIdentity();
     _rotation.SetIdentity();
-    _pivotPosition      = GfVec3d(0);
+    _pivotPosition = GfVec3d(0);
     _translation = GfVec3d(0);
 
     return *this;
 }
 
-GfMatrix4d
-GfTransform::GetMatrix() const
-{
-    bool        doPivot      = (_pivotPosition != GfVec3d(0));
-    bool        doScale       = (_scale  != GfVec3d(1.0, 1.0, 1.0));
-    bool        doScaleOrient = (_pivotOrientation.GetAngle() != 0.0);
-    bool        doRotation    = (_rotation.GetAngle() != 0.0);
-    bool        doTranslation = (_translation != GfVec3d(0));
-    bool        anySet        = false;
-    GfMatrix4d  mtx;
+GfMatrix4d GfTransform::GetMatrix() const {
+    bool doPivot = (_pivotPosition != GfVec3d(0));
+    bool doScale = (_scale != GfVec3d(1.0, 1.0, 1.0));
+    bool doScaleOrient = (_pivotOrientation.GetAngle() != 0.0);
+    bool doRotation = (_rotation.GetAngle() != 0.0);
+    bool doTranslation = (_translation != GfVec3d(0));
+    bool anySet = false;
+    GfMatrix4d mtx;
 
     //
     // When multiplying matrices A*B, the effects of A are more local
@@ -103,80 +94,64 @@ GfTransform::GetMatrix() const
     // operator), in the order we want the operations to be applied.
     //
 
-#define _GF_ACCUM(mtxOp)                        \
-    {                                           \
-        if (anySet) {                           \
-            GfMatrix4d tmp;                     \
-            tmp.mtxOp;                          \
-            mtx *= tmp;                         \
-        }                                       \
-        else {                                  \
-            mtx.mtxOp;                          \
-            anySet = true;                      \
-        }                                       \
+#define _GF_ACCUM(mtxOp)    \
+    {                       \
+        if (anySet) {       \
+            GfMatrix4d tmp; \
+            tmp.mtxOp;      \
+            mtx *= tmp;     \
+        } else {            \
+            mtx.mtxOp;      \
+            anySet = true;  \
+        }                   \
     }
 
-    if (doPivot)
-        _GF_ACCUM(SetTranslate(-_pivotPosition));
+    if (doPivot) _GF_ACCUM(SetTranslate(-_pivotPosition));
 
     if (doScale) {
-        if (doScaleOrient)
-            _GF_ACCUM(SetRotate(_pivotOrientation.GetInverse()));
+        if (doScaleOrient) _GF_ACCUM(SetRotate(_pivotOrientation.GetInverse()));
 
         _GF_ACCUM(SetScale(_scale));
 
-        if (doScaleOrient)
-            _GF_ACCUM(SetRotate(_pivotOrientation));
+        if (doScaleOrient) _GF_ACCUM(SetRotate(_pivotOrientation));
     }
 
-    if (doRotation)
-        _GF_ACCUM(SetRotate(_rotation));
+    if (doRotation) _GF_ACCUM(SetRotate(_rotation));
 
-    if (doPivot)
-        _GF_ACCUM(SetTranslate(_pivotPosition));
+    if (doPivot) _GF_ACCUM(SetTranslate(_pivotPosition));
 
-    if (doTranslation)
-        _GF_ACCUM(SetTranslate(_translation));
+    if (doTranslation) _GF_ACCUM(SetTranslate(_translation));
 
 #undef _GF_ACCUM
 
-    if (! anySet)
-        mtx.SetIdentity();
+    if (!anySet) mtx.SetIdentity();
 
     return mtx;
 }
 
-bool
-GfTransform::operator ==(const GfTransform &xf) const
-{
-    return (GetScale()            == xf.GetScale() &&
-	    GetPivotOrientation() == xf.GetPivotOrientation() &&
-	    GetRotation()         == xf.GetRotation() &&
-	    GetPivotPosition()    == xf.GetPivotPosition() &&
-	    GetTranslation()      == xf.GetTranslation());
+bool GfTransform::operator==(const GfTransform& xf) const {
+    return (GetScale() == xf.GetScale() && GetPivotOrientation() == xf.GetPivotOrientation() &&
+            GetRotation() == xf.GetRotation() && GetPivotPosition() == xf.GetPivotPosition() &&
+            GetTranslation() == xf.GetTranslation());
 }
 
-GfTransform &
-GfTransform::operator *=(const GfTransform &xf)
-{
+GfTransform& GfTransform::operator*=(const GfTransform& xf) {
     return SetMatrix(GetMatrix() * xf.GetMatrix());
 }
 
-std::ostream &
-operator<<(std::ostream& out, const GfTransform& xf)
-{
-    const GfVec3d &t = xf.GetTranslation();
+std::ostream& operator<<(std::ostream& out, const GfTransform& xf) {
+    const GfVec3d& t = xf.GetTranslation();
 
-    const GfRotation &rotation = xf.GetRotation();
-    const GfVec3d &rax = rotation.GetAxis();
+    const GfRotation& rotation = xf.GetRotation();
+    const GfVec3d& rax = rotation.GetAxis();
     double rang = rotation.GetAngle();
 
-    const GfVec3d &s = xf.GetScale();
+    const GfVec3d& s = xf.GetScale();
 
-    const GfVec3d &c = xf.GetPivotPosition();
+    const GfVec3d& c = xf.GetPivotPosition();
 
-    const GfRotation &pivotOrientation = xf.GetPivotOrientation();
-    const GfVec3d &pax = pivotOrientation.GetAxis();
+    const GfRotation& pivotOrientation = xf.GetPivotOrientation();
+    const GfVec3d& pax = pivotOrientation.GetAxis();
     double pang = pivotOrientation.GetAngle();
 
     // This class doesn't use the same precision helper that everyone
@@ -184,17 +159,14 @@ operator<<(std::ostream& out, const GfTransform& xf)
 
     // note:  we currently specify the same orientation for both scale and
     // rotation, but the format allows for different orientations.
-    return out
-        << "( "
-        << "(" << s[0] << ", " << s[1] << ", " << s[2] << ", 0), "
-        << "(" << pax[0] << ", " << pax[1] << ", " << pax[2] << ", "
-        << pang << "), "
-        << "(" << rax[0] << ", " << rax[1] << ", " << rax[2] << ", "
-        << rang << "), "
-   
-        << "(" << c[0] << ", " << c[1] << ", " << c[2] << ", 0), "
-        << "(" << t[0] << ", " << t[1] << ", " << t[2] << ", 0) "
-        << ")";
+    return out << "( "
+               << "(" << s[0] << ", " << s[1] << ", " << s[2] << ", 0), "
+               << "(" << pax[0] << ", " << pax[1] << ", " << pax[2] << ", " << pang << "), "
+               << "(" << rax[0] << ", " << rax[1] << ", " << rax[2] << ", " << rang << "), "
+
+               << "(" << c[0] << ", " << c[1] << ", " << c[2] << ", 0), "
+               << "(" << t[0] << ", " << t[1] << ", " << t[2] << ", 0) "
+               << ")";
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

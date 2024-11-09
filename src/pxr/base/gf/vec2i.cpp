@@ -30,33 +30,18 @@ TF_REGISTRY_FUNCTION(TfType) {
     TfType::Define<GfVec2i>();
 }
 
-std::ostream& 
-operator<<(std::ostream &out, GfVec2i const &v)
-{
-    return out << '(' 
-        << Gf_OstreamHelperP(v[0]) << ", " 
-        << Gf_OstreamHelperP(v[1]) << ')';
+std::ostream& operator<<(std::ostream& out, GfVec2i const& v) {
+    return out << '(' << Gf_OstreamHelperP(v[0]) << ", " << Gf_OstreamHelperP(v[1]) << ')';
 }
 
-
-bool
-GfVec2i::operator==(GfVec2d const &other) const
-{
-    return _data[0] == other[0] &&
-           _data[1] == other[1];
+bool GfVec2i::operator==(GfVec2d const& other) const {
+    return _data[0] == other[0] && _data[1] == other[1];
 }
-bool
-GfVec2i::operator==(GfVec2f const &other) const
-{
-    return _data[0] == other[0] &&
-           _data[1] == other[1];
+bool GfVec2i::operator==(GfVec2f const& other) const {
+    return _data[0] == other[0] && _data[1] == other[1];
 }
-bool
-GfVec2i::operator==(GfVec2h const &other) const
-{
-    return _data[0] == other[0] &&
-           _data[1] == other[1];
+bool GfVec2i::operator==(GfVec2h const& other) const {
+    return _data[0] == other[0] && _data[1] == other[1];
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

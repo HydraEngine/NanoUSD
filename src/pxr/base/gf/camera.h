@@ -29,8 +29,7 @@ class GfFrustum;
 /// This class provides a thin wrapper on the camera data model,
 /// with a small number of computations.
 ///
-class GfCamera
-{
+class GfCamera {
 public:
     /// Projection type.
     enum Projection {
@@ -39,10 +38,7 @@ public:
     };
 
     /// Direction used for Field of View or orthographic size
-    enum FOVDirection {
-        FOVHorizontal = 0,
-        FOVVertical
-    };
+    enum FOVDirection { FOVHorizontal = 0, FOVVertical };
 
     /// The unit for horizontal and vertical aperture is one tenth of the
     /// world unit. Thus, if the world unit is assumed to be cm, the horizontal
@@ -50,7 +46,7 @@ public:
     GF_API static const double APERTURE_UNIT;
     /// The unit for focal length. Similar to APERTURE_UNIT.
     GF_API static const double FOCAL_LENGTH_UNIT;
-    
+
     /// Default horizontal and vertical aperture, based on a 35mm
     /// (non-anamorphic) projector aperture (0.825 x 0602 inches, converted to
     /// mm).
@@ -58,24 +54,23 @@ public:
     GF_API static const double DEFAULT_VERTICAL_APERTURE;
 
 public:
-    GF_API GfCamera(
-        const GfMatrix4d &transform = GfMatrix4d(1.0),
-        Projection projection = Perspective,
-        float horizontalAperture = DEFAULT_HORIZONTAL_APERTURE,
-        float verticalAperture = DEFAULT_VERTICAL_APERTURE,
-        float horizontalApertureOffset = 0.0,
-        float verticalApertureOffset = 0.0,
-        float focalLength = 50.0,
-        const GfRange1f &clippingRange = GfRange1f(1, 1000000),
-        const std::vector<GfVec4f> &clippingPlanes = std::vector<GfVec4f>(),
-        float fStop = 0.0,
-        float focusDistance = 0.0);
+    GF_API GfCamera(const GfMatrix4d& transform = GfMatrix4d(1.0),
+                    Projection projection = Perspective,
+                    float horizontalAperture = DEFAULT_HORIZONTAL_APERTURE,
+                    float verticalAperture = DEFAULT_VERTICAL_APERTURE,
+                    float horizontalApertureOffset = 0.0,
+                    float verticalApertureOffset = 0.0,
+                    float focalLength = 50.0,
+                    const GfRange1f& clippingRange = GfRange1f(1, 1000000),
+                    const std::vector<GfVec4f>& clippingPlanes = std::vector<GfVec4f>(),
+                    float fStop = 0.0,
+                    float focusDistance = 0.0);
 
-    /// Sets the transform of the filmback in world space to \p val. 
-    GF_API void SetTransform(const GfMatrix4d &val);
+    /// Sets the transform of the filmback in world space to \p val.
+    GF_API void SetTransform(const GfMatrix4d& val);
 
     /// Sets the projection type.
-    GF_API void SetProjection(const Projection &val);
+    GF_API void SetProjection(const Projection& val);
 
     /// \name Physics based camera setup
 
@@ -84,7 +79,7 @@ public:
     /// Together with the clipping range, they determine the camera frustum.
 
     /// @{
-    
+
     /// Sets the focal length in tenths of a world unit (e.g., mm if the world
     /// unit is assumed to be cm).
     GF_API void SetFocalLength(const float val);
@@ -116,19 +111,19 @@ public:
     /// Do not pass values for \p horionztalAperture unless you care about
     /// DepthOfField.
 
-    GF_API void SetPerspectiveFromAspectRatioAndFieldOfView(
-        float aspectRatio,
-        float fieldOfView,
-        FOVDirection direction,
-        float horizontalAperture = DEFAULT_HORIZONTAL_APERTURE);
+    GF_API void SetPerspectiveFromAspectRatioAndFieldOfView(float aspectRatio,
+                                                            float fieldOfView,
+                                                            FOVDirection direction,
+                                                            float horizontalAperture = DEFAULT_HORIZONTAL_APERTURE);
 
     /// Sets the frustum to be orthographic such that it has the given
     /// \p aspectRatio and such that the orthographic width, respectively,
     /// orthographic height (in cm) is equal to \p orthographicSize
     /// (depending on direction).
 
-    GF_API void SetOrthographicFromAspectRatioAndSize(
-        float aspectRatio, float orthographicSize, FOVDirection direction);
+    GF_API void SetOrthographicFromAspectRatioAndSize(float aspectRatio,
+                                                      float orthographicSize,
+                                                      FOVDirection direction);
 
     /// Sets the camera from a view and projection matrix.
     ///
@@ -136,14 +131,14 @@ public:
     /// of aperture to focal length, so there is a choice which defaults
     /// to 50mm (or more accurately, 50 tenths of a world unit).
 
-    GF_API void SetFromViewAndProjectionMatrix(
-        const GfMatrix4d &viewMatrix, const GfMatrix4d &projMatix,
-        const float focalLength = 50.0);
+    GF_API void SetFromViewAndProjectionMatrix(const GfMatrix4d& viewMatrix,
+                                               const GfMatrix4d& projMatix,
+                                               const float focalLength = 50.0);
 
     /// @}
 
     /// Sets the clipping range in world units.
-    GF_API void SetClippingRange(const GfRange1f &val);
+    GF_API void SetClippingRange(const GfRange1f& val);
 
     /// Sets additional arbitrarily oriented clipping planes.
     /// A vector (a,b,c,d) encodes a clipping plane that clips off points
@@ -152,7 +147,7 @@ public:
     ///        a * x + b * y + c * z + d * 1 < 0
     ///
     /// where (x,y,z) are the coordinates in the camera's space.
-    GF_API void SetClippingPlanes(const std::vector<GfVec4f> &val);
+    GF_API void SetClippingPlanes(const std::vector<GfVec4f>& val);
 
     /// Sets the lens aperture, unitless.
     GF_API void SetFStop(const float val);
@@ -199,7 +194,7 @@ public:
     GF_API GfRange1f GetClippingRange() const;
 
     /// Returns additional clipping planes.
-    GF_API const std::vector<GfVec4f> &GetClippingPlanes() const;
+    GF_API const std::vector<GfVec4f>& GetClippingPlanes() const;
 
     /// Returns the computed, world-space camera frustum.  The frustum
     /// will always be that of a Y-up, -Z-looking camera.
@@ -219,21 +214,21 @@ public:
 
 private:
     // frustum
-    GfMatrix4d              _transform;
-    Projection              _projection;
-    float                   _horizontalAperture;
-    float                   _verticalAperture;
-    float                   _horizontalApertureOffset;
-    float                   _verticalApertureOffset;
-    float                   _focalLength;
-    GfRange1f               _clippingRange;
-    std::vector<GfVec4f>    _clippingPlanes;
+    GfMatrix4d _transform;
+    Projection _projection;
+    float _horizontalAperture;
+    float _verticalAperture;
+    float _horizontalApertureOffset;
+    float _verticalApertureOffset;
+    float _focalLength;
+    GfRange1f _clippingRange;
+    std::vector<GfVec4f> _clippingPlanes;
 
     // focus
-    float                   _fStop;
-    float                   _focusDistance;
+    float _fStop;
+    float _focusDistance;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_GF_CAMERA_H
+#endif  // PXR_BASE_GF_CAMERA_H

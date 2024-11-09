@@ -26,18 +26,14 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// different types where negative signed integers always compare less than (and
 /// not equal to) unsigned integers.
 template <class T, class U>
-constexpr bool
-GfIntegerCompareLess(T t, U u) noexcept
-{
+constexpr bool GfIntegerCompareLess(T t, U u) noexcept {
     static_assert(std::is_integral_v<T> && std::is_integral_v<U>);
 
     if constexpr (std::is_signed_v<T> == std::is_signed_v<U>) {
         return t < u;
-    }
-    else if constexpr (std::is_signed_v<T>) {
+    } else if constexpr (std::is_signed_v<T>) {
         return t < 0 || std::make_unsigned_t<T>(t) < u;
-    }
-    else {
+    } else {
         return u >= 0 && t < std::make_unsigned_t<U>(u);
     }
 }
@@ -71,11 +67,8 @@ enum GfNumericCastFailureType {
 /// GfHalf's _finite_ range will produce a +/- inf GfHalf.
 ///
 template <class To, class From>
-std::optional<To>
-GfNumericCast(From from, GfNumericCastFailureType *failType = nullptr)
-{
-    static_assert(GfIsArithmetic<From>::value &&
-                  GfIsArithmetic<To>::value);
+std::optional<To> GfNumericCast(From from, GfNumericCastFailureType* failType = nullptr) {
+    static_assert(GfIsArithmetic<From>::value && GfIsArithmetic<To>::value);
 
     using FromLimits = std::numeric_limits<From>;
     using ToLimits = std::numeric_limits<To>;
@@ -87,8 +80,7 @@ GfNumericCast(From from, GfNumericCastFailureType *failType = nullptr)
     };
 
     // int -> int.
-    if constexpr (std::is_integral_v<From> &&
-                  std::is_integral_v<To>) {
+    if constexpr (std::is_integral_v<From> && std::is_integral_v<To>) {
         // Range check integer to integer.
         if (GfIntegerCompareLess(from, ToLimits::min())) {
             setFail(GfNumericCastNegOverflow);
@@ -102,8 +94,7 @@ GfNumericCast(From from, GfNumericCastFailureType *failType = nullptr)
         return static_cast<To>(from);
     }
     // float -> int.
-    else if constexpr (GfIsFloatingPoint<From>::value &&
-                       std::is_integral_v<To>) {
+    else if constexpr (GfIsFloatingPoint<From>::value && std::is_integral_v<To>) {
         // If the floating point value is NaN we cannot convert.
         if (std::isnan(from)) {
             setFail(GfNumericCastNaN);
@@ -111,9 +102,7 @@ GfNumericCast(From from, GfNumericCastFailureType *failType = nullptr)
         }
         // If the floating point value is an infinity we cannot convert.
         if (std::isinf(from)) {
-            setFail(std::signbit(static_cast<double>(from))
-                    ? GfNumericCastNegOverflow
-                    : GfNumericCastPosOverflow);
+            setFail(std::signbit(static_cast<double>(from)) ? GfNumericCastNegOverflow : GfNumericCastPosOverflow);
             return {};
         }
         // Otherwise the floating point value must be (when truncated) in the
@@ -125,7 +114,7 @@ GfNumericCast(From from, GfNumericCastFailureType *failType = nullptr)
         // that all finite halfs are in-range.
         From low = static_cast<From>(ToLimits::lowest()) - static_cast<From>(1);
         From high = static_cast<From>(ToLimits::max()) + static_cast<From>(1);
-        
+
         if (from <= low) {
             setFail(GfNumericCastNegOverflow);
             return {};
@@ -139,8 +128,8 @@ GfNumericCast(From from, GfNumericCastFailureType *failType = nullptr)
     }
     // float -> float, or float -> int.
     else {
-        (void)setFail; // hush compiler.
-        
+        (void)setFail;  // hush compiler.
+
         // No range checking, following boost::numeric_cast.
         return static_cast<To>(from);
     }
@@ -148,4 +137,4 @@ GfNumericCast(From from, GfNumericCastFailureType *failType = nullptr)
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_GF_NUMERIC_CAST_H
+#endif  // PXR_BASE_GF_NUMERIC_CAST_H

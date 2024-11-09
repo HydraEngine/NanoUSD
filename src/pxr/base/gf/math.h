@@ -23,18 +23,18 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Returns true if \p a and \p b are with \p epsilon of each other.
 /// \ingroup group_gf_BasicMath
 inline bool GfIsClose(double a, double b, double epsilon) {
-    return fabs(a-b) < epsilon;
+    return fabs(a - b) < epsilon;
 }
 
 /// Converts an angle in radians to degrees.
 /// \ingroup group_gf_BasicMath
-inline double	GfRadiansToDegrees(double radians) {
+inline double GfRadiansToDegrees(double radians) {
     return radians * (180.0 / M_PI);
 }
 
 /// Converts an angle in degrees to radians.
 /// \ingroup group_gf_BasicMath
-inline double	GfDegreesToRadians(double degrees) {
+inline double GfDegreesToRadians(double degrees) {
     return degrees * (M_PI / 180.0);
 }
 
@@ -46,8 +46,7 @@ inline double	GfDegreesToRadians(double degrees) {
 /// varies from 0 to 1 using a cubic hermite blend, with given slopes at the
 /// min and max points.  The slopes are in the space that min and max are in.
 GF_API
-double GfSmoothStep(double min, double max, double val, 
-    double slope0 = 0.0, double slope1 = 0.0);
+double GfSmoothStep(double min, double max, double val, double slope0 = 0.0, double slope1 = 0.0);
 
 /// Smooth Step with independently controllable shoulders
 /// \ingroup group_gf_BasicMath
@@ -160,7 +159,7 @@ double GfSmoothStep(double min, double max, double val,
 ///                     the size of the ramp (tmax-tmin). This value must
 ///                     be in the range 0-1.
 GF_API
-double GfSmoothRamp(double tmin, double tmax, double t, double w0, double w1); 
+double GfSmoothRamp(double tmin, double tmax, double t, double w0, double w1);
 
 /// Returns the inner product of \c x with itself: specifically, \c x*x.
 /// Defined for \c int, \c float, \c double, and all \c GfVec types.
@@ -177,85 +176,128 @@ inline double GfSqr(const T& x) {
 ///
 /// \ingroup group_gf_BasicMath
 template <typename T>
-inline T
-GfSgn(T v) {
+inline T GfSgn(T v) {
     return (v < 0) ? -1 : ((v > 0) ? 1 : 0);
 }
 
 /// Return sqrt(\p f).
 /// \ingroup group_gf_BasicMath
-inline double GfSqrt(double f) { return std::sqrt(f); }
+inline double GfSqrt(double f) {
+    return std::sqrt(f);
+}
 /// Return sqrt(\p f).
 /// \ingroup group_gf_BasicMath
-inline float GfSqrt(float f) { return std::sqrt(f); }
+inline float GfSqrt(float f) {
+    return std::sqrt(f);
+}
 
 /// Return exp(\p f).
 /// \ingroup group_gf_BasicMath
-inline double GfExp(double f) { return std::exp(f); }
+inline double GfExp(double f) {
+    return std::exp(f);
+}
 /// Return exp(\p f).
 /// \ingroup group_gf_BasicMath
-inline float GfExp(float f) { return std::exp(f); }
+inline float GfExp(float f) {
+    return std::exp(f);
+}
 
 /// Return log(\p f).
 /// \ingroup group_gf_BasicMath
-inline double GfLog(double f) { return std::log(f); }
+inline double GfLog(double f) {
+    return std::log(f);
+}
 /// Return log(\p f).
 /// \ingroup group_gf_BasicMath
-inline float GfLog(float f) { return std::log(f); }
+inline float GfLog(float f) {
+    return std::log(f);
+}
 
 /// Return floor(\p f).
 /// \ingroup group_gf_BasicMath
-inline double GfFloor(double f) { return std::floor(f); }
+inline double GfFloor(double f) {
+    return std::floor(f);
+}
 /// Return floor(\p f).
 /// \ingroup group_gf_BasicMath
-inline float GfFloor(float f) { return std::floor(f); }
+inline float GfFloor(float f) {
+    return std::floor(f);
+}
 
 /// Return ceil(\p f).
 /// \ingroup group_gf_BasicMath
-inline double GfCeil(double f) { return std::ceil(f); }
+inline double GfCeil(double f) {
+    return std::ceil(f);
+}
 /// Return ceil(\p f).
 /// \ingroup group_gf_BasicMath
-inline float GfCeil(float f) { return std::ceil(f); }
+inline float GfCeil(float f) {
+    return std::ceil(f);
+}
 
 /// Return abs(\p f).
 /// \ingroup group_gf_BasicMath
-inline double GfAbs(double f) { return std::fabs(f); }
+inline double GfAbs(double f) {
+    return std::fabs(f);
+}
 /// Return abs(\p f).
 /// \ingroup group_gf_BasicMath
-inline float GfAbs(float f) { return std::fabs(f); }
+inline float GfAbs(float f) {
+    return std::fabs(f);
+}
 
 /// Return round(\p f).
 /// \ingroup group_gf_BasicMath
-inline double GfRound(double f) { return std::rint(f); }
+inline double GfRound(double f) {
+    return std::rint(f);
+}
 /// Return round(\p f).
 /// \ingroup group_gf_BasicMath
-inline float GfRound(float f) { return std::rint(f); }
+inline float GfRound(float f) {
+    return std::rint(f);
+}
 
 /// Return pow(\p f, \p p).
 /// \ingroup group_gf_BasicMath
-inline double GfPow(double f, double p) { return std::pow(f, p); }
+inline double GfPow(double f, double p) {
+    return std::pow(f, p);
+}
 /// Return pow(\p f, \p p).
 /// \ingroup group_gf_BasicMath
-inline float GfPow(float f, float p) { return std::pow(f, p); }
+inline float GfPow(float f, float p) {
+    return std::pow(f, p);
+}
 
 /// Return sin(\p v).
 /// \ingroup group_gf_BasicMath
-inline double GfSin(double v) { return std::sin(v); }
+inline double GfSin(double v) {
+    return std::sin(v);
+}
 /// Return sin(\p v).
 /// \ingroup group_gf_BasicMath
-inline float GfSin(float v) { return std::sin(v); }
+inline float GfSin(float v) {
+    return std::sin(v);
+}
 /// Return cos(\p v).
 /// \ingroup group_gf_BasicMath
-inline double GfCos(double v) { return std::cos(v); }
+inline double GfCos(double v) {
+    return std::cos(v);
+}
 /// Return cos(\p v).
 /// \ingroup group_gf_BasicMath
-inline float GfCos(float v) { return std::cos(v); }
+inline float GfCos(float v) {
+    return std::cos(v);
+}
 /// Return sin(\p v) in \p s and cos(\p v) in \p c.
 /// \ingroup group_gf_BasicMath
-inline void GfSinCos(double v, double *s, double *c) { ArchSinCos(v, s, c); }
+inline void GfSinCos(double v, double* s, double* c) {
+    ArchSinCos(v, s, c);
+}
 /// Return sin(\p v) in \p s and cos(\p v) in \p c.
 /// \ingroup group_gf_BasicMath
-inline void GfSinCos(float v, float *s, float *c) { ArchSinCosf(v, s, c); }
+inline void GfSinCos(float v, float* s, float* c) {
+    ArchSinCosf(v, s, c);
+}
 
 /// Return the resulting of clamping \p value to lie between
 /// \p min and \p max. This function is also defined for GfVecs.
@@ -272,7 +314,7 @@ inline float GfClamp(float value, float min, float max) {
     if (value < min) return min;
     if (value > max) return max;
     return value;
-}    
+}
 
 /// The mod function with "correct" behaviour for negative numbers.
 ///
@@ -290,15 +332,15 @@ float GfMod(float a, float b);
 
 /// Linear interpolation function.
 ///
-/// For any type that supports multiplication by a scalar and binary addition, returns 
-/// \code 
-/// (1-alpha) * a + alpha * b 
-/// \endcode 
-/// 
+/// For any type that supports multiplication by a scalar and binary addition, returns
+/// \code
+/// (1-alpha) * a + alpha * b
+/// \endcode
+///
 /// \ingroup group_gf_BasicMath
 template <class T>
-inline T GfLerp( double alpha, const T& a, const T& b) {
-    return (1-alpha)* a + alpha * b;
+inline T GfLerp(double alpha, const T& a, const T& b) {
+    return (1 - alpha) * a + alpha * b;
 }
 
 /// Returns the smallest of the given \c values.
@@ -342,37 +384,33 @@ inline T GfMax(T a1, T a2, T a3, T a4, T a5) {
 /// Returns the dot (inner) product of two vectors.
 /// For scalar types, this is just the regular product.
 /// \ingroup group_gf_BasicMath
-template <typename Left, typename Right,
-          std::enable_if_t<GfIsArithmetic<Left>::value &&
-                           GfIsArithmetic<Right>::value, int> = 0>
-inline decltype(std::declval<Left>() * std::declval<Right>())
-GfDot(Left left, Right right) {
+template <typename Left,
+          typename Right,
+          std::enable_if_t<GfIsArithmetic<Left>::value && GfIsArithmetic<Right>::value, int> = 0>
+inline decltype(std::declval<Left>() * std::declval<Right>()) GfDot(Left left, Right right) {
     return left * right;
 }
 
 /// Returns component-wise multiplication of vectors.
 /// For scalar types, this is just the regular product.
 /// \ingroup group_gf_BasicMath
-template <typename Left, typename Right,
-          std::enable_if_t<GfIsArithmetic<Left>::value &&
-                           GfIsArithmetic<Right>::value, int> = 0>
-inline decltype(std::declval<Left>() * std::declval<Right>())
-GfCompMult(Left left, Right right) {
+template <typename Left,
+          typename Right,
+          std::enable_if_t<GfIsArithmetic<Left>::value && GfIsArithmetic<Right>::value, int> = 0>
+inline decltype(std::declval<Left>() * std::declval<Right>()) GfCompMult(Left left, Right right) {
     return left * right;
 }
 
 /// Returns component-wise quotient of vectors.
 /// For scalar types, this is just the regular quotient.
 /// \ingroup group_gf_BasicMath
-template <typename Left, typename Right,
-          std::enable_if_t<GfIsArithmetic<Left>::value &&
-                           GfIsArithmetic<Right>::value, int> = 0>
-inline decltype(std::declval<Left>() / std::declval<Right>())
-GfCompDiv(Left left, Right right) {
+template <typename Left,
+          typename Right,
+          std::enable_if_t<GfIsArithmetic<Left>::value && GfIsArithmetic<Right>::value, int> = 0>
+inline decltype(std::declval<Left>() / std::declval<Right>()) GfCompDiv(Left left, Right right) {
     return left / right;
 }
 
-
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_GF_MATH_H 
+#endif  // PXR_BASE_GF_MATH_H

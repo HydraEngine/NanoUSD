@@ -20,9 +20,7 @@ TF_REGISTRY_FUNCTION(TfType) {
 }
 // CODE_COVERAGE_ON_GCOV_BUG
 
-std::ostream &
-operator<<(std::ostream &out, const GfInterval &i)
-{
+std::ostream& operator<<(std::ostream& out, const GfInterval& i) {
     out << (i.IsMinClosed() ? "[" : "(");
     out << Gf_OstreamHelperP(i.GetMin()) << ", ";
     out << Gf_OstreamHelperP(i.GetMax());

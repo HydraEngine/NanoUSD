@@ -30,41 +30,19 @@ TF_REGISTRY_FUNCTION(TfType) {
     TfType::Define<GfVec4f>();
 }
 
-std::ostream& 
-operator<<(std::ostream &out, GfVec4f const &v)
-{
-    return out << '(' 
-        << Gf_OstreamHelperP(v[0]) << ", " 
-        << Gf_OstreamHelperP(v[1]) << ", " 
-        << Gf_OstreamHelperP(v[2]) << ", " 
-        << Gf_OstreamHelperP(v[3]) << ')';
+std::ostream& operator<<(std::ostream& out, GfVec4f const& v) {
+    return out << '(' << Gf_OstreamHelperP(v[0]) << ", " << Gf_OstreamHelperP(v[1]) << ", " << Gf_OstreamHelperP(v[2])
+               << ", " << Gf_OstreamHelperP(v[3]) << ')';
 }
 
-
-bool
-GfVec4f::operator==(GfVec4d const &other) const
-{
-    return _data[0] == other[0] &&
-           _data[1] == other[1] &&
-           _data[2] == other[2] &&
-           _data[3] == other[3];
+bool GfVec4f::operator==(GfVec4d const& other) const {
+    return _data[0] == other[0] && _data[1] == other[1] && _data[2] == other[2] && _data[3] == other[3];
 }
-bool
-GfVec4f::operator==(GfVec4h const &other) const
-{
-    return _data[0] == other[0] &&
-           _data[1] == other[1] &&
-           _data[2] == other[2] &&
-           _data[3] == other[3];
+bool GfVec4f::operator==(GfVec4h const& other) const {
+    return _data[0] == other[0] && _data[1] == other[1] && _data[2] == other[2] && _data[3] == other[3];
 }
-bool
-GfVec4f::operator==(GfVec4i const &other) const
-{
-    return _data[0] == other[0] &&
-           _data[1] == other[1] &&
-           _data[2] == other[2] &&
-           _data[3] == other[3];
+bool GfVec4f::operator==(GfVec4i const& other) const {
+    return _data[0] == other[0] && _data[1] == other[1] && _data[2] == other[2] && _data[3] == other[3];
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

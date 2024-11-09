@@ -18,32 +18,22 @@ PXR_NAMESPACE_OPEN_SCOPE
 template <class T, int Rows, int Columns>
 class GfMatrixData {
 public:
-
     /// Return a pointer to a \a row of data.
-    T *operator[](int row) {
-        return _data + (row * Columns);
-    }
+    T* operator[](int row) { return _data + (row * Columns); }
 
     /// Return a const pointer to a \a row of data.
-    T const *operator[](int row) const {
-        return _data + (row * Columns);
-    }
+    T const* operator[](int row) const { return _data + (row * Columns); }
 
     /// Return a pointer to the start of all the data.
-    T *GetData() {
-        return _data;
-    }
+    T* GetData() { return _data; }
 
     /// Return a const pointer to the start of all the data.
-    T const *GetData() const {
-        return _data;
-    }
+    T const* GetData() const { return _data; }
 
 private:
-
     T _data[Rows * Columns];
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_GF_MATRIX_DATA_H
+#endif  // PXR_BASE_GF_MATRIX_DATA_H

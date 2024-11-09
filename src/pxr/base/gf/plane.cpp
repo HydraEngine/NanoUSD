@@ -27,23 +27,17 @@ TF_REGISTRY_FUNCTION(TfType) {
 }
 // CODE_COVERAGE_ON_GCOV_BUG
 
-void
-GfPlane::Set(const GfVec3d &normal, const GfVec3d &point)
-{
+void GfPlane::Set(const GfVec3d& normal, const GfVec3d& point) {
     _normal = normal.GetNormalized();
     _distance = GfDot(_normal, point);
 }
 
-void
-GfPlane::Set(const GfVec3d &p0, const GfVec3d &p1, const GfVec3d &p2)
-{
+void GfPlane::Set(const GfVec3d& p0, const GfVec3d& p1, const GfVec3d& p2) {
     _normal = GfCross(p1 - p0, p2 - p0).GetNormalized();
     _distance = GfDot(_normal, p0);
 }
 
-void
-GfPlane::Set(const GfVec4d &eqn)
-{
+void GfPlane::Set(const GfVec4d& eqn) {
     for (size_t i = 0; i < 3; i++) {
         _normal[i] = eqn[i];
     }
@@ -55,15 +49,11 @@ GfPlane::Set(const GfVec4d &eqn)
     }
 }
 
-GfVec4d
-GfPlane::GetEquation() const
- {
-     return GfVec4d(_normal[0], _normal[1], _normal[2], -_distance);
- }
+GfVec4d GfPlane::GetEquation() const {
+    return GfVec4d(_normal[0], _normal[1], _normal[2], -_distance);
+}
 
-GfPlane &
-GfPlane::Transform(const GfMatrix4d &matrix) 
-{
+GfPlane& GfPlane::Transform(const GfMatrix4d& matrix) {
     // Transform the coefficients of the plane equation by the adjoint
     // of the matrix to get the new normal.  The adjoint (inverse
     // transpose) is also used to multiply so they are not scaled
@@ -74,18 +64,15 @@ GfPlane::Transform(const GfMatrix4d &matrix)
     return *this;
 }
 
-bool
-GfPlane::IntersectsPositiveHalfSpace(const GfRange3d &box) const
-{
-    if (box.IsEmpty())
-	return false;
+bool GfPlane::IntersectsPositiveHalfSpace(const GfRange3d& box) const {
+    if (box.IsEmpty()) return false;
 
     // The maximum of the inner product between the normal and any point in the
     // box.
     double d = 0.0;
     for (int i = 0; i < 3; i++) {
         // Add the contributions each component makes to the inner product
-        // as the maximum of 
+        // as the maximum of
         // _normal[i] * box.GetMin()[i] and _normal[i] * box.GetMax()[i].
         // Depending on the sign of _normal[i], this will be the first or the
         // second term.
@@ -98,9 +85,7 @@ GfPlane::IntersectsPositiveHalfSpace(const GfRange3d &box) const
     return d >= _distance;
 }
 
-bool
-GfFitPlaneToPoints(const std::vector<GfVec3d>& points, GfPlane* fitPlane)
-{
+bool GfFitPlaneToPoints(const std::vector<GfVec3d>& points, GfPlane* fitPlane) {
     // Less than three points doesn't define a unique plane.
     if (points.size() < 3) {
         TF_CODING_ERROR("Need three points to correctly fit a plane");
@@ -191,8 +176,7 @@ GfFitPlaneToPoints(const std::vector<GfVec3d>& points, GfPlane* fitPlane)
         equation[0] = 1.0;
         equation[1] = leastSquaresEstimate[0];
         equation[2] = leastSquaresEstimate[1];
-    }
-    else if (det2 > 0.0 && det2 > det3) {
+    } else if (det2 > 0.0 && det2 > det3) {
         // A^T B = {{\sum (x_i) (-y_i)},
         //          {\sum (z_i) (-y_i)}}
         // X = {{a}, {c}}
@@ -201,8 +185,7 @@ GfFitPlaneToPoints(const std::vector<GfVec3d>& points, GfPlane* fitPlane)
         equation[0] = leastSquaresEstimate[0];
         equation[1] = 1.0;
         equation[2] = leastSquaresEstimate[1];
-    }
-    else if (det3 > 0.0) {
+    } else if (det3 > 0.0) {
         // A^T B = {{\sum (x_i) (z_i)},
         //          {\sum (y_i) (z_i)}}
         // X = {{a}, {b}}
@@ -211,8 +194,7 @@ GfFitPlaneToPoints(const std::vector<GfVec3d>& points, GfPlane* fitPlane)
         equation[0] = leastSquaresEstimate[0];
         equation[1] = leastSquaresEstimate[1];
         equation[2] = 1.0;
-    }
-    else {
+    } else {
         // In all cases, det(A^T A) is zero. This happens when the points are
         // collinear and a plane can't be fitted, for example.
         return false;
@@ -227,12 +209,8 @@ GfFitPlaneToPoints(const std::vector<GfVec3d>& points, GfPlane* fitPlane)
     return true;
 }
 
-std::ostream &
-operator<<(std::ostream& out, const GfPlane& p)
-{
-    return out
-        << '[' << Gf_OstreamHelperP(p.GetNormal()) << " " 
-        << Gf_OstreamHelperP(p.GetDistanceFromOrigin()) << ']';
+std::ostream& operator<<(std::ostream& out, const GfPlane& p) {
+    return out << '[' << Gf_OstreamHelperP(p.GetNormal()) << " " << Gf_OstreamHelperP(p.GetDistanceFromOrigin()) << ']';
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

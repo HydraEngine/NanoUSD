@@ -25,24 +25,19 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// This class represents a three-dimensional line in space.  Lines are
 /// constructed from a point, \p p0, and a direction, dir.  The direction is
-/// normalized in the constructor. 
+/// normalized in the constructor.
 ///
-/// The line is kept in a parametric represention, p = p0 + t * dir. 
+/// The line is kept in a parametric represention, p = p0 + t * dir.
 ///
 class GfLine {
-
-  public:
-
+public:
     /// The default constructor leaves line parameters undefined.
-    GfLine() {
-    }
+    GfLine() {}
 
     /// Construct a line from a point and a direction.
-    GfLine(const GfVec3d &p0, const GfVec3d &dir ) {
-        Set( p0, dir );
-    }
+    GfLine(const GfVec3d& p0, const GfVec3d& dir) { Set(p0, dir); }
 
-    double Set(const GfVec3d &p0, const GfVec3d &dir ) {
+    double Set(const GfVec3d& p0, const GfVec3d& dir) {
         _p0 = p0;
         _dir = dir;
         return _dir.Normalize();
@@ -50,38 +45,32 @@ class GfLine {
 
     /// Return the point on the line at \p ( p0 + t * dir ).
     /// Remember dir has been normalized so t represents a unit distance.
-    GfVec3d GetPoint( double t ) const { return _p0 + _dir * t; }
+    GfVec3d GetPoint(double t) const { return _p0 + _dir * t; }
 
     /// Return the normalized direction of the line.
-    const GfVec3d &GetDirection() const { return _dir; }
+    const GfVec3d& GetDirection() const { return _dir; }
 
     /// Returns the point on the line that is closest to \p point. If \p t is
     /// not \c NULL, it will be set to the parametric distance along the line
     /// of the returned point.
     GF_API
-    GfVec3d FindClosestPoint(const GfVec3d &point, double *t = NULL) const;
+    GfVec3d FindClosestPoint(const GfVec3d& point, double* t = NULL) const;
 
     /// Component-wise equality test. The starting points and directions,
     /// must match exactly for lines to be considered equal.
-    bool		operator ==(const GfLine &l) const {
-	return _p0 == l._p0 &&	_dir  == l._dir;
-    }
+    bool operator==(const GfLine& l) const { return _p0 == l._p0 && _dir == l._dir; }
 
     /// Component-wise inequality test. The starting points, and directions
     /// must match exactly for lines to be considered equal.
-    bool		operator !=(const GfLine &r) const {
-	return ! (*this == r);
-    }
+    bool operator!=(const GfLine& r) const { return !(*this == r); }
 
-  private:
+private:
     GF_API
-    friend bool GfFindClosestPoints( const GfLine &, const GfLine &,
-                                     GfVec3d *, GfVec3d *,
-                                     double *, double * );
+    friend bool GfFindClosestPoints(const GfLine&, const GfLine&, GfVec3d*, GfVec3d*, double*, double*);
     // Parametric description:
     //  l(t) = _p0 + t * _length * _dir;
-    GfVec3d             _p0;
-    GfVec3d             _dir;   
+    GfVec3d _p0;
+    GfVec3d _dir;
 };
 
 /// Computes the closets points between two lines.
@@ -93,14 +82,17 @@ class GfLine {
 /// points could be computed; in this case, the other return values are
 /// undefined.
 GF_API
-bool GfFindClosestPoints(const GfLine &l1, const GfLine &l2,
-                         GfVec3d *p1 = nullptr, GfVec3d *p2 = nullptr,
-                         double *t1 = nullptr, double *t2 = nullptr);
+bool GfFindClosestPoints(const GfLine& l1,
+                         const GfLine& l2,
+                         GfVec3d* p1 = nullptr,
+                         GfVec3d* p2 = nullptr,
+                         double* t1 = nullptr,
+                         double* t2 = nullptr);
 
 /// Output a GfLine.
 /// \ingroup group_gf_DebuggingOutput
-GF_API std::ostream &operator<<(std::ostream&, const GfLine&);
+GF_API std::ostream& operator<<(std::ostream&, const GfLine&);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_GF_LINE_H
+#endif  // PXR_BASE_GF_LINE_H

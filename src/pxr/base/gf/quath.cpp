@@ -23,28 +23,16 @@ TF_REGISTRY_FUNCTION(TfType) {
     TfType::Define<GfQuath>();
 }
 
-GfQuath::GfQuath(GfQuatd const &other)
-    : _imaginary(other.GetImaginary())
-    , _real(other.GetReal())
-{
-}
-GfQuath::GfQuath(GfQuatf const &other)
-    : _imaginary(other.GetImaginary())
-    , _real(other.GetReal())
-{
-}
+GfQuath::GfQuath(GfQuatd const& other) : _imaginary(other.GetImaginary()), _real(other.GetReal()) {}
+GfQuath::GfQuath(GfQuatf const& other) : _imaginary(other.GetImaginary()), _real(other.GetReal()) {}
 
-std::ostream& 
-operator<<(std::ostream &out, GfQuath const &q)
-{
+std::ostream& operator<<(std::ostream& out, GfQuath const& q) {
     GfVec3h i = q.GetImaginary();
     GfHalf real = q.GetReal();
     return out << GfVec4h(real, i[0], i[1], i[2]);
 }
 
-GfHalf
-GfQuath::Normalize(GfHalf eps)
-{
+GfHalf GfQuath::Normalize(GfHalf eps) {
     GfHalf length = GetLength();
 
     if (length < eps)
@@ -62,13 +50,13 @@ GfQuath::Normalize(GfHalf eps)
 //
 //     (Q * GfQuath(0, P) * Q.GetInverse()).GetImaginary()
 // which evaluates to point, rotated by the quaternion.
-// 
+//
 // A quaternion has a scalar real part and a vector imaginary part. Call them
 // r and i. The multiplication of two quaternions A * B expands to:
 //
 //     (Ar, Ai)*(Br, Bi) = (Ar*Br-(Ai . Bi), Ar*Bi+Br*Ai+(Ai x Bi))
 //                           ^real part^       ^imaginary part^
-// 
+//
 // where . is vector dot product and x is vector cross product.
 //
 // Let us define len2 as the quaternion length squared. If the length is 1.0
@@ -118,30 +106,25 @@ GfQuath::Normalize(GfHalf eps)
 //
 // which takes 22 multiplications, 11 additions, and 1 division
 //
-GfVec3h
-GfQuath::Transform(const GfVec3h& point) const
-{
+GfVec3h GfQuath::Transform(const GfVec3h& point) const {
     GfHalf tmpDot = GfDot(_imaginary, _imaginary);
     GfHalf tmpSqr = _real * _real;
-    return (2 * GfDot(_imaginary, point) * _imaginary +
-            (tmpSqr - tmpDot) * point +
-            2 * _real * GfCross(_imaginary, point)) / (tmpSqr + tmpDot);
+    return (2 * GfDot(_imaginary, point) * _imaginary + (tmpSqr - tmpDot) * point +
+            2 * _real * GfCross(_imaginary, point)) /
+           (tmpSqr + tmpDot);
 }
 
-GfQuath &
-GfQuath::operator *=(const GfQuath &q)
-{
+GfQuath& GfQuath::operator*=(const GfQuath& q) {
     GfHalf r1 = GetReal();
     GfHalf r2 = q.GetReal();
-    const GfVec3h &i1 = GetImaginary();
-    const GfVec3h &i2 = q.GetImaginary();
+    const GfVec3h& i1 = GetImaginary();
+    const GfVec3h& i2 = q.GetImaginary();
 
     GfHalf r = r1 * r2 - GfDot(i1, i2);
 
-    GfVec3h i(
-        r1 * i2[0] + r2 * i1[0] + (i1[1] * i2[2] - i1[2] * i2[1]),
-        r1 * i2[1] + r2 * i1[1] + (i1[2] * i2[0] - i1[0] * i2[2]),
-        r1 * i2[2] + r2 * i1[2] + (i1[0] * i2[1] - i1[1] * i2[0]));
+    GfVec3h i(r1 * i2[0] + r2 * i1[0] + (i1[1] * i2[2] - i1[2] * i2[1]),
+              r1 * i2[1] + r2 * i1[1] + (i1[2] * i2[0] - i1[0] * i2[2]),
+              r1 * i2[2] + r2 * i1[2] + (i1[0] * i2[1] - i1[1] * i2[0]));
 
     SetReal(r);
     SetImaginary(i);
@@ -149,17 +132,12 @@ GfQuath::operator *=(const GfQuath &q)
     return *this;
 }
 
-GfQuath
-GfSlerp(const GfQuath& q0, const GfQuath& q1, double alpha)
-{
+GfQuath GfSlerp(const GfQuath& q0, const GfQuath& q1, double alpha) {
     return GfSlerp(alpha, q0, q1);
 }
 
-GfQuath
-GfSlerp(double alpha, const GfQuath& q0, const GfQuath& q1)
-{
-    double cosTheta = q0.GetImaginary() * q1.GetImaginary() +
-        q0.GetReal() * q1.GetReal();
+GfQuath GfSlerp(double alpha, const GfQuath& q0, const GfQuath& q1) {
+    double cosTheta = q0.GetImaginary() * q1.GetImaginary() + q0.GetReal() * q1.GetReal();
     bool flip1 = false;
 
     if (cosTheta < 0.0) {
@@ -169,21 +147,19 @@ GfSlerp(double alpha, const GfQuath& q0, const GfQuath& q1)
 
     double scale0, scale1;
 
-    if (1.0 - cosTheta > 0.00001 ) {
+    if (1.0 - cosTheta > 0.00001) {
         // standard case
-        GfHalf theta = acos(cosTheta),
-               sinTheta = sin(theta);
+        GfHalf theta = acos(cosTheta), sinTheta = sin(theta);
 
         scale0 = sin((1.0 - alpha) * theta) / sinTheta;
         scale1 = sin(alpha * theta) / sinTheta;
-    } else {        
+    } else {
         // rot0 and rot1 very close - just do linear interp and renormalize.
         scale0 = 1.0 - alpha;
         scale1 = alpha;
     }
 
-    if (flip1)
-        scale1 = -scale1;
+    if (flip1) scale1 = -scale1;
 
     return scale0 * q0 + scale1 * q1;
 }

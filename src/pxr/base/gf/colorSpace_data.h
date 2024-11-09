@@ -7,11 +7,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-struct GfColorSpace::_Data
-{
-    ~_Data() {
-        NcFreeColorSpace(colorSpace);
-    }
+struct GfColorSpace::_Data {
+    ~_Data() { NcFreeColorSpace(colorSpace); }
 
     const NcColorSpace* colorSpace = nullptr;
 };

@@ -38,71 +38,53 @@ class GfRange3d;
 /// Note that by default a \c GfRay does not normalize its direction
 /// vector to unit length.
 ///
-/// Note for ray intersections, the start point is included in the computations, 
+/// Note for ray intersections, the start point is included in the computations,
 /// i.e., a distance of zero is defined to be intersecting.
 ///
 class GfRay {
-
-  public:
-
+public:
     /// The default constructor leaves the ray parameters undefined.
-    GfRay() {
-    }
+    GfRay() {}
 
     /// This constructor takes a starting point and a direction.
-    GfRay(const GfVec3d &startPoint, const GfVec3d &direction) {
-        SetPointAndDirection(startPoint, direction);
-    }
+    GfRay(const GfVec3d& startPoint, const GfVec3d& direction) { SetPointAndDirection(startPoint, direction); }
 
     /// Sets the ray by specifying a starting point and a direction.
     GF_API
-    void        SetPointAndDirection(const GfVec3d &startPoint,
-                                     const GfVec3d &direction);
+    void SetPointAndDirection(const GfVec3d& startPoint, const GfVec3d& direction);
 
     /// Sets the ray by specifying a starting point and an ending point.
     GF_API
-    void        SetEnds(const GfVec3d &startPoint, const GfVec3d &endPoint);
+    void SetEnds(const GfVec3d& startPoint, const GfVec3d& endPoint);
 
     /// Returns the starting point of the segment.
-    const GfVec3d &     GetStartPoint() const {
-        return _startPoint;
-    }
+    const GfVec3d& GetStartPoint() const { return _startPoint; }
 
     /// Returns the direction vector of the segment. This is not guaranteed to
     /// be unit length.
-    const GfVec3d &     GetDirection() const {
-        return _direction;
-    }
+    const GfVec3d& GetDirection() const { return _direction; }
 
     /// Returns the point that is \p distance units from the starting point
     /// along the direction vector, expressed in parametic distance.
-    GfVec3d             GetPoint(double distance) const {
-        return _startPoint + distance * _direction;
-    }
+    GfVec3d GetPoint(double distance) const { return _startPoint + distance * _direction; }
 
     /// Transforms the ray by the given matrix.
     GF_API
-    GfRay &     Transform(const GfMatrix4d &matrix);
+    GfRay& Transform(const GfMatrix4d& matrix);
 
     /// Returns the point on the ray that is closest to \p point. If \p
     /// rayDistance is not \c NULL, it will be set to the parametric distance
     /// along the ray of the closest point.
     GF_API
-    GfVec3d             FindClosestPoint(const GfVec3d &point,
-                                         double *rayDistance = NULL) const;
+    GfVec3d FindClosestPoint(const GfVec3d& point, double* rayDistance = NULL) const;
 
     /// Component-wise equality test. The starting points, directions, and
     /// lengths must match exactly for rays to be considered equal.
-    bool		operator ==(const GfRay &r) const {
-	return (_startPoint == r._startPoint &&
-		_direction  == r._direction);
-    }
+    bool operator==(const GfRay& r) const { return (_startPoint == r._startPoint && _direction == r._direction); }
 
     /// Component-wise inequality test. The starting points, directions, and
     /// lengths must match exactly for rays to be considered equal.
-    bool		operator !=(const GfRay &r) const {
-	return ! (*this == r);
-    }
+    bool operator!=(const GfRay& r) const { return !(*this == r); }
 
     /// \name Intersection methods.
     ///
@@ -132,14 +114,13 @@ class GfRay {
     ///                          barycentricCoords[2] * p2);
     /// \endcode
     GF_API
-    bool    Intersect(const GfVec3d &p0,
-                      const GfVec3d &p1,
-                      const GfVec3d &p2,
-                      double *distance = NULL,
-                      GfVec3d *barycentricCoords = NULL,
-                      bool *frontFacing = NULL,
-                      double maxDist = std::numeric_limits<double>::infinity())
-                      const;
+    bool Intersect(const GfVec3d& p0,
+                   const GfVec3d& p1,
+                   const GfVec3d& p2,
+                   double* distance = NULL,
+                   GfVec3d* barycentricCoords = NULL,
+                   bool* frontFacing = NULL,
+                   double maxDist = std::numeric_limits<double>::infinity()) const;
 
     /// Intersects the ray with a plane, returning \c true if the ray is not
     /// parallel to the plane and the intersection is within the ray bounds.
@@ -149,36 +130,32 @@ class GfRay {
     /// true if the intersection is on the side of the plane in which its
     /// normal points.
     GF_API
-    bool	Intersect(const GfPlane &plane, double *distance = NULL,
-			  bool *frontFacing = NULL) const;
+    bool Intersect(const GfPlane& plane, double* distance = NULL, bool* frontFacing = NULL) const;
 
     /// Intersects the ray with an axis-aligned box, returning \c true if the
     /// ray intersects it at all within bounds. If there is an intersection,
     /// this also returns the parametric distances to the two intersection
     /// points in \p enterDistance and \p exitDistance.
     GF_API
-    bool        Intersect(const GfRange3d &box,
-                          double *enterDistance = NULL,
-                          double *exitDistance = NULL) const;
+    bool Intersect(const GfRange3d& box, double* enterDistance = NULL, double* exitDistance = NULL) const;
 
     /// Intersects the ray with an oriented box, returning \c true if the
     /// ray intersects it at all within bounds. If there is an intersection,
     /// this also returns the parametric distances to the two intersection
     /// points in \p enterDistance and \p exitDistance.
     GF_API
-    bool        Intersect(const GfBBox3d &box,
-                          double *enterDistance = NULL,
-                          double *exitDistance = NULL) const;
+    bool Intersect(const GfBBox3d& box, double* enterDistance = NULL, double* exitDistance = NULL) const;
 
     /// Intersects the ray with a sphere, returning \c true if the ray
     /// intersects it at all within bounds.  If there is an intersection,
     /// returns the parametric distance to the two intersection points in \p
     /// enterDistance and \p exitDistance.
     GF_API
-    bool        Intersect(const GfVec3d &center, double radius,
-                          double *enterDistance = NULL,
-                          double *exitDistance = NULL ) const;
-    
+    bool Intersect(const GfVec3d& center,
+                   double radius,
+                   double* enterDistance = NULL,
+                   double* exitDistance = NULL) const;
+
     /// Intersects the ray with an infinite cylinder, with axis \p axis,
     /// centered at the \p origin, with radius \p radius.
     ///
@@ -188,12 +165,12 @@ class GfRay {
     ///
     /// Note this method does not validate whether the radius is valid.
     GF_API
-    bool Intersect(const GfVec3d &origin,
-                   const GfVec3d &axis,
-                   const double  radius,
-                   double        *enterDistance = NULL,
-                   double        *exitDistance = NULL) const;
-    
+    bool Intersect(const GfVec3d& origin,
+                   const GfVec3d& axis,
+                   const double radius,
+                   double* enterDistance = NULL,
+                   double* exitDistance = NULL) const;
+
     /// Intersects the ray with an infinite non-double cone, centered at \p
     /// origin, with axis \p axis, radius \p radius and apex at \p height.
     ///
@@ -204,37 +181,33 @@ class GfRay {
     /// Note this method does not validate whether the radius are height are
     /// valid.
     GF_API
-    bool Intersect(const GfVec3d &origin,
-                   const GfVec3d &axis,
-                   const double  radius,
-                   const double  height,
-                   double        *enterDistance = NULL,
-                   double        *exitDistance = NULL) const;
+    bool Intersect(const GfVec3d& origin,
+                   const GfVec3d& axis,
+                   const double radius,
+                   const double height,
+                   double* enterDistance = NULL,
+                   double* exitDistance = NULL) const;
     ///@}
 
-  private:
+private:
     GF_API
-    friend bool GfFindClosestPoints( const GfRay &, const GfLine &,
-                                     GfVec3d *, GfVec3d *,
-                                     double *, double * );
+    friend bool GfFindClosestPoints(const GfRay&, const GfLine&, GfVec3d*, GfVec3d*, double*, double*);
     GF_API
-    friend bool GfFindClosestPoints( const GfRay &, const GfLineSeg &,
-                                     GfVec3d *, GfVec3d *,
-                                     double *, double * );
-  
+    friend bool GfFindClosestPoints(const GfRay&, const GfLineSeg&, GfVec3d*, GfVec3d*, double*, double*);
+
     /// Solves the quadratic equation returning the solutions, if defined, in
     /// \p enterDistance and \p exitDistance, where \p enterDistance is less
     /// than or equal to \p exitDistance.
     bool _SolveQuadratic(const double a,
                          const double b,
                          const double c,
-                         double       *enterDistance = NULL,
-                         double       *exitDistance = NULL) const;
-  
+                         double* enterDistance = NULL,
+                         double* exitDistance = NULL) const;
+
     /// The starting point of the ray.
-    GfVec3d             _startPoint;
+    GfVec3d _startPoint;
     /// The direction vector.
-    GfVec3d             _direction;
+    GfVec3d _direction;
 };
 
 /// Computes the closest points between a ray and a line. The two points are
@@ -245,11 +218,12 @@ class GfRay {
 /// points could be computed; in this case, the other return values are
 /// undefined.
 GF_API
-bool GfFindClosestPoints( const GfRay &ray, const GfLine &line,
-                          GfVec3d *rayPoint = nullptr,
-                          GfVec3d *linePoint = nullptr,
-                          double *rayDistance = nullptr,
-                          double *lineDistance = nullptr );
+bool GfFindClosestPoints(const GfRay& ray,
+                         const GfLine& line,
+                         GfVec3d* rayPoint = nullptr,
+                         GfVec3d* linePoint = nullptr,
+                         double* rayDistance = nullptr,
+                         double* lineDistance = nullptr);
 
 /// Computes the closest points between a ray and a line segment. The two
 /// points are returned in \p rayPoint and \p segPoint.  The parametric
@@ -259,11 +233,12 @@ bool GfFindClosestPoints( const GfRay &ray, const GfLine &line,
 /// points could be computed; in this case, the other return values are
 /// undefined.
 GF_API
-bool GfFindClosestPoints( const GfRay &ray, const GfLineSeg &seg,
-                          GfVec3d *rayPoint = nullptr,
-                          GfVec3d *segPoint = nullptr,
-                          double *rayDistance = nullptr,
-                          double *segDistance = nullptr );
+bool GfFindClosestPoints(const GfRay& ray,
+                         const GfLineSeg& seg,
+                         GfVec3d* rayPoint = nullptr,
+                         GfVec3d* segPoint = nullptr,
+                         double* rayDistance = nullptr,
+                         double* segDistance = nullptr);
 
 /// Output a GfRay using the format [(x y z) >> (x y z)].
 /// \ingroup group_gf_DebuggingOutput
@@ -271,4 +246,4 @@ GF_API std::ostream& operator<<(std::ostream&, const GfRay&);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_GF_RAY_H
+#endif  // PXR_BASE_GF_RAY_H

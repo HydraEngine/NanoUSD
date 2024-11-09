@@ -22,35 +22,29 @@ TF_REGISTRY_FUNCTION(TfType) {
 }
 // CODE_COVERAGE_ON_GCOV_BUG
 
-GfVec3d
-GfLine::FindClosestPoint(const GfVec3d &point, double *t) const
-{
+GfVec3d GfLine::FindClosestPoint(const GfVec3d& point, double* t) const {
     // Compute the vector from the start point to the given point.
     GfVec3d v = point - _p0;
 
     // Find the length of the projection of this vector onto the line.
     double lt = GfDot(v, _dir);
-    
-    if (t)
-        *t = lt;
 
-    return GetPoint( lt );
+    if (t) *t = lt;
+
+    return GetPoint(lt);
 }
 
-bool
-GfFindClosestPoints( const GfLine &l1, const GfLine &l2,
-                     GfVec3d *closest1, GfVec3d *closest2,
-                     double *t1, double *t2 )
-{
+bool GfFindClosestPoints(
+        const GfLine& l1, const GfLine& l2, GfVec3d* closest1, GfVec3d* closest2, double* t1, double* t2) {
     // Define terms:
     //   p1 = line 1's position
     //   d1 = line 1's direction
     //   p2 = line 2's position
     //   d2 = line 2's direction
-    const GfVec3d &p1 = l1._p0; 
-    const GfVec3d &d1 = l1._dir;
-    const GfVec3d &p2 = l2._p0;
-    const GfVec3d &d2 = l2._dir;
+    const GfVec3d& p1 = l1._p0;
+    const GfVec3d& d1 = l1._dir;
+    const GfVec3d& p2 = l2._p0;
+    const GfVec3d& d2 = l2._dir;
 
     // We want to find points closest1 and closest2 on each line.
     // Their parametric definitions are:
@@ -96,36 +90,25 @@ GfFindClosestPoints( const GfLine &l1, const GfLine &l2,
     double denom = a * e - b * d;
 
     // Denominator == 0 means the lines are parallel; no intersection.
-    if ( GfIsClose( denom, 0, 1e-6 ) )
-        return false;
+    if (GfIsClose(denom, 0, 1e-6)) return false;
 
     double lt1 = (c * d - a * f) / denom;
     double lt2 = (c * e - b * f) / denom;
 
-    if ( closest1 )
-        *closest1 = l1.GetPoint( lt1 );
+    if (closest1) *closest1 = l1.GetPoint(lt1);
 
-    if ( closest2 )
-        *closest2 = l2.GetPoint( lt2 );
+    if (closest2) *closest2 = l2.GetPoint(lt2);
 
-    if ( t1 )
-        *t1 = lt1;
+    if (t1) *t1 = lt1;
 
-    if ( t2 )
-        *t2 = lt2;
-    
+    if (t2) *t2 = lt2;
+
     return true;
 }
 
-std::ostream &
-operator<<(std::ostream &out, const GfLine &line)
-{
-    return out 
-        << '(' 
-        << "point:" << Gf_OstreamHelperP(line.GetPoint(0.0)) 
-        << ' ' 
-        << "direction:" << Gf_OstreamHelperP(line.GetDirection()) 
-        << ')';
+std::ostream& operator<<(std::ostream& out, const GfLine& line) {
+    return out << '(' << "point:" << Gf_OstreamHelperP(line.GetPoint(0.0)) << ' '
+               << "direction:" << Gf_OstreamHelperP(line.GetDirection()) << ')';
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

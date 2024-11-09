@@ -33,7 +33,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 class GfVec4h;
 
 template <>
-struct GfIsGfVec<class GfVec4h> { static const bool value = true; };
+struct GfIsGfVec<class GfVec4h> {
+    static const bool value = true;
+};
 
 /// \class GfVec4h
 /// \ingroup group_gf_LinearAlgebra
@@ -43,8 +45,7 @@ struct GfIsGfVec<class GfVec4h> { static const bool value = true; };
 /// Represents a vector of 4 components of type \c GfHalf.
 /// It is intended to be fast and simple.
 ///
-class GfVec4h
-{
+class GfVec4h {
 public:
     /// Scalar element type and dimension.
     typedef GfHalf ScalarType;
@@ -54,33 +55,24 @@ public:
     GfVec4h() = default;
 
     /// Initialize all elements to a single value.
-    constexpr explicit GfVec4h(GfHalf value)
-        : _data{ value, value, value, value }
-    {
-    }
+    constexpr explicit GfVec4h(GfHalf value) : _data{value, value, value, value} {}
 
     /// Initialize all elements with explicit arguments.
-    constexpr GfVec4h(GfHalf s0, GfHalf s1, GfHalf s2, GfHalf s3)
-        : _data{ s0, s1, s2, s3 }
-    {
-    }
+    constexpr GfVec4h(GfHalf s0, GfHalf s1, GfHalf s2, GfHalf s3) : _data{s0, s1, s2, s3} {}
 
     /// Construct with pointer to values.
     template <class Scl>
-    constexpr explicit GfVec4h(Scl const *p)
-        : _data{ p[0], p[1], p[2], p[3] }
-    {
-    }
+    constexpr explicit GfVec4h(Scl const* p) : _data{p[0], p[1], p[2], p[3]} {}
 
     /// Construct from GfVec4d.
-    explicit GfVec4h(class GfVec4d const &other);
+    explicit GfVec4h(class GfVec4d const& other);
 
     /// Construct from GfVec4f.
-    explicit GfVec4h(class GfVec4f const &other);
+    explicit GfVec4h(class GfVec4f const& other);
 
     /// Implicitly convert from GfVec4i.
-    GfVec4h(class GfVec4i const &other);
- 
+    GfVec4h(class GfVec4i const& other);
+
     /// Create a unit vector along the X-axis.
     static GfVec4h XAxis() {
         GfVec4h result(0);
@@ -110,13 +102,12 @@ public:
     /// vector if \p i is greater than or equal to 4.
     static GfVec4h Axis(size_t i) {
         GfVec4h result(0);
-        if (i < 4)
-            result[i] = 1;
+        if (i < 4) result[i] = 1;
         return result;
     }
 
     /// Set all elements with passed arguments.
-    GfVec4h &Set(GfHalf s0, GfHalf s1, GfHalf s2, GfHalf s3) {
+    GfVec4h& Set(GfHalf s0, GfHalf s1, GfHalf s2, GfHalf s3) {
         _data[0] = s0;
         _data[1] = s1;
         _data[2] = s2;
@@ -125,104 +116,83 @@ public:
     }
 
     /// Set all elements with a pointer to data.
-    GfVec4h &Set(GfHalf const *a) {
-        return Set(a[0], a[1], a[2], a[3]);
-    }
+    GfVec4h& Set(GfHalf const* a) { return Set(a[0], a[1], a[2], a[3]); }
 
     /// Direct data access.
-    GfHalf const *data() const { return _data; }
-    GfHalf *data() { return _data; }
-    GfHalf const *GetArray() const { return data(); }
+    GfHalf const* data() const { return _data; }
+    GfHalf* data() { return _data; }
+    GfHalf const* GetArray() const { return data(); }
 
     /// Indexing.
-    GfHalf const &operator[](size_t i) const { return _data[i]; }
-    GfHalf &operator[](size_t i) { return _data[i]; }
+    GfHalf const& operator[](size_t i) const { return _data[i]; }
+    GfHalf& operator[](size_t i) { return _data[i]; }
 
     /// Hash.
-    friend inline size_t hash_value(GfVec4h const &vec) {
-        return TfHash::Combine(vec[0], vec[1], vec[2], vec[3]);
-    }
+    friend inline size_t hash_value(GfVec4h const& vec) { return TfHash::Combine(vec[0], vec[1], vec[2], vec[3]); }
 
     /// Equality comparison.
-    bool operator==(GfVec4h const &other) const {
-        return _data[0] == other[0] &&
-               _data[1] == other[1] &&
-               _data[2] == other[2] &&
-               _data[3] == other[3];
+    bool operator==(GfVec4h const& other) const {
+        return _data[0] == other[0] && _data[1] == other[1] && _data[2] == other[2] && _data[3] == other[3];
     }
-    bool operator!=(GfVec4h const &other) const {
-        return !(*this == other);
-    }
+    bool operator!=(GfVec4h const& other) const { return !(*this == other); }
 
     // TODO Add inequality for other vec types...
     /// Equality comparison.
     GF_API
-    bool operator==(class GfVec4d const &other) const;
+    bool operator==(class GfVec4d const& other) const;
     /// Equality comparison.
     GF_API
-    bool operator==(class GfVec4f const &other) const;
+    bool operator==(class GfVec4f const& other) const;
     /// Equality comparison.
     GF_API
-    bool operator==(class GfVec4i const &other) const;
-    
+    bool operator==(class GfVec4i const& other) const;
+
     /// Create a vec with negated elements.
-    GfVec4h operator-() const {
-        return GfVec4h(-_data[0], -_data[1], -_data[2], -_data[3]);
-    }
+    GfVec4h operator-() const { return GfVec4h(-_data[0], -_data[1], -_data[2], -_data[3]); }
 
     /// Addition.
-    GfVec4h &operator+=(GfVec4h const &other) {
+    GfVec4h& operator+=(GfVec4h const& other) {
         _data[0] += other[0];
         _data[1] += other[1];
         _data[2] += other[2];
         _data[3] += other[3];
         return *this;
     }
-    friend GfVec4h operator+(GfVec4h const &l, GfVec4h const &r) {
-        return GfVec4h(l) += r;
-    }
+    friend GfVec4h operator+(GfVec4h const& l, GfVec4h const& r) { return GfVec4h(l) += r; }
 
     /// Subtraction.
-    GfVec4h &operator-=(GfVec4h const &other) {
+    GfVec4h& operator-=(GfVec4h const& other) {
         _data[0] -= other[0];
         _data[1] -= other[1];
         _data[2] -= other[2];
         _data[3] -= other[3];
         return *this;
     }
-    friend GfVec4h operator-(GfVec4h const &l, GfVec4h const &r) {
-        return GfVec4h(l) -= r;
-    }
+    friend GfVec4h operator-(GfVec4h const& l, GfVec4h const& r) { return GfVec4h(l) -= r; }
 
     /// Multiplication by scalar.
-    GfVec4h &operator*=(double s) {
+    GfVec4h& operator*=(double s) {
         _data[0] *= s;
         _data[1] *= s;
         _data[2] *= s;
         _data[3] *= s;
         return *this;
     }
-    GfVec4h operator*(double s) const {
-        return GfVec4h(*this) *= s;
-    }
-    friend GfVec4h operator*(double s, GfVec4h const &v) {
-        return v * s;
-    }
+    GfVec4h operator*(double s) const { return GfVec4h(*this) *= s; }
+    friend GfVec4h operator*(double s, GfVec4h const& v) { return v * s; }
 
-        /// Division by scalar.
+    /// Division by scalar.
     // TODO should divide by the scalar type.
-    GfVec4h &operator/=(double s) {
+    GfVec4h& operator/=(double s) {
         // TODO This should not multiply by 1/s, it should do the division.
         // Doing the division is more numerically stable when s is close to
         // zero.
         return *this *= (1.0 / s);
     }
-    GfVec4h operator/(double s) const {
-        return *this * (1.0 / s);
-    }
-    
+    GfVec4h operator/(double s) const { return *this * (1.0 / s); }
+
     /// See GfDot().
-    GfHalf operator*(GfVec4h const &v) const {
+    GfHalf operator*(GfVec4h const& v) const {
         return _data[0] * v[0] + _data[1] * v[1] + _data[2] * v[2] + _data[3] * v[3];
     }
 
@@ -230,28 +200,20 @@ public:
     /// \code
     /// v * (*this * v)
     /// \endcode
-    GfVec4h GetProjection(GfVec4h const &v) const {
-        return v * (*this * v);
-    }
+    GfVec4h GetProjection(GfVec4h const& v) const { return v * (*this * v); }
 
     /// Returns the orthogonal complement of \p this->GetProjection(b).
     /// That is:
     /// \code
     ///  *this - this->GetProjection(b)
     /// \endcode
-    GfVec4h GetComplement(GfVec4h const &b) const {
-        return *this - this->GetProjection(b);
-    }
+    GfVec4h GetComplement(GfVec4h const& b) const { return *this - this->GetProjection(b); }
 
     /// Squared length.
-    GfHalf GetLengthSq() const {
-        return *this * *this;
-    }
+    GfHalf GetLengthSq() const { return *this * *this; }
 
     /// Length
-    GfHalf GetLength() const {
-        return GfSqrt(GetLengthSq());
-    }
+    GfHalf GetLength() const { return GfSqrt(GetLengthSq()); }
 
     /// Normalizes the vector in place to unit length, returning the
     /// length before normalization. If the length of the vector is
@@ -275,15 +237,13 @@ public:
         return normalized;
     }
 
-  
 private:
     GfHalf _data[4];
 };
 
 /// Output a GfVec4h.
 /// \ingroup group_gf_DebuggingOutput
-GF_API std::ostream& operator<<(std::ostream &, GfVec4h const &);
-
+GF_API std::ostream& operator<<(std::ostream&, GfVec4h const&);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
@@ -293,25 +253,19 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-inline
-GfVec4h::GfVec4h(class GfVec4d const &other)
-{
+inline GfVec4h::GfVec4h(class GfVec4d const& other) {
     _data[0] = other[0];
     _data[1] = other[1];
     _data[2] = other[2];
     _data[3] = other[3];
 }
-inline
-GfVec4h::GfVec4h(class GfVec4f const &other)
-{
+inline GfVec4h::GfVec4h(class GfVec4f const& other) {
     _data[0] = other[0];
     _data[1] = other[1];
     _data[2] = other[2];
     _data[3] = other[3];
 }
-inline
-GfVec4h::GfVec4h(class GfVec4i const &other)
-{
+inline GfVec4h::GfVec4h(class GfVec4i const& other) {
     _data[0] = other[0];
     _data[1] = other[1];
     _data[2] = other[2];
@@ -319,56 +273,36 @@ GfVec4h::GfVec4h(class GfVec4i const &other)
 }
 
 /// Returns component-wise multiplication of vectors \p v1 and \p v2.
-inline GfVec4h
-GfCompMult(GfVec4h const &v1, GfVec4h const &v2) {
-    return GfVec4h(
-        v1[0] * v2[0],
-        v1[1] * v2[1],
-        v1[2] * v2[2],
-        v1[3] * v2[3]
-        );
+inline GfVec4h GfCompMult(GfVec4h const& v1, GfVec4h const& v2) {
+    return GfVec4h(v1[0] * v2[0], v1[1] * v2[1], v1[2] * v2[2], v1[3] * v2[3]);
 }
 
 /// Returns component-wise quotient of vectors \p v1 and \p v2.
-inline GfVec4h
-GfCompDiv(GfVec4h const &v1, GfVec4h const &v2) {
-    return GfVec4h(
-        v1[0] / v2[0],
-        v1[1] / v2[1],
-        v1[2] / v2[2],
-        v1[3] / v2[3]
-        );
+inline GfVec4h GfCompDiv(GfVec4h const& v1, GfVec4h const& v2) {
+    return GfVec4h(v1[0] / v2[0], v1[1] / v2[1], v1[2] / v2[2], v1[3] / v2[3]);
 }
 
 /// Returns the dot (inner) product of two vectors.
-inline GfHalf
-GfDot(GfVec4h const &v1, GfVec4h const &v2) {
+inline GfHalf GfDot(GfVec4h const& v1, GfVec4h const& v2) {
     return v1 * v2;
 }
 
-
 /// Returns the geometric length of \c v.
-inline GfHalf
-GfGetLength(GfVec4h const &v)
-{
+inline GfHalf GfGetLength(GfVec4h const& v) {
     return v.GetLength();
 }
 
 /// Normalizes \c *v in place to unit length, returning the length before
 /// normalization. If the length of \c *v is smaller than \p eps then \c *v is
 /// set to \c *v/eps.  The original length of \c *v is returned.
-inline GfHalf
-GfNormalize(GfVec4h *v, GfHalf eps = 0.001)
-{
+inline GfHalf GfNormalize(GfVec4h* v, GfHalf eps = 0.001) {
     return v->Normalize(eps);
 }
 
 /// Returns a normalized (unit-length) vector with the same direction as \p v.
 /// If the length of this vector is smaller than \p eps, the vector divided by
 /// \p eps is returned.
-inline GfVec4h
-GfGetNormalized(GfVec4h const &v, GfHalf eps = 0.001)
-{
+inline GfVec4h GfGetNormalized(GfVec4h const& v, GfHalf eps = 0.001) {
     return v.GetNormalized(eps);
 }
 
@@ -376,9 +310,7 @@ GfGetNormalized(GfVec4h const &v, GfHalf eps = 0.001)
 /// \code
 /// b * (a * b)
 /// \endcode
-inline GfVec4h
-GfGetProjection(GfVec4h const &a, GfVec4h const &b)
-{
+inline GfVec4h GfGetProjection(GfVec4h const& a, GfVec4h const& b) {
     return a.GetProjection(b);
 }
 
@@ -386,23 +318,17 @@ GfGetProjection(GfVec4h const &a, GfVec4h const &b)
 /// \code
 ///  a - a.GetProjection(b)
 /// \endcode
-inline GfVec4h
-GfGetComplement(GfVec4h const &a, GfVec4h const &b)
-{
+inline GfVec4h GfGetComplement(GfVec4h const& a, GfVec4h const& b) {
     return a.GetComplement(b);
 }
 
 /// Tests for equality within a given tolerance, returning \c true if the
 /// length of the difference vector is less than or equal to \p tolerance.
-inline bool
-GfIsClose(GfVec4h const &v1, GfVec4h const &v2, double tolerance)
-{
+inline bool GfIsClose(GfVec4h const& v1, GfVec4h const& v2, double tolerance) {
     GfVec4h delta = v1 - v2;
     return delta.GetLengthSq() <= tolerance * tolerance;
 }
 
- 
- 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_GF_VEC4H_H
+#endif  // PXR_BASE_GF_VEC4H_H
