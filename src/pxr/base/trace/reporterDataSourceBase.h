@@ -20,8 +20,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ////////////////////////////////////////////////////////////////////////////////
 /// \class TraceReporterDataSourceBase
 ///
-/// This class is a base class for TraceReporterBase data sources. 
-/// TraceReporterBase uses an instance of a TraceReporterDataSourceBase derived 
+/// This class is a base class for TraceReporterBase data sources.
+/// TraceReporterBase uses an instance of a TraceReporterDataSourceBase derived
 /// class to access TraceCollections.
 ///
 class TraceReporterDataSourceBase {
@@ -40,4 +40,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_REPORTER_DATA_SOURCE_BASE_H
+#endif  // PXR_BASE_TRACE_REPORTER_DATA_SOURCE_BASE_H

@@ -26,7 +26,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// \class TraceCollection
 ///
-/// This class owns lists of TraceEvent instances per thread, and allows 
+/// This class owns lists of TraceEvent instances per thread, and allows
 /// read access to them.
 ///
 class TraceCollection {
@@ -47,13 +47,12 @@ public:
     /// Move assignment operator.
     TraceCollection& operator=(TraceCollection&&) = default;
 
-    // Collections should not be copied because TraceEvents contain 
+    // Collections should not be copied because TraceEvents contain
     // pointers to elements in the Key cache.
     TraceCollection(const TraceCollection&) = delete;
     TraceCollection& operator=(const TraceCollection&) = delete;
 
-
-    /// Appends \p events to the collection. The collection will 
+    /// Appends \p events to the collection. The collection will
     /// take ownership of the data.
     TRACE_API void AddToCollection(const TraceThreadId& id, EventListPtr&& events);
 
@@ -74,24 +73,21 @@ public:
         /// Called at the end of an iteration.
         virtual void OnEndCollection() = 0;
 
-        /// Called before the first event of from the thread with 
+        /// Called before the first event of from the thread with
         /// \p threadId is encountered.
         virtual void OnBeginThread(const TraceThreadId& threadId) = 0;
 
-        /// Called after the last event of from the thread with 
+        /// Called after the last event of from the thread with
         /// \p threadId is encountered.
         virtual void OnEndThread(const TraceThreadId& threadId) = 0;
 
-        /// Called before an event with \p categoryId is visited. If the 
+        /// Called before an event with \p categoryId is visited. If the
         /// return value is false, the event will be visited.
         virtual bool AcceptsCategory(TraceCategoryId categoryId) = 0;
 
-        /// Called for every event \p event with \p key on thread 
+        /// Called for every event \p event with \p key on thread
         /// \p threadId if AcceptsCategory returns true.
-        virtual void OnEvent(
-            const TraceThreadId& threadId, 
-            const TfToken& key, 
-            const TraceEvent& event) = 0;
+        virtual void OnEvent(const TraceThreadId& threadId, const TfToken& key, const TraceEvent& event) = 0;
     };
 
     /// Forward iterates over the events of the collection and calls the
@@ -103,8 +99,7 @@ public:
     TRACE_API void ReverseIterate(Visitor& visitor) const;
 
 private:
-    using KeyTokenCache = 
-        std::unordered_map<TraceKey, TfToken, TraceKey::HashFunctor>;
+    using KeyTokenCache = std::unordered_map<TraceKey, TfToken, TraceKey::HashFunctor>;
 
     /// Iterate through threads, then choose either forward or reverse
     /// iteration for the events in the threads
@@ -112,9 +107,8 @@ private:
 
     // Iterate through events in either forward or reverse order, depending on
     // the templated arguments
-    template <class I> 
-    void _IterateEvents(Visitor&, KeyTokenCache&, 
-        const TraceThreadId&, I, I) const;
+    template <class I>
+    void _IterateEvents(Visitor&, KeyTokenCache&, const TraceThreadId&, I, I) const;
 
     using EventTable = std::map<TraceThreadId, EventListPtr>;
 
@@ -123,4 +117,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_COLLECTION_H
+#endif  // PXR_BASE_TRACE_COLLECTION_H

@@ -15,33 +15,21 @@ PXR_NAMESPACE_OPEN_SCOPE
 namespace {
 
 // Variant visitor to convert TraceEventData to JsValue
-class JsValue_visitor
-{
+class JsValue_visitor {
 public:
-    JsValue_visitor(JsWriter& writer)
-        : _writer(writer) {}
+    JsValue_visitor(JsWriter& writer) : _writer(writer) {}
 
-    void operator()(int64_t i) const {
-        _writer.WriteValue(i);
-    }
+    void operator()(int64_t i) const { _writer.WriteValue(i); }
 
-    void operator()(uint64_t i) const {
-        _writer.WriteValue(i);
-    }
+    void operator()(uint64_t i) const { _writer.WriteValue(i); }
 
-    void operator()(bool i) const {
-        _writer.WriteValue(i);
-    }
+    void operator()(bool i) const { _writer.WriteValue(i); }
 
-    void operator()(double v) const {
-        _writer.WriteValue(v);
-    }
+    void operator()(double v) const { _writer.WriteValue(v); }
 
-    void operator()(const std::string& s) const {
-        _writer.WriteValue(s);
-    }
-    
-    template<class T>
+    void operator()(const std::string& s) const { _writer.WriteValue(s); }
+
+    template <class T>
     void operator()(T) const {
         _writer.WriteValue(nullptr);
     }
@@ -51,74 +39,51 @@ private:
 };
 
 // Variant visitor to convert TraceEventData to TraceEvent::DataType
-class Type_visitor
-{
+class Type_visitor {
 public:
-    TraceEvent::DataType operator()(int64_t i) const {
-        return TraceEvent::DataType::Int;
-    }
+    TraceEvent::DataType operator()(int64_t i) const { return TraceEvent::DataType::Int; }
 
-    TraceEvent::DataType operator()(uint64_t i) const {
-        return TraceEvent::DataType::UInt;
-    }
+    TraceEvent::DataType operator()(uint64_t i) const { return TraceEvent::DataType::UInt; }
 
-    TraceEvent::DataType operator()(bool i) const {
-        return TraceEvent::DataType::Boolean;
-    }
+    TraceEvent::DataType operator()(bool i) const { return TraceEvent::DataType::Boolean; }
 
-    TraceEvent::DataType operator()(double v) const {
-        return TraceEvent::DataType::Float;
-    }
+    TraceEvent::DataType operator()(double v) const { return TraceEvent::DataType::Float; }
 
-    TraceEvent::DataType operator()(const std::string& s) const {
-        return TraceEvent::DataType::String;
-    }
+    TraceEvent::DataType operator()(const std::string& s) const { return TraceEvent::DataType::String; }
 
-    template<class T>
+    template <class T>
     TraceEvent::DataType operator()(T) const {
         return TraceEvent::DataType::Invalid;
     }
 };
 
-}
+}  // namespace
 
-TraceEvent::DataType TraceEventData::GetType() const
-{
+TraceEvent::DataType TraceEventData::GetType() const {
     return std::visit(Type_visitor(), _data);
 }
 
-const int64_t* TraceEventData::GetInt() const
-{
-    return GetType() == TraceEvent::DataType::Int ?
-        &std::get<int64_t>(_data) : nullptr;
+const int64_t* TraceEventData::GetInt() const {
+    return GetType() == TraceEvent::DataType::Int ? &std::get<int64_t>(_data) : nullptr;
 }
 
-const uint64_t* TraceEventData::GetUInt() const
-{
-    return GetType() == TraceEvent::DataType::UInt ?
-        &std::get<uint64_t>(_data) : nullptr;
+const uint64_t* TraceEventData::GetUInt() const {
+    return GetType() == TraceEvent::DataType::UInt ? &std::get<uint64_t>(_data) : nullptr;
 }
 
-const double* TraceEventData::GetFloat() const
-{
-    return GetType() == TraceEvent::DataType::Float ?
-        &std::get<double>(_data) : nullptr;
+const double* TraceEventData::GetFloat() const {
+    return GetType() == TraceEvent::DataType::Float ? &std::get<double>(_data) : nullptr;
 }
 
-const bool* TraceEventData::GetBool() const
-{
-    return GetType() == TraceEvent::DataType::Boolean ?
-        &std::get<bool>(_data) : nullptr;
+const bool* TraceEventData::GetBool() const {
+    return GetType() == TraceEvent::DataType::Boolean ? &std::get<bool>(_data) : nullptr;
 }
 
-const std::string* TraceEventData::GetString() const
-{
-    return GetType() == TraceEvent::DataType::String ?
-        &std::get<std::string>(_data) : nullptr;
+const std::string* TraceEventData::GetString() const {
+    return GetType() == TraceEvent::DataType::String ? &std::get<std::string>(_data) : nullptr;
 }
 
-void TraceEventData::WriteJson(JsWriter& writer) const
-{
+void TraceEventData::WriteJson(JsWriter& writer) const {
     std::visit(JsValue_visitor(writer), _data);
 }
 

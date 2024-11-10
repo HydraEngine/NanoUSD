@@ -22,75 +22,62 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///////////////////////////////////////////////////////////////////////////////
 /// \class TraceEventContainer
 ///
-/// Holds TraceEvent instances. This container only allows appending events at 
+/// Holds TraceEvent instances. This container only allows appending events at
 /// the end and supports both forward and reverse iteration.
 ///
 class TraceEventContainer {
     // Intrusively doubly-linked list node that provides contiguous storage
     // for events.  Only appending events and iterating held events is
     // supported.
-    class _Node
-    {
+    class _Node {
     public:
-        using const_iterator = const TraceEvent *;
+        using const_iterator = const TraceEvent*;
 
         // Allocate a new node that is able to hold capacity events.
         static _Node* New(size_t capacity);
 
         // Destroys the list starting at head, which must be the first node
         // in its list.
-        static void DestroyList(_Node *head);
+        static void DestroyList(_Node* head);
 
         // Join the last and first nodes of two lists to form a new list.
-        static void Join(_Node *lhs, _Node *rhs);
+        static void Join(_Node* lhs, _Node* rhs);
 
         // Returns true if the node cannot hold any more events.
         bool IsFull() const { return _end == _sentinel; }
 
         const_iterator begin() const {
-            const char *p = reinterpret_cast<const char *>(this);
+            const char* p = reinterpret_cast<const char*>(this);
             p += sizeof(_Node);
-            return reinterpret_cast<const TraceEvent *>(p);
+            return reinterpret_cast<const TraceEvent*>(p);
         }
 
-        const_iterator end() const {
-            return _end;
-        }
+        const_iterator end() const { return _end; }
 
-        _Node *GetPrevNode() {
-            return _prev;
-        }
+        _Node* GetPrevNode() { return _prev; }
 
-        const _Node *GetPrevNode() const {
-            return _prev;
-        }
+        const _Node* GetPrevNode() const { return _prev; }
 
-        _Node *GetNextNode() {
-            return _next;
-        }
+        _Node* GetNextNode() { return _next; }
 
-        const _Node *GetNextNode() const {
-            return _next;
-        }
+        const _Node* GetNextNode() const { return _next; }
 
-        void ClaimEventEntry() {
-            ++_end;
-        }
+        void ClaimEventEntry() { ++_end; }
 
         // Remove this node from the linked list to which it belongs.
         void Unlink();
 
     private:
-        _Node(TraceEvent *end, size_t capacity);
+        _Node(TraceEvent* end, size_t capacity);
         ~_Node();
 
     private:
         union {
             struct {
-                TraceEvent *_end;
-                TraceEvent *_sentinel;
-                _Node *_prev;
-                _Node *_next;
+                TraceEvent* _end;
+                TraceEvent* _sentinel;
+                _Node* _prev;
+                _Node* _next;
             };
             // Ensure that _Node is aligned to at least the alignment of
             // TraceEvent.
@@ -111,49 +98,38 @@ public:
         using pointer = const TraceEvent*;
         using reference = const TraceEvent&;
 
-        reference operator*() {
-            return *_event;
-        }
+        reference operator*() { return *_event; }
 
-        pointer operator->() {
-            return _event;
-        }
+        pointer operator->() { return _event; }
 
-        bool operator !=(const const_iterator& other) const {
-            return !operator==(other);
-        }
+        bool operator!=(const const_iterator& other) const { return !operator==(other); }
 
-        bool operator == (const const_iterator& other) const {
-            return _event == other._event;
-        }
+        bool operator==(const const_iterator& other) const { return _event == other._event; }
 
-        const_iterator& operator ++() {
+        const_iterator& operator++() {
             Advance();
             return *this;
         }
 
-        const_iterator operator ++(int) {
+        const_iterator operator++(int) {
             const_iterator result(*this);
             Advance();
             return result;
         }
 
-        const_iterator& operator --() {
+        const_iterator& operator--() {
             Reverse();
             return *this;
         }
 
-        const_iterator operator --(int) {
+        const_iterator operator--(int) {
             const_iterator result(*this);
             Reverse();
             return result;
         }
 
     private:
-        const_iterator(const _Node *node, const TraceEvent *event)
-            : _node(node)
-            , _event(event)
-        {}
+        const_iterator(const _Node* node, const TraceEvent* event) : _node(node), _event(event) {}
 
         void Advance() {
             ++_event;
@@ -171,8 +147,8 @@ public:
             --_event;
         }
 
-        const _Node *_node;
-        const TraceEvent *_event;
+        const _Node* _node;
+        const TraceEvent* _event;
 
         friend class TraceEventContainer;
     };
@@ -197,10 +173,9 @@ public:
 
     /// \name Subset of stl container interface.
     /// @{
-    template < class... Args>
+    template <class... Args>
     TraceEvent& emplace_back(Args&&... args) {
-        TraceEvent *event =
-            new (_nextEvent++) TraceEvent(std::forward<Args>(args)...);
+        TraceEvent* event = new (_nextEvent++) TraceEvent(std::forward<Args>(args)...);
         _back->ClaimEventEntry();
         if (_back->IsFull()) {
             Allocate();
@@ -208,26 +183,18 @@ public:
         return *event;
     }
 
-    const_iterator begin() const { 
-        return const_iterator(_front, _front ? _front->begin() : nullptr);
-    }
+    const_iterator begin() const { return const_iterator(_front, _front ? _front->begin() : nullptr); }
 
-    const_iterator end() const { 
-        return const_iterator(_back, _back ? _back->end() : nullptr);
-    }
+    const_iterator end() const { return const_iterator(_back, _back ? _back->end() : nullptr); }
 
-    const_reverse_iterator rbegin() const { 
-        return const_reverse_iterator(end());
-    }
+    const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
 
-    const_reverse_iterator rend() const { 
-        return const_reverse_iterator(begin());
-    }
+    const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
     bool empty() const { return begin() == end(); }
     /// @}
 
-    /// Append the events in \p other to the end of this container. This takes 
+    /// Append the events in \p other to the end of this container. This takes
     /// ownership of the events that were in \p other.
     TRACE_API void Append(TraceEventContainer&& other);
 
@@ -244,4 +211,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_EVENT_CONTAINER_H
+#endif  // PXR_BASE_TRACE_EVENT_CONTAINER_H

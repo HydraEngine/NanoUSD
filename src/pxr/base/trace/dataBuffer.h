@@ -27,7 +27,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \class TraceDataBuffer
 ///
 /// This class stores copies of data that are associated with TraceEvent
-/// instances. 
+/// instances.
 /// Data stored in the buffer must be copy constructible and trivially
 /// destructible.
 ///
@@ -42,13 +42,10 @@ public:
     /// Makes a copy of \p value and returns a pointer to it.
     ///
     template <typename T>
-    const T* StoreData(const T& value)
-    {
-        static_assert(std::is_copy_constructible<T>::value,
-            "Must by copy constructible");
-        static_assert(std::is_trivially_destructible<T>::value,
-            "No destructors will be called");
-        return new(_alloc.Allocate(alignof(T), sizeof(T))) T(value);
+    const T* StoreData(const T& value) {
+        static_assert(std::is_copy_constructible<T>::value, "Must by copy constructible");
+        static_assert(std::is_trivially_destructible<T>::value, "No destructors will be called");
+        return new (_alloc.Allocate(alignof(T), sizeof(T))) T(value);
     }
 
     /// Makes a copy of \p str and returns a pointer to it.
@@ -62,12 +59,11 @@ public:
     }
 
 private:
-    // Simple Allocator that only supports allocations, but not frees. 
+    // Simple Allocator that only supports allocations, but not frees.
     // Allocated memory is tied to the lifetime of the allocator object.
     class Allocator {
     public:
-        Allocator(size_t blockSize) 
-            : _desiredBlockSize(blockSize) {}
+        Allocator(size_t blockSize) : _desiredBlockSize(blockSize) {}
         Allocator(Allocator&&) = default;
         Allocator& operator=(Allocator&&) = default;
 
@@ -91,8 +87,7 @@ private:
 
         static Byte* AlignPointer(Byte* ptr, const size_t align) {
             const size_t alignMask = align - 1;
-            return reinterpret_cast<Byte*>(
-                reinterpret_cast<uintptr_t>(ptr + alignMask) & ~alignMask);
+            return reinterpret_cast<Byte*>(reinterpret_cast<uintptr_t>(ptr + alignMask) & ~alignMask);
         }
 
         TRACE_API void AllocateBlock(const size_t align, const size_t desiredSize);
@@ -109,4 +104,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_DATA_BUFFER_H
+#endif  // PXR_BASE_TRACE_DATA_BUFFER_H

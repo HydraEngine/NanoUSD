@@ -23,55 +23,46 @@
 
 /// Records a timestamp when constructed and a timespan event when destructed,
 /// using the name of the function or method as the key.
-#define TRACE_FUNCTION() \
-        _TRACE_FUNCTION_INSTANCE(__LINE__, __ARCH_FUNCTION__, __ARCH_PRETTY_FUNCTION__)
+#define TRACE_FUNCTION() _TRACE_FUNCTION_INSTANCE(__LINE__, __ARCH_FUNCTION__, __ARCH_PRETTY_FUNCTION__)
 
 /// Records a timestamp when constructed and a timespan event when destructed,
 /// using \a name as the key.
-#define TRACE_SCOPE(name) \
-        _TRACE_SCOPE_INSTANCE(__LINE__, name)
+#define TRACE_SCOPE(name) _TRACE_SCOPE_INSTANCE(__LINE__, name)
 
 /// Records a timestamp when constructed and a timespan event when destructed,
 /// using the name of the function concatenated with \a name as the key.
 #define TRACE_FUNCTION_SCOPE(name) \
-        _TRACE_FUNCTION_SCOPE_INSTANCE( \
-            __LINE__, __ARCH_FUNCTION__, __ARCH_PRETTY_FUNCTION__, name)
+    _TRACE_FUNCTION_SCOPE_INSTANCE(__LINE__, __ARCH_FUNCTION__, __ARCH_PRETTY_FUNCTION__, name)
 
 /// Records a timestamp when constructed, using \a name as the key.
-#define TRACE_MARKER(name) \
-        _TRACE_MARKER_INSTANCE(__LINE__, name)
+#define TRACE_MARKER(name) _TRACE_MARKER_INSTANCE(__LINE__, name)
 
 /// Records a timestamp when constructed, using \a name as the key.
-#define TRACE_MARKER_DYNAMIC(name) \
-        _TRACE_MARKER_DYNAMIC_INSTANCE(__LINE__, name)
+#define TRACE_MARKER_DYNAMIC(name) _TRACE_MARKER_DYNAMIC_INSTANCE(__LINE__, name)
 
 /// Records a counter \a delta using the \a name as the counter key. The delta can
 /// be positive or negative. A positive delta will increment the total counter
 /// value, whereas a negative delta will decrement it. The recorded value will
 /// be stored at the currently traced scope, and will propagate up to the
 /// parent scopes.
-#define TRACE_COUNTER_DELTA(name, delta) \
-        _TRACE_COUNTER_INSTANCE(__LINE__, name, delta, /* isDelta */ true)
+#define TRACE_COUNTER_DELTA(name, delta) _TRACE_COUNTER_INSTANCE(__LINE__, name, delta, /* isDelta */ true)
 
-/// Records a counter delta using the name as the counter key. Similar to 
+/// Records a counter delta using the name as the counter key. Similar to
 /// TRACE_COUNTER_DELTA except that \p name does not need to be a compile time
 /// string.
 /// \sa TRACE_COUNTER_DELTA
-#define TRACE_COUNTER_DELTA_DYNAMIC(name, delta) \
-        TraceCollector::GetInstance().RecordCounterDelta(name, delta);
+#define TRACE_COUNTER_DELTA_DYNAMIC(name, delta) TraceCollector::GetInstance().RecordCounterDelta(name, delta);
 
-/// Records a counter value using the name as the counter key. The recorded 
+/// Records a counter value using the name as the counter key. The recorded
 /// value will be stored at the currently traced scope, and will propagate up to
 /// the parent scopes.
-#define TRACE_COUNTER_VALUE(name, value) \
-        _TRACE_COUNTER_INSTANCE(__LINE__, name, value, /* isDelta */ false)
+#define TRACE_COUNTER_VALUE(name, value) _TRACE_COUNTER_INSTANCE(__LINE__, name, value, /* isDelta */ false)
 
-/// Records a counter value using the name as the counter key. Similar to 
+/// Records a counter value using the name as the counter key. Similar to
 /// TRACE_COUNTER_VALUE except that \p name does not need to be a compile time
 /// string.
 /// \sa TRACE_COUNTER_VALUE
-#define TRACE_COUNTER_VALUE_DYNAMIC(name, value) \
-        TraceCollector::GetInstance().RecordCounterValue(name, value);
+#define TRACE_COUNTER_VALUE_DYNAMIC(name, value) TraceCollector::GetInstance().RecordCounterValue(name, value);
 
 /// Records a counter value using the name as the counter key. The value can
 /// be positive or negative. A positive value will increment the total counter
@@ -91,82 +82,64 @@
 /// TRACE_COUNTER_DELTA_CODE("My counter", {
 ///     value = _ComputeExpensiveCounterValue();
 /// })
-#define TRACE_COUNTER_DELTA_CODE(name, code) \
-        _TRACE_COUNTER_CODE_INSTANCE(__LINE__, name, code, true)
+#define TRACE_COUNTER_DELTA_CODE(name, code) _TRACE_COUNTER_CODE_INSTANCE(__LINE__, name, code, true)
 
 /// Records a begin event when constructed and an end event when destructed,
-/// using name of the function or method and the supplied name as the key. 
-/// Unlike TRACE_FUNCTION, the name argument will be evaluated each time this 
-/// macro is invoked. This allows for a single TRACE_FUNCTION to track time 
+/// using name of the function or method and the supplied name as the key.
+/// Unlike TRACE_FUNCTION, the name argument will be evaluated each time this
+/// macro is invoked. This allows for a single TRACE_FUNCTION to track time
 /// under different keys, but incurs greater overhead.
 #define TRACE_FUNCTION_DYNAMIC(name) \
-        _TRACE_FUNCTION_DYNAMIC_INSTANCE(__LINE__, __ARCH_FUNCTION__, __ARCH_PRETTY_FUNCTION__, name)
+    _TRACE_FUNCTION_DYNAMIC_INSTANCE(__LINE__, __ARCH_FUNCTION__, __ARCH_PRETTY_FUNCTION__, name)
 
 /// Records a begin event when constructed and an end event when destructed,
 /// using \a name as the key. Unlike TRACE_SCOPE, the name argument will
-/// be evaluated each time this macro is invoked. This allows for a single 
-/// TRACE_SCOPE to track time under different keys, but incurs greater 
+/// be evaluated each time this macro is invoked. This allows for a single
+/// TRACE_SCOPE to track time under different keys, but incurs greater
 /// overhead.
-#define TRACE_SCOPE_DYNAMIC(name) \
-        _TRACE_SCOPE_DYNAMIC_INSTANCE(__LINE__, name)
-
+#define TRACE_SCOPE_DYNAMIC(name) _TRACE_SCOPE_DYNAMIC_INSTANCE(__LINE__, name)
 
 /// These pair a uniquely named TraceScopeHolder with a TraceScopeAuto.
 /// Together these will register a TraceScope only the first time the
 /// code is executed or if the TraceScope expires.  Otherwise, the held
 /// TraceScope will be used to record begin and end events.
 
+#define _TRACE_FUNCTION_INSTANCE(instance, name, prettyName)                                          \
+    constexpr static PXR_NS::TraceStaticKeyData TF_PP_CAT(TraceKeyData_, instance)(name, prettyName); \
+    PXR_NS::TraceScopeAuto TF_PP_CAT(TraceScopeAuto_, instance)(TF_PP_CAT(TraceKeyData_, instance));
 
-#define _TRACE_FUNCTION_INSTANCE(instance, name, prettyName) \
-constexpr static PXR_NS::TraceStaticKeyData \
-    TF_PP_CAT(TraceKeyData_, instance)(name, prettyName); \
-PXR_NS::TraceScopeAuto TF_PP_CAT(TraceScopeAuto_, instance)(\
-    TF_PP_CAT(TraceKeyData_, instance));
+#define _TRACE_SCOPE_INSTANCE(instance, name)                                             \
+    constexpr static PXR_NS::TraceStaticKeyData TF_PP_CAT(TraceKeyData_, instance)(name); \
+    PXR_NS::TraceScopeAuto TF_PP_CAT(TraceScopeAuto_, instance)(TF_PP_CAT(TraceKeyData_, instance));
 
-#define _TRACE_SCOPE_INSTANCE(instance, name) \
-constexpr static PXR_NS::TraceStaticKeyData \
-    TF_PP_CAT(TraceKeyData_, instance)(name); \
-PXR_NS::TraceScopeAuto TF_PP_CAT(TraceScopeAuto_, instance)(\
-    TF_PP_CAT(TraceKeyData_, instance));
+#define _TRACE_FUNCTION_SCOPE_INSTANCE(instance, name, prettyName, scopeName)                                    \
+    constexpr static PXR_NS::TraceStaticKeyData TF_PP_CAT(TraceKeyData_, instance)(name, prettyName, scopeName); \
+    PXR_NS::TraceScopeAuto TF_PP_CAT(TraceScopeAuto_, instance)(TF_PP_CAT(TraceKeyData_, instance));
 
-#define _TRACE_FUNCTION_SCOPE_INSTANCE(instance, name, prettyName, scopeName) \
-constexpr static PXR_NS::TraceStaticKeyData \
-    TF_PP_CAT(TraceKeyData_, instance)(name, prettyName, scopeName); \
-PXR_NS::TraceScopeAuto TF_PP_CAT(TraceScopeAuto_, instance)(\
-    TF_PP_CAT(TraceKeyData_, instance));
-
-#define _TRACE_MARKER_INSTANCE(instance, name) \
-constexpr static PXR_NS::TraceStaticKeyData \
-    TF_PP_CAT(TraceKeyData_, instance)(name); \
+#define _TRACE_MARKER_INSTANCE(instance, name)                                            \
+    constexpr static PXR_NS::TraceStaticKeyData TF_PP_CAT(TraceKeyData_, instance)(name); \
     TraceCollector::GetInstance().MarkerEventStatic(TF_PP_CAT(TraceKeyData_, instance));
 
-#define _TRACE_COUNTER_INSTANCE(instance, name, value, isDelta) \
-constexpr static PXR_NS::TraceStaticKeyData \
-    TF_PP_CAT(TraceKeyData_, instance)(name); \
-static PXR_NS::TraceCounterHolder \
-    TF_PP_CAT(TraceCounterHolder_, instance) \
-    (TF_PP_CAT(TraceKeyData_, instance)); \
-TF_PP_CAT(TraceCounterHolder_, instance).Record(value, isDelta);
+#define _TRACE_COUNTER_INSTANCE(instance, name, value, isDelta)                                                     \
+    constexpr static PXR_NS::TraceStaticKeyData TF_PP_CAT(TraceKeyData_, instance)(name);                           \
+    static PXR_NS::TraceCounterHolder TF_PP_CAT(TraceCounterHolder_, instance)(TF_PP_CAT(TraceKeyData_, instance)); \
+    TF_PP_CAT(TraceCounterHolder_, instance).Record(value, isDelta);
 
-#define _TRACE_COUNTER_CODE_INSTANCE(instance, name, code, isDelta) \
-static PXR_NS::TraceCounterHolder \
-    TF_PP_CAT(TraceCounterHolder_, instance)(name); \
-if (TF_PP_CAT(TraceCounterHolder_, instance).IsEnabled()) { \
-    double value = 0.0; \
-    code \
-    TF_PP_CAT(TraceCounterHolder_, instance).RecordDelta(value, isDelta); \
-}
+#define _TRACE_COUNTER_CODE_INSTANCE(instance, name, code, isDelta)                   \
+    static PXR_NS::TraceCounterHolder TF_PP_CAT(TraceCounterHolder_, instance)(name); \
+    if (TF_PP_CAT(TraceCounterHolder_, instance).IsEnabled()) {                       \
+        double value = 0.0;                                                           \
+        code TF_PP_CAT(TraceCounterHolder_, instance).RecordDelta(value, isDelta);    \
+    }
 
 #define _TRACE_FUNCTION_DYNAMIC_INSTANCE(instance, fnName, fnPrettyName, name) \
-PXR_NS::TraceAuto TF_PP_CAT(TraceAuto_, instance)(fnName, fnPrettyName, name)
+    PXR_NS::TraceAuto TF_PP_CAT(TraceAuto_, instance)(fnName, fnPrettyName, name)
 
-#define _TRACE_SCOPE_DYNAMIC_INSTANCE(instance, str) \
-PXR_NS::TraceAuto TF_PP_CAT(TraceAuto_, instance)(str)
+#define _TRACE_SCOPE_DYNAMIC_INSTANCE(instance, str) PXR_NS::TraceAuto TF_PP_CAT(TraceAuto_, instance)(str)
 
-#define _TRACE_MARKER_DYNAMIC_INSTANCE(instance, name) \
-    TraceCollector::GetInstance().MarkerEvent(name);
+#define _TRACE_MARKER_DYNAMIC_INSTANCE(instance, name) TraceCollector::GetInstance().MarkerEvent(name);
 
-#else // TRACE_DISABLE
+#else  // TRACE_DISABLE
 
 #define TRACE_FUNCTION()
 #define TRACE_FUNCTION_DYNAMIC(name)
@@ -176,7 +149,7 @@ PXR_NS::TraceAuto TF_PP_CAT(TraceAuto_, instance)(str)
 #define TRACE_MARKER(name)
 #define TRACE_MARKER_DYNAMIC(name)
 
-#endif // TRACE_DISABLE
+#endif  // TRACE_DISABLE
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -191,20 +164,15 @@ public:
     /// Constructor for TRACE_FUNCTION macro.
     ///
     explicit TraceScopeAuto(const TraceStaticKeyData& key) noexcept
-        : _key(&key)
-        , _intervalTimer(/*start=*/TraceCollector::IsEnabled()) {
-    }
+        : _key(&key), _intervalTimer(/*start=*/TraceCollector::IsEnabled()) {}
 
     /// Constructor that also records scope arguments.
     ///
-    template < typename... Args>
-    TraceScopeAuto(const TraceStaticKeyData& key, Args&&... args)
-        : _key(&key)
-        , _intervalTimer(/*start=*/false) {
+    template <typename... Args>
+    TraceScopeAuto(const TraceStaticKeyData& key, Args&&... args) : _key(&key), _intervalTimer(/*start=*/false) {
         if (TraceCollector::IsEnabled()) {
             _intervalTimer.Start();
-            TraceCollector
-                ::GetInstance().ScopeArgs(std::forward<Args>(args)...);
+            TraceCollector ::GetInstance().ScopeArgs(std::forward<Args>(args)...);
         }
     }
 
@@ -212,13 +180,11 @@ public:
     ///
     ~TraceScopeAuto() noexcept {
         if (_intervalTimer.IsStarted()) {
-            TraceCollector::TimeStamp stopTicks =
-                _intervalTimer.GetCurrentTicks();
-            TraceCollector::Scope(
-                *_key, _intervalTimer.GetStartTicks(), stopTicks);
+            TraceCollector::TimeStamp stopTicks = _intervalTimer.GetCurrentTicks();
+            TraceCollector::Scope(*_key, _intervalTimer.GetStartTicks(), stopTicks);
         }
     }
-    
+
 private:
     const TraceStaticKeyData* const _key;
     ArchIntervalTimer _intervalTimer;
@@ -231,15 +197,14 @@ private:
 /// end event when it is destructed.  It is intended to help ensure begin-end
 /// pairing correctness when the begin-end pairing can be expressed by automatic
 /// variable lifetime.
-/// 
+///
 /// The TRACE_FUNCTION() macro may be even more convenient in some
 /// circumstances.
 ///
 struct TraceAuto {
     /// Constructor taking function name, pretty function name and a scope name.
     ///
-    TraceAuto(const char *funcName, const char *prettyFuncName,
-              const std::string &name) 
+    TraceAuto(const char* funcName, const char* prettyFuncName, const std::string& name)
         : _key(_CreateKeyString(funcName, prettyFuncName, name)) {
         std::atomic_thread_fence(std::memory_order_seq_cst);
         _collector = &TraceCollector::GetInstance();
@@ -249,8 +214,7 @@ struct TraceAuto {
 
     /// Constructor taking a TfToken key.
     ///
-    explicit TraceAuto(const TfToken& key)
-        : _key(key) {
+    explicit TraceAuto(const TfToken& key) : _key(key) {
         std::atomic_thread_fence(std::memory_order_seq_cst);
         _collector = &TraceCollector::GetInstance();
         _collector->BeginEvent(_key);
@@ -259,18 +223,17 @@ struct TraceAuto {
 
     /// Constructor taking a string key.
     ///
-    explicit TraceAuto(const std::string& key) 
-        : TraceAuto(TfToken(key)) {}
+    explicit TraceAuto(const std::string& key) : TraceAuto(TfToken(key)) {}
 
     // Non-copyable
     //
-    TraceAuto(const TraceAuto &) = delete;
-    TraceAuto& operator=(const TraceAuto &) = delete;
+    TraceAuto(const TraceAuto&) = delete;
+    TraceAuto& operator=(const TraceAuto&) = delete;
 
     // Non-movable
     //
-    TraceAuto(TraceAuto &&) = delete;
-    TraceAuto& operator=(TraceAuto &&) = delete;
+    TraceAuto(TraceAuto&&) = delete;
+    TraceAuto& operator=(TraceAuto&&) = delete;
 
     /// Destructor.
     ///
@@ -281,10 +244,7 @@ struct TraceAuto {
     }
 
 private:
-    static std::string _CreateKeyString(
-        const char *funcName,
-        const char *prettyFuncName,
-        const std::string &name) {
+    static std::string _CreateKeyString(const char* funcName, const char* prettyFuncName, const std::string& name) {
         std::string key = ArchGetPrettierFunctionName(funcName, prettyFuncName);
         key += " [";
         key += name;
@@ -306,14 +266,11 @@ class TraceCounterHolder {
 public:
     /// Constructor used by TRACE_COUNTER_* macro.
     ///
-    explicit TraceCounterHolder(const TraceKey& key) 
-        : _key(key) {}
+    explicit TraceCounterHolder(const TraceKey& key) : _key(key) {}
 
     /// Returns whether the TraceCollector is enabled or not.
     ///
-    bool IsEnabled() const {
-        return TraceCollector::IsEnabled();
-    }
+    bool IsEnabled() const { return TraceCollector::IsEnabled(); }
 
     /// Records a counter delta \p value if the TraceCollector is enabled.
     ///
@@ -331,4 +288,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_TRACE_H
+#endif  // PXR_BASE_TRACE_TRACE_H

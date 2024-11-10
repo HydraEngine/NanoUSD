@@ -33,7 +33,7 @@ public:
     public:
         /// Constructor from string literals.
         template <size_t N>
-        constexpr StringLiteral(const char(&s)[N]) : str(s) {}
+        constexpr StringLiteral(const char (&s)[N]) : str(s) {}
 
         /// Default Constructor.
         constexpr StringLiteral() : str(nullptr) {}
@@ -45,26 +45,20 @@ public:
     };
 
     /// Constructor for a \p name.
-    constexpr TraceStaticKeyData(const StringLiteral name) 
-        : _name(name.str) {}
-    
-    /// Constructor for a function (\p func, \p prettyFunc) and optional 
+    constexpr TraceStaticKeyData(const StringLiteral name) : _name(name.str) {}
+
+    /// Constructor for a function (\p func, \p prettyFunc) and optional
     /// scope \p name.
-    constexpr TraceStaticKeyData(
-        const StringLiteral func,
-        const StringLiteral prettyFunc,
-        const StringLiteral name = StringLiteral())
-        : _funcName(func.str)
-        , _prettyFuncName(prettyFunc.str)
-        , _name(name.str) {}
+    constexpr TraceStaticKeyData(const StringLiteral func,
+                                 const StringLiteral prettyFunc,
+                                 const StringLiteral name = StringLiteral())
+        : _funcName(func.str), _prettyFuncName(prettyFunc.str), _name(name.str) {}
 
     /// Equality comparison.  Inequality is also defined.
     TRACE_API
-    bool operator == (const TraceStaticKeyData& other) const;
+    bool operator==(const TraceStaticKeyData& other) const;
 
-    bool operator != (const TraceStaticKeyData& other) const {
-        return !(*this == other);
-    }
+    bool operator!=(const TraceStaticKeyData& other) const { return !(*this == other); }
 
     /// Returns the string representation of the key data.
     TRACE_API
@@ -82,4 +76,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_STATIC_KEY_DATA_H
+#endif  // PXR_BASE_TRACE_STATIC_KEY_DATA_H

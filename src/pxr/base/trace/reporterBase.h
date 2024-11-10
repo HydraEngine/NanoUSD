@@ -28,12 +28,11 @@ TF_DECLARE_WEAK_AND_REF_PTRS(TraceReporterBase);
 ////////////////////////////////////////////////////////////////////////////////
 /// \class TraceReporterBase
 ///
-/// This class is a base class for report implementations. It handles receiving 
+/// This class is a base class for report implementations. It handles receiving
 /// and processing of TraceCollections.
 ///
 ///
-class TraceReporterBase :
-    public TfRefBase, public TfWeakBase {
+class TraceReporterBase : public TfRefBase, public TfWeakBase {
 public:
     using This = TraceReporterBase;
     using ThisPtr = TraceReporterBasePtr;
@@ -49,6 +48,7 @@ public:
 
     /// Write all collections that were processed by this reporter to \p ostr.
     TRACE_API bool SerializeProcessedCollections(std::ostream& ostr) const;
+
 protected:
     /// Removes all references to TraceCollections.
     TRACE_API void _Clear();
@@ -67,4 +67,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_REPORTER_BASE_H
+#endif  // PXR_BASE_TRACE_REPORTER_BASE_H

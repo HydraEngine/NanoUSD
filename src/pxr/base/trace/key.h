@@ -11,13 +11,12 @@
 #include "pxr/pxr.h"
 #include "pxr/base/trace/staticKeyData.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \class TraceKey
 ///
-/// A wrapper around a TraceStaticKeyData pointer that is stored in TraceEvent 
+/// A wrapper around a TraceStaticKeyData pointer that is stored in TraceEvent
 /// instances.
 ///
 class TraceKey {
@@ -26,7 +25,7 @@ public:
     constexpr TraceKey(const TraceStaticKeyData& data) : _ptr(&data) {}
 
     /// Equality comparison.
-    bool operator == (const TraceKey& other) const {
+    bool operator==(const TraceKey& other) const {
         if (_ptr == other._ptr) {
             return true;
         } else {
@@ -35,15 +34,11 @@ public:
     }
 
     /// Hash function.
-    size_t Hash() const {
-        return reinterpret_cast<size_t>(_ptr)/sizeof(TraceStaticKeyData);
-    }
+    size_t Hash() const { return reinterpret_cast<size_t>(_ptr) / sizeof(TraceStaticKeyData); }
 
     /// A Hash functor which may be used to store keys in a TfHashMap.
     struct HashFunctor {
-        size_t operator()(const TraceKey& key) const {
-            return key.Hash();
-        }
+        size_t operator()(const TraceKey& key) const { return key.Hash(); }
     };
 
 private:
@@ -55,4 +50,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_KEY_H
+#endif  // PXR_BASE_TRACE_KEY_H

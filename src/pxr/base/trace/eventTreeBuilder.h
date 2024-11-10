@@ -24,8 +24,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This class creates a tree of TraceEventTree instances from
 /// TraceCollection instances.
 ///
-class Trace_EventTreeBuilder
-    : protected TraceCollection::Visitor {
+class Trace_EventTreeBuilder : protected TraceCollection::Visitor {
 public:
     /// Constructor.
     Trace_EventTreeBuilder();
@@ -37,8 +36,7 @@ public:
     TRACE_API void CreateTree(const TraceCollection& collection);
 
     /// Set the value of the counters.
-    void SetCounterValues(
-        const TraceEventTree::CounterMap& counterValues) {
+    void SetCounterValues(const TraceEventTree::CounterMap& counterValues) {
         _counterAccum.SetCurrentValues(counterValues);
     }
 
@@ -50,12 +48,10 @@ protected:
     virtual bool AcceptsCategory(TraceCategoryId) override;
     virtual void OnBeginThread(const TraceThreadId&) override;
     virtual void OnEndThread(const TraceThreadId&) override;
-    virtual void OnEvent(
-        const TraceThreadId&, const TfToken&, const TraceEvent&) override;
+    virtual void OnEvent(const TraceThreadId&, const TfToken&, const TraceEvent&) override;
     /// @}
 
 private:
-
     // Helper class for event graph creation.
     struct _PendingEventNode {
         using TimeStamp = TraceEvent::TimeStamp;
@@ -66,20 +62,20 @@ private:
             TraceEventNode::AttributeData data;
         };
 
-        _PendingEventNode( const TfToken& key, 
-                                 TraceCategoryId category,
-                                 TimeStamp start,
-                                 TimeStamp end,
-                                 bool separateEvents,
-                                 bool isComplete);
+        _PendingEventNode(const TfToken& key,
+                          TraceCategoryId category,
+                          TimeStamp start,
+                          TimeStamp end,
+                          bool separateEvents,
+                          bool isComplete);
         TraceEventNodeRefPtr Close();
 
         // Can move this, but not copy it
         _PendingEventNode(const _PendingEventNode&) = delete;
-        _PendingEventNode& operator= (const _PendingEventNode&) = delete;
+        _PendingEventNode& operator=(const _PendingEventNode&) = delete;
 
         _PendingEventNode(_PendingEventNode&&) = default;
-        _PendingEventNode& operator= (_PendingEventNode&&) = default;
+        _PendingEventNode& operator=(_PendingEventNode&&) = default;
 
         TfToken key;
         TraceCategoryId category;
@@ -100,7 +96,7 @@ private:
     using _PendingNodeStack = std::vector<_PendingEventNode>;
     using _ThreadStackMap = std::map<TraceThreadId, _PendingNodeStack>;
 
-    void _PopAndClose(_PendingNodeStack& stack); 
+    void _PopAndClose(_PendingNodeStack& stack);
 
     TraceEventNodeRefPtr _root;
     _ThreadStackMap _threadStacks;
@@ -117,4 +113,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_EVENT_TREE_BUILDER_H
+#endif  // PXR_BASE_TRACE_EVENT_TREE_BUILDER_H

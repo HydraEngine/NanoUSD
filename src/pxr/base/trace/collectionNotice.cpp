@@ -13,10 +13,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType)
-{
-    TfType::Define< TraceCollectionAvailable,
-        TfType::Bases<TfNotice> >();
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<TraceCollectionAvailable, TfType::Bases<TfNotice>>();
 }
 
 TraceCollectionAvailable::~TraceCollectionAvailable() {}

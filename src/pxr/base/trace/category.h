@@ -30,24 +30,23 @@ using TraceCategoryId = uint32_t;
 ///
 /// \class TraceCategory
 ///
-/// This singleton class provides a way to mark TraceEvent instances with 
-/// category Ids which can be used to filter them. This class also provides a 
+/// This singleton class provides a way to mark TraceEvent instances with
+/// category Ids which can be used to filter them. This class also provides a
 /// way to associate TraceCategoryId values with human readable names.
 ///
 class TraceCategory {
 public:
     /// Computes an id for the given a string literal \p str.
     template <int N>
-    static constexpr TraceCategoryId CreateTraceCategoryId(
-        const char (&str)[N]) {
+    static constexpr TraceCategoryId CreateTraceCategoryId(const char (&str)[N]) {
         return TraceStringHash::Hash(str);
     }
 
-    /// Default category if none are explicitly specified when creating a 
+    /// Default category if none are explicitly specified when creating a
     /// TraceEvent.
     enum : TraceCategoryId { Default = 0 };
 
-    /// Associates the \p id with \p name. These associates are not necessarily 
+    /// Associates the \p id with \p name. These associates are not necessarily
     /// unique.
     TRACE_API void RegisterCategory(TraceCategoryId id, const std::string& name);
 
@@ -70,4 +69,4 @@ TRACE_API_TEMPLATE_CLASS(TfSingleton<TraceCategory>);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_CATEGORY_H
+#endif  // PXR_BASE_TRACE_CATEGORY_H

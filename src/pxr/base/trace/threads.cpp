@@ -14,8 +14,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TraceThreadId::TraceThreadId()
-{
+TraceThreadId::TraceThreadId() {
     if (std::this_thread::get_id() == ArchGetMainThreadId()) {
         _id = "Main Thread";
     } else {
@@ -25,25 +24,18 @@ TraceThreadId::TraceThreadId()
     }
 }
 
-TraceThreadId::TraceThreadId(const std::string& s)
-    : _id(s)
-{}
+TraceThreadId::TraceThreadId(const std::string& s) : _id(s) {}
 
-bool
-TraceThreadId::operator==(const TraceThreadId& rhs) const
-{
+bool TraceThreadId::operator==(const TraceThreadId& rhs) const {
     return _id == rhs._id;
 }
 
-bool
-TraceThreadId::operator<(const TraceThreadId& rhs) const
-{
-    // Because thread ids are stored in a string, sort the shorter strings to 
+bool TraceThreadId::operator<(const TraceThreadId& rhs) const {
+    // Because thread ids are stored in a string, sort the shorter strings to
     // the front of the list. This results is a numerically sorted list rather
-    // than an alphabetically sorted one, assuming all the thread ids are in 
+    // than an alphabetically sorted one, assuming all the thread ids are in
     // the form of "Thread XXX" or "XXX".
-    return _id.length() != rhs._id.length() ? 
-        _id.length() < rhs._id.length() : _id < rhs._id;
+    return _id.length() != rhs._id.length() ? _id.length() < rhs._id.length() : _id < rhs._id;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

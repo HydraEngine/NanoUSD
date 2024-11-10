@@ -39,7 +39,6 @@ TF_DECLARE_WEAK_AND_REF_PTRS(TraceAggregateNode);
 
 class TraceAggregateNode : public TfRefBase, public TfWeakBase {
 public:
-
     using This = TraceAggregateNode;
     using ThisPtr = TraceAggregateNodePtr;
     using ThisRefPtr = TraceAggregateNodeRefPtr;
@@ -48,39 +47,32 @@ public:
 
     // This class is only used for validity checks.
     // FIXME: This class should be removed.
-    class Id
-    {
+    class Id {
     public:
         Id() : _valid(false) {}
         Id(const TraceThreadId&) : _valid(true) {}
         bool IsValid() const { return _valid; }
+
     private:
         bool _valid;
     };
 
-    static ThisRefPtr New() {
-        return This::New(Id(), TfToken("root"), 0, 0);
-    }
+    static ThisRefPtr New() { return This::New(Id(), TfToken("root"), 0, 0); }
 
-    static ThisRefPtr New(const Id &id,
-                          const TfToken &key,
-                          const TimeStamp ts,
-                          const int count = 1,
-                          const int exclusiveCount = 1) {
+    static ThisRefPtr New(
+            const Id& id, const TfToken& key, const TimeStamp ts, const int count = 1, const int exclusiveCount = 1) {
         return TfCreateRefPtr(new This(id, key, ts, count, exclusiveCount));
     }
 
-    TRACE_API TraceAggregateNodeRefPtr 
-    Append(Id id, const TfToken &key, TimeStamp ts,
-           int c = 1, int xc = 1);
+    TRACE_API TraceAggregateNodeRefPtr Append(Id id, const TfToken& key, TimeStamp ts, int c = 1, int xc = 1);
 
     TRACE_API void Append(TraceAggregateNodeRefPtr child);
 
     /// Returns the node's key.
-    TfToken GetKey() { return _key;}
+    TfToken GetKey() { return _key; }
 
     /// Returns the node's id.
-    const Id &GetId() { return _id;}
+    const Id& GetId() { return _id; }
 
     /// \name Profile Data Accessors
     /// @{
@@ -91,17 +83,14 @@ public:
     /// Returns the time spent in this node but not its children.
     TRACE_API TimeStamp GetExclusiveTime(bool recursive = false);
 
-    /// Returns the call count of this node. \p recursive determines if 
+    /// Returns the call count of this node. \p recursive determines if
     /// recursive calls are counted.
-    int GetCount(bool recursive = false) const {
-        return recursive ? _recursiveCount : _count; 
-    }
+    int GetCount(bool recursive = false) const { return recursive ? _recursiveCount : _count; }
 
     /// Returns the exclusive count.
     int GetExclusiveCount() const { return _exclusiveCount; }
 
     /// @}
-
 
     /// \name Counter Value Accessors
     /// @{
@@ -116,39 +105,29 @@ public:
 
     /// @}
 
-    /// Recursively calculates the inclusive counter values from the inclusive 
+    /// Recursively calculates the inclusive counter values from the inclusive
     /// and exclusive counts of child nodes.
     TRACE_API void CalculateInclusiveCounterValues();
-
 
     /// \name Children Accessors
     /// @{
     const TraceAggregateNodePtrVector GetChildren() {
         // convert to a vector of weak ptrs
-        return TraceAggregateNodePtrVector( _children.begin(),_children.end() );
+        return TraceAggregateNodePtrVector(_children.begin(), _children.end());
     }
 
-    const TraceAggregateNodeRefPtrVector &GetChildrenRef() {
-        return _children;
-    }
+    const TraceAggregateNodeRefPtrVector& GetChildrenRef() { return _children; }
 
-    TRACE_API TraceAggregateNodeRefPtr GetChild(const TfToken &key);
-    TraceAggregateNodeRefPtr GetChild(const std::string &key) {
-        return GetChild(TfToken(key));
-    }
+    TRACE_API TraceAggregateNodeRefPtr GetChild(const TfToken& key);
+    TraceAggregateNodeRefPtr GetChild(const std::string& key) { return GetChild(TfToken(key)); }
 
     /// @}
 
-
     /// Sets whether or not this node is expanded in a gui.
-    void SetExpanded(bool expanded) {
-        _expanded = expanded;
-    }
+    void SetExpanded(bool expanded) { _expanded = expanded; }
 
     /// Returns whether this node is expanded in a gui.
-    bool IsExpanded() {
-        return _expanded;
-    }
+    bool IsExpanded() { return _expanded; }
 
     /// Subtract \p scopeOverhead cost times the number of descendant nodes from
     /// the inclusive time of each node.  If \p numDescendantNodes is not null,
@@ -158,9 +137,9 @@ public:
     /// parent's exclusive time, but instead set their times to zero.  This way
     /// we retain the sample count, but do not pollute the parent node's
     /// exclusive time with noise.
-    TRACE_API void AdjustForOverheadAndNoise(
-        TimeStamp scopeOverhead, TimeStamp timerQuantum,
-        uint64_t *numDescendantNodes = nullptr);
+    TRACE_API void AdjustForOverheadAndNoise(TimeStamp scopeOverhead,
+                                             TimeStamp timerQuantum,
+                                             uint64_t* numDescendantNodes = nullptr);
 
     /// \name Recursion
     /// @{
@@ -172,48 +151,52 @@ public:
     /// data is invalid in the node.
     TRACE_API void MarkRecursiveChildren();
 
-    /// Returns true if this node is simply a marker for a merged recursive 
+    /// Returns true if this node is simply a marker for a merged recursive
     /// subtree; otherwise returns false.
     ///
-    /// This value is meaningless until this node or any of its ancestors have 
+    /// This value is meaningless until this node or any of its ancestors have
     /// been marked with MarkRecursiveChildren().
     bool IsRecursionMarker() const { return _isRecursionMarker; }
 
     /// Returns true if this node is the head of a recursive call tree
-    /// (i.e. the function has been called recursively).  
+    /// (i.e. the function has been called recursively).
     ///
-    /// This value is meaningless until this node or any of its ancestors have 
+    /// This value is meaningless until this node or any of its ancestors have
     /// been marked with MarkRecursiveChildren().
     bool IsRecursionHead() const { return _isRecursionHead; }
 
     /// @}
 
-
 private:
-
-    TraceAggregateNode(const Id &id, const TfToken &key, TimeStamp ts,
-              int count, int exclusiveCount) :
-        _id(id), _key(key), _ts(ts), _exclusiveTs(ts),
-        _count(count), _exclusiveCount(exclusiveCount),
-        _recursiveCount(count), _recursiveExclusiveTs(ts), _expanded(false), 
-        _isRecursionMarker(false), _isRecursionHead(false),
-        _isRecursionProcessed(false) {}
+    TraceAggregateNode(const Id& id, const TfToken& key, TimeStamp ts, int count, int exclusiveCount)
+        : _id(id),
+          _key(key),
+          _ts(ts),
+          _exclusiveTs(ts),
+          _count(count),
+          _exclusiveCount(exclusiveCount),
+          _recursiveCount(count),
+          _recursiveExclusiveTs(ts),
+          _expanded(false),
+          _isRecursionMarker(false),
+          _isRecursionHead(false),
+          _isRecursionProcessed(false) {}
 
     using _ChildDictionary = TfDenseHashMap<TfToken, size_t, TfHash>;
 
-    void _MergeRecursive(const TraceAggregateNodeRefPtr &node);
+    void _MergeRecursive(const TraceAggregateNodeRefPtr& node);
 
     void _SetAsRecursionMarker(TraceAggregateNodePtr parent);
 
     Id _id;
     TfToken _key;
 
-    TimeStamp _ts;  
+    TimeStamp _ts;
     TimeStamp _exclusiveTs;
     int _count;
     int _exclusiveCount;
 
-    // We keep the recursive counts separate so that we don't mess with 
+    // We keep the recursive counts separate so that we don't mess with
     // the collected data.
     int _recursiveCount;
     TraceAggregateNodePtr _recursionParent;
@@ -235,26 +218,26 @@ private:
 
     // The counter values associated with specific counter indices
     _CounterValues _counterValues;
-    
+
     unsigned int
-    // If multiple Trace Editors are to be pointed at the same Reporter, this
-    // might have to be changed
-                _expanded:1,
+            // If multiple Trace Editors are to be pointed at the same Reporter, this
+            // might have to be changed
+            _expanded : 1,
 
-    // This flag keeps track of whether or not this node is simply intended
-    // as a marker for the start of a recursive call tree.
-                _isRecursionMarker:1,
+            // This flag keeps track of whether or not this node is simply intended
+            // as a marker for the start of a recursive call tree.
+            _isRecursionMarker : 1,
 
-    // This flag keeps track of whether or not a node is the head of a
-    // recursive call tree.  In other words, if it is a function that has been
-    // called recursively.
-                _isRecursionHead:1,
+            // This flag keeps track of whether or not a node is the head of a
+            // recursive call tree.  In other words, if it is a function that has been
+            // called recursively.
+            _isRecursionHead : 1,
 
-    // This flag is used during recursive traversal to mark the node as having 
-    // been visited and avoid too much processing.
-                _isRecursionProcessed:1;
+            // This flag is used during recursive traversal to mark the node as having
+            // been visited and avoid too much processing.
+            _isRecursionProcessed : 1;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_AGGREGATE_NODE_H
+#endif  // PXR_BASE_TRACE_AGGREGATE_NODE_H

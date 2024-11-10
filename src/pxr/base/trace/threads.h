@@ -38,14 +38,15 @@ public:
 
     /// Less than operator.
     TRACE_API bool operator<(const TraceThreadId&) const;
+
 private:
     std::string _id;
 };
 
 inline TraceThreadId TraceGetThreadId() {
-    return  TraceThreadId();
+    return TraceThreadId();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_THREADS_H
+#endif  // PXR_BASE_TRACE_THREADS_H

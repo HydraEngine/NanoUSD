@@ -11,30 +11,18 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TraceEventNodeRefPtr
-TraceEventNode::Append(
-    const TfToken &key, 
-    TraceCategoryId category, 
-    TimeStamp beginTime, 
-    TimeStamp endTime,
-    bool separateEvents)
-{
-    TraceEventNodeRefPtr n = 
-        TraceEventNode::New(
-            key, category, beginTime, endTime, {}, separateEvents);
+TraceEventNodeRefPtr TraceEventNode::Append(
+        const TfToken& key, TraceCategoryId category, TimeStamp beginTime, TimeStamp endTime, bool separateEvents) {
+    TraceEventNodeRefPtr n = TraceEventNode::New(key, category, beginTime, endTime, {}, separateEvents);
     _children.push_back(n);
     return n;
 }
 
-void
-TraceEventNode::Append(TraceEventNodeRefPtr node)
-{
+void TraceEventNode::Append(TraceEventNodeRefPtr node) {
     _children.push_back(node);
 }
 
-void 
-TraceEventNode::SetBeginAndEndTimesFromChildren()
-{
+void TraceEventNode::SetBeginAndEndTimesFromChildren() {
     if (_children.empty()) {
         _beginTime = 0;
         _endTime = 0;
@@ -42,19 +30,15 @@ TraceEventNode::SetBeginAndEndTimesFromChildren()
     }
 
     _beginTime = std::numeric_limits<TimeStamp>::max();
-    _endTime   = std::numeric_limits<TimeStamp>::min();
+    _endTime = std::numeric_limits<TimeStamp>::min();
 
     for (const TraceEventNodeRefPtr& c : _children) {
         _beginTime = std::min(_beginTime, c->GetBeginTime());
-        _endTime   = std::max(_endTime, c->GetEndTime());
+        _endTime = std::max(_endTime, c->GetEndTime());
     }
-
 }
 
-void
-TraceEventNode::AddAttribute(
-    const TfToken& key, const AttributeData& attr)
-{
+void TraceEventNode::AddAttribute(const TfToken& key, const AttributeData& attr) {
     _attributes.emplace(key, attr);
 }
 

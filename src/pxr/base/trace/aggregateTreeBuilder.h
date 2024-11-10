@@ -24,17 +24,14 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// TraceCollection instances.
 ///
 ///
-class Trace_AggregateTreeBuilder : private TraceCollection::Visitor
-{
+class Trace_AggregateTreeBuilder : private TraceCollection::Visitor {
 public:
-    static void AddEventTreeToAggregate(
-        TraceAggregateTree* aggregateTree,
-        const TraceEventTreeRefPtr& eventTree,
-        const TraceCollection& collection);
+    static void AddEventTreeToAggregate(TraceAggregateTree* aggregateTree,
+                                        const TraceEventTreeRefPtr& eventTree,
+                                        const TraceCollection& collection);
 
 private:
-    Trace_AggregateTreeBuilder(
-        TraceAggregateTree* tree, const TraceEventTreeRefPtr& eventTree);
+    Trace_AggregateTreeBuilder(TraceAggregateTree* tree, const TraceEventTreeRefPtr& eventTree);
 
     void _ProcessCounters(const TraceCollection& collection);
 
@@ -46,17 +43,11 @@ private:
     virtual void OnBeginThread(const TraceThreadId& threadId) override;
     virtual void OnEndThread(const TraceThreadId& threadId) override;
     virtual bool AcceptsCategory(TraceCategoryId categoryId) override;
-    virtual void OnEvent(
-        const TraceThreadId& threadIndex, 
-        const TfToken& key, 
-        const TraceEvent& e) override;
+    virtual void OnEvent(const TraceThreadId& threadIndex, const TfToken& key, const TraceEvent& e) override;
 
-    void _OnCounterEvent(const TraceThreadId& threadIndex, 
-        const TfToken& key, 
-        const TraceEvent& e);
+    void _OnCounterEvent(const TraceThreadId& threadIndex, const TfToken& key, const TraceEvent& e);
 
-    TraceAggregateNodePtr _FindAggregateNode(
-        const TraceThreadId& threadId, const TraceEvent::TimeStamp ts) const ;
+    TraceAggregateNodePtr _FindAggregateNode(const TraceThreadId& threadId, const TraceEvent::TimeStamp ts) const;
 
     TraceAggregateTree* _aggregateTree;
     TraceEventTreeRefPtr _tree;
@@ -64,4 +55,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_AGGREGATE_TREE_BUILDER_H
+#endif  // PXR_BASE_TRACE_AGGREGATE_TREE_BUILDER_H

@@ -26,9 +26,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 template <typename T>
 class TraceConcurrentList {
-
     // Linked list node that is cache line aligned to prevent false sharing.
-    struct alignas(ARCH_CACHE_LINE_SIZE*2) Node {
+    struct alignas(ARCH_CACHE_LINE_SIZE * 2) Node {
         T value;
         Node* next;
     };
@@ -51,13 +50,9 @@ public:
 
         iterator() : _node(nullptr) {}
 
-        pointer operator->() {
-            return _node ? &_node->value : nullptr;
-        }
+        pointer operator->() { return _node ? &_node->value : nullptr; }
 
-        reference operator*() {
-            return _node->value;
-        }
+        reference operator*() { return _node->value; }
 
         iterator& operator++() {
             _node = _node->next;
@@ -70,13 +65,9 @@ public:
             return result;
         }
 
-        bool operator !=(const iterator& other) const {
-            return _node != other._node;
-        }
+        bool operator!=(const iterator& other) const { return _node != other._node; }
 
-        bool operator ==(const iterator& other) const {
-            return _node == other._node;
-        }
+        bool operator==(const iterator& other) const { return _node == other._node; }
 
     private:
         explicit iterator(Node* node) : _node(node) {}
@@ -113,7 +104,7 @@ public:
     /// the newly created item.
     iterator Insert() {
         Node* newNode = _alloc.allocate(1);
-        new(newNode) Node();
+        new (newNode) Node();
 
         // Add the node to the linked list in an atomic manner.
         do {
@@ -129,4 +120,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_CONCURRENT_LIST_H
+#endif  // PXR_BASE_TRACE_CONCURRENT_LIST_H

@@ -39,9 +39,7 @@ public:
     using CounterMap = TfHashMap<TfToken, double, TfToken::HashFunctor>;
 
     /// Create an empty tree
-    static ThisRefPtr New() {
-        return TfCreateRefPtr(new This());
-    }
+    static ThisRefPtr New() { return TfCreateRefPtr(new This()); }
 
     /// Returns the root node of the tree.
     TraceAggregateNodePtr GetRoot() { return _root; }
@@ -56,27 +54,25 @@ public:
 
     /// Returns the numeric index associated with a counter key. Counter values
     /// on the event nodes will have to be looked up by the numeric index.
-    TRACE_API int GetCounterIndex(const TfToken &key) const;
+    TRACE_API int GetCounterIndex(const TfToken& key) const;
 
     /// Add a counter to the tree. This method can be used to restore a
     /// previous trace state and tree. Note, that the counter being added must
     /// have a unique key and index. The method will return false if a key or
     /// index already exists.
-    TRACE_API bool AddCounter(const TfToken &key, int index, double totalValue);
+    TRACE_API bool AddCounter(const TfToken& key, int index, double totalValue);
 
     /// Removes all data and nodes from the tree.
     TRACE_API void Clear();
 
-    /// Creates new nodes and counter data from data in \p eventTree and \p 
-    /// collection. 
-    TRACE_API void Append(
-        const TraceEventTreeRefPtr& eventTree,
-        const TraceCollection& collection);
+    /// Creates new nodes and counter data from data in \p eventTree and \p
+    /// collection.
+    TRACE_API void Append(const TraceEventTreeRefPtr& eventTree, const TraceCollection& collection);
 
 private:
     TRACE_API TraceAggregateTree();
 
-    using _CounterIndexMap =TfHashMap<TfToken, int, TfToken::HashFunctor>;
+    using _CounterIndexMap = TfHashMap<TfToken, int, TfToken::HashFunctor>;
 
     TraceAggregateNodeRefPtr _root;
     EventTimes _eventTimes;
@@ -89,4 +85,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_AGGREGATE_TREE_H
+#endif  // PXR_BASE_TRACE_AGGREGATE_TREE_H

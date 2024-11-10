@@ -38,7 +38,7 @@ public:
 
     /// Ctor for UInt type.
     explicit TraceEventData(uint64_t i) : _data(i) {}
-    
+
     /// Ctor for Float type.
     explicit TraceEventData(double d) : _data(d) {}
 
@@ -70,11 +70,10 @@ private:
     // Type that represents no data was stored in an event.
     struct _NoData {};
 
-    using Variant = 
-        std::variant<_NoData, std::string, bool, int64_t, uint64_t, double>;
+    using Variant = std::variant<_NoData, std::string, bool, int64_t, uint64_t, double>;
     Variant _data;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TRACE_EVENT_DATA_H
+#endif  // PXR_BASE_TRACE_EVENT_DATA_H

@@ -33,8 +33,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 // We define the empty stub for ABI compatibility even if Python support is
 // enabled so we can make sure size and alignment is the same.
-class TfPyObjWrapperStub
-{
+class TfPyObjWrapperStub {
 public:
     static constexpr std::size_t Size = 16;
     static constexpr std::size_t Align = 8;
@@ -45,7 +44,6 @@ private:
     std::aligned_storage<Size, Align>::type _stub;
     ARCH_PRAGMA_POP
 };
-
 
 /// \class TfPyObjWrapper
 ///
@@ -74,13 +72,10 @@ private:
 /// However it is important to note that callers must ensure the GIL is held
 /// before using these operators!
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
-class TfPyObjWrapper
-    : public pxr_boost::python::api::object_operators<TfPyObjWrapper>
-{
+class TfPyObjWrapper : public pxr_boost::python::api::object_operators<TfPyObjWrapper> {
     typedef pxr_boost::python::object object;
 
 public:
-
     /// Default construct a TfPyObjWrapper holding a reference to python None.
     /// The GIL need not be held by the caller.
     TF_API TfPyObjWrapper();
@@ -95,9 +90,7 @@ public:
     /// held to call this.  However, the caller is strongly advised to ensure
     /// the GIL is held, since assigning this object to another or otherwise
     /// operating on the returned object requires it.
-    object const &Get() const {
-        return *_objectPtr;
-    }
+    object const& Get() const { return *_objectPtr; }
 
     /// Underlying PyObject* access.
     /// This method returns a pointer, so technically, the GIL need not be
@@ -106,50 +99,41 @@ public:
     /// operating on the returned object requires it.  The returned PyObject *
     /// is a "borrowed reference", meaning that the underlying object's
     /// reference count has not been incremented on behalf of the caller.
-    TF_API PyObject *ptr() const;
+    TF_API PyObject* ptr() const;
 
     /// Produce a hash code for this object.
     /// Note that this does not attempt to hash the underlying python object,
     /// it returns a hash code that's suitable for hash-table lookup of
     /// TfPyObjWrapper instances, and does not require taking the python lock.
-    friend inline size_t hash_value(TfPyObjWrapper const &o) {
-        return (size_t) o.ptr();
-    }
+    friend inline size_t hash_value(TfPyObjWrapper const& o) { return (size_t)o.ptr(); }
 
     /// Equality.
     /// Returns true if \a other refers to the same python object.
-    TF_API bool operator==(TfPyObjWrapper const &other) const;
+    TF_API bool operator==(TfPyObjWrapper const& other) const;
 
     /// Inequality.
     /// Returns false if \a other refers to the same python object.
-    TF_API bool operator!=(TfPyObjWrapper const &other) const;
+    TF_API bool operator!=(TfPyObjWrapper const& other) const;
 
 private:
-
     // Befriend object_operators to allow it access to implicit conversion to
     // pxr_boost::python::object.
     friend class pxr_boost::python::api::object_operators<TfPyObjWrapper>;
-    operator object const &() const {
-        return Get();
-    }
+    operator object const&() const { return Get(); }
 
     // Store a shared_ptr to a python object.
     std::shared_ptr<object> _objectPtr;
 };
 
-static_assert(sizeof(TfPyObjWrapper) == sizeof(TfPyObjWrapperStub),
-              "ABI break: Incompatible class sizes.");
-static_assert(alignof(TfPyObjWrapper) == alignof(TfPyObjWrapperStub),
-              "ABI break: Incompatible class alignments.");
+static_assert(sizeof(TfPyObjWrapper) == sizeof(TfPyObjWrapperStub), "ABI break: Incompatible class sizes.");
+static_assert(alignof(TfPyObjWrapper) == alignof(TfPyObjWrapperStub), "ABI break: Incompatible class alignments.");
 
-#else // PXR_PYTHON_SUPPORT_ENABLED
+#else  // PXR_PYTHON_SUPPORT_ENABLED
 
-class TfPyObjWrapper : TfPyObjWrapperStub
-{
-};
+class TfPyObjWrapper : TfPyObjWrapperStub {};
 
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_PY_OBJ_WRAPPER_H
+#endif  // PXR_BASE_TF_PY_OBJ_WRAPPER_H
