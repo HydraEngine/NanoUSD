@@ -28,32 +28,28 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 class Vt_ValueFromPythonRegistry {
 public:
-
     static bool HasConversions() {
-        return !_GetInstance()._lvalueExtractors.empty() &&
-               !_GetInstance()._rvalueExtractors.empty();
+        return !_GetInstance()._lvalueExtractors.empty() && !_GetInstance()._rvalueExtractors.empty();
     }
-    
-    VT_API static VtValue Invoke(PyObject *obj);
+
+    VT_API static VtValue Invoke(PyObject* obj);
 
     template <class T>
     static void Register(bool registerRvalue) {
         if (!TfPyIsInitialized()) {
-            TF_FATAL_ERROR("Tried to register a VtValue from python conversion "
-                           "but python is not initialized!");
+            TF_FATAL_ERROR(
+                    "Tried to register a VtValue from python conversion "
+                    "but python is not initialized!");
         }
         _GetInstance()._RegisterLValue(_Extractor::MakeLValue<T>());
-        if (registerRvalue)
-            _GetInstance()._RegisterRValue(_Extractor::MakeRValue<T>());
+        if (registerRvalue) _GetInstance()._RegisterRValue(_Extractor::MakeRValue<T>());
     }
 
     Vt_ValueFromPythonRegistry(Vt_ValueFromPythonRegistry const&) = delete;
-    Vt_ValueFromPythonRegistry& operator=(
-        Vt_ValueFromPythonRegistry const&) = delete;
+    Vt_ValueFromPythonRegistry& operator=(Vt_ValueFromPythonRegistry const&) = delete;
 
-    Vt_ValueFromPythonRegistry(Vt_ValueFromPythonRegistry &&) = delete;
-    Vt_ValueFromPythonRegistry& operator=(
-        Vt_ValueFromPythonRegistry &&) = delete;
+    Vt_ValueFromPythonRegistry(Vt_ValueFromPythonRegistry&&) = delete;
+    Vt_ValueFromPythonRegistry& operator=(Vt_ValueFromPythonRegistry&&) = delete;
 
 private:
     Vt_ValueFromPythonRegistry() {}
@@ -63,35 +59,32 @@ private:
 
     class _Extractor {
     private:
-        using _ExtractFunc = VtValue (*)(PyObject *);
+        using _ExtractFunc = VtValue (*)(PyObject*);
 
         // _ExtractLValue will attempt to obtain an l-value T from the python
         // object it's passed.  This effectively disallows type conversions
         // (other than things like derived-to-base type conversions).
         template <class T>
-        static VtValue _ExtractLValue(PyObject *);
+        static VtValue _ExtractLValue(PyObject*);
 
         // _ExtractRValue will attempt to obtain an r-value T from the python
         // object it's passed.  This allows boost.python to invoke type
         // conversions to produce the T.
         template <class T>
-        static VtValue _ExtractRValue(PyObject *);
+        static VtValue _ExtractRValue(PyObject*);
 
     public:
-
         template <class T>
         static _Extractor MakeLValue() {
             return _Extractor(&_ExtractLValue<T>);
         }
-        
+
         template <class T>
         static _Extractor MakeRValue() {
             return _Extractor(&_ExtractRValue<T>);
         }
-        
-        VtValue Invoke(PyObject *obj) const {
-            return _extract(obj);
-        }
+
+        VtValue Invoke(PyObject* obj) const { return _extract(obj); }
 
     private:
         explicit _Extractor(_ExtractFunc extract) : _extract(extract) {}
@@ -99,38 +92,33 @@ private:
         _ExtractFunc _extract;
     };
 
-    VT_API static Vt_ValueFromPythonRegistry &_GetInstance() {
+    VT_API static Vt_ValueFromPythonRegistry& _GetInstance() {
         return TfSingleton<Vt_ValueFromPythonRegistry>::GetInstance();
     }
-    
-    VT_API void _RegisterLValue(_Extractor const &e);
-    VT_API void _RegisterRValue(_Extractor const &e);
-    
+
+    VT_API void _RegisterLValue(_Extractor const& e);
+    VT_API void _RegisterRValue(_Extractor const& e);
+
     std::vector<_Extractor> _lvalueExtractors;
     std::vector<_Extractor> _rvalueExtractors;
 
-    typedef TfHashMap<PyObject *, _Extractor, TfHash> _LValueExtractorCache;
+    typedef TfHashMap<PyObject*, _Extractor, TfHash> _LValueExtractorCache;
     _LValueExtractorCache _lvalueExtractorCache;
-
 };
 
 VT_API_TEMPLATE_CLASS(TfSingleton<Vt_ValueFromPythonRegistry>);
 
 template <class T>
-VtValue Vt_ValueFromPythonRegistry::
-_Extractor::_ExtractLValue(PyObject *obj) {
-    pxr_boost::python::extract<T &> x(obj);
-    if (x.check())
-        return VtValue(x());
+VtValue Vt_ValueFromPythonRegistry::_Extractor::_ExtractLValue(PyObject* obj) {
+    pxr_boost::python::extract<T&> x(obj);
+    if (x.check()) return VtValue(x());
     return VtValue();
 }
 
 template <class T>
-VtValue Vt_ValueFromPythonRegistry::
-_Extractor::_ExtractRValue(PyObject *obj) {
+VtValue Vt_ValueFromPythonRegistry::_Extractor::_ExtractRValue(PyObject* obj) {
     pxr_boost::python::extract<T> x(obj);
-    if (x.check())
-        return VtValue(x());
+    if (x.check()) return VtValue(x());
     return VtValue();
 }
 
@@ -146,4 +134,4 @@ void VtValueFromPythonLValue() {
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_VT_VALUE_FROM_PYTHON_H
+#endif  // PXR_BASE_VT_VALUE_FROM_PYTHON_H

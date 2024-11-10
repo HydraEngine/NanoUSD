@@ -18,20 +18,17 @@ namespace Vt_ValueVisitDetail {
 // These two overloads do SFINAE to detect whether the visitor can be invoked
 // with the given held type T.  If the visitor cannot be invoked with T, it is
 // instead invoked with the VtValue itself.
-template <class T, class Visitor,
-    class = decltype(std::declval<Visitor>()(std::declval<T>()))>
-auto
-Visit(VtValue const &val, Visitor &&visitor, int) {
+template <class T, class Visitor, class = decltype(std::declval<Visitor>()(std::declval<T>()))>
+auto Visit(VtValue const& val, Visitor&& visitor, int) {
     return std::forward<Visitor>(visitor)(val.UncheckedGet<T>());
 }
 
 template <class T, class Visitor>
-auto
-Visit(VtValue const &val, Visitor &&visitor, ...) {
+auto Visit(VtValue const& val, Visitor&& visitor, ...) {
     return std::forward<Visitor>(visitor)(val);
 }
 
-} // Vt_ValueVisitDetail
+}  // namespace Vt_ValueVisitDetail
 
 /// Invoke \p visitor with \p value's held object if \p value holds an object of
 /// one of the "known" value types (those in VT_VALUE_TYPES, see vt/types.h).
@@ -85,29 +82,25 @@ Visit(VtValue const &val, Visitor &&visitor, ...) {
 /// VtVisitValue(VtValue("not-convertible-to-double"), AsDouble()) -> NaN.
 /// \endcode
 template <class Visitor>
-auto VtVisitValue(VtValue const &value, Visitor &&visitor)
-{
+auto VtVisitValue(VtValue const& value, Visitor&& visitor) {
     // This generally gets the compiler to emit a jump table to dispatch
     // directly to the code for each known value type.
     switch (value.GetKnownValueTypeIndex()) {
-
 // Cases for known types.
-#define VT_CASE_FOR_TYPE_INDEX(unused, elem)                                   \
-        case VtGetKnownValueTypeIndex<VT_TYPE(elem)>():                        \
-            return Vt_ValueVisitDetail::Visit<VT_TYPE(elem)>(                  \
-                value, std::forward<Visitor>(visitor), 0);                     \
-            break;
-TF_PP_SEQ_FOR_EACH(VT_CASE_FOR_TYPE_INDEX, ~, VT_VALUE_TYPES)
+#define VT_CASE_FOR_TYPE_INDEX(unused, elem)                                                        \
+    case VtGetKnownValueTypeIndex<VT_TYPE(elem)>():                                                 \
+        return Vt_ValueVisitDetail::Visit<VT_TYPE(elem)>(value, std::forward<Visitor>(visitor), 0); \
+        break;
+        TF_PP_SEQ_FOR_EACH(VT_CASE_FOR_TYPE_INDEX, ~, VT_VALUE_TYPES)
 #undef VT_CASE_FOR_TYPE_INDEX
-    
+
         default:
             // Invoke visitor with value itself.
-            return Vt_ValueVisitDetail::Visit<VtValue>(
-                value, std::forward<Visitor>(visitor), 0);
+            return Vt_ValueVisitDetail::Visit<VtValue>(value, std::forward<Visitor>(visitor), 0);
             break;
     };
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_VT_VISIT_VALUE_H
+#endif  // PXR_BASE_VT_VISIT_VALUE_H

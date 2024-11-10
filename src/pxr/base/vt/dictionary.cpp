@@ -33,18 +33,13 @@ TF_MAKE_STATIC_DATA(VtDictionary, _emptyDictionary) {
 }
 
 VtDictionary::VtDictionary(VtDictionary const& other) {
-    if (other._dictMap)
-        _dictMap.reset(new _Map(*other._dictMap));
+    if (other._dictMap) _dictMap.reset(new _Map(*other._dictMap));
 }
 
-VtDictionary::VtDictionary(std::initializer_list<value_type> init)
-    : _dictMap(new _Map(init.begin(), init.end()))
-{
-}
-   
+VtDictionary::VtDictionary(std::initializer_list<value_type> init) : _dictMap(new _Map(init.begin(), init.end())) {}
+
 VtDictionary& VtDictionary::operator=(VtDictionary const& other) {
-    if (this != &other)
-        _dictMap.reset(other._dictMap ? new _Map(*other._dictMap) : 0);
+    if (this != &other) _dictMap.reset(other._dictMap ? new _Map(*other._dictMap) : 0);
     return *this;
 }
 
@@ -61,7 +56,7 @@ VtDictionary::size_type VtDictionary::count(const string& key) const {
 VtDictionary::size_type VtDictionary::count(const char* key) const {
     return _dictMap ? _dictMap->count(key) : 0;
 }
-    
+
 VtDictionary::size_type VtDictionary::erase(const string& key) {
     return _dictMap ? _dictMap->erase(key) : 0;
 }
@@ -71,45 +66,36 @@ void VtDictionary::erase(iterator it) {
 }
 
 void VtDictionary::erase(iterator f, iterator l) {
-    if (!_dictMap)
-        return;
-    _dictMap->erase(f.GetUnderlyingIterator(_dictMap.get()),
-        l.GetUnderlyingIterator(_dictMap.get()));
+    if (!_dictMap) return;
+    _dictMap->erase(f.GetUnderlyingIterator(_dictMap.get()), l.GetUnderlyingIterator(_dictMap.get()));
 }
 
 void VtDictionary::clear() {
-    if (_dictMap)
-        _dictMap->clear();
+    if (_dictMap) _dictMap->clear();
 }
 
 VtDictionary::iterator VtDictionary::find(const string& key) {
-    return _dictMap ? iterator(_dictMap.get(), _dictMap->find(key))
-        : iterator(); 
+    return _dictMap ? iterator(_dictMap.get(), _dictMap->find(key)) : iterator();
 }
 
 VtDictionary::iterator VtDictionary::find(const char* key) {
-    return _dictMap ? iterator(_dictMap.get(), _dictMap->find(key))
-        : iterator(); 
+    return _dictMap ? iterator(_dictMap.get(), _dictMap->find(key)) : iterator();
 }
 
 VtDictionary::const_iterator VtDictionary::find(const string& key) const {
-    return _dictMap ? const_iterator(_dictMap.get(), _dictMap->find(key))
-        : const_iterator(); 
+    return _dictMap ? const_iterator(_dictMap.get(), _dictMap->find(key)) : const_iterator();
 }
 
 VtDictionary::const_iterator VtDictionary::find(const char* key) const {
-    return _dictMap ? const_iterator(_dictMap.get(), _dictMap->find(key))
-        : const_iterator(); 
+    return _dictMap ? const_iterator(_dictMap.get(), _dictMap->find(key)) : const_iterator();
 }
 
 VtDictionary::iterator VtDictionary::begin() {
-    return _dictMap ? iterator(_dictMap.get(), _dictMap->begin())
-        : iterator(); 
+    return _dictMap ? iterator(_dictMap.get(), _dictMap->begin()) : iterator();
 }
 
 VtDictionary::const_iterator VtDictionary::begin() const {
-    return _dictMap ? const_iterator(_dictMap.get(), _dictMap->begin())
-        : const_iterator(); 
+    return _dictMap ? const_iterator(_dictMap.get(), _dictMap->begin()) : const_iterator();
 }
 
 VtDictionary::iterator VtDictionary::end() {
@@ -132,41 +118,31 @@ void VtDictionary::swap(VtDictionary& dict) {
     _dictMap.swap(dict._dictMap);
 }
 
-std::pair<VtDictionary::iterator, bool>
-VtDictionary::insert(const value_type& obj) {
+std::pair<VtDictionary::iterator, bool> VtDictionary::insert(const value_type& obj) {
     TfAutoMallocTag2 tag("Vt", "VtDictionary::insert");
     _CreateDictIfNeeded();
     std::pair<_Map::iterator, bool> inserted = _dictMap->insert(obj);
-    return std::pair<iterator, bool>(
-        iterator(_dictMap.get(), inserted.first), inserted.second);
+    return std::pair<iterator, bool>(iterator(_dictMap.get(), inserted.first), inserted.second);
 }
 
-VtValue const *
-VtDictionary::GetValueAtPath(string const &keyPath,
-                             char const *delimiters) const
-{
+VtValue const* VtDictionary::GetValueAtPath(string const& keyPath, char const* delimiters) const {
     return GetValueAtPath(TfStringSplit(keyPath, delimiters));
 }
 
-VtValue const *
-VtDictionary::GetValueAtPath(vector<string> const &keyElems) const
-{
+VtValue const* VtDictionary::GetValueAtPath(vector<string> const& keyElems) const {
     // Search for keyElems in dictionary.  All elements but the last in
     // keyElems must identify sub-dictionaries.
-    if (keyElems.empty())
-        return NULL;
+    if (keyElems.empty()) return NULL;
 
     // Walk up to the last element.
-    vector<string>::const_iterator
-        start = keyElems.begin(), last = keyElems.end() - 1;
+    vector<string>::const_iterator start = keyElems.begin(), last = keyElems.end() - 1;
 
     // Descend dictionaries according to the key path elements.  If we fail
     // to find a dictionary element at any point, we can bail out.
-    VtDictionary const *dict = this;
+    VtDictionary const* dict = this;
     for (vector<string>::const_iterator i = start; i != last; ++i) {
         const_iterator j = dict->find(*i);
-        if (j == dict->end() || !j->second.IsHolding<VtDictionary>())
-            return NULL;
+        if (j == dict->end() || !j->second.IsHolding<VtDictionary>()) return NULL;
         dict = &j->second.UncheckedGet<VtDictionary>();
     }
 
@@ -176,11 +152,9 @@ VtDictionary::GetValueAtPath(vector<string> const &keyElems) const
     return j != dict->end() ? &j->second : NULL;
 }
 
-void
-VtDictionary::_SetValueAtPathImpl(vector<string>::const_iterator curKeyElem,
-                                  vector<string>::const_iterator keyElemEnd,
-                                  VtValue const &value)
-{
+void VtDictionary::_SetValueAtPathImpl(vector<string>::const_iterator curKeyElem,
+                                       vector<string>::const_iterator keyElemEnd,
+                                       VtValue const& value) {
     // Look ahead to see if we're on the last path element.  If so, we can set
     // the final value in place and return.
     vector<string>::const_iterator nextKeyElem = curKeyElem;
@@ -209,29 +183,19 @@ VtDictionary::_SetValueAtPathImpl(vector<string>::const_iterator curKeyElem,
     i->second.Swap(newDict);
 }
 
-void
-VtDictionary::SetValueAtPath(
-    string const &keyPath, VtValue const &value, char const *delimiters)
-{
+void VtDictionary::SetValueAtPath(string const& keyPath, VtValue const& value, char const* delimiters) {
     vector<string> keyElems = TfStringSplit(keyPath, delimiters);
-    if (keyElems.empty())
-        return;
+    if (keyElems.empty()) return;
     _SetValueAtPathImpl(keyElems.begin(), keyElems.end(), value);
 }
 
-void
-VtDictionary::SetValueAtPath(
-    vector<string> const &keyPath, VtValue const &value)
-{
-    if (keyPath.empty())
-        return;
+void VtDictionary::SetValueAtPath(vector<string> const& keyPath, VtValue const& value) {
+    if (keyPath.empty()) return;
     _SetValueAtPathImpl(keyPath.begin(), keyPath.end(), value);
 }
 
-void
-VtDictionary::_EraseValueAtPathImpl(vector<string>::const_iterator curKeyElem,
-                                    vector<string>::const_iterator keyElemEnd)
-{
+void VtDictionary::_EraseValueAtPathImpl(vector<string>::const_iterator curKeyElem,
+                                         vector<string>::const_iterator keyElemEnd) {
     // Look ahead to see if we're on the last path element.  If so we can kill
     // the element at this path and return.
     vector<string>::const_iterator nextKeyElem = curKeyElem;
@@ -257,26 +221,18 @@ VtDictionary::_EraseValueAtPathImpl(vector<string>::const_iterator curKeyElem,
     }
 }
 
-void
-VtDictionary::EraseValueAtPath(
-    string const &keyPath, char const *delimiters)
-{
+void VtDictionary::EraseValueAtPath(string const& keyPath, char const* delimiters) {
     vector<string> keyElems = TfStringSplit(keyPath, delimiters);
-    if (keyElems.empty())
-        return;
+    if (keyElems.empty()) return;
 
     _EraseValueAtPathImpl(keyElems.begin(), keyElems.end());
 }
 
-void
-VtDictionary::EraseValueAtPath(vector<string> const &keyPath)
-{
-    if (keyPath.empty())
-        return;
+void VtDictionary::EraseValueAtPath(vector<string> const& keyPath) {
+    if (keyPath.empty()) return;
 
     _EraseValueAtPathImpl(keyPath.begin(), keyPath.end());
 }
-
 
 void VtDictionary::_CreateDictIfNeeded() {
     if (!_dictMap) {
@@ -285,26 +241,19 @@ void VtDictionary::_CreateDictIfNeeded() {
     }
 }
 
-
-VtDictionary const &VtGetEmptyDictionary() {
+VtDictionary const& VtGetEmptyDictionary() {
     return *_emptyDictionary;
 }
 
 Vt_DefaultGenerator VtDefault;
 
-VtDictionary
-VtDictionaryOver(const VtDictionary &strong, const VtDictionary &weak,
-                 bool coerceToWeakerOpinionType)
-{
+VtDictionary VtDictionaryOver(const VtDictionary& strong, const VtDictionary& weak, bool coerceToWeakerOpinionType) {
     VtDictionary result = strong;
     VtDictionaryOver(&result, weak, coerceToWeakerOpinionType);
     return result;
 }
 
-void
-VtDictionaryOver(VtDictionary *strong, const VtDictionary &weak,
-                 bool coerceToWeakerOpinionType)
-{
+void VtDictionaryOver(VtDictionary* strong, const VtDictionary& weak, bool coerceToWeakerOpinionType) {
     if (!strong) {
         TF_CODING_ERROR("VtDictionaryOver: NULL dictionary pointer.");
         return;
@@ -321,10 +270,7 @@ VtDictionaryOver(VtDictionary *strong, const VtDictionary &weak,
     }
 }
 
-void
-VtDictionaryOver(const VtDictionary &strong, VtDictionary *weak,
-                 bool coerceToWeakerOpinionType)
-{
+void VtDictionaryOver(const VtDictionary& strong, VtDictionary* weak, bool coerceToWeakerOpinionType) {
     if (!weak) {
         TF_CODING_ERROR("VtDictionaryOver: NULL dictionary pointer");
         return;
@@ -334,13 +280,11 @@ VtDictionaryOver(const VtDictionary &strong, VtDictionary *weak,
             VtDictionary::iterator j = weak->find(it->first);
             if (j == weak->end()) {
                 weak->insert(*it);
-            }
-            else {
+            } else {
                 j->second = VtValue::CastToTypeOf(it->second, j->second);
             }
         }
-    }
-    else {
+    } else {
         // Can't use map::insert here, because that doesn't overwrite
         // values for keys in strong that are already in weak.
         TF_FOR_ALL(it, strong) {
@@ -349,32 +293,26 @@ VtDictionaryOver(const VtDictionary &strong, VtDictionary *weak,
     }
 }
 
-VtDictionary
-VtDictionaryOverRecursive(const VtDictionary &strong, const VtDictionary &weak,
-                          bool coerceToWeakerOpinionType)
-{
+VtDictionary VtDictionaryOverRecursive(const VtDictionary& strong,
+                                       const VtDictionary& weak,
+                                       bool coerceToWeakerOpinionType) {
     VtDictionary result = strong;
     VtDictionaryOverRecursive(&result, weak, coerceToWeakerOpinionType);
     return result;
 }
 
-void
-VtDictionaryOverRecursive(VtDictionary *strong, const VtDictionary &weak,
-                          bool coerceToWeakerOpinionType)
-{
+void VtDictionaryOverRecursive(VtDictionary* strong, const VtDictionary& weak, bool coerceToWeakerOpinionType) {
     if (!strong) {
         TF_CODING_ERROR("VtDictionaryOverRecursive: NULL dictionary pointer.");
         return;
     }
 
     TF_FOR_ALL(it, weak) {
-        // If both dictionaries have values that are in turn dictionaries, 
+        // If both dictionaries have values that are in turn dictionaries,
         // recurse:
         if (VtDictionaryIsHolding<VtDictionary>(*strong, it->first) &&
             VtDictionaryIsHolding<VtDictionary>(weak, it->first)) {
-
-            const VtDictionary &weakSubDict =
-                VtDictionaryGet<VtDictionary>(weak, it->first);
+            const VtDictionary& weakSubDict = VtDictionaryGet<VtDictionary>(weak, it->first);
 
             // Swap out the stored dictionary, mutate it, then swap it back in
             // place.  This avoids expensive copying.  There may still be a copy
@@ -388,9 +326,9 @@ VtDictionaryOverRecursive(VtDictionary *strong, const VtDictionary &weak,
             i->second.Swap(strongSubDict);
 
         } else {
-            // Insert will set strong with value from weak only if 
+            // Insert will set strong with value from weak only if
             // strong does not already have a value for that key.
-            std::pair<VtDictionary::iterator, bool> result =strong->insert(*it);
+            std::pair<VtDictionary::iterator, bool> result = strong->insert(*it);
             if (!result.second && coerceToWeakerOpinionType) {
                 result.first->second.CastToTypeOf(it->second);
             }
@@ -398,23 +336,18 @@ VtDictionaryOverRecursive(VtDictionary *strong, const VtDictionary &weak,
     }
 }
 
-void
-VtDictionaryOverRecursive(const VtDictionary &strong, VtDictionary *weak,
-                          bool coerceToWeakerOpinionType)
-{
+void VtDictionaryOverRecursive(const VtDictionary& strong, VtDictionary* weak, bool coerceToWeakerOpinionType) {
     if (!weak) {
         TF_CODING_ERROR("VtDictionaryOverRecursive: NULL dictionary pointer.");
         return;
     }
 
     TF_FOR_ALL(it, strong) {
-        // If both dictionaries have values that are in turn dictionaries, 
+        // If both dictionaries have values that are in turn dictionaries,
         // recurse:
         if (VtDictionaryIsHolding<VtDictionary>(strong, it->first) &&
             VtDictionaryIsHolding<VtDictionary>(*weak, it->first)) {
-
-            VtDictionary const &strongSubDict =
-                VtDictionaryGet<VtDictionary>(strong, it->first);
+            VtDictionary const& strongSubDict = VtDictionaryGet<VtDictionary>(strong, it->first);
 
             // Swap out the stored dictionary, mutate it, then swap it back in
             // place.  This avoids expensive copying.  There may still be a copy
@@ -442,9 +375,7 @@ VtDictionaryOverRecursive(const VtDictionary &strong, VtDictionary *weak,
     }
 }
 
-
-bool operator==(VtDictionary const &lhs, VtDictionary const &rhs)
-{
+bool operator==(VtDictionary const& lhs, VtDictionary const& rhs) {
     if (lhs.size() != rhs.size()) {
         return false;
     }
@@ -452,7 +383,7 @@ bool operator==(VtDictionary const &lhs, VtDictionary const &rhs)
     // Iterate over all key-value pairs in the left-hand side dictionary
     // and check if they match up with the content of the right-hand
     // side dictionary.
-    TF_FOR_ALL(it, lhs){
+    TF_FOR_ALL(it, lhs) {
         VtDictionary::const_iterator it2 = rhs.find(it->first);
         if (it2 == rhs.end()) {
             return false;
@@ -464,14 +395,11 @@ bool operator==(VtDictionary const &lhs, VtDictionary const &rhs)
     return true;
 }
 
-bool operator!=(VtDictionary const &lhs, VtDictionary const &rhs)
-{
+bool operator!=(VtDictionary const& lhs, VtDictionary const& rhs) {
     return !(lhs == rhs);
 }
 
-std::ostream &
-operator<<(std::ostream &stream, VtDictionary const &dict)
-{
+std::ostream& operator<<(std::ostream& stream, VtDictionary const& dict) {
     bool first = true;
     stream << '{';
     TF_FOR_ALL(i, dict) {
@@ -486,4 +414,3 @@ operator<<(std::ostream &stream, VtDictionary const &dict)
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

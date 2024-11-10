@@ -50,4 +50,4 @@
 #include "pxr/base/gf/vec4h.h"
 #include "pxr/base/gf/vec4i.h"
 
-#endif // PXR_BASE_VT_TYPE_HEADERS_H
+#endif  // PXR_BASE_VT_TYPE_HEADERS_H

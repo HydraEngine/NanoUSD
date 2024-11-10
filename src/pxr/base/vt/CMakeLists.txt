@@ -1,84 +1,31 @@
-set(PXR_PREFIX pxr/base)
-set(PXR_PACKAGE vt)
+#  Copyright (c) 2023 Feng Yang
+#
+#  I am making my contributions/submissions to this project solely in my
+#  personal capacity and am not conveying any rights to any intellectual
+#  property of any third parties.
 
-pxr_library(vt
-    LIBRARIES
-        arch
-        tf
-        gf
-        trace
-        ${TBB_tbb_LIBRARY}
+# create sample app project
+project(vt LANGUAGES C CXX)
 
-    INCLUDE_DIRS
-        ${TBB_INCLUDE_DIRS}
-
-    PUBLIC_CLASSES
-        array
-        dictionary
-        hash
-        streamOut
-        types
-        value
-
-    PYTHON_PUBLIC_CLASSES
-        arrayPyBuffer
-        valueFromPython
-        wrapArray
-
-    PUBLIC_HEADERS
-        api.h
-        traits.h
-        typeHeaders.h
-        visitValue.h
-    
-    PYTHON_PUBLIC_HEADERS
-        pyOperators.h
-
-    PYTHON_CPPFILES
-        moduleDeps.cpp
-
-    PYMODULE_CPPFILES
-        module.cpp
-        wrapArrayBase.cpp
-        wrapArrayDualQuaternion.cpp
-        wrapArrayFloat.cpp
-        wrapArrayIntegral.cpp
-        wrapArrayMatrix.cpp
-        wrapArrayQuaternion.cpp
-        wrapArrayRange.cpp
-        wrapArrayString.cpp
-        wrapArrayToken.cpp
-        wrapArrayVec.cpp
-        wrapDictionary.cpp
-        wrapValue.cpp
-
-    PYMODULE_FILES
-        __init__.py
-
-    DOXYGEN_FILES
-        overview.dox
+set(SRC_FILES
+        array.cpp
+        dictionary.cpp
+        hash.cpp
+        streamOut.cpp
+        types.cpp
+        value.cpp
 )
 
-pxr_build_test(testVtCpp
-    LIBRARIES
-        tf
-        gf
-        vt
-    CPPFILES
-        testenv/testVtCpp.cpp
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+        ${PXR_INCLUDE_PATH}
 )
-pxr_test_scripts(
-    testenv/testVtArray.py
-    testenv/testVtValue.py
+
+target_link_libraries(${PROJECT_NAME} PUBLIC
+        fmt::fmt
+        Eigen3::Eigen
+        TBB::tbb
 )
-pxr_register_test(testVtValue
-    PYTHON
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testVtValue"
-)
-pxr_register_test(testVtArray
-    PYTHON
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testVtArray"
-)
-pxr_register_test(testVtCpp
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testVtCpp"
-)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
