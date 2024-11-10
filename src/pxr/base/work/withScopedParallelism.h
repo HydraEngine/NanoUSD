@@ -96,14 +96,11 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// released the GIL, it reacquires it before returning.
 ///
 template <class Fn>
-auto
-WorkWithScopedParallelism(Fn &&fn, bool dropPythonGIL=true)
-{
+auto WorkWithScopedParallelism(Fn&& fn, bool dropPythonGIL = true) {
     if (dropPythonGIL) {
         TF_PY_ALLOW_THREADS_IN_SCOPE();
         return tbb::this_task_arena::isolate(std::forward<Fn>(fn));
-    }
-    else {
+    } else {
         return tbb::this_task_arena::isolate(std::forward<Fn>(fn));
     }
 }
@@ -115,17 +112,16 @@ WorkWithScopedParallelism(Fn &&fn, bool dropPythonGIL=true)
 /// dispatcher instance.  The \p dropPythonGIL argument has the same meaning as
 /// it does for WorkWithScopedParallelism().
 template <class Fn>
-auto
-WorkWithScopedDispatcher(Fn &&fn, bool dropPythonGIL=true)
-{
-    return WorkWithScopedParallelism([&fn]() {
-        WorkDispatcher dispatcher;
-        return std::forward<Fn>(fn)(dispatcher);
-        // dispatcher's destructor invokes Wait() here.
-    }, dropPythonGIL);
+auto WorkWithScopedDispatcher(Fn&& fn, bool dropPythonGIL = true) {
+    return WorkWithScopedParallelism(
+            [&fn]() {
+                WorkDispatcher dispatcher;
+                return std::forward<Fn>(fn)(dispatcher);
+                // dispatcher's destructor invokes Wait() here.
+            },
+            dropPythonGIL);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_WORK_WITH_SCOPED_PARALLELISM_H
-
+#endif  // PXR_BASE_WORK_WITH_SCOPED_PARALLELISM_H

@@ -62,8 +62,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Additionally, Wait() must never be called by a task added by Run(), since
 /// that task could never complete.
 ///
-class WorkDispatcher
-{
+class WorkDispatcher {
 public:
     /// Construct a new dispatcher.
     WORK_API WorkDispatcher();
@@ -71,8 +70,8 @@ public:
     /// Wait() for any pending tasks to complete, then destroy the dispatcher.
     WORK_API ~WorkDispatcher() noexcept;
 
-    WorkDispatcher(WorkDispatcher const &) = delete;
-    WorkDispatcher &operator=(WorkDispatcher const &) = delete;
+    WorkDispatcher(WorkDispatcher const&) = delete;
+    WorkDispatcher& operator=(WorkDispatcher const&) = delete;
 
 #ifdef doxygen
 
@@ -87,27 +86,26 @@ public:
     /// but not completed, or may be completed upon return.  No guarantee is
     /// made.
     template <class Callable, class A1, class A2, ... class AN>
-    void Run(Callable &&c, A1 &&a1, A2 &&a2, ... AN &&aN);
+    void Run(Callable&& c, A1&& a1, A2&& a2, ... AN&& aN);
 
-#else // doxygen
+#else  // doxygen
 
     template <class Callable>
-    inline void Run(Callable &&c) {
+    inline void Run(Callable&& c) {
 #if TBB_INTERFACE_VERSION_MAJOR >= 12
-        _taskGroup.run(_InvokerTask<typename std::remove_reference<Callable>::type>(std::forward<Callable>(c), &_errors));
+        _taskGroup.run(
+                _InvokerTask<typename std::remove_reference<Callable>::type>(std::forward<Callable>(c), &_errors));
 #else
         _rootTask->spawn(_MakeInvokerTask(std::forward<Callable>(c)));
 #endif
     }
 
-    template <class Callable, class A0, class ... Args>
-    inline void Run(Callable &&c, A0 &&a0, Args&&... args) {
-        Run(std::bind(std::forward<Callable>(c),
-                      std::forward<A0>(a0),
-                      std::forward<Args>(args)...));
+    template <class Callable, class A0, class... Args>
+    inline void Run(Callable&& c, A0&& a0, Args&&... args) {
+        Run(std::bind(std::forward<Callable>(c), std::forward<A0>(a0), std::forward<Args>(args)...));
     }
-    
-#endif // doxygen
+
+#endif  // doxygen
 
     /// Block until the work started by Run() completes.
     WORK_API void Wait();
@@ -133,64 +131,57 @@ private:
 #if TBB_INTERFACE_VERSION_MAJOR >= 12
     template <class Fn>
     struct _InvokerTask {
-        explicit _InvokerTask(Fn &&fn, _ErrorTransports *err) 
-            : _fn(std::move(fn)), _errors(err) {}
+        explicit _InvokerTask(Fn&& fn, _ErrorTransports* err) : _fn(std::move(fn)), _errors(err) {}
 
-        explicit _InvokerTask(Fn const &fn, _ErrorTransports *err) 
-            : _fn(fn), _errors(err) {}
+        explicit _InvokerTask(Fn const& fn, _ErrorTransports* err) : _fn(fn), _errors(err) {}
 
         // Ensure only moves happen, no copies.
-        _InvokerTask(_InvokerTask &&other) = default;
-        _InvokerTask(const _InvokerTask &other) = delete;
-        _InvokerTask &operator=(const _InvokerTask &other) = delete;
+        _InvokerTask(_InvokerTask&& other) = default;
+        _InvokerTask(const _InvokerTask& other) = delete;
+        _InvokerTask& operator=(const _InvokerTask& other) = delete;
 
         void operator()() const {
             TfErrorMark m;
             _fn();
-            if (!m.IsClean())
-                WorkDispatcher::_TransportErrors(m, _errors);
+            if (!m.IsClean()) WorkDispatcher::_TransportErrors(m, _errors);
         }
+
     private:
         Fn _fn;
-        _ErrorTransports *_errors;
+        _ErrorTransports* _errors;
     };
 #else
     template <class Fn>
     struct _InvokerTask : public tbb::task {
-        explicit _InvokerTask(Fn &&fn, _ErrorTransports *err)
-            : _fn(std::move(fn)), _errors(err) {}
+        explicit _InvokerTask(Fn&& fn, _ErrorTransports* err) : _fn(std::move(fn)), _errors(err) {}
 
-        explicit _InvokerTask(Fn const &fn, _ErrorTransports *err)
-            : _fn(fn), _errors(err) {}
+        explicit _InvokerTask(Fn const& fn, _ErrorTransports* err) : _fn(fn), _errors(err) {}
 
         virtual tbb::task* execute() {
             TfErrorMark m;
             // In anticipation of OneTBB, ensure that _fn meets OneTBB's
             // requirement that a task's call operator must be const.
-            const_cast<_InvokerTask const *>(this)->_fn();
-            if (!m.IsClean())
-                WorkDispatcher::_TransportErrors(m, _errors);
+            const_cast<_InvokerTask const*>(this)->_fn();
+            if (!m.IsClean()) WorkDispatcher::_TransportErrors(m, _errors);
             return NULL;
         }
+
     private:
         Fn _fn;
-        _ErrorTransports *_errors;
+        _ErrorTransports* _errors;
     };
 
     // Make an _InvokerTask instance, letting the function template deduce Fn.
     template <class Fn>
-    _InvokerTask<typename std::remove_reference<Fn>::type>&
-    _MakeInvokerTask(Fn &&fn) { 
-        return *new( _rootTask->allocate_additional_child_of(*_rootTask) )
-            _InvokerTask<typename std::remove_reference<Fn>::type>(
-                std::forward<Fn>(fn), &_errors);
+    _InvokerTask<typename std::remove_reference<Fn>::type>& _MakeInvokerTask(Fn&& fn) {
+        return *new (_rootTask->allocate_additional_child_of(*_rootTask))
+                _InvokerTask<typename std::remove_reference<Fn>::type>(std::forward<Fn>(fn), &_errors);
     }
 #endif
 
     // Helper function that removes errors from \p m and stores them in a new
     // entry in \p errors.
-    WORK_API static void
-    _TransportErrors(const TfErrorMark &m, _ErrorTransports *errors);
+    WORK_API static void _TransportErrors(const TfErrorMark& m, _ErrorTransports* errors);
 
     // Task group context to run tasks in.
     tbb::task_group_context _context;
@@ -199,7 +190,7 @@ private:
     class _TaskGroup : public tbb::task_group {
     public:
         _TaskGroup(tbb::task_group_context& ctx) : tbb::task_group(ctx) {}
-         inline tbb::detail::d1::wait_context& _GetInternalWaitContext();
+        inline tbb::detail::d1::wait_context& _GetInternalWaitContext();
     };
 
     _TaskGroup _taskGroup;
@@ -220,39 +211,31 @@ private:
 // Wrapper class for non-const tasks.
 template <class Fn>
 struct Work_DeprecatedMutableTask {
-    explicit Work_DeprecatedMutableTask(Fn &&fn) 
-        : _fn(std::move(fn)) {}
+    explicit Work_DeprecatedMutableTask(Fn&& fn) : _fn(std::move(fn)) {}
 
-    explicit Work_DeprecatedMutableTask(Fn const &fn) 
-        : _fn(fn) {}
+    explicit Work_DeprecatedMutableTask(Fn const& fn) : _fn(fn) {}
 
     // Ensure only moves happen, no copies.
-    Work_DeprecatedMutableTask
-        (Work_DeprecatedMutableTask &&other) = default;
-    Work_DeprecatedMutableTask
-        (const Work_DeprecatedMutableTask &other) = delete;
-    Work_DeprecatedMutableTask
-        &operator= (const Work_DeprecatedMutableTask &other) = delete;
+    Work_DeprecatedMutableTask(Work_DeprecatedMutableTask&& other) = default;
+    Work_DeprecatedMutableTask(const Work_DeprecatedMutableTask& other) = delete;
+    Work_DeprecatedMutableTask& operator=(const Work_DeprecatedMutableTask& other) = delete;
 
-    void operator()() const {
-        _fn();
-    }
+    void operator()() const { _fn(); }
+
 private:
     mutable Fn _fn;
 };
 
-// Wrapper function to convert non-const tasks to a Work_DeprecatedMutableTask. 
-// When adding new tasks refrain from using this wrapper, instead ensure the 
+// Wrapper function to convert non-const tasks to a Work_DeprecatedMutableTask.
+// When adding new tasks refrain from using this wrapper, instead ensure the
 // call operator of the task is const such that it is compatible with oneTBB.
 template <typename Fn>
-Work_DeprecatedMutableTask<typename std::remove_reference_t<Fn>> 
-WorkMakeDeprecatedMutableTask(Fn &&fn) {
-    return Work_DeprecatedMutableTask<typename std::remove_reference_t<Fn>>
-            (std::forward<Fn>(fn));
+Work_DeprecatedMutableTask<typename std::remove_reference_t<Fn>> WorkMakeDeprecatedMutableTask(Fn&& fn) {
+    return Work_DeprecatedMutableTask<typename std::remove_reference_t<Fn>>(std::forward<Fn>(fn));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_WORK_DISPATCHER_H
+#endif  // PXR_BASE_WORK_DISPATCHER_H

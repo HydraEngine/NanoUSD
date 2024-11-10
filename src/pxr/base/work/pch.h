@@ -65,11 +65,11 @@
 #include <boost/python/def.hpp>
 #include <boost/python/dict.hpp>
 #include <boost/python/module.hpp>
-#if defined(__APPLE__) // Fix breakage caused by Python's pyport.h.
+#if defined(__APPLE__)  // Fix breakage caused by Python's pyport.h.
 #undef tolower
 #undef toupper
 #endif
-#endif // PXR_PYTHON_SUPPORT_ENABLED && !PXR_USE_INTERNAL_BOOST_PYTHON
+#endif  // PXR_PYTHON_SUPPORT_ENABLED && !PXR_USE_INTERNAL_BOOST_PYTHON
 #include <tbb/blocked_range.h>
 #include <tbb/concurrent_vector.h>
 #include <tbb/enumerable_thread_specific.h>

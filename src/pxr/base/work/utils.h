@@ -33,19 +33,14 @@ struct Work_AsyncSwapDestroyHelper {
     Work_AsyncSwapDestroyHelper() = default;
 
     Work_AsyncSwapDestroyHelper(Work_AsyncSwapDestroyHelper const&) = delete;
-    Work_AsyncSwapDestroyHelper& operator=(
-        Work_AsyncSwapDestroyHelper const&) = delete;
+    Work_AsyncSwapDestroyHelper& operator=(Work_AsyncSwapDestroyHelper const&) = delete;
 
-    Work_AsyncSwapDestroyHelper(Work_AsyncSwapDestroyHelper &&other)
-        : obj()
-    {
+    Work_AsyncSwapDestroyHelper(Work_AsyncSwapDestroyHelper&& other) : obj() {
         using std::swap;
         swap(obj, other.obj);
     }
 
-    Work_AsyncSwapDestroyHelper& operator=(
-        Work_AsyncSwapDestroyHelper &&other)
-    {
+    Work_AsyncSwapDestroyHelper& operator=(Work_AsyncSwapDestroyHelper&& other) {
         using std::swap;
         swap(obj, other.obj);
         return *this;
@@ -63,25 +58,21 @@ struct Work_AsyncSwapDestroyHelper {
 /// data structure that could be destroyed by the time obj's destruction occurs.
 /// Be careful.
 template <class T>
-void WorkSwapDestroyAsync(T &obj)
-{
+void WorkSwapDestroyAsync(T& obj) {
     using std::swap;
     Work_AsyncSwapDestroyHelper<T> helper;
     swap(helper.obj, obj);
-    if (!Work_ShouldSynchronizeAsyncDestroyCalls())
-        WorkRunDetachedTask(std::move(helper));
+    if (!Work_ShouldSynchronizeAsyncDestroyCalls()) WorkRunDetachedTask(std::move(helper));
 }
 
 /// Like WorkSwapDestroyAsync() but instead, move from \p obj, leaving it
 /// in a moved-from state instead of a default constructed state.
 template <class T>
-void WorkMoveDestroyAsync(T &obj)
-{
-    Work_AsyncMoveDestroyHelper<T> helper { std::move(obj) };
-    if (!Work_ShouldSynchronizeAsyncDestroyCalls())
-        WorkRunDetachedTask(std::move(helper));
+void WorkMoveDestroyAsync(T& obj) {
+    Work_AsyncMoveDestroyHelper<T> helper{std::move(obj)};
+    if (!Work_ShouldSynchronizeAsyncDestroyCalls()) WorkRunDetachedTask(std::move(helper));
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_WORK_UTILS_H
+#endif  // PXR_BASE_WORK_UTILS_H

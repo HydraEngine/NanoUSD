@@ -11,34 +11,31 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 WorkDispatcher::WorkDispatcher()
-    : _context(
-        tbb::task_group_context::isolated,
-        tbb::task_group_context::concurrent_wait | 
-        tbb::task_group_context::default_traits)
+    : _context(tbb::task_group_context::isolated,
+               tbb::task_group_context::concurrent_wait | tbb::task_group_context::default_traits)
 #if TBB_INTERFACE_VERSION_MAJOR >= 12
-      , _taskGroup(_context)
+      ,
+      _taskGroup(_context)
 #endif
 {
     _waitCleanupFlag.clear();
-    
+
 #if TBB_INTERFACE_VERSION_MAJOR < 12
     // The concurrent_wait flag used with the task_group_context ensures
     // the ref count will remain at 1 after all predecessor tasks are
     // completed, so we don't need to keep resetting it in Wait().
-    _rootTask = new(tbb::task::allocate_root(_context)) tbb::empty_task;
+    _rootTask = new (tbb::task::allocate_root(_context)) tbb::empty_task;
     _rootTask->set_ref_count(1);
 #endif
 }
 
 #if TBB_INTERFACE_VERSION_MAJOR >= 12
-inline tbb::detail::d1::wait_context& 
-WorkDispatcher::_TaskGroup::_GetInternalWaitContext() {
-    return m_wait_ctx;
+inline tbb::detail::d1::wait_context& WorkDispatcher::_TaskGroup::_GetInternalWaitContext() {
+    return m_wait_vertex.get_context();
 }
 #endif
 
-WorkDispatcher::~WorkDispatcher() noexcept
-{
+WorkDispatcher::~WorkDispatcher() noexcept {
     Wait();
 
 #if TBB_INTERFACE_VERSION_MAJOR < 12
@@ -46,9 +43,7 @@ WorkDispatcher::~WorkDispatcher() noexcept
 #endif
 }
 
-void
-WorkDispatcher::Wait()
-{
+void WorkDispatcher::Wait() {
     // Wait for tasks to complete.
 #if TBB_INTERFACE_VERSION_MAJOR >= 12
     // The native task_group::wait() has a comment saying its call to the
@@ -67,7 +62,7 @@ WorkDispatcher::Wait()
         }
 
         // Post all diagnostics to this thread's list.
-        for (auto &et: _errors) {
+        for (auto& et : _errors) {
             et.Post();
         }
         _errors.clear();
@@ -75,9 +70,7 @@ WorkDispatcher::Wait()
     }
 }
 
-void
-WorkDispatcher::Cancel()
-{
+void WorkDispatcher::Cancel() {
 #if TBB_INTERFACE_VERSION_MAJOR >= 12
     _taskGroup.cancel();
 #else
@@ -86,10 +79,7 @@ WorkDispatcher::Cancel()
 }
 
 /* static */
-void
-WorkDispatcher::_TransportErrors(const TfErrorMark &mark,
-                                 _ErrorTransports *errors)
-{
+void WorkDispatcher::_TransportErrors(const TfErrorMark& mark, _ErrorTransports* errors) {
     TfErrorTransport transport = mark.Transport();
     errors->grow_by(1)->swap(transport);
 }

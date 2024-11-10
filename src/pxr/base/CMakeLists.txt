@@ -5,3 +5,7 @@ add_subdirectory(js)
 add_subdirectory(plug)
 add_subdirectory(trace)
 add_subdirectory(vt)
+add_subdirectory(work)
+
+#add_subdirectory(ts)
+#add_subdirectory(pegtl)
