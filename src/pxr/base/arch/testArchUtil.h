@@ -12,11 +12,7 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Crash types.
-enum class ArchTestCrashMode {
-    Error,
-    ReadInvalidAddresses,
-    ReadInvalidAddressesWithThread
-};
+enum class ArchTestCrashMode { Error, ReadInvalidAddresses, ReadInvalidAddressesWithThread };
 
 // Cause the test to crash deliberately.
 void ArchTestCrash(ArchTestCrashMode mode);
@@ -27,4 +23,4 @@ void ArchTestCrashArgParse(int argc, char** argv);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_TEST_ARCH_UTIL_H
+#endif  // PXR_BASE_ARCH_TEST_ARCH_UTIL_H

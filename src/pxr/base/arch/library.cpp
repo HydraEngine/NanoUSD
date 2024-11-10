@@ -23,14 +23,12 @@ DWORD arch_lastLibraryError = 0;
 }
 #endif
 
-void* ArchLibraryOpen(const std::string &filename, int flag)
-{
+void* ArchLibraryOpen(const std::string& filename, int flag) {
 #if defined(ARCH_OS_WINDOWS)
     arch_lastLibraryError = 0;
     if (void* result = LoadLibrary(filename.c_str())) {
         return result;
-    }
-    else {
+    } else {
         arch_lastLibraryError = GetLastError();
         return nullptr;
     }
@@ -41,8 +39,7 @@ void* ArchLibraryOpen(const std::string &filename, int flag)
 #endif
 }
 
-std::string ArchLibraryError()
-{
+std::string ArchLibraryError() {
 #if defined(ARCH_OS_WINDOWS)
     const DWORD error = arch_lastLibraryError;
     return error ? ArchStrSysError(error) : std::string();
@@ -52,8 +49,7 @@ std::string ArchLibraryError()
 #endif
 }
 
-int ArchLibraryClose(void* handle)
-{
+int ArchLibraryClose(void* handle) {
 #if defined(ARCH_OS_WINDOWS)
     arch_lastLibraryError = 0;
     // dlclose() returns 0 on success and non-zero on error, the opposite of
@@ -68,8 +64,7 @@ int ArchLibraryClose(void* handle)
     return status;
 }
 
-void* ArchLibraryGetSymbolAddress(void* handle, const char* name)
-{
+void* ArchLibraryGetSymbolAddress(void* handle, const char* name) {
 #if defined(ARCH_OS_WINDOWS)
     return GetProcAddress(reinterpret_cast<HMODULE>(handle), name);
 #else

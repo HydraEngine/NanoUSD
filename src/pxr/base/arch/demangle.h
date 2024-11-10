@@ -43,15 +43,13 @@ ARCH_API bool ArchDemangle(std::string* typeName);
 /// string; otherwise, the function returns the empty string.
 ///
 /// \see ArchDemangle()
-ARCH_API std::string
-ArchGetDemangled(const std::string& typeName);
+ARCH_API std::string ArchGetDemangled(const std::string& typeName);
 
 /// Return demangled RTTI-generated type name.
 ///
 /// \see ArchDemangle()
 /// \overload
-ARCH_API std::string
-ArchGetDemangled(const char *typeName);
+ARCH_API std::string ArchGetDemangled(const char* typeName);
 
 /// Return demangled RTTI-generated type name.
 ///
@@ -59,8 +57,7 @@ ArchGetDemangled(const char *typeName);
 ///
 /// \see ArchDemangle()
 /// \overload
-inline std::string
-ArchGetDemangled(const std::type_info& typeInfo) {
+inline std::string ArchGetDemangled(const std::type_info& typeInfo) {
     return ArchGetDemangled(typeInfo.name());
 }
 
@@ -70,8 +67,7 @@ ArchGetDemangled(const std::type_info& typeInfo) {
 ///
 /// \see ArchDemangle()
 /// \overload
-inline std::string
-ArchGetDemangled(const std::type_index& typeIndex) {
+inline std::string ArchGetDemangled(const std::type_index& typeIndex) {
     return ArchGetDemangled(typeIndex.name());
 }
 
@@ -82,8 +78,7 @@ ArchGetDemangled(const std::type_index& typeIndex) {
 /// \see ArchDemangle()
 /// \overload
 template <typename T>
-inline std::string
-ArchGetDemangled() {
+inline std::string ArchGetDemangled() {
     return ArchGetDemangled(typeid(T).name());
 }
 
@@ -95,4 +90,4 @@ void Arch_DemangleFunctionName(std::string* functionName);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif	// PXR_BASE_ARCH_DEMANGLE_H 
+#endif  // PXR_BASE_ARCH_DEMANGLE_H

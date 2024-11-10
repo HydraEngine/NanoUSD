@@ -42,4 +42,4 @@ typedef unsigned char uchar;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_INTTYPES_H
+#endif  // PXR_BASE_ARCH_INTTYPES_H

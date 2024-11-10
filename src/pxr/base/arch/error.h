@@ -28,9 +28,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// \private
 [[noreturn]]
-ARCH_API
-void Arch_Error(const char* msg, const char* funcName,
-                size_t lineNo, const char* fileName);
+ARCH_API void Arch_Error(const char* msg, const char* funcName, size_t lineNo, const char* fileName);
 
 /// Print warning message to standard error, but continue execution.
 ///
@@ -41,8 +39,7 @@ void Arch_Error(const char* msg, const char* funcName,
 ///
 /// \private
 ARCH_API
-void Arch_Warning(const char* msg, const char* funcName,
-                  size_t lineNo, const char* fileName);
+void Arch_Warning(const char* msg, const char* funcName, size_t lineNo, const char* fileName);
 
 /// \addtogroup group_arch_Diagnostics
 ///@{
@@ -52,16 +49,14 @@ void Arch_Warning(const char* msg, const char* funcName,
 /// \param msg is a literal string, a \c const \c char* (but not
 ///        an \c std::string) that describes why the program is aborting.
 /// \hideinitializer
-#define ARCH_ERROR(msg) \
-    Arch_Error(msg, __ARCH_FUNCTION__, __LINE__, __ARCH_FILE__)
+#define ARCH_ERROR(msg) Arch_Error(msg, __ARCH_FUNCTION__, __LINE__, __ARCH_FILE__)
 
 /// Prints a warning message to stderr.
 ///
 /// \param msg is a literal string, a \c const \c char* (but not
 ///        an \c std::string).
 /// \hideinitializer
-#define ARCH_WARNING(msg) \
-    Arch_Warning(msg, __ARCH_FUNCTION__, __LINE__, __ARCH_FILE__)
+#define ARCH_WARNING(msg) Arch_Warning(msg, __ARCH_FUNCTION__, __LINE__, __ARCH_FILE__)
 
 /// Aborts the program if \p cond evaluates to false.
 /// \hideinitializer
@@ -72,4 +67,4 @@ void Arch_Warning(const char* msg, const char* funcName,
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_ERROR_H
+#endif  // PXR_BASE_ARCH_ERROR_H

@@ -12,9 +12,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-void
-Arch_Error(const char* cond, const char* funcName, size_t lineNo, const char* fileName)
-{
+void Arch_Error(const char* cond, const char* funcName, size_t lineNo, const char* fileName) {
     fprintf(stderr, " ArchError: %s\n", cond);
     fprintf(stderr, "  Function: %s\n", funcName);
     fprintf(stderr, "      File: %s\n", fileName);
@@ -22,9 +20,7 @@ Arch_Error(const char* cond, const char* funcName, size_t lineNo, const char* fi
     ArchAbort();
 }
 
-void
-Arch_Warning(const char* cond, const char* funcName, size_t lineNo, const char* fileName)
-{
+void Arch_Warning(const char* cond, const char* funcName, size_t lineNo, const char* fileName) {
     fprintf(stderr, " ArchWarn: %s\n", cond);
     fprintf(stderr, " Function: %s\n", funcName);
     fprintf(stderr, "     File: %s\n", fileName);

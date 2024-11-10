@@ -45,10 +45,6 @@ namespace PXR_NS {
 #endif // PXR_USE_NAMESPACES
 
 #if 1
-#define PXR_PYTHON_SUPPORT_ENABLED
-#endif
-
-#if 1
 #define PXR_PREFER_SAFETY_OVER_SPEED
 #endif
 

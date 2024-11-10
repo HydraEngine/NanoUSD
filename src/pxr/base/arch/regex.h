@@ -17,18 +17,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class ArchRegex {
 public:
-    enum : unsigned int {
-        CASE_INSENSITIVE = 1u,
-        GLOB             = 2u
-    };
+    enum : unsigned int { CASE_INSENSITIVE = 1u, GLOB = 2u };
 
     /// Create an empty regex.
     ArchRegex() = default;
 
-    ArchRegex(ArchRegex &&) noexcept = default;
-    ArchRegex(ArchRegex const &) = default;
-    ArchRegex &operator=(ArchRegex &&) noexcept = default;
-    ArchRegex &operator=(ArchRegex const &) = default;
+    ArchRegex(ArchRegex&&) noexcept = default;
+    ArchRegex(ArchRegex const&) = default;
+    ArchRegex& operator=(ArchRegex&&) noexcept = default;
+    ArchRegex& operator=(ArchRegex const&) = default;
 
     /// Create with pattern and optional flags.
     ARCH_API ArchRegex(const std::string& pattern, unsigned int flags = 0);
@@ -59,4 +56,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_REGEX_H
+#endif  // PXR_BASE_ARCH_REGEX_H

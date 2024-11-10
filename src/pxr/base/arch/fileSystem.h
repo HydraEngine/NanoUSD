@@ -43,58 +43,58 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \addtogroup group_arch_SystemFunctions
 ///@{
 #if !defined(ARCH_OS_WINDOWS)
-    #ifdef _POSIX_VERSION
-        #include <limits.h>                     /* for PATH_MAX */
-    #else
-        #include <sys/param.h>                  /* for MAXPATHLEN */
-    #endif
+#ifdef _POSIX_VERSION
+#include <limits.h> /* for PATH_MAX */
 #else
-    // XXX -- Should probably have ARCH_ macro for this.
-    #define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+#include <sys/param.h> /* for MAXPATHLEN */
+#endif
+#else
+// XXX -- Should probably have ARCH_ macro for this.
+#define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
 
-    // See https://msdn.microsoft.com/en-us/library/1w06ktdy.aspx
-    // XXX -- Should probably have Arch enum for these.
-    #define F_OK    0       // Test for existence.
-    #define X_OK    1       // Test for execute permission.
-    #define W_OK    2       // Test for write permission.
-    #define R_OK    4       // Test for read permission.
+// See https://msdn.microsoft.com/en-us/library/1w06ktdy.aspx
+// XXX -- Should probably have Arch enum for these.
+#define F_OK 0  // Test for existence.
+#define X_OK 1  // Test for execute permission.
+#define W_OK 2  // Test for write permission.
+#define R_OK 4  // Test for read permission.
 #endif
 
 #if defined(ARCH_OS_WINDOWS)
-    #define ARCH_GLOB_NOCHECK   1
-    #define ARCH_GLOB_MARK      2
-    #define ARCH_GLOB_NOSORT    4
+#define ARCH_GLOB_NOCHECK 1
+#define ARCH_GLOB_MARK 2
+#define ARCH_GLOB_NOSORT 4
 #else
-    #define ARCH_GLOB_NOCHECK   GLOB_NOCHECK
-    #define ARCH_GLOB_MARK      GLOB_MARK
-    #define ARCH_GLOB_NOSORT    GLOB_NOSORT
+#define ARCH_GLOB_NOCHECK GLOB_NOCHECK
+#define ARCH_GLOB_MARK GLOB_MARK
+#define ARCH_GLOB_NOSORT GLOB_NOSORT
 #endif
-#define ARCH_GLOB_DEFAULT   (ARCH_GLOB_NOCHECK | ARCH_GLOB_MARK)
+#define ARCH_GLOB_DEFAULT (ARCH_GLOB_NOCHECK | ARCH_GLOB_MARK)
 
 #ifndef ARCH_PATH_MAX
-    #ifdef PATH_MAX
-        #define ARCH_PATH_MAX PATH_MAX
-    #else
-        #ifdef MAXPATHLEN
-            #define ARCH_PATH_MAX MAXPATHLEN
-        #else
-            #ifdef _MAX_PATH
-                #define ARCH_PATH_MAX _MAX_PATH
-            #else
-                #define ARCH_PATH_MAX 1024
-            #endif
-        #endif
-    #endif
+#ifdef PATH_MAX
+#define ARCH_PATH_MAX PATH_MAX
+#else
+#ifdef MAXPATHLEN
+#define ARCH_PATH_MAX MAXPATHLEN
+#else
+#ifdef _MAX_PATH
+#define ARCH_PATH_MAX _MAX_PATH
+#else
+#define ARCH_PATH_MAX 1024
+#endif
+#endif
+#endif
 #endif
 
 #if defined(ARCH_OS_WINDOWS)
-    #define ARCH_PATH_SEP       "\\"
-    #define ARCH_PATH_LIST_SEP  ";"
-    #define ARCH_REL_PATH_IDENT ".\\"
+#define ARCH_PATH_SEP "\\"
+#define ARCH_PATH_LIST_SEP ";"
+#define ARCH_REL_PATH_IDENT ".\\"
 #else
-    #define ARCH_PATH_SEP       "/"
-    #define ARCH_PATH_LIST_SEP  ":"
-    #define ARCH_REL_PATH_IDENT "./"
+#define ARCH_PATH_SEP "/"
+#define ARCH_PATH_LIST_SEP ":"
+#define ARCH_REL_PATH_IDENT "./"
 #endif
 
 #if defined(ARCH_OS_WINDOWS)
@@ -113,68 +113,67 @@ typedef struct stat ArchStatType;
 /// Opens the file that is specified by filename.
 /// Returning true if the file was opened successfully; false otherwise.
 ///
-ARCH_API FILE*
-ArchOpenFile(char const* fileName, char const* mode);
+ARCH_API FILE* ArchOpenFile(char const* fileName, char const* mode);
 
 #if defined(ARCH_OS_WINDOWS)
-#   define ArchChmod(path, mode)        _chmod(path, mode)
+#define ArchChmod(path, mode) _chmod(path, mode)
 #else
-#   define ArchChmod(path, mode)        chmod(path, mode)
+#define ArchChmod(path, mode) chmod(path, mode)
 #endif
 
 #if defined(ARCH_OS_WINDOWS)
-#   define ArchCloseFile(fd)            _close(fd)
+#define ArchCloseFile(fd) _close(fd)
 #else
-#   define ArchCloseFile(fd)            close(fd)
+#define ArchCloseFile(fd) close(fd)
 #endif
 
 #if defined(ARCH_OS_WINDOWS)
-#   define ArchUnlinkFile(path)         _unlink(path)
+#define ArchUnlinkFile(path) _unlink(path)
 #else
-#   define ArchUnlinkFile(path)         unlink(path)
+#define ArchUnlinkFile(path) unlink(path)
 #endif
 
 #if defined(ARCH_OS_WINDOWS)
-    ARCH_API int ArchFileAccess(const char* path, int mode);
+ARCH_API int ArchFileAccess(const char* path, int mode);
 #else
-#   define ArchFileAccess(path, mode)   access(path, mode)
+#define ArchFileAccess(path, mode) access(path, mode)
 #endif
 
 #if defined(ARCH_OS_WINDOWS)
-#   define ArchFdOpen(fd, mode)         _fdopen(fd, mode)
+#define ArchFdOpen(fd, mode) _fdopen(fd, mode)
 #else
-#   define ArchFdOpen(fd, mode)         fdopen(fd, mode)
+#define ArchFdOpen(fd, mode) fdopen(fd, mode)
 #endif
 
 #if defined(ARCH_OS_WINDOWS)
-#   define ArchFileNo(stream)           _fileno(stream)
+#define ArchFileNo(stream) _fileno(stream)
 #else
-#   define ArchFileNo(stream)           fileno(stream)
+#define ArchFileNo(stream) fileno(stream)
 #endif
 
 #if defined(ARCH_OS_WINDOWS)
-#   define ArchFileIsaTTY(stream)       _isatty(stream)
+#define ArchFileIsaTTY(stream) _isatty(stream)
 #else
-#   define ArchFileIsaTTY(stream)       isatty(stream)
+#define ArchFileIsaTTY(stream) isatty(stream)
 #endif
 
 #if defined(ARCH_OS_WINDOWS)
-    ARCH_API int ArchRmDir(const char* path);
+ARCH_API int ArchRmDir(const char* path);
 #else
-#   define ArchRmDir(path)   rmdir(path)
+#define ArchRmDir(path) rmdir(path)
 #endif
 
 /// Return the length of a file in bytes.
 ///
 /// Returns -1 if the file cannot be opened/read.
 ARCH_API int64_t ArchGetFileLength(const char* fileName);
-ARCH_API int64_t ArchGetFileLength(FILE *file);
+ARCH_API int64_t ArchGetFileLength(FILE* file);
 
 /// Return a filename for this file, if one can be obtained.  Note that there
 /// are many reasons why it may be impossible to obtain a filename, even for an
 /// opened FILE *.  Whenever possible avoid using this function and instead
 /// store the filename for future use.
-ARCH_API std::string ArchGetFileName(FILE *file);
+ARCH_API std::string ArchGetFileName(FILE* file);
 
 /// Returns true if the data in \c stat struct \p st indicates that the target
 /// file or directory is writable.
@@ -182,7 +181,7 @@ ARCH_API std::string ArchGetFileName(FILE *file);
 /// This returns true if the struct pointer is valid, and the stat indicates
 /// the target is writable by the effective user, effective group, or all
 /// users.
-ARCH_API bool ArchStatIsWritable(const ArchStatType *st);
+ARCH_API bool ArchStatIsWritable(const ArchStatType* st);
 
 /// Returns the modification time (mtime) in seconds for a file.
 ///
@@ -206,8 +205,7 @@ ARCH_API double ArchGetModificationTime(const ArchStatType& st);
 /// On Windows, all backslashes are converted to forward slashes and drive
 /// specifiers (e.g., "C:") are lower-cased. If \p stripDriveSpecifier
 /// is \c true, these drive specifiers are removed from the path.
-ARCH_API std::string ArchNormPath(const std::string& path,
-                                  bool stripDriveSpecifier = false);
+ARCH_API std::string ArchNormPath(const std::string& path, bool stripDriveSpecifier = false);
 
 /// Returns the canonical absolute path of the specified filename.
 ///
@@ -220,7 +218,7 @@ ARCH_API std::string ArchAbsPath(const std::string& path);
 /// This function stats the given pathname and returns the permissions flags
 /// for it and returns true.  If the stat fails, returns false.
 ///
-ARCH_API bool ArchGetStatMode(const char *pathname, int *mode);
+ARCH_API bool ArchGetStatMode(const char* pathname, int* mode);
 
 /// Return the path to a temporary directory for this platform.
 ///
@@ -231,7 +229,7 @@ ARCH_API bool ArchGetStatMode(const char *pathname, int *mode);
 /// see "man hier"). The returned string will not have a trailing slash.
 ///
 /// This routine is threadsafe and will not perform any memory allocations.
-ARCH_API const char *ArchGetTmpDir();
+ARCH_API const char* ArchGetTmpDir();
 
 /// Make a temporary file name, in a system-determined temporary directory.
 ///
@@ -247,8 +245,7 @@ ARCH_API const char *ArchGetTmpDir();
 /// choosing the name and opening the file.  This call should be avoided in
 /// favor of \c ArchMakeTmpFile().
 ARCH_API
-std::string ArchMakeTmpFileName(const std::string& prefix,
-                                const std::string& suffix = std::string());
+std::string ArchMakeTmpFileName(const std::string& prefix, const std::string& suffix = std::string());
 
 /// Create a temporary file, in a system-determined temporary directory.
 ///
@@ -271,8 +268,7 @@ int ArchMakeTmpFile(const std::string& prefix, std::string* pathname = 0);
 ///
 /// The call is threadsafe.
 ARCH_API
-int ArchMakeTmpFile(const std::string& tmpdir,
-                    const std::string& prefix, std::string* pathname = 0);
+int ArchMakeTmpFile(const std::string& tmpdir, const std::string& prefix, std::string* pathname = 0);
 
 /// Create a temporary sub-direcrory, in a given temporary directory.
 ///
@@ -283,16 +279,16 @@ int ArchMakeTmpFile(const std::string& tmpdir,
 ///
 /// The call is threadsafe.
 ARCH_API
-std::string ArchMakeTmpSubdir(const std::string& tmpdir,
-                              const std::string& prefix);
+std::string ArchMakeTmpSubdir(const std::string& tmpdir, const std::string& prefix);
 
 // Helper 'deleter' for use with std::unique_ptr for file mappings.
 struct Arch_Unmapper {
     Arch_Unmapper() : _length(~0) {}
     explicit Arch_Unmapper(size_t length) : _length(length) {}
-    ARCH_API void operator()(char *mapStart) const;
-    ARCH_API void operator()(char const *mapStart) const;
+    ARCH_API void operator()(char* mapStart) const;
+    ARCH_API void operator()(char const* mapStart) const;
     size_t GetLength() const { return _length; }
+
 private:
     size_t _length;
 };
@@ -305,14 +301,12 @@ using ArchConstFileMapping = std::unique_ptr<char const, Arch_Unmapper>;
 using ArchMutableFileMapping = std::unique_ptr<char, Arch_Unmapper>;
 
 /// Return the length of an ArchConstFileMapping.
-inline size_t
-ArchGetFileMappingLength(ArchConstFileMapping const &m) {
+inline size_t ArchGetFileMappingLength(ArchConstFileMapping const& m) {
     return m.get_deleter().GetLength();
 }
 
 /// Return the length of an ArchMutableFileMapping.
-inline size_t
-ArchGetFileMappingLength(ArchMutableFileMapping const &m) {
+inline size_t ArchGetFileMappingLength(ArchMutableFileMapping const& m) {
     return m.get_deleter().GetLength();
 }
 
@@ -321,13 +315,11 @@ ArchGetFileMappingLength(ArchMutableFileMapping const &m) {
 /// fails, return a null unique_ptr and if errMsg is not null fill it with
 /// information about the failure.
 ARCH_API
-ArchConstFileMapping
-ArchMapFileReadOnly(FILE *file, std::string *errMsg=nullptr);
+ArchConstFileMapping ArchMapFileReadOnly(FILE* file, std::string* errMsg = nullptr);
 
 /// \overload
 ARCH_API
-ArchConstFileMapping
-ArchMapFileReadOnly(std::string const& path, std::string *errMsg=nullptr);
+ArchConstFileMapping ArchMapFileReadOnly(std::string const& path, std::string* errMsg = nullptr);
 
 /// Privately map the passed \p file into memory and return a unique_ptr to the
 /// copy-on-write mapped contents.  If modified, the affected pages are
@@ -336,19 +328,17 @@ ArchMapFileReadOnly(std::string const& path, std::string *errMsg=nullptr);
 /// If mapping fails, return a null unique_ptr and if errMsg is not null fill it
 /// with information about the failure.
 ARCH_API
-ArchMutableFileMapping
-ArchMapFileReadWrite(FILE *file, std::string *errMsg=nullptr);
+ArchMutableFileMapping ArchMapFileReadWrite(FILE* file, std::string* errMsg = nullptr);
 
 /// \overload
 ARCH_API
-ArchMutableFileMapping
-ArchMapFileReadWrite(std::string const& path, std::string *errMsg=nullptr);
+ArchMutableFileMapping ArchMapFileReadWrite(std::string const& path, std::string* errMsg = nullptr);
 
 enum ArchMemAdvice {
-    ArchMemAdviceNormal,       // Treat range with default behavior.
-    ArchMemAdviceWillNeed,     // OS may prefetch this range.
-    ArchMemAdviceDontNeed,     // OS may free resources related to this range.
-    ArchMemAdviceRandomAccess, // Prefetching may not be beneficial.
+    ArchMemAdviceNormal,        // Treat range with default behavior.
+    ArchMemAdviceWillNeed,      // OS may prefetch this range.
+    ArchMemAdviceDontNeed,      // OS may free resources related to this range.
+    ArchMemAdviceRandomAccess,  // Prefetching may not be beneficial.
 };
 
 /// Advise the OS regarding how the application intends to access a range of
@@ -356,7 +346,7 @@ enum ArchMemAdvice {
 /// regions.  This call does not change program semantics.  It is only an
 /// optimization hint to the OS, and may be a no-op on some systems.
 ARCH_API
-void ArchMemAdvise(void const *addr, size_t len, ArchMemAdvice adv);
+void ArchMemAdvise(void const* addr, size_t len, ArchMemAdvice adv);
 
 /// Report whether or not the mapped virtual memory pages starting at \p addr
 /// for \p len bytes are resident in RAM.  Pages that are resident will not,
@@ -371,23 +361,21 @@ void ArchMemAdvise(void const *addr, size_t len, ArchMemAdvice adv);
 /// Note that currently this function is only implemented on Linux and Darwin.
 /// On Windows it currently always returns false.
 ARCH_API
-bool
-ArchQueryMappedMemoryResidency(
-    void const *addr, size_t len, unsigned char *pageMap);
+bool ArchQueryMappedMemoryResidency(void const* addr, size_t len, unsigned char* pageMap);
 
 /// Read up to \p count bytes from \p offset in \p file into \p buffer.  The
 /// file position indicator for \p file is not changed.  Return the number of
 /// bytes read, or zero if at end of file.  Return -1 in case of an error, with
 /// errno set appropriately.
 ARCH_API
-int64_t ArchPRead(FILE *file, void *buffer, size_t count, int64_t offset);
+int64_t ArchPRead(FILE* file, void* buffer, size_t count, int64_t offset);
 
 /// Write up to \p count bytes from \p buffer to \p file at \p offset.  The file
 /// position indicator for \p file is not changed.  Return the number of bytes
 /// written, possibly zero if none written.  Return -1 in case of an error, with
 /// errno set appropriately.
 ARCH_API
-int64_t ArchPWrite(FILE *file, void const *bytes, size_t count, int64_t offset);
+int64_t ArchPWrite(FILE* file, void const* bytes, size_t count, int64_t offset);
 
 /// Returns the value of the symbolic link at \p path.  Returns the empty
 /// string on error or if \p path does not refer to a symbolic link.
@@ -395,10 +383,10 @@ ARCH_API
 std::string ArchReadLink(const char* path);
 
 enum ArchFileAdvice {
-    ArchFileAdviceNormal,       // Treat range with default behavior.
-    ArchFileAdviceWillNeed,     // OS may prefetch this range.
-    ArchFileAdviceDontNeed,     // OS may free resources related to this range.
-    ArchFileAdviceRandomAccess, // Prefetching may not be beneficial.
+    ArchFileAdviceNormal,        // Treat range with default behavior.
+    ArchFileAdviceWillNeed,      // OS may prefetch this range.
+    ArchFileAdviceDontNeed,      // OS may free resources related to this range.
+    ArchFileAdviceRandomAccess,  // Prefetching may not be beneficial.
 };
 
 /// Advise the OS regarding how the application intends to access a range of
@@ -406,38 +394,31 @@ enum ArchFileAdvice {
 /// semantics.  It is only an optimization hint to the OS, and may be a no-op on
 /// some systems.
 ARCH_API
-void ArchFileAdvise(FILE *file, int64_t offset, size_t count,
-                    ArchFileAdvice adv);
+void ArchFileAdvise(FILE* file, int64_t offset, size_t count, ArchFileAdvice adv);
 
 #if defined(ARCH_OS_WINDOWS)
 
 /// Converts UTF-16 windows string to regular std::string - Windows-only
-inline std::string ArchWindowsUtf16ToUtf8(const std::wstring &wstr)
-{
+inline std::string ArchWindowsUtf16ToUtf8(const std::wstring& wstr) {
     if (wstr.empty()) return std::string();
     // first call is only to get required size for string
-    int size = WideCharToMultiByte(
-        CP_UTF8, 0, wstr.data(), (int)wstr.size(), NULL, 0, NULL, NULL);
+    int size = WideCharToMultiByte(CP_UTF8, 0, wstr.data(), (int)wstr.size(), NULL, 0, NULL, NULL);
     if (size == 0) return std::string();
     std::string str(size, 0);
-    if (WideCharToMultiByte(CP_UTF8, 0, wstr.data(), (int)wstr.size(),
-                            &str[0], size, NULL, NULL) == 0) {
+    if (WideCharToMultiByte(CP_UTF8, 0, wstr.data(), (int)wstr.size(), &str[0], size, NULL, NULL) == 0) {
         return std::string();
     }
     return str;
 }
 
 /// Converts regular std::string to UTF-16 windows string - Windows-only
-inline std::wstring ArchWindowsUtf8ToUtf16(const std::string &str)
-{
+inline std::wstring ArchWindowsUtf8ToUtf16(const std::string& str) {
     if (str.empty()) return std::wstring();
     // first call is only to get required size for wstring
-    int size = MultiByteToWideChar(
-        CP_UTF8, 0, str.data(), (int)str.size(), NULL, 0);
+    int size = MultiByteToWideChar(CP_UTF8, 0, str.data(), (int)str.size(), NULL, 0);
     if (size == 0) return std::wstring();
     std::wstring wstr(size, 0);
-    if(MultiByteToWideChar(
-           CP_UTF8, 0, str.data(), (int)str.size(), &wstr[0], size) == 0) {
+    if (MultiByteToWideChar(CP_UTF8, 0, str.data(), (int)str.size(), &wstr[0], size) == 0) {
         return std::wstring();
     }
     return wstr;
@@ -449,4 +430,4 @@ inline std::wstring ArchWindowsUtf8ToUtf16(const std::string &str)
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_FILE_SYSTEM_H
+#endif  // PXR_BASE_ARCH_FILE_SYSTEM_H

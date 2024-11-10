@@ -30,9 +30,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-static size_t
-Arch_ObtainCacheLineSize()
-{
+static size_t Arch_ObtainCacheLineSize() {
 #if defined(ARCH_OS_LINUX)
     return sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
 #elif defined(ARCH_OS_DARWIN)
@@ -54,13 +52,9 @@ Arch_ObtainCacheLineSize()
     std::unique_ptr<INFO[]> buffer(new INFO[total]);
 
     size_t lineSize = 0;
-    if (::GetLogicalProcessorInformation(&buffer[0], &bufferSize))
-    {
-        for (size_t current = 0; current != total; ++current)
-        {
-            if (buffer[current].Relationship == RelationCache &&
-                1 == buffer[current].Cache.Level)
-            {
+    if (::GetLogicalProcessorInformation(&buffer[0], &bufferSize)) {
+        for (size_t current = 0; current != total; ++current) {
+            if (buffer[current].Relationship == RelationCache && 1 == buffer[current].Cache.Level) {
                 lineSize = buffer[current].Cache.LineSize;
                 break;
             }
@@ -74,17 +68,14 @@ Arch_ObtainCacheLineSize()
 }
 
 ARCH_HIDDEN
-void
-Arch_ValidateAssumptions()
-{
+void Arch_ValidateAssumptions() {
     enum SomeEnum { BLAH };
 
     /*
      * We do an atomic compare-and-swap on enum's, treating then as ints,
      * so we are assuming that an enum is the same size as an int.
      */
-    static_assert(sizeof(SomeEnum) == sizeof(int),
-                  "sizeof(enum) != sizeof(int)");
+    static_assert(sizeof(SomeEnum) == sizeof(int), "sizeof(enum) != sizeof(int)");
 
     /*
      * Assert that sizeof(int) is 4.
@@ -94,10 +85,8 @@ Arch_ValidateAssumptions()
     /*
      * Verify that float and double are IEEE-754 compliant.
      */
-    static_assert(sizeof(float) == sizeof(uint32_t) &&
-                  sizeof(double) == sizeof(uint64_t) &&
-                  std::numeric_limits<float>::is_iec559 &&
-                  std::numeric_limits<double>::is_iec559,
+    static_assert(sizeof(float) == sizeof(uint32_t) && sizeof(double) == sizeof(uint64_t) &&
+                          std::numeric_limits<float>::is_iec559 && std::numeric_limits<double>::is_iec559,
                   "float/double not IEEE-754 compliant");
 
     /*
@@ -106,7 +95,7 @@ Arch_ValidateAssumptions()
     if (ArchGetDemangled<int>() != "int") {
         ARCH_WARNING("C++ demangling appears badly broken.");
     }
-    
+
     size_t cacheLineSize = Arch_ObtainCacheLineSize();
 
 #if defined(ARCH_OS_DARWIN) && defined(ARCH_CPU_INTEL)
@@ -115,16 +104,15 @@ Arch_ValidateAssumptions()
      * an Apple Silicon arm64 cpu. macOS always returns the underlying
      * HW's cache line size, so we explicitly approve this exception here
      * by setting the detected cache line size to be what we expect.
-     * This won't align, but the impact is one of performance. 
-     * We don't really care about it because when this is happening, we're 
+     * This won't align, but the impact is one of performance.
+     * We don't really care about it because when this is happening, we're
      * emulating x64_64 on arm64 which has a far greater performance impact.
      */
     const size_t ROSETTA_WORKAROUND_CACHE_LINE_SIZE = 128;
     NXArchInfo const* archInfo = NXGetLocalArchInfo();
     if (archInfo && ((archInfo->cputype & ~CPU_ARCH_MASK) == CPU_TYPE_ARM)) {
         if ((cacheLineSize != ROSETTA_WORKAROUND_CACHE_LINE_SIZE)) {
-            ARCH_WARNING(
-                "Cache-line size mismatch may negatively impact performance.");
+            ARCH_WARNING("Cache-line size mismatch may negatively impact performance.");
         }
         cacheLineSize = ARCH_CACHE_LINE_SIZE;
     }
@@ -133,7 +121,7 @@ Arch_ValidateAssumptions()
     /*
      * Make sure that the ARCH_CACHE_LINE_SIZE constant is set as expected
      * on the current hardware architecture.
-     */ 
+     */
     if (ARCH_CACHE_LINE_SIZE != cacheLineSize) {
         ARCH_WARNING("ARCH_CACHE_LINE_SIZE != Arch_ObtainCacheLineSize()");
     }
@@ -144,12 +132,12 @@ Arch_ValidateAssumptions()
      */
     {
         uint32_t check;
-        char buf[] = { 1, 2, 3, 4 };
+        char buf[] = {1, 2, 3, 4};
         memcpy(&check, buf, sizeof(check));
         if (check != 0x04030201) {
             ARCH_ERROR("Big-endian byte order not supported.");
         }
-    }    
+    }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

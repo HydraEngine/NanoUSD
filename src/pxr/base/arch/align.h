@@ -33,8 +33,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// returns the amount that would actually be consumed by the system to
 /// satisfy it. This is needed for efficient user-defined memory management.
 ///
-inline size_t
-ArchAlignMemorySize(size_t nBytes) {
+inline size_t ArchAlignMemorySize(size_t nBytes) {
     return (nBytes + 7) & (~0x7);
 }
 
@@ -44,18 +43,15 @@ ArchAlignMemorySize(size_t nBytes) {
 /// than \c ARCH_MAX_ALIGNMENT_INCREASE.
 ///
 /// \hideinitializer
-#define ARCH_MAX_ALIGNMENT_INCREASE	7
+#define ARCH_MAX_ALIGNMENT_INCREASE 7
 
 /// Align memory to the next "best" alignment value.
 ///
 /// This will take a pointer and bump it to the next ideal alignment boundary
 /// that will work for all data types.
 ///
-inline void *
-ArchAlignMemory(void *base)
-{
-    return reinterpret_cast<void *>
-	((reinterpret_cast<uintptr_t>(base) + 7) & ~0x7);
+inline void* ArchAlignMemory(void* base) {
+    return reinterpret_cast<void*>((reinterpret_cast<uintptr_t>(base) + 7) & ~0x7);
 }
 
 /// The size of a CPU cache line on the current processor architecture in bytes.
@@ -69,16 +65,14 @@ ArchAlignMemory(void *base)
 
 /// Aligned memory allocation.
 ARCH_API
-void *
-ArchAlignedAlloc(size_t alignment, size_t size);
+void* ArchAlignedAlloc(size_t alignment, size_t size);
 
 /// Free memory allocated by ArchAlignedAlloc.
 ARCH_API
-void
-ArchAlignedFree(void* ptr);
+void ArchAlignedFree(void* ptr);
 
 ///@}
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif	// PXR_BASE_ARCH_ALIGN_H 
+#endif  // PXR_BASE_ARCH_ALIGN_H

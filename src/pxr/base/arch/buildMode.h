@@ -27,4 +27,4 @@ struct ArchBuildMode {
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_BUILD_MODE_H
+#endif  // PXR_BASE_ARCH_BUILD_MODE_H

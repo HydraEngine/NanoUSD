@@ -47,16 +47,17 @@
 /// the ends of the earth, and this can lead to surprising results
 /// (e.g. undefined behavior) if we are not careful.
 
-#if defined(ARCH_COMPILER_GCC) || \
-    defined(ARCH_COMPILER_CLANG) || \
-    defined(ARCH_COMPILER_ICC)
+#if defined(ARCH_COMPILER_GCC) || defined(ARCH_COMPILER_CLANG) || defined(ARCH_COMPILER_ICC)
 
 // Intentionally using __builtin_unreachable on clang for consistency, since
 // __builtin_assume does not evaluate the expression, and our only option on gcc
 // is the __builtin_unreachable branch.
 
 #define ARCH_GUARANTEE_TO_COMPILER(x) \
-    if (static_cast<bool>(x)) { } else { __builtin_unreachable(); }
+    if (static_cast<bool>(x)) {       \
+    } else {                          \
+        __builtin_unreachable();      \
+    }
 
 #else
 
@@ -64,5 +65,4 @@
 
 #endif
 
-
-#endif // PXR_BASE_ARCH_HINTS_H
+#endif  // PXR_BASE_ARCH_HINTS_H

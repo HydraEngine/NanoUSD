@@ -18,7 +18,6 @@
 // XXX: This include is a hack to avoid build errors due to
 // incompatible macro definitions in pyport.h on macOS.
 #include <locale>
-#include "pxr/external/boost/python/dict.hpp"
 
 #include <deque>
 #include "pxr/base/tf/hashmap.h"
@@ -67,11 +66,6 @@ public:
     /// order.
     TF_API
     std::vector<std::string> GetModuleNames() const;
-
-    /// Return a python dict containing all currently known modules under
-    /// their canonical names.
-    TF_API
-    pxr_boost::python::dict GetModulesDict() const;
 
     /// Write a graphviz dot-file for the dependency graph of all. currently
     /// known libraries/modules to \a file.

@@ -42,7 +42,7 @@ ARCH_API std::thread::id ArchGetMainThreadId();
 #endif
 #elif defined(ARCH_CPU_ARM)
 #if defined(ARCH_COMPILER_GCC) || defined(ARCH_COMPILER_CLANG)
-#define ARCH_SPIN_PAUSE() asm volatile ("yield" ::: "memory")
+#define ARCH_SPIN_PAUSE() asm volatile("yield" ::: "memory")
 #elif defined(ARCH_COMPILER_MSVC)
 #define ARCH_SPIN_PAUSE() __yield();
 #endif
@@ -52,4 +52,4 @@ ARCH_API std::thread::id ArchGetMainThreadId();
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_THREADS_H
+#endif  // PXR_BASE_ARCH_THREADS_H

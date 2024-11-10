@@ -20,16 +20,13 @@ namespace {
 
 const std::thread::id _mainThreadId = std::this_thread::get_id();
 
-} // anonymous namespace
+}  // anonymous namespace
 
-bool ArchIsMainThread()
-{
+bool ArchIsMainThread() {
     return std::this_thread::get_id() == _mainThreadId;
 }
 
-std::thread::id
-ArchGetMainThreadId()
-{
+std::thread::id ArchGetMainThreadId() {
     return _mainThreadId;
 }
 

@@ -23,9 +23,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// passing it on as \p seed.  Note that this is *not* equivalent to hashing the
 /// contiguous pieces as a whole.  Support for that may be added in future.
 ///
-ARCH_API uint32_t ArchHash(const char *data, size_t len);
+ARCH_API uint32_t ArchHash(const char* data, size_t len);
 /// \overload
-ARCH_API uint32_t ArchHash(const char *data, size_t len, uint32_t seed);
+ARCH_API uint32_t ArchHash(const char* data, size_t len, uint32_t seed);
 
 /// Hash \a len bytes of \a data.
 ///
@@ -34,10 +34,10 @@ ARCH_API uint32_t ArchHash(const char *data, size_t len, uint32_t seed);
 /// passing it on as \p seed.  Note that this is *not* equivalent to hashing the
 /// contiguous pieces as a whole.  Support for that may be added in future.
 ///
-ARCH_API uint64_t ArchHash64(const char *data, size_t len);
+ARCH_API uint64_t ArchHash64(const char* data, size_t len);
 /// \overload
-ARCH_API uint64_t ArchHash64(const char *data, size_t len, uint64_t seed);
+ARCH_API uint64_t ArchHash64(const char* data, size_t len, uint64_t seed);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_HASH_H
+#endif  // PXR_BASE_ARCH_HASH_H

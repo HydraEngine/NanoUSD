@@ -43,9 +43,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// value.  Returns 0 on success.
 ///
 /// \ingroup group_arch_Multithreading
-ARCH_API 
+ARCH_API
 int ArchCloseAllFiles(int nExcept, const int* exceptFds);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_DAEMON_H 
+#endif  // PXR_BASE_ARCH_DAEMON_H

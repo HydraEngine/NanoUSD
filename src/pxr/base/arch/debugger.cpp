@@ -53,10 +53,7 @@ static std::atomic<bool> _archDebuggerWait(false);
 static char** _archDebuggerAttachArgs = 0;
 
 #if defined(ARCH_OS_LINUX) || defined(ARCH_OS_DARWIN)
-static
-void
-Arch_DebuggerTrapHandler(int)
-{
+static void Arch_DebuggerTrapHandler(int) {
     // If we're not configured to wait then do nothing.  Otherwise
     // reconfigure to not wait the next time then wait for the
     // debugger to continue us.
@@ -68,10 +65,7 @@ Arch_DebuggerTrapHandler(int)
 #endif
 
 #if defined(ARCH_OS_LINUX) || defined(ARCH_OS_DARWIN)
-static
-void
-Arch_DebuggerInitPosix()
-{
+static void Arch_DebuggerInitPosix() {
     _archDebuggerInitialized = true;
 
     // Handle the SIGTRAP signal so if no debugger is attached then
@@ -79,14 +73,14 @@ Arch_DebuggerInitPosix()
     // didn't handle this signal then the app would die.
     struct sigaction act;
     sigemptyset(&act.sa_mask);
-    act.sa_flags   = SA_NODEFER;
+    act.sa_flags = SA_NODEFER;
     act.sa_handler = Arch_DebuggerTrapHandler;
     if (sigaction(SIGTRAP, &act, 0)) {
-        ARCH_WARNING("Failed to set SIGTRAP handler;  "
-                     "debug trap not enabled");
+        ARCH_WARNING(
+                "Failed to set SIGTRAP handler;  "
+                "debug trap not enabled");
         _archDebuggerEnabled = false;
-    }
-    else {
+    } else {
         _archDebuggerEnabled = true;
     }
 }
@@ -94,13 +88,10 @@ namespace {
 struct InitPosix {
     InitPosix() { Arch_DebuggerInitPosix(); }
 };
-}
+}  // namespace
 #endif
 
-static
-void
-Arch_DebuggerInit()
-{
+static void Arch_DebuggerInit() {
 #if defined(ARCH_OS_LINUX) || defined(ARCH_OS_DARWIN)
 #if defined(ARCH_CPU_INTEL) && defined(ARCH_BITS_64)
     // Save some registers that normally don't have to be preserved.  We
@@ -111,14 +102,14 @@ Arch_DebuggerInit()
     // here, there's nowhere the debugger can look to get them.
     uint64_t rdi, rsi, rdx, rcx;
     asm volatile(
-        "movq %%rdi, %[rdi];\n"
-        "movq %%rsi, %[rsi];\n"
-        "movq %%rdx, %[rdx];\n"
-        "movq %%rcx, %[rcx];\n"
-        : [rdi] "=m" (rdi), [rsi] "=m" (rsi), [rdx] "=m" (rdx), [rcx] "=m" (rcx)
-        : // input
-        : // clobbered
-        );
+            "movq %%rdi, %[rdi];\n"
+            "movq %%rsi, %[rsi];\n"
+            "movq %%rdx, %[rdx];\n"
+            "movq %%rcx, %[rcx];\n"
+            : [rdi] "=m"(rdi), [rsi] "=m"(rsi), [rdx] "=m"(rdx), [rcx] "=m"(rcx)
+            :  // input
+            :  // clobbered
+    );
 #endif
 
     // Initialize once.
@@ -127,14 +118,14 @@ Arch_DebuggerInit()
 #if defined(ARCH_CPU_INTEL) && defined(ARCH_BITS_64)
     // Restore the saved registers.
     asm volatile(
-        "movq %[rdi], %%rdi;\n"
-        "movq %[rsi], %%rsi;\n"
-        "movq %[rdx], %%rdx;\n"
-        "movq %[rcx], %%rcx;\n"
-        : // output
-        : [rdi] "m" (rdi), [rsi] "m" (rsi), [rdx] "m" (rdx), [rcx] "m" (rcx)
-        : // clobbered
-        );
+            "movq %[rdi], %%rdi;\n"
+            "movq %[rsi], %%rsi;\n"
+            "movq %[rdx], %%rdx;\n"
+            "movq %[rcx], %%rcx;\n"
+            :  // output
+            : [rdi] "m"(rdi), [rsi] "m"(rsi), [rdx] "m"(rdx), [rcx] "m"(rcx)
+            :  // clobbered
+    );
 #endif
 
 #elif defined(ARCH_OS_WINDOWS)
@@ -145,22 +136,18 @@ Arch_DebuggerInit()
 #endif
 }
 
-
 #if defined(ARCH_OS_LINUX) || defined(ARCH_OS_DARWIN)
 // Use a 'non-locking' fork so that we won't get hung up if we've
 // had malloc corruption.  We can't prevent fork() from using the
 // heap, unfortunately, since fork handlers can do whatever they
 // want.  May want to use clone() on Linux or something similar.
-static int
-nonLockingFork()
-{
+static int nonLockingFork() {
     typedef int (*ForkFunc)(void);
     extern ForkFunc Arch_nonLockingFork;
 
     if (Arch_nonLockingFork != NULL) {
         return (Arch_nonLockingFork)();
-    }
-    else {
+    } else {
         return fork();
     }
 }
@@ -170,9 +157,7 @@ nonLockingFork()
 // go through a fairly typical daemonize process except we don't exit the
 // original process and we wait for the callback in the new process to exec
 // or return.
-bool
-Arch_DebuggerRunUnrelatedProcessPosix(bool (*cb)(void*), void* data)
-{
+bool Arch_DebuggerRunUnrelatedProcessPosix(bool (*cb)(void*), void* data) {
     // Do *not* use the heap in here.  Avoid using any functions except
     // system calls.
 
@@ -314,23 +299,17 @@ Arch_DebuggerRunUnrelatedProcessPosix(bool (*cb)(void*), void* data)
     _exit(0);
 }
 
-static
-bool
-Arch_DebuggerAttachExecPosix(void* data)
-{
+static bool Arch_DebuggerAttachExecPosix(void* data) {
     char** args = (char**)data;
     execve(args[0], args, ArchEnviron());
     return false;
 }
 
-#endif // defined(ARCH_OS_LINUX) || defined(ARCH_OS_DARWIN)
+#endif  // defined(ARCH_OS_LINUX) || defined(ARCH_OS_DARWIN)
 
 #if defined(ARCH_OS_LINUX)
 
-static
-bool
-Arch_DebuggerIsAttachedPosix()
-{
+static bool Arch_DebuggerIsAttachedPosix() {
     // Check for a ptrace based debugger by trying to ptrace.
     pid_t parent = getpid();
     pid_t pid = nonLockingFork();
@@ -370,7 +349,6 @@ Arch_DebuggerIsAttachedPosix()
         return WEXITSTATUS(status) != 0;
     }
     return false;
-
 }
 
 #elif defined(ARCH_OS_DARWIN)
@@ -378,17 +356,15 @@ Arch_DebuggerIsAttachedPosix()
 // From Apple:
 //   https://developer.apple.com/library/content/qa/qa1361/_index.html
 //
-// Returns true if the current process is being debugged (either 
+// Returns true if the current process is being debugged (either
 // running under the debugger or has a debugger attached post facto).
-static bool
-AmIBeingDebugged()
-{
-    int                 junk;
-    int                 mib[4];
-    struct kinfo_proc   info;
-    size_t              size;
+static bool AmIBeingDebugged() {
+    int junk;
+    int mib[4];
+    struct kinfo_proc info;
+    size_t size;
 
-    // Initialize the flags so that, if sysctl fails for some bizarre 
+    // Initialize the flags so that, if sysctl fails for some bizarre
     // reason, we get a predictable result.
 
     info.kp_proc.p_flag = 0;
@@ -408,15 +384,12 @@ AmIBeingDebugged()
 
     // We're being debugged if the P_TRACED flag is set.
 
-    return junk == 0 && ( (info.kp_proc.p_flag & P_TRACED) != 0 );
+    return junk == 0 && ((info.kp_proc.p_flag & P_TRACED) != 0);
 }
 
-#endif // defined(ARCH_OS_LINUX)
+#endif  // defined(ARCH_OS_LINUX)
 
-static
-bool
-Arch_DebuggerAttach()
-{
+static bool Arch_DebuggerAttach() {
     // Be very careful here to avoid using the heap.  We're not even sure
     // the stack is available but there's only so much we can do about that.
 
@@ -446,7 +419,8 @@ Arch_DebuggerAttach()
     // there's no obvious indication that the program has stopped.
     //
     // To attach to lldb on Darwin:
-    //   ARCH_DEBUGGER='osascript -e "tell application \"Terminal\"" -e "activate" -e "set newTab to do script(\"lldb -p %p\")" -e "end tell"'
+    //   ARCH_DEBUGGER='osascript -e "tell application \"Terminal\"" -e "activate" -e "set newTab to do script(\"lldb -p
+    //   %p\")" -e "end tell"'
     // This will bring up lldb in a (new) terminal window.  If your system
     // has System Integrity Protection then this won't work but there's a
     // workaround:  make a copy of Terminal (in /Applications/Utilities);
@@ -458,8 +432,7 @@ Arch_DebuggerAttach()
         // We need to start a process unrelated to this process so the
         // debugger's parent process is init, not this process (you can't
         // debug an ancestor process).
-        if (Arch_DebuggerRunUnrelatedProcessPosix(
-                    Arch_DebuggerAttachExecPosix, _archDebuggerAttachArgs)) {
+        if (Arch_DebuggerRunUnrelatedProcessPosix(Arch_DebuggerAttachExecPosix, _archDebuggerAttachArgs)) {
             // Give the debugger a chance to attach.  We have no way of
             // blocking to wait for that and we can't be sure the client
             // is even going to start a debugger so we simply sleep for
@@ -476,12 +449,9 @@ Arch_DebuggerAttach()
     return false;
 }
 
-
 // Do initialization now that would require heap/stack when attaching.
 ARCH_HIDDEN
-void
-Arch_InitDebuggerAttach()
-{
+void Arch_InitDebuggerAttach() {
 #if defined(ARCH_OS_LINUX) || defined(ARCH_OS_DARWIN)
     // Maximum length of a pid written as a decimal.  It's okay for this
     // to be greater than that.
@@ -500,8 +470,7 @@ Arch_InitDebuggerAttach()
             if (i[0] == '%' && i[1] == 'p') {
                 n += _decimalPidLength;
                 ++i;
-            }
-            else if (i[0] == '%' && i[1] == 'e') {
+            } else if (i[0] == '%' && i[1] == 'e') {
                 // Get the symlink in the proc filesystem if we haven't
                 // yet.
                 if (link.empty()) {
@@ -510,8 +479,7 @@ Arch_InitDebuggerAttach()
 
                 n += link.size();
                 ++i;
-            }
-            else {
+            } else {
                 ++n;
             }
         }
@@ -537,8 +505,7 @@ Arch_InitDebuggerAttach()
 
                 // Skip over the '%p'.
                 ++i;
-            }
-            else if (i[0] == '%' && i[1] == 'e') {
+            } else if (i[0] == '%' && i[1] == 'e') {
                 // Write the executable path
                 strcat(a, link.c_str());
 
@@ -547,8 +514,7 @@ Arch_InitDebuggerAttach()
 
                 // Skip over the '%e'.
                 ++i;
-            }
-            else {
+            } else {
                 // Copy the character.
                 *a++ = *i;
             }
@@ -565,13 +531,11 @@ Arch_InitDebuggerAttach()
 #endif
 }
 
-void
-ArchDebuggerTrap()
-{
+void ArchDebuggerTrap() {
     // Trap if a debugger is attached or we try and fail to attach one.
     // If we attach one we assume it will automatically stop this process.
     if (ArchDebuggerIsAttached() || !Arch_DebuggerAttach()) {
-    if (_archDebuggerEnabled) {
+        if (_archDebuggerEnabled) {
 #if defined(ARCH_OS_WINDOWS)
             DebugBreak();
 #elif defined(ARCH_CPU_INTEL)
@@ -579,34 +543,25 @@ ArchDebuggerTrap()
 #else
             raise(SIGTRAP);
 #endif
+        }
     }
 }
-}
 
-void
-ArchDebuggerWait(bool wait)
-{
+void ArchDebuggerWait(bool wait) {
     _archDebuggerWait = wait;
 }
 
 namespace {
-bool
-_ArchAvoidJIT()
-{
+bool _ArchAvoidJIT() {
     return (getenv("ARCH_AVOID_JIT") != nullptr);
 }
+}  // namespace
+
+bool ArchDebuggerAttach() {
+    return !_ArchAvoidJIT() && (ArchDebuggerIsAttached() || Arch_DebuggerAttach());
 }
 
-bool
-ArchDebuggerAttach()
-{
-    return !_ArchAvoidJIT() &&
-            (ArchDebuggerIsAttached() || Arch_DebuggerAttach());
-}
-
-bool
-ArchDebuggerIsAttached()
-{
+bool ArchDebuggerIsAttached() {
     Arch_DebuggerInit();
 #if defined(ARCH_OS_WINDOWS)
     return IsDebuggerPresent() == TRUE;
@@ -618,16 +573,14 @@ ArchDebuggerIsAttached()
     return false;
 }
 
-void
-ArchAbort(bool logging)
-{
+void ArchAbort(bool logging) {
     if (!_ArchAvoidJIT() || ArchDebuggerIsAttached()) {
         if (!logging) {
 #if !defined(ARCH_OS_WINDOWS)
             // Remove signal handler.
             struct sigaction act;
             act.sa_handler = SIG_DFL;
-            act.sa_flags   = 0;
+            act.sa_flags = 0;
             sigemptyset(&act.sa_mask);
             sigaction(SIGABRT, &act, NULL);
 #endif

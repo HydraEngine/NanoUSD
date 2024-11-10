@@ -7,7 +7,25 @@
 # create sample app project
 project(tf LANGUAGES C CXX)
 
+set(DOUBLE_CONVERSION_FILES
+        pxrDoubleConversion/bignum.cc
+        pxrDoubleConversion/bignum-dtoa.cc
+        pxrDoubleConversion/cached-powers.cc
+        pxrDoubleConversion/double-to-string.cc
+        pxrDoubleConversion/fast-dtoa.cc
+        pxrDoubleConversion/fixed-dtoa.cc
+        pxrDoubleConversion/string-to-double.cc
+        pxrDoubleConversion/strtod.cc
+)
+
+set(LZ4_FILES
+        pxrLZ4/lz4.cpp
+)
+
 set(SRC_FILES
+        ${DOUBLE_CONVERSION_FILES}
+        ${LZ4_FILES}
+
         anyUniquePtr.cpp
         anyWeakPtr.cpp
         atomicOfstreamWrapper.cpp
@@ -55,7 +73,7 @@ set(SRC_FILES
         safeOutputFile.cpp
         scoped.cpp
         scopeDescription.cpp
-        scriptModuleLoader.cpp
+#        scriptModuleLoader.cpp
         setenv.cpp
         singleton.cpp
         smallVector.cpp
@@ -90,6 +108,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME} PUBLIC
         fmt::fmt
         Eigen3::Eigen
+        TBB::tbb
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)

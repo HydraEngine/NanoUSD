@@ -18,6 +18,8 @@ execute_process(
 # Import nanobind through CMake's find_package mechanism
 find_package(nanobind CONFIG REQUIRED)
 
+find_package(TBB REQUIRED)
+
 find_package(fmt CONFIG REQUIRED)
 find_package(Eigen3 CONFIG REQUIRED)
 
@@ -78,9 +80,10 @@ target_include_directories(py_usd_ext PRIVATE
 
 target_link_libraries(py_usd_ext PRIVATE
         fmt::fmt
+        arch
         tf
         gf
-        json
+        js
 )
 
 # ==================================================================================================

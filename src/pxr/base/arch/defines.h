@@ -32,8 +32,7 @@
 // Processor
 //
 
-#if defined(i386) || defined(__i386__) || defined(__x86_64__) || \
-    defined(_M_IX86) || defined(_M_X64)
+#if defined(i386) || defined(__i386__) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
 #define ARCH_CPU_INTEL
 #elif defined(__arm__) || defined(__aarch64__) || defined(_M_ARM)
 #define ARCH_CPU_ARM
@@ -97,9 +96,9 @@
 // See here for more detail about MSVC's preprocessors:
 // https://learn.microsoft.com/en-us/cpp/preprocessor/preprocessor-experimental-overview
 #if defined(ARCH_COMPILER_MSVC)
-    #if !defined(_MSVC_TRADITIONAL) || _MSVC_TRADITIONAL
-    #define ARCH_PREPROCESSOR_MSVC_TRADITIONAL
-    #endif
+#if !defined(_MSVC_TRADITIONAL) || _MSVC_TRADITIONAL
+#define ARCH_PREPROCESSOR_MSVC_TRADITIONAL
+#endif
 #endif
 
-#endif // PXR_BASE_ARCH_DEFINES_H 
+#endif  // PXR_BASE_ARCH_DEFINES_H

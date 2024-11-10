@@ -29,11 +29,11 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \addtogroup group_arch_Math
 ///@{
 
-#if defined (ARCH_CPU_INTEL) || defined (ARCH_CPU_ARM) || defined (doxygen)
+#if defined(ARCH_CPU_INTEL) || defined(ARCH_CPU_ARM) || defined(doxygen)
 
 /// This is the smallest value e such that 1+e^2 == 1, using floats.
 /// True for all IEEE754 chipsets.
-#define ARCH_MIN_FLOAT_EPS_SQR      0.000244141F
+#define ARCH_MIN_FLOAT_EPS_SQR 0.000244141F
 
 /// Three-valued sign.  Return 1 if val > 0, 0 if val == 0, or -1 if val < 0.
 inline long ArchSign(long val) {
@@ -91,32 +91,33 @@ inline double ArchBitPatternToDouble(uint64_t v) {
 #if defined(ARCH_OS_LINUX) || defined(doxygen)
 
 /// Computes the sine and cosine of the specified value as a float.
-inline void ArchSinCosf(float v, float *s, float *c) { sincosf(v, s, c); }
+inline void ArchSinCosf(float v, float* s, float* c) {
+    sincosf(v, s, c);
+}
 
 /// Computes the sine and cosine of the specified value as a double.
-inline void ArchSinCos(double v, double *s, double *c) { sincos(v, s, c); }
+inline void ArchSinCos(double v, double* s, double* c) {
+    sincos(v, s, c);
+}
 
 #elif defined(ARCH_OS_DARWIN) || defined(ARCH_OS_WINDOWS)
 
-inline void ArchSinCosf(float v, float *s, float *c) {
+inline void ArchSinCosf(float v, float* s, float* c) {
     *s = std::sin(v);
-    *c = std::cos(v);  
+    *c = std::cos(v);
 }
-inline void ArchSinCos(double v, double *s, double *c) {
+inline void ArchSinCos(double v, double* s, double* c) {
     *s = std::sin(v);
-    *c = std::cos(v);  
+    *c = std::cos(v);
 }
 
 #else
 #error Unknown architecture.
 #endif
 
-
 /// Return the number of consecutive 0-bits in \p x starting from the least
 /// significant bit position.  If \p x is 0, the result is undefined.
-inline int
-ArchCountTrailingZeros(uint64_t x)
-{
+inline int ArchCountTrailingZeros(uint64_t x) {
 #if defined(ARCH_COMPILER_GCC) || defined(ARCH_COMPILER_CLANG)
     return __builtin_ctzl(x);
 #elif defined(ARCH_COMPILER_MSVC)
@@ -134,9 +135,8 @@ ArchCountTrailingZeros(uint64_t x)
 #endif
 }
 
-
 ///@}
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_MATH_H
+#endif  // PXR_BASE_ARCH_MATH_H

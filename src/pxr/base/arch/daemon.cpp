@@ -25,9 +25,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 // Fork the current process and close all undesired file descriptors.
 //
-int
-ArchCloseAllFiles(int nExcept, const int* exceptFds)
-{
+int ArchCloseAllFiles(int nExcept, const int* exceptFds) {
 #if defined(ARCH_OS_LINUX) || defined(ARCH_OS_DARWIN)
 
     int status, retStatus, retErrno;
@@ -38,12 +36,9 @@ ArchCloseAllFiles(int nExcept, const int* exceptFds)
     //
     status = getrlimit(RLIMIT_NOFILE, &limits);
 
-    if (limits.rlim_cur == RLIM_INFINITY)
-    {
+    if (limits.rlim_cur == RLIM_INFINITY) {
         maxfd = NOFILE;
-    }
-    else
-    {
+    } else {
         maxfd = (int)limits.rlim_cur;
     }
 
@@ -55,10 +50,9 @@ ArchCloseAllFiles(int nExcept, const int* exceptFds)
     }
 
     retStatus = 0;
-    retErrno  = 0;
+    retErrno = 0;
 
-    for (i = 0; i < maxfd; ++i)
-    {
+    for (i = 0; i < maxfd; ++i) {
         // Check if we should skip this file descriptor.
         // XXX -- This is slow for large maxfd and nExcept but nExcept is
         //        never large in our use cases.  We could copy and sort
@@ -84,13 +78,11 @@ ArchCloseAllFiles(int nExcept, const int* exceptFds)
             status = close(i);
         } while (status != 0 && errno == EINTR);
 
-        if (status != 0 &&
-            errno  != EBADF)
-        {
+        if (status != 0 && errno != EBADF) {
             // We got some real error.  Remember it but keep going.
             //
             retStatus = status;
-            retErrno  = errno;
+            retErrno = errno;
         }
     }
 

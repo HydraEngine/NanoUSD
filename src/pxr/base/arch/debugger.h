@@ -37,7 +37,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// continue command.  The user can also continue the process from an
 /// attached terminal by putting the process into the foreground or
 /// background.
-/// 
+///
 ARCH_API
 void ArchDebuggerTrap() ARCH_NOINLINE;
 
@@ -47,7 +47,7 @@ void ArchDebuggerTrap() ARCH_NOINLINE;
 /// will cause the process to wait for a signal.  The user can attach
 /// a debugger to continue the process.  The process will not wait
 /// again until another call to this function with \p wait \c true.
-/// 
+///
 ARCH_API
 void ArchDebuggerWait(bool wait);
 
@@ -74,8 +74,7 @@ bool ArchDebuggerIsAttached() ARCH_NOINLINE;
 /// case it will _exit(134).  If \p logging is \c false then this will
 /// attempt to bypass any crash logging.
 [[noreturn]]
-ARCH_API
-void ArchAbort(bool logging = true);
+ARCH_API void ArchAbort(bool logging = true);
 
 /// Stop in the debugger.
 ///
@@ -84,11 +83,18 @@ void ArchAbort(bool logging = true);
 /// debugger's stack trace.  The calling functions should also use the
 /// \c ARCH_NOINLINE function attribute.
 #if defined(ARCH_COMPILER_GCC) || defined(ARCH_COMPILER_CLANG)
-#define ARCH_DEBUGGER_TRAP do { ArchDebuggerTrap(); asm(""); } while (0)
+#define ARCH_DEBUGGER_TRAP  \
+    do {                    \
+        ArchDebuggerTrap(); \
+        asm("");            \
+    } while (0)
 #else
-#define ARCH_DEBUGGER_TRAP do { ArchDebuggerTrap(); } while (0)
+#define ARCH_DEBUGGER_TRAP  \
+    do {                    \
+        ArchDebuggerTrap(); \
+    } while (0)
 #endif
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_DEBUGGER_H
+#endif  // PXR_BASE_ARCH_DEBUGGER_H

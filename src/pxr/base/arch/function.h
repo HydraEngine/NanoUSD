@@ -29,9 +29,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// \ingroup group_arch_Diagnostic
 ARCH_API
-std::string ArchGetPrettierFunctionName(const std::string &function,
-                                        const std::string &prettyFunction);
+std::string ArchGetPrettierFunctionName(const std::string& function, const std::string& prettyFunction);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_ARCH_FUNCTION_H 
+#endif  // PXR_BASE_ARCH_FUNCTION_H
