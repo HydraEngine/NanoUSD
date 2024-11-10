@@ -24,20 +24,13 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
-TF_REGISTRY_FUNCTION(TfType)
-{
+TF_REGISTRY_FUNCTION(TfType) {
     TfType::Define<TsSpline>();
 }
 
-
 // static
-bool TsSpline::IsSupportedValueType(const TfType valueType)
-{
-    return (
-        valueType == Ts_GetType<double>()
-        || valueType == Ts_GetType<float>()
-        || valueType == Ts_GetType<GfHalf>());
+bool TsSpline::IsSupportedValueType(const TfType valueType) {
+    return (valueType == Ts_GetType<double>() || valueType == Ts_GetType<float>() || valueType == Ts_GetType<GfHalf>());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -45,31 +38,22 @@ bool TsSpline::IsSupportedValueType(const TfType valueType)
 
 TsSpline::TsSpline() = default;
 
-TsSpline::TsSpline(const TfType valueType)
-    : _data(Ts_SplineData::Create(valueType))
-{
-}
+TsSpline::TsSpline(const TfType valueType) : _data(Ts_SplineData::Create(valueType)) {}
 
-TsSpline::TsSpline(const TsSpline &other)
-    : _data(other._data)
-{
-}
+TsSpline::TsSpline(const TsSpline& other) : _data(other._data) {}
 
-TsSpline& TsSpline::operator=(const TsSpline &other)
-{
+TsSpline& TsSpline::operator=(const TsSpline& other) {
     _data = other._data;
     return *this;
 }
 
-bool TsSpline::operator==(const TsSpline &other) const
-{
+bool TsSpline::operator==(const TsSpline& other) const {
     // Get data for both sides.
     const Ts_SplineData* const data = _GetData();
     const Ts_SplineData* const otherData = other._GetData();
 
     // If we're sharing data, we're equal.
-    if (data == otherData)
-    {
+    if (data == otherData) {
         return true;
     }
 
@@ -77,110 +61,90 @@ bool TsSpline::operator==(const TsSpline &other) const
     return *data == *otherData;
 }
 
-bool TsSpline::operator!=(const TsSpline &other) const
-{
+bool TsSpline::operator!=(const TsSpline& other) const {
     return !(*this == other);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Value types
 
-TfType TsSpline::GetValueType() const
-{
+TfType TsSpline::GetValueType() const {
     return _GetData()->GetValueType();
 }
 
-void TsSpline::SetTimeValued(const bool timeValued)
-{
+void TsSpline::SetTimeValued(const bool timeValued) {
     _PrepareForWrite();
     _data->timeValued = timeValued;
 }
 
-bool TsSpline::IsTimeValued() const
-{
+bool TsSpline::IsTimeValued() const {
     return _GetData()->timeValued;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Curve types
 
-void TsSpline::SetCurveType(const TsCurveType curveType)
-{
+void TsSpline::SetCurveType(const TsCurveType curveType) {
     _PrepareForWrite();
     _data->curveType = curveType;
 }
 
-TsCurveType TsSpline::GetCurveType() const
-{
+TsCurveType TsSpline::GetCurveType() const {
     return _GetData()->curveType;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Extrapolation
 
-void TsSpline::SetPreExtrapolation(
-    const TsExtrapolation &extrap)
-{
+void TsSpline::SetPreExtrapolation(const TsExtrapolation& extrap) {
     _PrepareForWrite();
     _data->preExtrapolation = extrap;
 }
 
-TsExtrapolation TsSpline::GetPreExtrapolation() const
-{
+TsExtrapolation TsSpline::GetPreExtrapolation() const {
     return _GetData()->preExtrapolation;
 }
 
-void TsSpline::SetPostExtrapolation(
-    const TsExtrapolation &extrap)
-{
+void TsSpline::SetPostExtrapolation(const TsExtrapolation& extrap) {
     _PrepareForWrite();
     _data->postExtrapolation = extrap;
 }
 
-TsExtrapolation TsSpline::GetPostExtrapolation() const
-{
+TsExtrapolation TsSpline::GetPostExtrapolation() const {
     return _GetData()->postExtrapolation;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Inner Loops
 
-void TsSpline::SetInnerLoopParams(
-    const TsLoopParams &params)
-{
+void TsSpline::SetInnerLoopParams(const TsLoopParams& params) {
     _PrepareForWrite();
 
     // Store a copy.
     _data->loopParams = params;
 
     // Ignore negative loop counts.
-    if (_data->loopParams.numPreLoops < 0)
-    {
+    if (_data->loopParams.numPreLoops < 0) {
         _data->loopParams.numPreLoops = 0;
     }
-    if (_data->loopParams.numPostLoops < 0)
-    {
+    if (_data->loopParams.numPostLoops < 0) {
         _data->loopParams.numPostLoops = 0;
     }
 }
 
-TsLoopParams TsSpline::GetInnerLoopParams() const
-{
+TsLoopParams TsSpline::GetInnerLoopParams() const {
     return _GetData()->loopParams;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Knots
 
-void TsSpline::SetKnots(const TsKnotMap &knots)
-{
-    if (_GetData()->isTyped && knots.GetValueType() != GetValueType())
-    {
+void TsSpline::SetKnots(const TsKnotMap& knots) {
+    if (_GetData()->isTyped && knots.GetValueType() != GetValueType()) {
         TF_CODING_ERROR(
-            "Mismatched knot map type '%s' passed to TsSpline::SetKnots "
-            "for spline of type '%s'",
-            knots.GetValueType().GetTypeName().c_str(),
-            GetValueType().GetTypeName().c_str());
+                "Mismatched knot map type '%s' passed to TsSpline::SetKnots "
+                "for spline of type '%s'",
+                knots.GetValueType().GetTypeName().c_str(), GetValueType().GetTypeName().c_str());
         return;
     }
 
@@ -191,42 +155,31 @@ void TsSpline::SetKnots(const TsKnotMap &knots)
 
     // Copy knot data.
     _data->ReserveForKnotCount(knots.size());
-    for (const TsKnot &knot : knots)
-        _data->PushKnot(knot._GetData(), knot.GetCustomData());
+    for (const TsKnot& knot : knots) _data->PushKnot(knot._GetData(), knot.GetCustomData());
 
     // De-regress.
-    if (TsEditBehaviorBlock::GetStack().empty())
-    {
+    if (TsEditBehaviorBlock::GetStack().empty()) {
         AdjustRegressiveTangents();
     }
 }
 
-bool TsSpline::CanSetKnot(
-    const TsKnot &knot,
-    std::string* const reasonOut) const
-{
-    if (_GetData()->isTyped && knot.GetValueType() != GetValueType())
-    {
-        if (reasonOut)
-        {
+bool TsSpline::CanSetKnot(const TsKnot& knot, std::string* const reasonOut) const {
+    if (_GetData()->isTyped && knot.GetValueType() != GetValueType()) {
+        if (reasonOut) {
             *reasonOut = TfStringPrintf(
-                "Cannot set knot of value type '%s' "
-                "into spline of value type '%s'",
-                knot.GetValueType().GetTypeName().c_str(),
-                GetValueType().GetTypeName().c_str());
+                    "Cannot set knot of value type '%s' "
+                    "into spline of value type '%s'",
+                    knot.GetValueType().GetTypeName().c_str(), GetValueType().GetTypeName().c_str());
         }
         return false;
     }
 
-    if (knot.GetCurveType() != GetCurveType())
-    {
-        if (reasonOut)
-        {
+    if (knot.GetCurveType() != GetCurveType()) {
+        if (reasonOut) {
             *reasonOut = TfStringPrintf(
-                "Cannot set knot of curve type '%s' "
-                "into spline of curve type '%s'",
-                TfEnum::GetName(knot.GetCurveType()).c_str(),
-                TfEnum::GetName(GetCurveType()).c_str());
+                    "Cannot set knot of curve type '%s' "
+                    "into spline of curve type '%s'",
+                    TfEnum::GetName(knot.GetCurveType()).c_str(), TfEnum::GetName(GetCurveType()).c_str());
         }
         return false;
     }
@@ -234,15 +187,11 @@ bool TsSpline::CanSetKnot(
     return true;
 }
 
-bool TsSpline::SetKnot(
-    const TsKnot &knot,
-    GfInterval *affectedIntervalOut)
-{
+bool TsSpline::SetKnot(const TsKnot& knot, GfInterval* affectedIntervalOut) {
     // XXX TODO: affectedIntervalOut
 
     std::string msg;
-    if (!CanSetKnot(knot, &msg))
-    {
+    if (!CanSetKnot(knot, &msg)) {
         TF_CODING_ERROR(msg);
         return false;
     }
@@ -253,51 +202,39 @@ bool TsSpline::SetKnot(
     const size_t idx = _data->SetKnot(knot._GetData(), knot.GetCustomData());
 
     // De-regress.
-    if (TsEditBehaviorBlock::GetStack().empty()
-        && _data->curveType == TsCurveTypeBezier)
-    {
+    if (TsEditBehaviorBlock::GetStack().empty() && _data->curveType == TsCurveTypeBezier) {
         // Find indices of knots bounding segments that the knot is part of.
         const size_t first = (idx == 0 ? idx : idx - 1);
         const size_t last = (idx == _data->times.size() - 1 ? idx : idx + 1);
 
         // Process zero, one, or two segments.
-        for (size_t i = first; i < last; i++)
-        {
+        for (size_t i = first; i < last; i++) {
             Ts_KnotData* const startKnot = _data->GetKnotPtrAtIndex(i);
             Ts_KnotData* const endKnot = _data->GetKnotPtrAtIndex(i + 1);
-            Ts_RegressionPreventerBatchAccess::ProcessSegment(
-                startKnot, endKnot, GetAntiRegressionAuthoringMode());
+            Ts_RegressionPreventerBatchAccess::ProcessSegment(startKnot, endKnot, GetAntiRegressionAuthoringMode());
         }
     }
 
     return true;
 }
 
-void TsSpline::_SetKnotUnchecked(
-    const TsKnot &knot)
-{
+void TsSpline::_SetKnotUnchecked(const TsKnot& knot) {
     _PrepareForWrite(knot.GetValueType());
     _data->SetKnot(knot._GetData(), knot.GetCustomData());
 }
 
-TsKnotMap TsSpline::GetKnots() const
-{
+TsKnotMap TsSpline::GetKnots() const {
     return TsKnotMap(_GetData());
 }
 
-bool TsSpline::GetKnot(
-    const TsTime time,
-    TsKnot* const knotOut) const
-{
-    if (!_data)
-    {
+bool TsSpline::GetKnot(const TsTime time, TsKnot* const knotOut) const {
+    if (!_data) {
         return false;
     }
 
     // Look up and clone knot data.
     Ts_KnotData* const knotData = _data->CloneKnotAtTime(time);
-    if (!knotData)
-    {
+    if (!knotData) {
         return false;
     }
 
@@ -313,16 +250,12 @@ bool TsSpline::GetKnot(
 ////////////////////////////////////////////////////////////////////////////////
 // Removing knots
 
-void TsSpline::ClearKnots()
-{
+void TsSpline::ClearKnots() {
     _PrepareForWrite();
     _data->ClearKnots();
 }
 
-void TsSpline::RemoveKnot(
-    const TsTime time,
-    GfInterval* const affectedIntervalOut)
-{
+void TsSpline::RemoveKnot(const TsTime time, GfInterval* const affectedIntervalOut) {
     _PrepareForWrite();
     _data->RemoveKnotAtTime(time);
 
@@ -332,9 +265,7 @@ void TsSpline::RemoveKnot(
 ////////////////////////////////////////////////////////////////////////////////
 // Evaluation
 
-bool TsSpline::DoSidesDiffer(
-    const TsTime time) const
-{
+bool TsSpline::DoSidesDiffer(const TsTime time) const {
     // Simple implementation.  Could probably be faster.
     double preValue = 0, value = 0;
     EvalPreValue(time, &preValue);
@@ -345,84 +276,65 @@ bool TsSpline::DoSidesDiffer(
 ////////////////////////////////////////////////////////////////////////////////
 // Whole-Spline Queries
 
-bool TsSpline::IsEmpty() const
-{
+bool TsSpline::IsEmpty() const {
     return _GetData()->times.empty();
 }
 
-bool TsSpline::HasValueBlocks() const
-{
+bool TsSpline::HasValueBlocks() const {
     return _GetData()->HasValueBlocks();
 }
 
-bool TsSpline::HasLoops() const
-{
+bool TsSpline::HasLoops() const {
     return HasInnerLoops() || HasExtrapolatingLoops();
 }
 
-bool TsSpline::HasInnerLoops() const
-{
+bool TsSpline::HasInnerLoops() const {
     return _GetData()->HasInnerLoops();
 }
 
-bool TsSpline::HasExtrapolatingLoops() const
-{
-    return (
-        _GetData()->preExtrapolation.IsLooping()
-        || _GetData()->postExtrapolation.IsLooping());
+bool TsSpline::HasExtrapolatingLoops() const {
+    return (_GetData()->preExtrapolation.IsLooping() || _GetData()->postExtrapolation.IsLooping());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Within-Spline Queries
 
-bool TsSpline::HasValueBlockAtTime(const TsTime time) const
-{
+bool TsSpline::HasValueBlockAtTime(const TsTime time) const {
     return _GetData()->HasValueBlockAtTime(time);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Human-readable dump
 
-static std::string _ExtrapDesc(const TsExtrapolation &extrap)
-{
+static std::string _ExtrapDesc(const TsExtrapolation& extrap) {
     std::ostringstream ss;
 
     ss << TfEnum::GetName(extrap.mode).substr(8);
 
-    if (extrap.mode == TsExtrapSloped)
-    {
+    if (extrap.mode == TsExtrapSloped) {
         ss << " " << TfStringify(extrap.slope);
     }
 
     return ss.str();
 }
 
-std::ostream& operator<<(std::ostream& out, const TsSpline &spline)
-{
+std::ostream& operator<<(std::ostream& out, const TsSpline& spline) {
     out << "Spline:" << std::endl
         << "  value type " << spline.GetValueType().GetTypeName() << std::endl
         << "  time valued " << spline.IsTimeValued() << std::endl
-        << "  curve type "
-        << TfEnum::GetName(spline.GetCurveType()).substr(11) << std::endl
-        << "  pre extrap "
-        << _ExtrapDesc(spline.GetPreExtrapolation()) << std::endl
-        << "  post extrap "
-        << _ExtrapDesc(spline.GetPostExtrapolation()) << std::endl;
+        << "  curve type " << TfEnum::GetName(spline.GetCurveType()).substr(11) << std::endl
+        << "  pre extrap " << _ExtrapDesc(spline.GetPreExtrapolation()) << std::endl
+        << "  post extrap " << _ExtrapDesc(spline.GetPostExtrapolation()) << std::endl;
 
-    if (spline.HasInnerLoops())
-    {
+    if (spline.HasInnerLoops()) {
         const TsLoopParams lp = spline.GetInnerLoopParams();
         out << "Loop:" << std::endl
-            << "  start " << TfStringify(lp.protoStart)
-            << ", end " << TfStringify(lp.protoEnd)
-            << ", numPreLoops " << lp.numPreLoops
-            << ", numPostLoops " << lp.numPostLoops
-            << ", valueOffset " << TfStringify(lp.valueOffset)
+            << "  start " << TfStringify(lp.protoStart) << ", end " << TfStringify(lp.protoEnd) << ", numPreLoops "
+            << lp.numPreLoops << ", numPostLoops " << lp.numPostLoops << ", valueOffset " << TfStringify(lp.valueOffset)
             << std::endl;
     }
 
-    for (const TsKnot &knot : spline.GetKnots())
-        out << knot;
+    for (const TsKnot& knot : spline.GetKnots()) out << knot;
 
     return out;
 }
@@ -430,11 +342,7 @@ std::ostream& operator<<(std::ostream& out, const TsSpline &spline)
 ////////////////////////////////////////////////////////////////////////////////
 // Applying layer offsets
 
-void Ts_SplineOffsetAccess::ApplyOffsetAndScale(
-    TsSpline *spline,
-    const TsTime offset,
-    const double scale)
-{
+void Ts_SplineOffsetAccess::ApplyOffsetAndScale(TsSpline* spline, const TsTime offset, const double scale) {
     spline->_PrepareForWrite();
     spline->_data->ApplyOffsetAndScale(offset, scale);
 }
@@ -442,48 +350,40 @@ void Ts_SplineOffsetAccess::ApplyOffsetAndScale(
 ////////////////////////////////////////////////////////////////////////////////
 // Helpers
 
-const Ts_SplineData* TsSpline::_GetData() const
-{
+const Ts_SplineData* TsSpline::_GetData() const {
     // Function-static default data to use when _data is null.
-    static const Ts_SplineData* const defaultData =
-        Ts_SplineData::Create(TfType());
+    static const Ts_SplineData* const defaultData = Ts_SplineData::Create(TfType());
 
     return (_data ? _data.get() : defaultData);
 }
 
-void TsSpline::_PrepareForWrite(TfType valueType)
-{
+void TsSpline::_PrepareForWrite(TfType valueType) {
     // If we had default state, create storage now.  If no value type was
     // specified, the storage will be physically double-typed (anticipating the
     // most common case) but labeled untyped.
-    if (!_data)
-    {
+    if (!_data) {
         _data.reset(Ts_SplineData::Create(valueType));
     }
 
     // If we're adding our first knot(s), and we have untyped data, make sure we
     // have the correct typed data.
-    else if (_data && !_data->isTyped && valueType)
-    {
+    else if (_data && !_data->isTyped && valueType) {
         // If we guessed correctly, upgrade to real storage by marking typed.
-        if (valueType == Ts_GetType<double>())
-        {
+        if (valueType == Ts_GetType<double>()) {
             _data->isTyped = true;
         }
 
         // Otherwise create new storage and transfer.  The second parameter to
         // Create serves as a copy source for overall spline parameters, which
         // are the purpose of untyped storage.
-        else
-        {
+        else {
             _data.reset(Ts_SplineData::Create(valueType, _data.get()));
         }
     }
 
     // Copy-on-write: if we have shared data, make an independent copy so we can
     // modify it without affecting other TsSpline instances.
-    else if (_data && _data.use_count() > 1)
-    {
+    else if (_data && _data.use_count() > 1) {
         _data.reset(_data->Clone());
     }
 }
@@ -496,45 +396,35 @@ void TsSpline::_PrepareForWrite(TfType valueType)
 #endif
 
 // static
-TsAntiRegressionMode
-TsSpline::GetAntiRegressionAuthoringMode()
-{
-    const TsAntiRegressionAuthoringSelector* const selector =
-        TsAntiRegressionAuthoringSelector::GetStackTop();
-    if (selector)
-    {
+TsAntiRegressionMode TsSpline::GetAntiRegressionAuthoringMode() {
+    const TsAntiRegressionAuthoringSelector* const selector = TsAntiRegressionAuthoringSelector::GetStackTop();
+    if (selector) {
         return selector->mode;
     }
 
     return PXR_TS_DEFAULT_ANTI_REGRESSION_AUTHORING_MODE;
 }
 
-bool TsSpline::HasRegressiveTangents() const
-{
-    if (!_data)
-    {
+bool TsSpline::HasRegressiveTangents() const {
+    if (!_data) {
         return false;
     }
 
-    if (_data->curveType != TsCurveTypeBezier)
-    {
+    if (_data->curveType != TsCurveTypeBezier) {
         return false;
     }
 
     const size_t size = _data->times.size();
-    if (size < 2)
-    {
+    if (size < 2) {
         return false;
     }
 
-    for (size_t i = 0; i < size - 1; i++)
-    {
+    for (size_t i = 0; i < size - 1; i++) {
         const Ts_KnotData* const startKnot = _data->GetKnotPtrAtIndex(i);
         const Ts_KnotData* const endKnot = _data->GetKnotPtrAtIndex(i + 1);
 
-        if (Ts_RegressionPreventerBatchAccess::IsSegmentRegressive(
-                startKnot, endKnot, GetAntiRegressionAuthoringMode()))
-        {
+        if (Ts_RegressionPreventerBatchAccess::IsSegmentRegressive(startKnot, endKnot,
+                                                                   GetAntiRegressionAuthoringMode())) {
             return true;
         }
     }
@@ -542,21 +432,17 @@ bool TsSpline::HasRegressiveTangents() const
     return false;
 }
 
-bool TsSpline::AdjustRegressiveTangents()
-{
-    if (!_data)
-    {
+bool TsSpline::AdjustRegressiveTangents() {
+    if (!_data) {
         return false;
     }
 
-    if (_data->curveType != TsCurveTypeBezier)
-    {
+    if (_data->curveType != TsCurveTypeBezier) {
         return false;
     }
 
     const size_t size = _data->times.size();
-    if (size < 2)
-    {
+    if (size < 2) {
         return false;
     }
 
@@ -564,26 +450,22 @@ bool TsSpline::AdjustRegressiveTangents()
     bool splineChanged = false;
 
     // If we're sharing data, start by only querying for regression.
-    if (_data.use_count() > 1)
-    {
-        for (; i < size - 1; i++)
-        {
+    if (_data.use_count() > 1) {
+        for (; i < size - 1; i++) {
             const Ts_KnotData* const startKnot = _data->GetKnotPtrAtIndex(i);
             const Ts_KnotData* const endKnot = _data->GetKnotPtrAtIndex(i + 1);
 
             // After we break here, 'i' will still identify the regression, and
             // we'll reuse that index in the modifying loop below.
-            if (Ts_RegressionPreventerBatchAccess::IsSegmentRegressive(
-                    startKnot, endKnot, GetAntiRegressionAuthoringMode()))
-            {
+            if (Ts_RegressionPreventerBatchAccess::IsSegmentRegressive(startKnot, endKnot,
+                                                                       GetAntiRegressionAuthoringMode())) {
                 break;
             }
         }
 
         // If we didn't get all the way through, then there is regression in the
         // i'th segment.  Copy the data in preparation for modification.
-        if (i < size - 1)
-        {
+        if (i < size - 1) {
             _PrepareForWrite();
         }
     }
@@ -592,14 +474,11 @@ bool TsSpline::AdjustRegressiveTangents()
     // already examined some of the segments in read-only mode above; it may be
     // skipped because we found no regression above; or it may be the only thing
     // we do, because we were not sharing data.
-    for (; i < size - 1; i++)
-    {
+    for (; i < size - 1; i++) {
         Ts_KnotData* const startKnot = _data->GetKnotPtrAtIndex(i);
         Ts_KnotData* const endKnot = _data->GetKnotPtrAtIndex(i + 1);
 
-        if (Ts_RegressionPreventerBatchAccess::ProcessSegment(
-                startKnot, endKnot, GetAntiRegressionAuthoringMode()))
-        {
+        if (Ts_RegressionPreventerBatchAccess::ProcessSegment(startKnot, endKnot, GetAntiRegressionAuthoringMode())) {
             splineChanged = true;
         }
     }
@@ -611,10 +490,8 @@ bool TsSpline::AdjustRegressiveTangents()
 // Misc
 
 // XXX: see comment in header.
-void swap(TsSpline &lhs, TsSpline &rhs)
-{
+void swap(TsSpline& lhs, TsSpline& rhs) {
     std::swap(lhs, rhs);
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

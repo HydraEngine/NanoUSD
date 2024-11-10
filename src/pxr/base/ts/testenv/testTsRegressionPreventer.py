@@ -21,8 +21,8 @@ class TestTsRegressionPreventer(unittest.TestCase):
 
     def _DoTest(
             self, caseName, museumId, knotTime,
-            knotDelta = 0, preDelta = 0, postDelta = 0,
-            isRegressive = False, isInitiallyRegressive = False):
+            knotDelta=0, preDelta=0, postDelta=0,
+            isRegressive=False, isInitiallyRegressive=False):
         """
         Modify a knot with a RegressionPreventer, verify the outcome, and, if
         possible, write a graph image of the modified spline.
@@ -57,7 +57,7 @@ class TestTsRegressionPreventer(unittest.TestCase):
         # This illustrates the possibly regressive spline that results from the
         # unfiltered edit.
         bezSplineData = Evaluator().SplineToSplineData(unfilteredSpline)
-        bezSamples = SampleBezier(bezSplineData, numSamples = 200)
+        bezSamples = SampleBezier(bezSplineData, numSamples=200)
 
         # Gather test results, but always keep going.  This ensures we get all
         # possible information.
@@ -103,9 +103,9 @@ class TestTsRegressionPreventer(unittest.TestCase):
             # Include the result of Set() to be diffed against baseline.
             # Include the non-anti-regressed Bezier as a reference.
             baseliner = Baseliner.CreateForParamCompare(
-                subCaseStr, splineData, samples, precision = 6)
+                subCaseStr, splineData, samples, precision=6)
             baseliner.SetCreationString(
-                result.GetDebugDescription(precision = 6))
+                result.GetDebugDescription(precision=6))
             baseliner.AddReferenceSpline("Bezier", bezSplineData, bezSamples)
             subCaseOk = baseliner.Validate()
             if not subCaseOk:
@@ -169,12 +169,12 @@ class TestTsRegressionPreventer(unittest.TestCase):
         # XXX: should just stringify splines, rather than going through TsTest
         data1 = Evaluator().SplineToSplineData(spline1)
         data2 = Evaluator().SplineToSplineData(spline2)
-        lines1 = data1.GetDebugDescription().splitlines(keepends = True)
-        lines2 = data2.GetDebugDescription().splitlines(keepends = True)
+        lines1 = data1.GetDebugDescription().splitlines(keepends=True)
+        lines2 = data2.GetDebugDescription().splitlines(keepends=True)
 
         # ...however, this produced a strange error (Unicode?)
-        #lines1 = str(spline1)
-        #lines2 = str(spline2)
+        # lines1 = str(spline1)
+        # lines2 = str(spline2)
 
         if lines2 == lines1:
             return True
@@ -184,8 +184,8 @@ class TestTsRegressionPreventer(unittest.TestCase):
         sys.stdout.writelines(
             difflib.unified_diff(
                 lines1, lines2,
-                fromfile = name1, tofile = name2,
-                n = len(lines1) + len(lines2)))
+                fromfile=name1, tofile=name2,
+                n=len(lines1) + len(lines2)))
         print()
 
         return False
@@ -196,8 +196,8 @@ class TestTsRegressionPreventer(unittest.TestCase):
         """
         self._DoTest(
             "Noop", Museum.NearCenterVertical,
-            knotTime = 0,
-            isRegressive = False)
+            knotTime=0,
+            isRegressive=False)
 
     def test_InitiallyRegressive(self):
         """
@@ -207,8 +207,8 @@ class TestTsRegressionPreventer(unittest.TestCase):
         """
         self._DoTest(
             "InitiallyRegressive", Museum.RegressiveS,
-            knotTime = 156,
-            isRegressive = True, isInitiallyRegressive = True)
+            knotTime=156,
+            isRegressive=True, isInitiallyRegressive=True)
 
     def test_PreRegressive(self):
         """
@@ -216,8 +216,8 @@ class TestTsRegressionPreventer(unittest.TestCase):
         """
         self._DoTest(
             "PreRegressive", Museum.NearCenterVertical,
-            knotTime = 0, postDelta = 0.5,
-            isRegressive = True)
+            knotTime=0, postDelta=0.5,
+            isRegressive=True)
 
     def test_PostRegressive(self):
         """
@@ -225,8 +225,8 @@ class TestTsRegressionPreventer(unittest.TestCase):
         """
         self._DoTest(
             "PostRegressive", Museum.NearCenterVertical,
-            knotTime = 1, preDelta = 0.5,
-            isRegressive = True)
+            knotTime=1, preDelta=0.5,
+            isRegressive=True)
 
     def test_MoveStart(self):
         """
@@ -234,8 +234,8 @@ class TestTsRegressionPreventer(unittest.TestCase):
         """
         self._DoTest(
             "MoveStart", Museum.NearCenterVertical,
-            knotTime = 0, knotDelta = 0.4,
-            isRegressive = True)
+            knotTime=0, knotDelta=0.4,
+            isRegressive=True)
 
     def test_Replace(self):
         """
@@ -243,8 +243,8 @@ class TestTsRegressionPreventer(unittest.TestCase):
         """
         self._DoTest(
             "Replace", Museum.FourKnotBezier,
-            knotTime = 2, knotDelta = 1,
-            isRegressive = False)
+            knotTime=2, knotDelta=1,
+            isRegressive=False)
 
     def test_Reorder(self):
         """
@@ -252,10 +252,9 @@ class TestTsRegressionPreventer(unittest.TestCase):
         """
         self._DoTest(
             "Reorder", Museum.FourKnotBezier,
-            knotTime = 2, knotDelta = 1.2,
-            isRegressive = True)
+            knotTime=2, knotDelta=1.2,
+            isRegressive=True)
 
 
 if __name__ == "__main__":
-
     unittest.main()

@@ -14,9 +14,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
-TF_REGISTRY_FUNCTION(TfEnum)
-{
+TF_REGISTRY_FUNCTION(TfEnum) {
     TF_ADD_ENUM_NAME(TsInterpValueBlock, "Value Block");
     TF_ADD_ENUM_NAME(TsInterpHeld, "Held");
     TF_ADD_ENUM_NAME(TsInterpLinear, "Linear");
@@ -39,60 +37,39 @@ TF_REGISTRY_FUNCTION(TfEnum)
     TF_ADD_ENUM_NAME(TsAntiRegressionKeepStart, "Keep Start");
 }
 
-
-bool TsLoopParams::operator==(const TsLoopParams &other) const
-{
-    return
-        protoStart == other.protoStart
-        && protoEnd == other.protoEnd
-        && numPreLoops == other.numPreLoops
-        && numPostLoops == other.numPostLoops
-        && valueOffset == other.valueOffset;
+bool TsLoopParams::operator==(const TsLoopParams& other) const {
+    return protoStart == other.protoStart && protoEnd == other.protoEnd && numPreLoops == other.numPreLoops &&
+           numPostLoops == other.numPostLoops && valueOffset == other.valueOffset;
 }
 
-bool TsLoopParams::operator!=(const TsLoopParams &other) const
-{
+bool TsLoopParams::operator!=(const TsLoopParams& other) const {
     return !(*this == other);
 }
 
-GfInterval TsLoopParams::GetPrototypeInterval() const
-{
-    return GfInterval(
-        protoStart, protoEnd,
-        /* minClosed = */ true, /* maxClosed = */ false);
+GfInterval TsLoopParams::GetPrototypeInterval() const {
+    return GfInterval(protoStart, protoEnd,
+                      /* minClosed = */ true, /* maxClosed = */ false);
 }
 
-GfInterval TsLoopParams::GetLoopedInterval() const
-{
+GfInterval TsLoopParams::GetLoopedInterval() const {
     const TsTime protoSpan = protoEnd - protoStart;
-    return GfInterval(
-        protoStart - numPreLoops * protoSpan,
-        protoEnd + numPostLoops * protoSpan);
+    return GfInterval(protoStart - numPreLoops * protoSpan, protoEnd + numPostLoops * protoSpan);
 }
 
 TsExtrapolation::TsExtrapolation() = default;
 
-TsExtrapolation::TsExtrapolation(TsExtrapMode modeIn)
-    : mode(modeIn)
-{
+TsExtrapolation::TsExtrapolation(TsExtrapMode modeIn) : mode(modeIn) {}
+
+bool TsExtrapolation::operator==(const TsExtrapolation& other) const {
+    return mode == other.mode && (mode != TsExtrapSloped || slope == other.slope);
 }
 
-bool TsExtrapolation::operator==(const TsExtrapolation &other) const
-{
-    return
-        mode == other.mode
-        && (mode != TsExtrapSloped || slope == other.slope);
-}
-
-bool TsExtrapolation::operator!=(const TsExtrapolation &other) const
-{
+bool TsExtrapolation::operator!=(const TsExtrapolation& other) const {
     return !(*this == other);
 }
 
-bool TsExtrapolation::IsLooping() const
-{
+bool TsExtrapolation::IsLooping() const {
     return (mode >= TsExtrapLoopRepeat && mode <= TsExtrapLoopOscillate);
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

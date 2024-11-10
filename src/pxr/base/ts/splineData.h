@@ -29,13 +29,11 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class TsSpline;
 
-
 // Primary data structure for splines.  Abstract; subclasses store knot data,
 // which is flexibly typed (double/float/half).  This is the unit of data that
 // is managed by shared_ptr, and forms the basis of copy-on-write data sharing.
 //
-struct Ts_SplineData
-{
+struct Ts_SplineData {
 public:
     // If valueType is known, create a TypedSplineData of the specified type.
     // If valueType is unknown, create a TypedSplineData<double> to store
@@ -44,9 +42,7 @@ public:
     // overallParamSource is provided, it is a previous overall-only struct, and
     // our guess about double was wrong, so we are transferring the overall
     // parameters.
-    static Ts_SplineData* Create(
-        TfType valueType,
-        const Ts_SplineData *overallParamSource = nullptr);
+    static Ts_SplineData* Create(TfType valueType, const Ts_SplineData* overallParamSource = nullptr);
 
     virtual ~Ts_SplineData();
 
@@ -57,28 +53,21 @@ public:
     virtual size_t GetKnotStructSize() const = 0;
     virtual Ts_SplineData* Clone() const = 0;
 
-    virtual bool operator==(const Ts_SplineData &other) const = 0;
+    virtual bool operator==(const Ts_SplineData& other) const = 0;
 
     virtual void ReserveForKnotCount(size_t count) = 0;
-    virtual void PushKnot(
-        const Ts_KnotData *knotData,
-        const VtDictionary &customData) = 0;
-    virtual size_t SetKnot(
-        const Ts_KnotData *knotData,
-        const VtDictionary &customData) = 0;
+    virtual void PushKnot(const Ts_KnotData* knotData, const VtDictionary& customData) = 0;
+    virtual size_t SetKnot(const Ts_KnotData* knotData, const VtDictionary& customData) = 0;
 
     virtual Ts_KnotData* CloneKnotAtIndex(size_t index) const = 0;
     virtual Ts_KnotData* CloneKnotAtTime(TsTime time) const = 0;
     virtual Ts_KnotData* GetKnotPtrAtIndex(size_t index) = 0;
-    virtual Ts_TypedKnotData<double>
-        GetKnotDataAsDouble(size_t index) const = 0;
+    virtual Ts_TypedKnotData<double> GetKnotDataAsDouble(size_t index) const = 0;
 
     virtual void ClearKnots() = 0;
     virtual void RemoveKnotAtTime(TsTime time) = 0;
 
-    virtual void ApplyOffsetAndScale(
-        TsTime offset,
-        double scale) = 0;
+    virtual void ApplyOffsetAndScale(TsTime offset, double scale) = 0;
 
     virtual bool HasValueBlocks() const = 0;
     virtual bool HasValueBlockAtTime(TsTime time) const = 0;
@@ -87,8 +76,7 @@ public:
     // Returns whether there is a valid inner-loop configuration.  If
     // firstProtoIndexOut is provided, it receives the index of the first knot
     // in the prototype.
-    bool HasInnerLoops(
-        size_t *firstProtoIndexOut = nullptr) const;
+    bool HasInnerLoops(size_t* firstProtoIndexOut = nullptr) const;
 
 public:
     // BITFIELDS - note: for enum-typed bitfields, we declare one bit more than
@@ -128,40 +116,30 @@ public:
     std::unordered_map<TsTime, VtDictionary> customData;
 };
 
-
 // Concrete subclass of Ts_SplineData.  Templated on T, the value type.
 //
 template <typename T>
-struct Ts_TypedSplineData final :
-    public Ts_SplineData
-{
+struct Ts_TypedSplineData final : public Ts_SplineData {
 public:
     TfType GetValueType() const override;
     size_t GetKnotStructSize() const override;
     Ts_SplineData* Clone() const override;
 
-    bool operator==(const Ts_SplineData &other) const override;
+    bool operator==(const Ts_SplineData& other) const override;
 
     void ReserveForKnotCount(size_t count) override;
-    void PushKnot(
-        const Ts_KnotData *knotData,
-        const VtDictionary &customData) override;
-    size_t SetKnot(
-        const Ts_KnotData *knotData,
-        const VtDictionary &customData) override;
+    void PushKnot(const Ts_KnotData* knotData, const VtDictionary& customData) override;
+    size_t SetKnot(const Ts_KnotData* knotData, const VtDictionary& customData) override;
 
     Ts_KnotData* CloneKnotAtIndex(size_t index) const override;
     Ts_KnotData* CloneKnotAtTime(TsTime time) const override;
     Ts_KnotData* GetKnotPtrAtIndex(size_t index) override;
-    Ts_TypedKnotData<double>
-        GetKnotDataAsDouble(size_t index) const override;
+    Ts_TypedKnotData<double> GetKnotDataAsDouble(size_t index) const override;
 
     void ClearKnots() override;
     void RemoveKnotAtTime(TsTime time) override;
 
-    void ApplyOffsetAndScale(
-        TsTime offset,
-        double scale) override;
+    void ApplyOffsetAndScale(TsTime offset, double scale) override;
 
     bool HasValueBlocks() const override;
     bool HasValueBlockAtTime(TsTime time) const override;
@@ -171,33 +149,25 @@ public:
     std::vector<Ts_TypedKnotData<T>> knots;
 };
 
-
 // Data-access helpers for the Ts implementation.  The untyped functions are
 // friends of TsSpline, and retrieve private data pointers.
 
-Ts_SplineData*
-Ts_GetSplineData(TsSpline &spline);
+Ts_SplineData* Ts_GetSplineData(TsSpline& spline);
 
-const Ts_SplineData*
-Ts_GetSplineData(const TsSpline &spline);
+const Ts_SplineData* Ts_GetSplineData(const TsSpline& spline);
 
 template <typename T>
-Ts_TypedSplineData<T>*
-Ts_GetTypedSplineData(TsSpline &spline);
+Ts_TypedSplineData<T>* Ts_GetTypedSplineData(TsSpline& spline);
 
 template <typename T>
-const Ts_TypedSplineData<T>*
-Ts_GetTypedSplineData(const TsSpline &spline);
-
+const Ts_TypedSplineData<T>* Ts_GetTypedSplineData(const TsSpline& spline);
 
 ////////////////////////////////////////////////////////////////////////////////
 // TEMPLATE IMPLEMENTATIONS
 
 template <typename T>
-TfType Ts_TypedSplineData<T>::GetValueType() const
-{
-    if (!isTyped)
-    {
+TfType Ts_TypedSplineData<T>::GetValueType() const {
+    if (!isTyped) {
         return TfType();
     }
 
@@ -205,40 +175,28 @@ TfType Ts_TypedSplineData<T>::GetValueType() const
 }
 
 template <typename T>
-size_t Ts_TypedSplineData<T>::GetKnotStructSize() const
-{
+size_t Ts_TypedSplineData<T>::GetKnotStructSize() const {
     return sizeof(Ts_TypedKnotData<T>);
 }
 
 template <typename T>
-Ts_SplineData*
-Ts_TypedSplineData<T>::Clone() const
-{
+Ts_SplineData* Ts_TypedSplineData<T>::Clone() const {
     return new Ts_TypedSplineData<T>(*this);
 }
 
 template <typename T>
-bool Ts_TypedSplineData<T>::operator==(
-    const Ts_SplineData &other) const
-{
+bool Ts_TypedSplineData<T>::operator==(const Ts_SplineData& other) const {
     // Compare non-templated data.
-    if (isTyped != other.isTyped
-        || timeValued != other.timeValued
-        || curveType != other.curveType
-        || preExtrapolation != other.preExtrapolation
-        || postExtrapolation != other.postExtrapolation
-        || loopParams != other.loopParams
-        || customData != other.customData)
-    {
+    if (isTyped != other.isTyped || timeValued != other.timeValued || curveType != other.curveType ||
+        preExtrapolation != other.preExtrapolation || postExtrapolation != other.postExtrapolation ||
+        loopParams != other.loopParams || customData != other.customData) {
         return false;
     }
 
     // Downcast to our value type.  If other is not of the same type, we're not
     // equal.
-    const Ts_TypedSplineData<T>* const typedOther =
-        dynamic_cast<const Ts_TypedSplineData<T>*>(&other);
-    if (!typedOther)
-    {
+    const Ts_TypedSplineData<T>* const typedOther = dynamic_cast<const Ts_TypedSplineData<T>*>(&other);
+    if (!typedOther) {
         return false;
     }
 
@@ -247,61 +205,43 @@ bool Ts_TypedSplineData<T>::operator==(
 }
 
 template <typename T>
-void Ts_TypedSplineData<T>::ReserveForKnotCount(
-    const size_t count)
-{
+void Ts_TypedSplineData<T>::ReserveForKnotCount(const size_t count) {
     times.reserve(count);
     knots.reserve(count);
 }
 
 template <typename T>
-void Ts_TypedSplineData<T>::PushKnot(
-    const Ts_KnotData* const knotData,
-    const VtDictionary &customDataIn)
-{
-    const Ts_TypedKnotData<T>* const typedKnotData =
-        static_cast<const Ts_TypedKnotData<T>*>(knotData);
+void Ts_TypedSplineData<T>::PushKnot(const Ts_KnotData* const knotData, const VtDictionary& customDataIn) {
+    const Ts_TypedKnotData<T>* const typedKnotData = static_cast<const Ts_TypedKnotData<T>*>(knotData);
 
     times.push_back(knotData->time);
     knots.push_back(*typedKnotData);
 
-    if (!customDataIn.empty())
-    {
+    if (!customDataIn.empty()) {
         customData[knotData->time] = customDataIn;
     }
 }
 
 template <typename T>
-size_t Ts_TypedSplineData<T>::SetKnot(
-    const Ts_KnotData* const knotData,
-    const VtDictionary &customDataIn)
-{
-    const Ts_TypedKnotData<T>* const typedKnotData =
-        static_cast<const Ts_TypedKnotData<T>*>(knotData);
+size_t Ts_TypedSplineData<T>::SetKnot(const Ts_KnotData* const knotData, const VtDictionary& customDataIn) {
+    const Ts_TypedKnotData<T>* const typedKnotData = static_cast<const Ts_TypedKnotData<T>*>(knotData);
 
     // Use binary search to find insert-or-overwrite position.
-    const auto it =
-        std::lower_bound(times.begin(), times.end(), knotData->time);
-    const size_t idx =
-        it - times.begin();
-    const bool overwrite =
-        (it != times.end() && *it == knotData->time);
+    const auto it = std::lower_bound(times.begin(), times.end(), knotData->time);
+    const size_t idx = it - times.begin();
+    const bool overwrite = (it != times.end() && *it == knotData->time);
 
     // Insert or overwrite new time and knot data.
-    if (overwrite)
-    {
+    if (overwrite) {
         times[idx] = knotData->time;
         knots[idx] = *typedKnotData;
-    }
-    else
-    {
+    } else {
         times.insert(it, knotData->time);
         knots.insert(knots.begin() + idx, *typedKnotData);
     }
 
     // Store customData, if any.
-    if (!customDataIn.empty())
-    {
+    if (!customDataIn.empty()) {
         customData[knotData->time] = customDataIn;
     }
 
@@ -309,21 +249,14 @@ size_t Ts_TypedSplineData<T>::SetKnot(
 }
 
 template <typename T>
-Ts_KnotData*
-Ts_TypedSplineData<T>::CloneKnotAtIndex(
-    const size_t index) const
-{
+Ts_KnotData* Ts_TypedSplineData<T>::CloneKnotAtIndex(const size_t index) const {
     return new Ts_TypedKnotData<T>(knots[index]);
 }
 
 template <typename T>
-Ts_KnotData*
-Ts_TypedSplineData<T>::CloneKnotAtTime(
-    const TsTime time) const
-{
+Ts_KnotData* Ts_TypedSplineData<T>::CloneKnotAtTime(const TsTime time) const {
     const auto it = std::lower_bound(times.begin(), times.end(), time);
-    if (it == times.end() || *it != time)
-    {
+    if (it == times.end() || *it != time) {
         return nullptr;
     }
 
@@ -332,20 +265,14 @@ Ts_TypedSplineData<T>::CloneKnotAtTime(
 }
 
 template <typename T>
-Ts_KnotData*
-Ts_TypedSplineData<T>::GetKnotPtrAtIndex(
-    const size_t index)
-{
+Ts_KnotData* Ts_TypedSplineData<T>::GetKnotPtrAtIndex(const size_t index) {
     return &(knots[index]);
 }
 
 // Depending on T, this is either a verbatim copy or an increase in precision.
 template <typename T>
-Ts_TypedKnotData<double>
-Ts_TypedSplineData<T>::GetKnotDataAsDouble(
-    const size_t index) const
-{
-    const Ts_TypedKnotData<T> &in = knots[index];
+Ts_TypedKnotData<double> Ts_TypedSplineData<T>::GetKnotDataAsDouble(const size_t index) const {
+    const Ts_TypedKnotData<T>& in = knots[index];
     Ts_TypedKnotData<double> out;
 
     // Use operator= to copy base-class members.  This is admittedly weird, but
@@ -362,20 +289,16 @@ Ts_TypedSplineData<T>::GetKnotDataAsDouble(
 }
 
 template <typename T>
-void Ts_TypedSplineData<T>::ClearKnots()
-{
+void Ts_TypedSplineData<T>::ClearKnots() {
     times.clear();
     customData.clear();
     knots.clear();
 }
 
 template <typename T>
-void Ts_TypedSplineData<T>::RemoveKnotAtTime(
-    const TsTime time)
-{
+void Ts_TypedSplineData<T>::RemoveKnotAtTime(const TsTime time) {
     const auto it = std::lower_bound(times.begin(), times.end(), time);
-    if (it == times.end() || *it != time)
-    {
+    if (it == times.end() || *it != time) {
         TF_CODING_ERROR("Cannot remove nonexistent knot from SplineData");
         return;
     }
@@ -387,11 +310,7 @@ void Ts_TypedSplineData<T>::RemoveKnotAtTime(
 }
 
 template <typename T>
-static void _ApplyOffsetAndScaleToKnot(
-    Ts_TypedKnotData<T>* const knotData,
-    const TsTime offset,
-    const double scale)
-{
+static void _ApplyOffsetAndScaleToKnot(Ts_TypedKnotData<T>* const knotData, const TsTime offset, const double scale) {
     const bool reversing = (scale < 0);
     const double absScale = std::abs(scale);
 
@@ -407,8 +326,7 @@ static void _ApplyOffsetAndScaleToKnot(
     knotData->postTanSlope /= scale;
 
     // Swap pre- and post-data if time-reversing.
-    if (reversing)
-    {
+    if (reversing) {
         std::swap(knotData->preTanWidth, knotData->postTanWidth);
         std::swap(knotData->preValue, knotData->value);
         std::swap(knotData->preTanSlope, knotData->postTanSlope);
@@ -416,10 +334,7 @@ static void _ApplyOffsetAndScaleToKnot(
 }
 
 template <typename T>
-void Ts_TypedSplineData<T>::ApplyOffsetAndScale(
-    const TsTime offset,
-    const double scale)
-{
+void Ts_TypedSplineData<T>::ApplyOffsetAndScale(const TsTime offset, const double scale) {
     // XXX: scale can be negative.  We believe this is uncommon.  It is supposed
     // to mean that the spline is not only scaled, but also time-reversed.  We
     // make an attempt, but there will be inconsistencies, because splines have
@@ -456,8 +371,7 @@ void Ts_TypedSplineData<T>::ApplyOffsetAndScale(
     //   value will be taken from the (originally) pre-value instead.
     //
     const bool reversing = (scale < 0);
-    if (reversing)
-    {
+    if (reversing) {
         TF_WARN("Applying negative scale to spline");
     }
 
@@ -468,106 +382,82 @@ void Ts_TypedSplineData<T>::ApplyOffsetAndScale(
     // - Inverse relative (slopes): slope = height/width, so we apply 1/scale.
 
     // Scale extrapolation slopes if applicable (inverse relative).
-    if (preExtrapolation.mode == TsExtrapSloped)
-    {
+    if (preExtrapolation.mode == TsExtrapSloped) {
         preExtrapolation.slope /= scale;
     }
-    if (postExtrapolation.mode == TsExtrapSloped)
-    {
+    if (postExtrapolation.mode == TsExtrapSloped) {
         postExtrapolation.slope /= scale;
     }
 
     // Swap extrapolations if time-reversing.
-    if (reversing)
-    {
+    if (reversing) {
         std::swap(preExtrapolation, postExtrapolation);
     }
 
     // Process inner-loop params.
-    if (loopParams.protoEnd > loopParams.protoStart)
-    {
+    if (loopParams.protoEnd > loopParams.protoStart) {
         // Process start and end times (absolute).
         loopParams.protoStart = loopParams.protoStart * scale + offset;
         loopParams.protoEnd = loopParams.protoEnd * scale + offset;
 
         // Swap start and end times if reversing.
-        if (reversing)
-        {
+        if (reversing) {
             std::swap(loopParams.protoStart, loopParams.protoEnd);
             std::swap(loopParams.numPreLoops, loopParams.numPostLoops);
         }
     }
 
     // Process knot-times vector (absolute).
-    for (TsTime &time : times)
-        time = time * scale + offset;
+    for (TsTime& time : times) time = time * scale + offset;
 
     // Reorder knot times if reversing.
-    if (reversing)
-    {
+    if (reversing) {
         std::reverse(times.begin(), times.end());
     }
 
     // Process knots.  Duplicate the logic that is applied unconditionally, so
     // that we can rip through the entire vector just once, and we don't have to
     // do the if-check on each iteration.
-    if (timeValued)
-    {
-        for (Ts_TypedKnotData<T> &knotData : knots)
-        {
+    if (timeValued) {
+        for (Ts_TypedKnotData<T>& knotData : knots) {
             _ApplyOffsetAndScaleToKnot(&knotData, offset, scale);
 
             // Process time values (absolute).
-            knotData.value =
-                static_cast<T>(knotData.value * scale + offset);
-            knotData.preValue =
-                static_cast<T>(knotData.preValue * scale + offset);
+            knotData.value = static_cast<T>(knotData.value * scale + offset);
+            knotData.preValue = static_cast<T>(knotData.preValue * scale + offset);
         }
-    }
-    else
-    {
-        for (Ts_TypedKnotData<T> &knotData : knots)
-            _ApplyOffsetAndScaleToKnot(&knotData, offset, scale);
+    } else {
+        for (Ts_TypedKnotData<T>& knotData : knots) _ApplyOffsetAndScaleToKnot(&knotData, offset, scale);
     }
 
-    if (reversing)
-    {
+    if (reversing) {
         // Move interpolation modes from start knots to end knots.
-        for (size_t i = 1; i < knots.size(); i++)
-            knots[i - 1].nextInterp = knots[i].nextInterp;
+        for (size_t i = 1; i < knots.size(); i++) knots[i - 1].nextInterp = knots[i].nextInterp;
 
         // Reorder knots.
         std::reverse(knots.begin(), knots.end());
     }
 
     // Re-index custom data.  Times are adjusted absolutely.
-    if (!customData.empty())
-    {
+    if (!customData.empty()) {
         std::unordered_map<TsTime, VtDictionary> newCustomData;
-        for (const auto &mapPair : customData)
-            newCustomData[mapPair.first * scale + offset] = mapPair.second;
+        for (const auto& mapPair : customData) newCustomData[mapPair.first * scale + offset] = mapPair.second;
         customData.swap(newCustomData);
     }
 }
 
 template <typename T>
-bool Ts_TypedSplineData<T>::HasValueBlocks() const
-{
-    if (knots.empty())
-    {
+bool Ts_TypedSplineData<T>::HasValueBlocks() const {
+    if (knots.empty()) {
         return false;
     }
 
-    if (preExtrapolation.mode == TsExtrapValueBlock
-        || postExtrapolation.mode == TsExtrapValueBlock)
-    {
+    if (preExtrapolation.mode == TsExtrapValueBlock || postExtrapolation.mode == TsExtrapValueBlock) {
         return true;
     }
 
-    for (const Ts_TypedKnotData<T> &knotData : knots)
-    {
-        if (knotData.nextInterp == TsInterpValueBlock)
-        {
+    for (const Ts_TypedKnotData<T>& knotData : knots) {
+        if (knotData.nextInterp == TsInterpValueBlock) {
             return true;
         }
     }
@@ -576,38 +466,31 @@ bool Ts_TypedSplineData<T>::HasValueBlocks() const
 }
 
 template <typename T>
-bool Ts_TypedSplineData<T>::HasValueBlockAtTime(
-    const TsTime time) const
-{
+bool Ts_TypedSplineData<T>::HasValueBlockAtTime(const TsTime time) const {
     // If no knots, no blocks.
-    if (knots.empty())
-    {
+    if (knots.empty()) {
         return false;
     }
 
     // Find first knot at or after time.
-    const auto lbIt =
-        std::lower_bound(times.begin(), times.end(), time);
+    const auto lbIt = std::lower_bound(times.begin(), times.end(), time);
 
     // If time is after all knots, return whether we have blocked
     // post-extrapolation.
-    if (lbIt == times.end())
-    {
+    if (lbIt == times.end()) {
         return postExtrapolation.mode == TsExtrapValueBlock;
     }
 
     // If there is a knot at this time, return whether its segment has blocked
     // interpolation.
-    if (*lbIt == time)
-    {
+    if (*lbIt == time) {
         const auto knotIt = knots.begin() + (lbIt - times.begin());
         return knotIt->nextInterp == TsInterpValueBlock;
     }
 
     // If time is before all knots, return whether we have blocked
     // pre-extrapolation.
-    if (lbIt == times.begin())
-    {
+    if (lbIt == times.begin()) {
         return preExtrapolation.mode == TsExtrapValueBlock;
     }
 
@@ -618,21 +501,14 @@ bool Ts_TypedSplineData<T>::HasValueBlockAtTime(
 }
 
 template <typename T>
-Ts_TypedSplineData<T>*
-Ts_GetTypedSplineData(TsSpline &spline)
-{
-    return static_cast<Ts_TypedSplineData<T>*>(
-        Ts_GetSplineData(spline));
+Ts_TypedSplineData<T>* Ts_GetTypedSplineData(TsSpline& spline) {
+    return static_cast<Ts_TypedSplineData<T>*>(Ts_GetSplineData(spline));
 }
 
 template <typename T>
-const Ts_TypedSplineData<T>*
-Ts_GetTypedSplineData(const TsSpline &spline)
-{
-    return static_cast<Ts_TypedSplineData<T>*>(
-        Ts_GetSplineData(spline));
+const Ts_TypedSplineData<T>* Ts_GetTypedSplineData(const TsSpline& spline) {
+    return static_cast<Ts_TypedSplineData<T>*>(Ts_GetSplineData(spline));
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

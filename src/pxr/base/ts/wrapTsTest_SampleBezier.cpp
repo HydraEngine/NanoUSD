@@ -16,11 +16,7 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 using namespace pxr_boost::python;
 
-
-void wrapTsTest_SampleBezier()
-{
-    def("TsTest_SampleBezier", &TsTest_SampleBezier,
-        (arg("splineData"),
-         arg("numSamples")),
+void wrapTsTest_SampleBezier() {
+    def("TsTest_SampleBezier", &TsTest_SampleBezier, (arg("splineData"), arg("numSamples")),
         return_value_policy<TfPySequenceToList>());
 }

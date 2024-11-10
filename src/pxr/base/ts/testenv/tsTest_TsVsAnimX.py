@@ -18,7 +18,7 @@ import unittest
 
 class TsTest_TsVsAnimX(unittest.TestCase):
 
-    def _DoTest(self, case, dataId, extrapLoop = False):
+    def _DoTest(self, case, dataId, extrapLoop=False):
         """
         Illustrate the differences between Ts and AnimX.
         """
@@ -30,7 +30,7 @@ class TsTest_TsVsAnimX(unittest.TestCase):
         tsSamples = TsEvaluator().Eval(data, times)
         animXSamples = AnimXEvaluator().Eval(data, times)
 
-        comparator = Comparator(title = case)
+        comparator = Comparator(title=case)
         comparator.AddSpline("Ts", data, tsSamples)
         comparator.AddSpline("AnimX", data, animXSamples)
 
@@ -65,17 +65,17 @@ class TsTest_TsVsAnimX(unittest.TestCase):
     def test_ExtrapRepeat(self):
         self._DoTest(
             "test_ExtrapRepeat", Museum.ExtrapLoopRepeat,
-            extrapLoop = True)
+            extrapLoop=True)
 
     def test_ExtrapReset(self):
         self._DoTest(
             "test_ExtrapReset", Museum.ExtrapLoopReset,
-            extrapLoop = True)
+            extrapLoop=True)
 
     def test_ExtrapOscillate(self):
         self._DoTest(
             "test_ExtrapOscillate", Museum.ExtrapLoopOscillate,
-            extrapLoop = True)
+            extrapLoop=True)
 
 
 if __name__ == "__main__":

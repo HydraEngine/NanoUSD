@@ -18,7 +18,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 // Internal helper to avoid repeated lookups.
 //
 template <typename T>
@@ -33,28 +32,22 @@ TS_API TfType Ts_GetType<float>();
 template <>
 TS_API TfType Ts_GetType<GfHalf>();
 
-
 // Compile-time type whose value is true only for supported value types.
 //
 template <typename T>
 struct Ts_IsSupportedValueType;
 
 template <>
-struct Ts_IsSupportedValueType<double> :
-    public std::bool_constant<true> {};
+struct Ts_IsSupportedValueType<double> : public std::bool_constant<true> {};
 
 template <>
-struct Ts_IsSupportedValueType<float> :
-    public std::bool_constant<true> {};
+struct Ts_IsSupportedValueType<float> : public std::bool_constant<true> {};
 
 template <>
-struct Ts_IsSupportedValueType<GfHalf> :
-    public std::bool_constant<true> {};
+struct Ts_IsSupportedValueType<GfHalf> : public std::bool_constant<true> {};
 
 template <typename T>
-struct Ts_IsSupportedValueType :
-    public std::bool_constant<false> {};
-
+struct Ts_IsSupportedValueType : public std::bool_constant<false> {};
 
 // Mapping from Python type names to TfTypes for supported spline value types.
 // These strings align with type names used in downstream libraries; we can't
@@ -62,13 +55,12 @@ struct Ts_IsSupportedValueType :
 // here.
 //
 TS_API
-TfType Ts_GetTypeFromTypeName(const std::string &typeName);
+TfType Ts_GetTypeFromTypeName(const std::string& typeName);
 
 // Opposite of the above.
 //
 TS_API
 std::string Ts_GetTypeNameFromType(TfType valueType);
-
 
 // GfHalf doesn't have an overload for std::isfinite, so we provide an adapter.
 //
@@ -79,8 +71,7 @@ template <>
 TS_API bool Ts_IsFinite(const GfHalf value);
 
 template <typename T>
-bool Ts_IsFinite(const T value)
-{
+bool Ts_IsFinite(const T value) {
     return std::isfinite(value);
 }
 

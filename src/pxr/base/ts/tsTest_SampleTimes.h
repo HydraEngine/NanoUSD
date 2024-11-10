@@ -17,14 +17,12 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class TsTest_SampleTimes
-{
+class TsTest_SampleTimes {
 public:
     // A time at which to perform evaluation.  Typically just a time, but can
     // also be a "pre" time, which at a dual-valued knot can differ from the
     // ordinary value.
-    class SampleTime
-    {
+    class SampleTime {
     public:
         double time = 0.0;
         bool pre = false;
@@ -43,13 +41,13 @@ public:
         SampleTime& operator=(double time);
 
         TS_API
-        bool operator<(const SampleTime &other) const;
+        bool operator<(const SampleTime& other) const;
 
         TS_API
-        bool operator==(const SampleTime &other) const;
+        bool operator==(const SampleTime& other) const;
 
         TS_API
-        bool operator!=(const SampleTime &other) const;
+        bool operator!=(const SampleTime& other) const;
     };
 
     using SampleTimeSet = std::set<SampleTime>;
@@ -63,21 +61,18 @@ public:
 
     // Adds the specified times.
     TS_API
-    void AddTimes(
-        const std::vector<double> &times);
+    void AddTimes(const std::vector<double>& times);
 
     // Adds the specified times.
     TS_API
-    void AddTimes(
-        const std::vector<SampleTime> &times);
+    void AddTimes(const std::vector<SampleTime>& times);
 
     // SPLINE-DRIVEN
 
     // Constructs a SampleTimes object for specification of times based on the
     // contents of splineData.
     TS_API
-    TsTest_SampleTimes(
-        const TsTest_SplineData &splineData);
+    TsTest_SampleTimes(const TsTest_SplineData& splineData);
 
     // Adds a time for each knot in splineData.  For dual-valued knots, adds
     // both a pre-time and an ordinary time.
@@ -88,8 +83,7 @@ public:
     // The first sample is after the first knot, and the last sample is before
     // the last knot.
     TS_API
-    void AddUniformInterpolationTimes(
-        int numSamples);
+    void AddUniformInterpolationTimes(int numSamples);
 
     // Determines the time range of the knots in splineData, extends it by
     // extrapolationFactor on each end, and adds one pre-extrapolating and one
@@ -99,14 +93,11 @@ public:
     // extrapolation regions, this method does nothing; call
     // AddExtrapolatingLoopTimes instead or in addition.
     TS_API
-    void AddExtrapolationTimes(
-        double extrapolationFactor);
+    void AddExtrapolationTimes(double extrapolationFactor);
 
     // Adds times to handle extrapolating loops, if there are any.
     TS_API
-    void AddExtrapolatingLoopTimes(
-        int numIterations,
-        int numSamplesPerIteration);
+    void AddExtrapolatingLoopTimes(int numIterations, int numSamplesPerIteration);
 
     // MACRO
 
@@ -119,8 +110,7 @@ public:
 
     // Returns the set of sample times.
     TS_API
-    const SampleTimeSet&
-    GetTimes() const;
+    const SampleTimeSet& GetTimes() const;
 
 private:
     SampleTimeSet _GetKnotTimes() const;

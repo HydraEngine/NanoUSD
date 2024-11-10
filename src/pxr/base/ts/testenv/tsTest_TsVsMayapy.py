@@ -32,7 +32,7 @@ class TsTest_TsVsMayapy(unittest.TestCase):
         tsSamples = TsEvaluator().Eval(data, times)
         mayapySamples = g_mayapyEvaluator.Eval(data, times)
 
-        comparator = Comparator(title = case)
+        comparator = Comparator(title=case)
         comparator.AddSpline("Ts", data, tsSamples)
         comparator.AddSpline("mayapy", data, mayapySamples)
 
@@ -59,6 +59,7 @@ def setUpModule():
     global g_mayapyEvaluator
     g_mayapyEvaluator = MayapyEvaluator(g_mayapyPath)
 
+
 def tearDownModule():
     """
     Called after all test classes have been run.
@@ -68,7 +69,6 @@ def tearDownModule():
 
 
 if __name__ == "__main__":
-
     # Grab the path to mayapy from the command line.
     # Prevent unittest from seeing that arg, which it won't understand.
     g_mayapyPath = sys.argv.pop()

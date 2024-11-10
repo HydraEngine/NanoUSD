@@ -17,68 +17,43 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 using namespace pxr_boost::python;
 
+namespace {
+class _PyAntiRegressionSelector {
+public:
+    _PyAntiRegressionSelector(TsAntiRegressionMode mode) : _mode(mode) {}
 
-namespace
-{
-    class _PyAntiRegressionSelector
-    {
-    public:
-        _PyAntiRegressionSelector(TsAntiRegressionMode mode)
-            : _mode(mode)
-        {
-        }
+    void Enter() { _selector.reset(new TsAntiRegressionAuthoringSelector(_mode)); }
 
-        void Enter()
-        {
-            _selector.reset(new TsAntiRegressionAuthoringSelector(_mode));
-        }
+    void Exit(const object&, const object&, const object&) { _selector.reset(); }
 
-        void Exit(const object &, const object &, const object &)
-        {
-            _selector.reset();
-        }
+private:
+    const TsAntiRegressionMode _mode;
+    std::unique_ptr<TsAntiRegressionAuthoringSelector> _selector;
+};
 
-    private:
-        const TsAntiRegressionMode _mode;
-        std::unique_ptr<TsAntiRegressionAuthoringSelector> _selector;
-    };
+class _PyBehaviorBlock {
+public:
+    void Enter() { _block.reset(new TsEditBehaviorBlock()); }
 
-    class _PyBehaviorBlock
-    {
-    public:
-        void Enter()
-        {
-            _block.reset(new TsEditBehaviorBlock());
-        }
+    void Exit() { _block.reset(); }
 
-        void Exit()
-        {
-            _block.reset();
-        }
+private:
+    std::unique_ptr<TsEditBehaviorBlock> _block;
+};
+}  // namespace
 
-    private:
-        std::unique_ptr<TsEditBehaviorBlock> _block;
-    };
-}
-
-
-void wrapRaii()
-{
+void wrapRaii() {
     // Context-manager class that temporarily sets the current anti-regression
     // authoring mode for the calling thread.  Use in a 'with' statement.
-    class_<_PyAntiRegressionSelector, noncopyable>(
-        "AntiRegressionAuthoringSelector", no_init)
-        .def(init<TsAntiRegressionMode>())
-        .def("__enter__", &_PyAntiRegressionSelector::Enter, return_self<>())
-        .def("__exit__", &_PyAntiRegressionSelector::Exit)
-        ;
+    class_<_PyAntiRegressionSelector, noncopyable>("AntiRegressionAuthoringSelector", no_init)
+            .def(init<TsAntiRegressionMode>())
+            .def("__enter__", &_PyAntiRegressionSelector::Enter, return_self<>())
+            .def("__exit__", &_PyAntiRegressionSelector::Exit);
 
     // Context-manager class that temporarily prevents automatic behaviors when
     // editing splines.  Use in a 'with' statement.
-    class_<_PyBehaviorBlock, noncopyable>(
-        "EditBehaviorBlock")
-        // Default init not suppressed, so automatically created.
-        .def("__enter__", &_PyBehaviorBlock::Enter, return_self<>())
-        .def("__exit__", &_PyBehaviorBlock::Exit)
-        ;
+    class_<_PyBehaviorBlock, noncopyable>("EditBehaviorBlock")
+            // Default init not suppressed, so automatically created.
+            .def("__enter__", &_PyBehaviorBlock::Enter, return_self<>())
+            .def("__exit__", &_PyBehaviorBlock::Exit);
 }

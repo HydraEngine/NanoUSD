@@ -11,7 +11,6 @@ import sys
 
 
 class TsTest_Grapher(object):
-
     class Spline(object):
         def __init__(self, name, data, samples, baked, colorIndex):
             self.data = data
@@ -43,7 +42,7 @@ class TsTest_Grapher(object):
             # Before first knot: dim
             self._regions.append(self._Region(
                 float('-inf'),
-                openStart = True, isDim = True))
+                openStart=True, isDim=True))
 
             # No knots: all dim
             if not knots:
@@ -53,7 +52,7 @@ class TsTest_Grapher(object):
             # XXX: incorrect if the earliest knot is from looping
             self._regions.append(self._Region(
                 knots[0].time,
-                openStart = False, isDim = False))
+                openStart=False, isDim=False))
 
             # Looping regions
             if lp.enabled:
@@ -64,18 +63,18 @@ class TsTest_Grapher(object):
                 if lp.numPreLoops:
                     self._regions.append(self._Region(
                         lp.protoStart - protoLen * lp.numPreLoops,
-                        openStart = False, isDim = True))
+                        openStart=False, isDim=True))
 
                 # Prototype: normal
                 self._regions.append(self._Region(
                     lp.protoStart,
-                    openStart = False, isDim = False))
+                    openStart=False, isDim=False))
 
                 # Repeats: dim
                 if lp.numPostLoops:
                     self._regions.append(self._Region(
                         lp.protoEnd,
-                        openStart = False, isDim = True))
+                        openStart=False, isDim=True))
                     loopEnd = lp.protoEnd + protoLen * lp.numPostLoops
                 else:
                     loopEnd = lp.protoEnd
@@ -84,12 +83,12 @@ class TsTest_Grapher(object):
                 # prior region (openStart).
                 self._regions.append(self._Region(
                     loopEnd,
-                    openStart = forKnots, isDim = False))
+                    openStart=forKnots, isDim=False))
 
             # After last knot: dim.  A knot exactly on the boundary belongs to
             # the prior region (openStart).
             self._regions.append(self._Region(
-                knots[-1].time, openStart = forKnots, isDim = True))
+                knots[-1].time, openStart=forKnots, isDim=True))
 
         def IsDim(self, time):
 
@@ -129,16 +128,16 @@ class TsTest_Grapher(object):
             if self.knotTimes:
                 ax.scatter(
                     self.knotTimes, self.knotValues,
-                    color = color, marker = "o")
+                    color=color, marker="o")
 
             if self.tanPtTimes:
                 if not self.splineData.GetIsHermite():
                     ax.scatter(
                         self.tanPtTimes, self.tanPtValues,
-                        color = color, marker = "s")
+                        color=color, marker="s")
                 ax.plot(
                     self.tanLineTimes, self.tanLineValues,
-                    color = color, linestyle = "dashed")
+                    color=color, linestyle="dashed")
 
     @classmethod
     def Init(cls):
@@ -155,13 +154,13 @@ class TsTest_Grapher(object):
             print("Could not import matplotlib.  "
                   "Graphical output is disabled.  "
                   "To enable it, install the Python matplotlib module.",
-                  file = sys.stderr)
+                  file=sys.stderr)
             return False
 
     def __init__(
-            self, title = None,
-            widthPx = 1000, heightPx = 750, dataAspect = None,
-            includeScales = True, includeBox = True):
+            self, title=None,
+            widthPx=1000, heightPx=750, dataAspect=None,
+            includeScales=True, includeBox=True):
         """
         Set up a Grapher.
 
@@ -200,8 +199,8 @@ class TsTest_Grapher(object):
         self._diffs = None
         self._figure = None
 
-    def AddSpline(self, name, splineData, samples, baked = None,
-                  colorIndex = None):
+    def AddSpline(self, name, splineData, samples, baked=None,
+                  colorIndex=None):
 
         self._splines.append(
             TsTest_Grapher.Spline(
@@ -246,7 +245,7 @@ class TsTest_Grapher(object):
         else:
             # Turn on X-axis labels.  Axis sharing causes these to be off by
             # default for the top graph if there are two graphs.
-            axes.get_xaxis().set_tick_params(labelbottom = True)
+            axes.get_xaxis().set_tick_params(labelbottom=True)
 
         if not self._includeBox:
             axes.set_frame_on(False)
@@ -275,11 +274,11 @@ class TsTest_Grapher(object):
         # graph does not.
         numGraphs = 2 if self._diffs else 1
         self._figure, axSet = pyplot.subplots(
-            nrows = numGraphs, squeeze = False, sharex = True)
+            nrows=numGraphs, squeeze=False, sharex=True)
         self._figure.set(
-            dpi = 100.0,
-            figwidth = self._widthPx / 100.0,
-            figheight = self._heightPx / 100.0)
+            dpi=100.0,
+            figwidth=self._widthPx / 100.0,
+            figheight=self._heightPx / 100.0)
 
         # Main graph
         axMain = axSet[0][0]
@@ -303,7 +302,7 @@ class TsTest_Grapher(object):
 
             # Collect legend data.  Fake up a Line2D artist.
             legendNames.append(self._splines[splineIdx].name)
-            legendLines.append(lines.Line2D([0], [0], color = splineColor))
+            legendLines.append(lines.Line2D([0], [0], color=splineColor))
 
             sampleTimes = []
             sampleValues = []
@@ -311,10 +310,10 @@ class TsTest_Grapher(object):
             # Build style region tables.
             styleTable = self._StyleTable(
                 self._splines[splineIdx].data,
-                forKnots = False)
+                forKnots=False)
             knotStyleTable = self._StyleTable(
                 self._splines[splineIdx].data,
-                forKnots = True)
+                forKnots=True)
 
             # Find regions to draw.  A region is a time extent in which the
             # spline is drawn with the same styling.  Things that require new
@@ -336,9 +335,9 @@ class TsTest_Grapher(object):
                 # Determine whether we have crossed into a different style
                 # region.
                 isRegionEnd = (
-                    nextSample
-                    and styleTable.IsDim(nextSample.time) !=
-                    styleTable.IsDim(sample.time))
+                        nextSample
+                        and styleTable.IsDim(nextSample.time) !=
+                        styleTable.IsDim(sample.time))
 
                 # Append this sample for drawing.
                 sampleTimes.append(sample.time)
@@ -362,7 +361,7 @@ class TsTest_Grapher(object):
                         color = self._DimColor(color)
 
                     # Draw.
-                    axMain.plot(sampleTimes, sampleValues, color = color)
+                    axMain.plot(sampleTimes, sampleValues, color=color)
 
                     # Reset data for next region.
                     sampleTimes = []
@@ -380,8 +379,8 @@ class TsTest_Grapher(object):
                     axMain.plot(
                         [sample.time, nextSample.time],
                         [sample.value, nextSample.value],
-                        color = color,
-                        linestyle = "dashed")
+                        color=color,
+                        linestyle="dashed")
 
         # Legend, if multiple splines
         if len(legendNames) > 1:
@@ -399,7 +398,7 @@ class TsTest_Grapher(object):
             # Build style region table.
             styleTable = self._StyleTable(
                 knotSplines[splineIdx].data,
-                forKnots = True)
+                forKnots=True)
 
             normalKnotData = self._KnotData(splineData)
             dimKnotData = self._KnotData(splineData)

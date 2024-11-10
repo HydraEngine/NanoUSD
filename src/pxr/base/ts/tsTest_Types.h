@@ -15,8 +15,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class TsTest_Sample
-{
+class TsTest_Sample {
 public:
     double time = 0;
     double value = 0;
@@ -24,8 +23,7 @@ public:
 public:
     TsTest_Sample() = default;
 
-    TsTest_Sample(double timeIn, double valueIn)
-        : time(timeIn), value(valueIn) {}
+    TsTest_Sample(double timeIn, double valueIn) : time(timeIn), value(valueIn) {}
 };
 
 using TsTest_SampleVec = std::vector<TsTest_Sample>;

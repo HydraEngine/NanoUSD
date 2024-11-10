@@ -25,7 +25,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 /// A knot belonging to a TsSpline.
 ///
 /// This class is non-templated, but can hold data for varying value types
@@ -34,8 +33,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// \sa TsTypedKnot
 ///
-class TsKnot
-{
+class TsKnot {
 public:
     /// \name Construction and value semantics
     ///
@@ -54,38 +52,35 @@ public:
 
     /// Creates a knot with a specified value type.
     TS_API
-    TsKnot(
-        TfType valueType,
-        TsCurveType curveType = TsCurveTypeBezier);
+    TsKnot(TfType valueType, TsCurveType curveType = TsCurveTypeBezier);
 
     TS_API
-    TsKnot(const TsKnot &other);
+    TsKnot(const TsKnot& other);
 
     TS_API
-    TsKnot(TsKnot &&other);
+    TsKnot(TsKnot&& other);
 
     TS_API
     ~TsKnot();
 
     TS_API
-    TsKnot& operator=(const TsKnot &other);
+    TsKnot& operator=(const TsKnot& other);
 
     TS_API
-    TsKnot& operator=(TsKnot &&other);
+    TsKnot& operator=(TsKnot&& other);
 
     TS_API
-    bool operator==(const TsKnot &other) const;
+    bool operator==(const TsKnot& other) const;
 
     TS_API
-    bool operator!=(const TsKnot &other) const;
+    bool operator!=(const TsKnot& other) const;
 
     /// @}
     /// \name Knot time
     /// @{
 
     TS_API
-    bool SetTime(
-        TsTime time);
+    bool SetTime(TsTime time);
 
     TS_API
     TsTime GetTime() const;
@@ -112,20 +107,16 @@ public:
     bool IsHolding() const;
 
     TS_API
-    bool SetValue(
-        VtValue value);
+    bool SetValue(VtValue value);
 
     template <typename T>
-    bool SetValue(
-        const T value);
+    bool SetValue(const T value);
 
     TS_API
-    bool GetValue(
-        VtValue *valueOut) const;
+    bool GetValue(VtValue* valueOut) const;
 
     template <typename T>
-    bool GetValue(
-        T *valueOut) const;
+    bool GetValue(T* valueOut) const;
 
     /// @}
     /// \name Dual values
@@ -135,20 +126,16 @@ public:
     bool IsDualValued() const;
 
     TS_API
-    bool SetPreValue(
-        VtValue value);
+    bool SetPreValue(VtValue value);
 
     template <typename T>
-    bool SetPreValue(
-        const T value);
+    bool SetPreValue(const T value);
 
     TS_API
-    bool GetPreValue(
-        VtValue *valueOut) const;
+    bool GetPreValue(VtValue* valueOut) const;
 
     template <typename T>
-    bool GetPreValue(
-        T *valueOut) const;
+    bool GetPreValue(T* valueOut) const;
 
     TS_API
     bool ClearPreValue();
@@ -196,10 +183,10 @@ public:
     bool SetPreTanSlope(T slope);
 
     TS_API
-    bool GetPreTanSlope(VtValue *slopeOut) const;
+    bool GetPreTanSlope(VtValue* slopeOut) const;
 
     template <typename T>
-    bool GetPreTanSlope(T *slopeOut) const;
+    bool GetPreTanSlope(T* slopeOut) const;
 
     /// @}
     /// \name Post-tangent
@@ -218,10 +205,10 @@ public:
     bool SetPostTanSlope(T slope);
 
     TS_API
-    bool GetPostTanSlope(VtValue *slopeOut) const;
+    bool GetPostTanSlope(VtValue* slopeOut) const;
 
     template <typename T>
-    bool GetPostTanSlope(T *slopeOut) const;
+    bool GetPostTanSlope(T* slopeOut) const;
 
     /// @}
     /// \name Custom data
@@ -239,20 +226,16 @@ public:
     /// @{
 
     TS_API
-    bool SetCustomData(
-        VtDictionary customData);
+    bool SetCustomData(VtDictionary customData);
 
     TS_API
     VtDictionary GetCustomData() const;
 
     TS_API
-    bool SetCustomDataByKey(
-        const std::string &keyPath,
-        VtValue value);
+    bool SetCustomDataByKey(const std::string& keyPath, VtValue value);
 
     TS_API
-    VtValue GetCustomDataByKey(
-        const std::string &keyPath) const;
+    VtValue GetCustomDataByKey(const std::string& keyPath) const;
 
     /// @}
     /// \name Continuity queries
@@ -279,10 +262,7 @@ protected:
 
     // Constructor for copying knot data from SplineData.  The data has been
     // copied for us, and we take ownership of it.
-    TsKnot(
-        Ts_KnotData *data,
-        TfType valueType,
-        VtDictionary &&customData);
+    TsKnot(Ts_KnotData* data, TfType valueType, VtDictionary&& customData);
 
     // Accessors for low-level knot data.
     Ts_KnotData* _GetData() { return _data; }
@@ -293,7 +273,7 @@ private:
     bool _CheckInParam(T value) const;
 
     template <typename T>
-    bool _CheckOutParam(T *valueOut) const;
+    bool _CheckOutParam(T* valueOut) const;
 
     bool _CheckGetWidth() const;
     bool _CheckSetWidth(TsTime width) const;
@@ -327,8 +307,7 @@ private:
 
 /// Output a text representation of a spline to a stream.
 TS_API
-std::ostream& operator<<(std::ostream& out, const TsKnot &knot);
-
+std::ostream& operator<<(std::ostream& out, const TsKnot& knot);
 
 /// A convenience for constructing knots with specified types.
 ///
@@ -348,10 +327,8 @@ std::ostream& operator<<(std::ostream& out, const TsKnot &knot);
 /// TsHalfKnot knot3;
 /// </pre>
 ///
-template <typename T,
-          typename = std::enable_if_t<Ts_IsSupportedValueType<T>::value>>
-class TsTypedKnot : public TsKnot
-{
+template <typename T, typename = std::enable_if_t<Ts_IsSupportedValueType<T>::value>>
+class TsTypedKnot : public TsKnot {
 public:
     TsTypedKnot() : TsKnot(Ts_GetType<T>()) {}
 };
@@ -368,32 +345,23 @@ using TsFloatKnot = TsTypedKnot<float>;
 /// A knot-construction convenience.  See TsTypedKnot.
 using TsHalfKnot = TsTypedKnot<GfHalf>;
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // TEMPLATE HELPERS
 
 template <typename T>
-bool TsKnot::_CheckInParam(const T value) const
-{
-    if constexpr (!Ts_IsSupportedValueType<T>::value)
-    {
+bool TsKnot::_CheckInParam(const T value) const {
+    if constexpr (!Ts_IsSupportedValueType<T>::value) {
         static_assert(Ts_IsSupportedValueType<T>::value,
-            "Cannot pass non-floating-point type as T-typed knot parameter");
+                      "Cannot pass non-floating-point type as T-typed knot parameter");
         return false;
-    }
-    else
-    {
-        if (GetValueType() != Ts_GetType<T>())
-        {
-            TF_CODING_ERROR(
-                "Cannot set '%s' value into knot of type '%s'",
-                Ts_GetType<T>().GetTypeName().c_str(),
-                GetValueType().GetTypeName().c_str());
+    } else {
+        if (GetValueType() != Ts_GetType<T>()) {
+            TF_CODING_ERROR("Cannot set '%s' value into knot of type '%s'", Ts_GetType<T>().GetTypeName().c_str(),
+                            GetValueType().GetTypeName().c_str());
             return false;
         }
 
-        if (!Ts_IsFinite(value))
-        {
+        if (!Ts_IsFinite(value)) {
             TF_CODING_ERROR("Set values must be finite.");
             return false;
         }
@@ -403,28 +371,20 @@ bool TsKnot::_CheckInParam(const T value) const
 }
 
 template <typename T>
-bool TsKnot::_CheckOutParam(T *valueOut) const
-{
-    if constexpr (!Ts_IsSupportedValueType<T>::value)
-    {
+bool TsKnot::_CheckOutParam(T* valueOut) const {
+    if constexpr (!Ts_IsSupportedValueType<T>::value) {
         static_assert(Ts_IsSupportedValueType<T>::value,
-            "Cannot pass non-floating-point type as T-typed knot parameter");
+                      "Cannot pass non-floating-point type as T-typed knot parameter");
         return false;
-    }
-    else
-    {
-        if (!valueOut)
-        {
+    } else {
+        if (!valueOut) {
             TF_CODING_ERROR("Null pointer");
             return false;
         }
 
-        if (GetValueType() != Ts_GetType<T>())
-        {
-            TF_CODING_ERROR(
-                "Cannot read from knot of type '%s' into '%s'",
-                GetValueType().GetTypeName().c_str(),
-                Ts_GetType<T>().GetTypeName().c_str());
+        if (GetValueType() != Ts_GetType<T>()) {
+            TF_CODING_ERROR("Cannot read from knot of type '%s' into '%s'", GetValueType().GetTypeName().c_str(),
+                            Ts_GetType<T>().GetTypeName().c_str());
             return false;
         }
 
@@ -433,16 +393,12 @@ bool TsKnot::_CheckOutParam(T *valueOut) const
 }
 
 template <typename T>
-Ts_TypedKnotData<T>*
-TsKnot::_TypedData() const
-{
+Ts_TypedKnotData<T>* TsKnot::_TypedData() const {
     return static_cast<Ts_TypedKnotData<T>*>(_data);
 }
 
 template <typename T>
-const Ts_TypedKnotData<T>*
-TsKnot::_ConstTypedData() const
-{
+const Ts_TypedKnotData<T>* TsKnot::_ConstTypedData() const {
     return static_cast<const Ts_TypedKnotData<T>*>(_data);
 }
 
@@ -450,16 +406,13 @@ TsKnot::_ConstTypedData() const
 // TEMPLATE IMPLEMENTATIONS
 
 template <typename T>
-bool TsKnot::IsHolding() const
-{
+bool TsKnot::IsHolding() const {
     return GetValueType() == Ts_GetType<T>();
 }
 
 template <typename T>
-bool TsKnot::SetValue(const T value)
-{
-    if (!_CheckInParam(value))
-    {
+bool TsKnot::SetValue(const T value) {
+    if (!_CheckInParam(value)) {
         return false;
     }
 
@@ -468,10 +421,8 @@ bool TsKnot::SetValue(const T value)
 }
 
 template <typename T>
-bool TsKnot::GetValue(T *valueOut) const
-{
-    if (!_CheckOutParam(valueOut))
-    {
+bool TsKnot::GetValue(T* valueOut) const {
+    if (!_CheckOutParam(valueOut)) {
         return false;
     }
 
@@ -480,10 +431,8 @@ bool TsKnot::GetValue(T *valueOut) const
 }
 
 template <typename T>
-bool TsKnot::SetPreValue(const T value)
-{
-    if (!_CheckInParam(value))
-    {
+bool TsKnot::SetPreValue(const T value) {
+    if (!_CheckInParam(value)) {
         return false;
     }
 
@@ -493,19 +442,14 @@ bool TsKnot::SetPreValue(const T value)
 }
 
 template <typename T>
-bool TsKnot::GetPreValue(T* const valueOut) const
-{
-    if (!_CheckOutParam(valueOut))
-    {
+bool TsKnot::GetPreValue(T* const valueOut) const {
+    if (!_CheckOutParam(valueOut)) {
         return false;
     }
 
-    if (_data->dualValued)
-    {
+    if (_data->dualValued) {
         *valueOut = _ConstTypedData<T>()->preValue;
-    }
-    else
-    {
+    } else {
         *valueOut = _ConstTypedData<T>()->value;
     }
 
@@ -516,10 +460,8 @@ bool TsKnot::GetPreValue(T* const valueOut) const
 // Pre-Tangent
 
 template <typename T>
-bool TsKnot::SetPreTanSlope(const T slope)
-{
-    if (!_CheckInParam(slope))
-    {
+bool TsKnot::SetPreTanSlope(const T slope) {
+    if (!_CheckInParam(slope)) {
         return false;
     }
 
@@ -528,10 +470,8 @@ bool TsKnot::SetPreTanSlope(const T slope)
 }
 
 template <typename T>
-bool TsKnot::GetPreTanSlope(T* const slopeOut) const
-{
-    if (!_CheckOutParam(slopeOut))
-    {
+bool TsKnot::GetPreTanSlope(T* const slopeOut) const {
+    if (!_CheckOutParam(slopeOut)) {
         return false;
     }
 
@@ -543,10 +483,8 @@ bool TsKnot::GetPreTanSlope(T* const slopeOut) const
 // Post-Tangent
 
 template <typename T>
-bool TsKnot::SetPostTanSlope(const T slope)
-{
-    if (!_CheckInParam(slope))
-    {
+bool TsKnot::SetPostTanSlope(const T slope) {
+    if (!_CheckInParam(slope)) {
         return false;
     }
 
@@ -555,17 +493,14 @@ bool TsKnot::SetPostTanSlope(const T slope)
 }
 
 template <typename T>
-bool TsKnot::GetPostTanSlope(T* const slopeOut) const
-{
-    if (!_CheckOutParam(slopeOut))
-    {
+bool TsKnot::GetPostTanSlope(T* const slopeOut) const {
+    if (!_CheckOutParam(slopeOut)) {
         return false;
     }
 
     *slopeOut = _ConstTypedData<T>()->GetPostTanSlope();
     return true;
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

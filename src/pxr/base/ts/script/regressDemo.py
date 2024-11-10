@@ -20,7 +20,6 @@ except ImportError:
     except ImportError:
         sys.exit("Can't import PySide")
 
-
 kColors = {
     Ts.AntiRegressionNone: '#3ab2ab',
     Ts.AntiRegressionContain: '#ff7f0e',
@@ -35,15 +34,12 @@ kColors = {
 class KeyMonitor(QtCore.QObject):
 
     def __init__(self):
-
         super().__init__()
 
     def eventFilter(self, obj, event):
-
         if event.type() == QtCore.QEvent.KeyPress \
                 and event.modifiers() == QtCore.Qt.ControlModifier \
                 and event.key() == QtCore.Qt.Key_Q:
-
             g_app.exit()
             return True
 
@@ -139,20 +135,21 @@ class Controller:
 
         self._museumList.currentItemChanged.connect(
             lambda newItem, prevItem:
-                newItem
-                and self._canvasWidget.LoadMuseumCase(newItem.text()))
+            newItem
+            and self._canvasWidget.LoadMuseumCase(newItem.text()))
 
         for rb in self._modeRadios:
             def func(mode, checked):
                 if checked:
                     self._canvasWidget.SetMode(mode)
                     self._graphWidget.SetMode(mode)
+
             rb.toggled.connect(
                 functools.partial(func, rb.property("arMode")))
 
         self._bezCheckbox.stateChanged.connect(
             lambda state:
-                self._canvasWidget.SetBezierEnabled(bool(state)))
+            self._canvasWidget.SetBezierEnabled(bool(state)))
 
         self._adjustButton.clicked.connect(
             self._canvasWidget.PerformBatchAntiRegression)
@@ -186,10 +183,9 @@ class Controller:
 
 def _ConfigurePainter(
         painter,
-        lineColor = None, lineWidth = 1,
-        fillColor = None,
-        intensity = 1.0):
-
+        lineColor=None, lineWidth=1,
+        fillColor=None,
+        intensity=1.0):
     def _LightenedColor(name, intensity):
         """
         Create the named or stringified color, then modulate its lightness:
@@ -215,7 +211,6 @@ def _ConfigurePainter(
 
 
 class CanvasWidget(QtWidgets.QWidget):
-
     CanBatchChanged = QtCore.Signal(bool)
     WidthsChanged = QtCore.Signal(float, float, float, float)
 
@@ -232,17 +227,14 @@ class CanvasWidget(QtWidgets.QWidget):
     class _Pickable:
 
         def __init__(self, knotTime, whichHandle):
-
             self.knotTime = knotTime
             self.whichHandle = whichHandle
 
         def AffectsPreSegment(self):
-
             return self.whichHandle in [
                 CanvasWidget.HandleKnot, CanvasWidget.HandlePre]
 
         def AffectsPostSegment(self):
-
             return self.whichHandle in [
                 CanvasWidget.HandleKnot, CanvasWidget.HandlePost]
 
@@ -371,9 +363,9 @@ class CanvasWidget(QtWidgets.QWidget):
     def _CanBatch(self):
 
         if self._mode not in [
-                Ts.AntiRegressionContain,
-                Ts.AntiRegressionKeepRatio,
-                Ts.AntiRegressionKeepStart]:
+            Ts.AntiRegressionContain,
+            Ts.AntiRegressionKeepRatio,
+            Ts.AntiRegressionKeepStart]:
             return False
 
         with Ts.AntiRegressionAuthoringSelector(self._mode):
@@ -399,7 +391,7 @@ class CanvasWidget(QtWidgets.QWidget):
 
         # Set up for drawing and init background.
         self._painter = QtGui.QPainter(self)
-        _ConfigurePainter(self._painter, fillColor = "white")
+        _ConfigurePainter(self._painter, fillColor="white")
         self._painter.drawRect(self.rect())
 
         # Set up for pick rendering unless we're already dragging.
@@ -452,9 +444,9 @@ class CanvasWidget(QtWidgets.QWidget):
 
             # Determine whether this is an echoed knot.
             echoed = (
-                lp
-                and lp.GetLoopedInterval().Contains(knot.GetTime())
-                and not lp.GetPrototypeInterval().Contains(knot.GetTime()))
+                    lp
+                    and lp.GetLoopedInterval().Contains(knot.GetTime())
+                    and not lp.GetPrototypeInterval().Contains(knot.GetTime()))
 
             # Draw echoed knots fainter.
             intensity = 0.2 if echoed else 1.0
@@ -462,7 +454,7 @@ class CanvasWidget(QtWidgets.QWidget):
             # Draw circle at knot.
             # Don't allow echoed knots to be moved.
             _ConfigurePainter(
-                self._painter, fillColor = knotColor, intensity = intensity)
+                self._painter, fillColor=knotColor, intensity=intensity)
             pickable = self._Pickable(knot.GetTime(), self.HandleKnot)
             self._DrawWithPickable(
                 None if echoed else pickable,
@@ -517,7 +509,7 @@ class CanvasWidget(QtWidgets.QWidget):
 
         # Sample with TsTest.
         samples = Ts.TsTest_SampleBezier(
-            splineData, numSamples = 200 * numSegments)
+            splineData, numSamples=200 * numSegments)
 
         # Translate to QPainterPath.
         path = QtGui.QPainterPath()
@@ -528,12 +520,12 @@ class CanvasWidget(QtWidgets.QWidget):
         # Paint curve.
         _ConfigurePainter(
             self._painter,
-            lineColor = kColors["Bezier"], lineWidth = self.kLineWidthPix)
+            lineColor=kColors["Bezier"], lineWidth=self.kLineWidthPix)
         self._painter.drawPath(path)
 
     def _PaintTangent(
             self, knot, oppositeKnot, whichHandle, color,
-            intensity = 1.0, pickable = None):
+            intensity=1.0, pickable=None):
 
         # Only draw tangents for Beziers.
         startKnot = knot if whichHandle == self.HandlePost else oppositeKnot
@@ -546,18 +538,18 @@ class CanvasWidget(QtWidgets.QWidget):
             tanPt = self._ToPix(
                 knot.GetTime() - knot.GetPreTanWidth(),
                 knot.GetValue()
-                    - knot.GetPreTanWidth() * knot.GetPreTanSlope())
+                - knot.GetPreTanWidth() * knot.GetPreTanSlope())
         else:
             tanPt = self._ToPix(
                 knot.GetTime() + knot.GetPostTanWidth(),
                 knot.GetValue()
-                    + knot.GetPostTanWidth() * knot.GetPostTanSlope())
+                + knot.GetPostTanWidth() * knot.GetPostTanSlope())
 
         _ConfigurePainter(
             self._painter,
-            lineColor = color, lineWidth = self.kLineWidthPix,
-            fillColor = color,
-            intensity = intensity)
+            lineColor=color, lineWidth=self.kLineWidthPix,
+            fillColor=color,
+            intensity=intensity)
 
         # Draw marker, optionally with pickable.
         drawArgs = (
@@ -597,8 +589,8 @@ class CanvasWidget(QtWidgets.QWidget):
             # Paint.
             _ConfigurePainter(
                 self._painter,
-                lineColor = region.color, lineWidth = self.kLineWidthPix,
-                intensity = region.intensity)
+                lineColor=region.color, lineWidth=self.kLineWidthPix,
+                intensity=region.intensity)
             self._painter.drawPath(path)
 
     def _MakeRegions(self):
@@ -707,7 +699,7 @@ class CanvasWidget(QtWidgets.QWidget):
 
         # Tell the pick painter to paint the pick ID, in grayscale.
         _ConfigurePainter(
-            self._pickPainter, fillColor = QtGui.QColor(pickId, pickId, pickId))
+            self._pickPainter, fillColor=QtGui.QColor(pickId, pickId, pickId))
 
         # Call identical method on pick painter as on ordinary painter.
         func(self._pickPainter, *args)
@@ -719,7 +711,7 @@ class CanvasWidget(QtWidgets.QWidget):
         if pickId == self.NoPick:
             return
         if pickId >= len(self._pickables):
-            print(f"Error: pick id {pickId} out of range", file = sys.stderr)
+            print(f"Error: pick id {pickId} out of range", file=sys.stderr)
             return
         self._pick = self._pickables[pickId]
 
@@ -739,7 +731,7 @@ class CanvasWidget(QtWidgets.QWidget):
                     self._spline, self._pick.knotTime)
         else:
             self._preventer = Ts.RegressionPreventer(
-                    self._spline, self._pick.knotTime, self._mode)
+                self._spline, self._pick.knotTime, self._mode)
 
         # Make a copy of the spline for non-anti-regressed drawing (the raw
         # Bezier).
@@ -886,7 +878,6 @@ class CanvasWidget(QtWidgets.QWidget):
 
 
 class GraphWidget(QtWidgets.QWidget):
-
     kCoordMax = 1.5
 
     kMarginPix = 20
@@ -941,7 +932,7 @@ class GraphWidget(QtWidgets.QWidget):
         self._ellipsePoints = []
         for i in range(self.kEllipseSamples + 1):
             x = i / float(self.kEllipseSamples)
-            discr = math.sqrt(x * (4 - 3*x))
+            discr = math.sqrt(x * (4 - 3 * x))
             y = (discr - x + 2) / 2
             self._ellipsePoints.append([x, y])
 
@@ -960,7 +951,7 @@ class GraphWidget(QtWidgets.QWidget):
     def paintEvent(self, event):
 
         self._painter = QtGui.QPainter(self)
-        _ConfigurePainter(self._painter, fillColor = "white")
+        _ConfigurePainter(self._painter, fillColor="white")
         self._painter.drawRect(self.rect())
 
         self._DrawAreas()
@@ -974,7 +965,7 @@ class GraphWidget(QtWidgets.QWidget):
         # Axes.
         _ConfigurePainter(
             self._painter,
-            lineColor = self.kAxisColor, lineWidth = self.kAxisLineWidthPix)
+            lineColor=self.kAxisColor, lineWidth=self.kAxisLineWidthPix)
         self._painter.drawLine(
             self._ToPix(0, 0), self._ToPix(0, self.kCoordMax))
         self._painter.drawLine(
@@ -983,7 +974,7 @@ class GraphWidget(QtWidgets.QWidget):
         # Grid.
         _ConfigurePainter(
             self._painter,
-            lineColor = self.kGridColor, lineWidth = self.kGridLineWidthPix)
+            lineColor=self.kGridColor, lineWidth=self.kGridLineWidthPix)
         for i in range(1, 4):
             self._painter.drawLine(
                 self._ToPix(0, i / 3.0), self._ToPix(4.0 / 3.0, i / 3.0))
@@ -991,7 +982,7 @@ class GraphWidget(QtWidgets.QWidget):
                 self._ToPix(i / 3.0, 0), self._ToPix(i / 3.0, 4.0 / 3.0))
 
         # Square.
-        _ConfigurePainter(self._painter, fillColor = self.kSquareColor)
+        _ConfigurePainter(self._painter, fillColor=self.kSquareColor)
         self._painter.drawRect(
             QtCore.QRect(
                 self._ToPix(0, 1),
@@ -1012,18 +1003,18 @@ class GraphWidget(QtWidgets.QWidget):
         path2.lineTo(self._ToPix(1, 0))
 
         # Draw ellipse sections.
-        _ConfigurePainter(self._painter, fillColor = self.kEllipseColor)
+        _ConfigurePainter(self._painter, fillColor=self.kEllipseColor)
         self._painter.drawPath(path1)
         self._painter.drawPath(path2)
 
     def _DrawPoints(self):
 
-        _ConfigurePainter(self._painter, fillColor = kColors["Bezier"])
+        _ConfigurePainter(self._painter, fillColor=kColors["Bezier"])
         self._painter.drawEllipse(
             self._ToPix(self._uw1, self._uw2),
             self.kPointRadiusPix, self.kPointRadiusPix)
 
-        _ConfigurePainter(self._painter, fillColor = self._pointColor)
+        _ConfigurePainter(self._painter, fillColor=self._pointColor)
         self._painter.drawEllipse(
             self._ToPix(self._w1, self._w2),
             self.kPointRadiusPix, self.kPointRadiusPix)
@@ -1047,7 +1038,6 @@ class GraphWidget(QtWidgets.QWidget):
 
 
 if __name__ == "__main__":
-
     g_app = QtWidgets.QApplication(sys.argv)
     g_controller = Controller()
     g_app.exec_()

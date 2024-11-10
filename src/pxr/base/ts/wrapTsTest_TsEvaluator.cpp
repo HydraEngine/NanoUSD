@@ -18,38 +18,31 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 using namespace pxr_boost::python;
 
-
-void wrapTsTest_TsEvaluator()
-{
+void wrapTsTest_TsEvaluator() {
     using This = TsTest_TsEvaluator;
 
     class_<This>("TsTest_TsEvaluator")
-        // Default init is not suppressed, so automatically created.
+            // Default init is not suppressed, so automatically created.
 
-        .def("Eval", &This::Eval,
-            (arg("splineData"),
-             arg("sampleTimes")),
-            return_value_policy<TfPySequenceToList>())
+            .def("Eval", &This::Eval, (arg("splineData"), arg("sampleTimes")),
+                 return_value_policy<TfPySequenceToList>())
 
-        /*
-        .def("Sample", &This::Sample,
-            (arg("splineData"),
-             arg("interval"),
-             arg("tolerance")),
-            return_value_policy<TfPySequenceToList>())
-        */
+            /*
+            .def("Sample", &This::Sample,
+                (arg("splineData"),
+                 arg("interval"),
+                 arg("tolerance")),
+                return_value_policy<TfPySequenceToList>())
+            */
 
-        .def("SplineToSplineData", &This::SplineToSplineData,
-            (arg("spline")))
+            .def("SplineToSplineData", &This::SplineToSplineData, (arg("spline")))
 
-        .def("SplineDataToSpline", &This::SplineDataToSpline,
-            (arg("splineData"),
-             arg("mayaTangentForm") = false))
+            .def("SplineDataToSpline", &This::SplineDataToSpline, (arg("splineData"), arg("mayaTangentForm") = false))
 
-        /*
-        .def("BakeInnerLoops", &This::BakeInnerLoops,
-            (arg("splineData")))
-        */
+            /*
+            .def("BakeInnerLoops", &This::BakeInnerLoops,
+                (arg("splineData")))
+            */
 
-        ;
+            ;
 }

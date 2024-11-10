@@ -18,11 +18,8 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 using namespace pxr_boost::python;
 
-
 // Return a full-precision python repr for a double value.
-static std::string
-_HexFloatRepr(const double num)
-{
+static std::string _HexFloatRepr(const double num) {
     // XXX: work around std::hexfloat apparently not working in our libstdc++ as
     // of this writing.
     char buf[100];
@@ -30,35 +27,24 @@ _HexFloatRepr(const double num)
     return std::string(buf);
 }
 
-static std::string
-_SampleRepr(const TsTest_Sample &sample)
-{
+static std::string _SampleRepr(const TsTest_Sample& sample) {
     std::ostringstream result;
 
-    result << "Ts.TsTest_Sample("
-           << _HexFloatRepr(sample.time)
-           << ", " << _HexFloatRepr(sample.value)
-           << ")";
+    result << "Ts.TsTest_Sample(" << _HexFloatRepr(sample.time) << ", " << _HexFloatRepr(sample.value) << ")";
 
     return result.str();
 }
 
-
-void wrapTsTest_Types()
-{
+void wrapTsTest_Types() {
     class_<TsTest_Sample>("TsTest_Sample")
-        // Default init is not suppressed, so automatically created.
-        .def(init<double, double>())
-        .def(init<const TsTest_Sample&>())
-        .def("__repr__", &_SampleRepr)
-        .def_readwrite("time", &TsTest_Sample::time)
-        .def_readwrite("value", &TsTest_Sample::value)
-        ;
+            // Default init is not suppressed, so automatically created.
+            .def(init<double, double>())
+            .def(init<const TsTest_Sample&>())
+            .def("__repr__", &_SampleRepr)
+            .def_readwrite("time", &TsTest_Sample::time)
+            .def_readwrite("value", &TsTest_Sample::value);
 
-    to_python_converter<
-        TsTest_SampleVec,
-        TfPySequenceToPython<TsTest_SampleVec>>();
-    TfPyContainerConversions::from_python_sequence<
-        TsTest_SampleVec,
-        TfPyContainerConversions::variable_capacity_policy>();
+    to_python_converter<TsTest_SampleVec, TfPySequenceToPython<TsTest_SampleVec>>();
+    TfPyContainerConversions::from_python_sequence<TsTest_SampleVec,
+                                                   TfPyContainerConversions::variable_capacity_policy>();
 }

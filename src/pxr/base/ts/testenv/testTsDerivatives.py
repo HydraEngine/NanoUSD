@@ -21,8 +21,8 @@ class TsTest_Derivatives(unittest.TestCase):
             self, case, extrap,
             interps, times, vals,
             expB, expP, expK,
-            single = True, dual = True,
-            graph = False, graphParams = {}):
+            single=True, dual=True,
+            graph=False, graphParams={}):
         """
         Build a spline and validate expected derivatives.
 
@@ -82,12 +82,12 @@ class TsTest_Derivatives(unittest.TestCase):
         for i in range(len(interps)):
             tans = bezTans if interps[i] == "C" else garbageTans
             knot = Ts.Knot(
-                time = times[i], value = float(vals[i]),
-                nextInterp = interpMap[interps[i]],
-                preTanWidth = tans["lens"][0],
-                preTanSlope = tans["slopes"][0],
-                postTanWidth = tans["lens"][1],
-                postTanSlope = tans["slopes"][1])
+                time=times[i], value=float(vals[i]),
+                nextInterp=interpMap[interps[i]],
+                preTanWidth=tans["lens"][0],
+                preTanSlope=tans["slopes"][0],
+                postTanWidth=tans["lens"][1],
+                postTanSlope=tans["slopes"][1])
             spline.SetKnot(knot)
 
         # If requested, create a graph of the spline to aid debugging.
@@ -169,11 +169,11 @@ class TsTest_Derivatives(unittest.TestCase):
         # Compare results between knots, pre-values at knots, and at knots.
         errors = 0
         errors += self._DoTestWithPositionVariation(
-            "Betweens", spline, betTimes, expB, pre = False)
+            "Betweens", spline, betTimes, expB, pre=False)
         errors += self._DoTestWithPositionVariation(
-            "Pre-Knots", spline, times, expP, pre = True)
+            "Pre-Knots", spline, times, expP, pre=True)
         errors += self._DoTestWithPositionVariation(
-            "Knots", spline, times, expK, pre = False)
+            "Knots", spline, times, expK, pre=False)
 
         return errors
 
@@ -220,7 +220,7 @@ class TsTest_Derivatives(unittest.TestCase):
 
             # Check error tolerances.
             if abs(diff) < DERIV_TOLERANCE \
-                   and abs(sampleDiff) < SAMPLE_TOLERANCE:
+                    and abs(sampleDiff) < SAMPLE_TOLERANCE:
                 status = "PASS"
             else:
                 status = "**FAIL"
@@ -244,16 +244,16 @@ class TsTest_Derivatives(unittest.TestCase):
         # H = held, L = linear, C = curve (Bezier)
         # expB = expected between; expP = expected pre; expK = expected at knot
         extrap = "H"
-        interps = [ "H", "L", "C", "C" ]
-        times =   [  0,   1,   2,   3  ]
-        vals =    [  5,   6,   7,   8  ]
-        expB =    [0,  0,   1,  "bb", 0]
-        expP =    [  0,   0,   1,  "s" ]
-        expK =    [  0,   1,  "s",  0  ]
+        interps = ["H", "L", "C", "C"]
+        times = [0, 1, 2, 3]
+        vals = [5, 6, 7, 8]
+        expB = [0, 0, 1, "bb", 0]
+        expP = [0, 0, 1, "s"]
+        expK = [0, 1, "s", 0]
 
         self._DoTest(
             "Main", extrap, interps, times, vals, expB, expP, expK,
-            graph = True)
+            graph=True)
 
     def test_Empty(self):
         """
@@ -334,7 +334,7 @@ class TsTest_Derivatives(unittest.TestCase):
         expK = [1, 1]
         self._DoTest("Extrapolation, linear interp, linear extrap",
                      extrap, interps, times, vals, expB, expP, expK,
-                     single = True, dual = False)
+                     single=True, dual=False)
 
         extrap = "L"
         interps = ["C", "C"]
@@ -343,7 +343,7 @@ class TsTest_Derivatives(unittest.TestCase):
         expK = ["s", "s"]
         self._DoTest("Extrapolation, Bezier interp, linear extrap",
                      extrap, interps, times, vals, expB, expP, expK,
-                     single = True, dual = False)
+                     single=True, dual=False)
 
         # Linear extrapolation behaves differently when there are dual values at
         # first/last knots.  The determination of an extrapolation slope is
@@ -356,7 +356,7 @@ class TsTest_Derivatives(unittest.TestCase):
         expK = [1, 0]
         self._DoTest("Extrapolation, linear interp, linear extrap",
                      extrap, interps, times, vals, expB, expP, expK,
-                     single = False, dual = True)
+                     single=False, dual=True)
 
         extrap = "S"
         interps = ["H", "H"]
@@ -392,9 +392,8 @@ class TsTest_Derivatives(unittest.TestCase):
 
 
 if __name__ == "__main__":
-
     # 'buffer' means that all stdout will be captured and swallowed, unless
     # there is an error, in which case the stdout of the erroring case will be
     # printed on stderr along with the test results.  Suppressing the output of
     # passing cases makes it easier to find the output of failing ones.
-    unittest.main(testRunner = unittest.TextTestRunner(buffer = True))
+    unittest.main(testRunner=unittest.TextTestRunner(buffer=True))

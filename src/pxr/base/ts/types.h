@@ -16,7 +16,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 // Times are encoded as double.
 using TsTime = double;
 
@@ -28,33 +27,30 @@ using TsTime = double;
 
 /// Interpolation mode for a spline segment (region between two knots).
 ///
-enum TsInterpMode
-{
-    TsInterpValueBlock  = 0,  //< No value in this segment.
-    TsInterpHeld        = 1,  //< Constant value in this segment.
-    TsInterpLinear      = 2,  //< Linear interpolation.
-    TsInterpCurve       = 3   //< Bezier or Hermite, depends on curve type.
+enum TsInterpMode {
+    TsInterpValueBlock = 0,  //< No value in this segment.
+    TsInterpHeld = 1,        //< Constant value in this segment.
+    TsInterpLinear = 2,      //< Linear interpolation.
+    TsInterpCurve = 3        //< Bezier or Hermite, depends on curve type.
 };
 
 /// Type of interpolation for a spline's \c Curve segments.
 ///
-enum TsCurveType
-{
-    TsCurveTypeBezier  = 0,  //< Bezier curve, free tangent widths.
-    TsCurveTypeHermite = 1   //< Hermite curve, like Bezier but fixed tan width.
+enum TsCurveType {
+    TsCurveTypeBezier = 0,  //< Bezier curve, free tangent widths.
+    TsCurveTypeHermite = 1  //< Hermite curve, like Bezier but fixed tan width.
 };
 
 /// Curve-shaping mode for one of a spline's extrapolation regions (before all
 /// knots and after all knots).
 ///
-enum TsExtrapMode
-{
-    TsExtrapValueBlock    = 0, //< No value in this region.
-    TsExtrapHeld          = 1, //< Constant value in this region.
-    TsExtrapLinear        = 2, //< Linear interpolation based on edge knots.
-    TsExtrapSloped        = 3, //< Linear interpolation with specified slope.
-    TsExtrapLoopRepeat    = 4, //< Knot curve repeated, offset so ends meet.
-    TsExtrapLoopReset     = 5, //< Curve repeated exactly, discontinuous joins.
+enum TsExtrapMode {
+    TsExtrapValueBlock = 0,    //< No value in this region.
+    TsExtrapHeld = 1,          //< Constant value in this region.
+    TsExtrapLinear = 2,        //< Linear interpolation based on edge knots.
+    TsExtrapSloped = 3,        //< Linear interpolation with specified slope.
+    TsExtrapLoopRepeat = 4,    //< Knot curve repeated, offset so ends meet.
+    TsExtrapLoopReset = 5,     //< Curve repeated exactly, discontinuous joins.
     TsExtrapLoopOscillate = 6  //< Like Reset, but every other copy reversed.
 };
 
@@ -90,8 +86,7 @@ enum TsExtrapMode
 /// zero counts.  These quantities are signed only so that accidental underflow
 /// does not result in huge loop counts.
 ///
-class TsLoopParams
-{
+class TsLoopParams {
 public:
     TsTime protoStart = 0.0;
     TsTime protoEnd = 0.0;
@@ -101,10 +96,10 @@ public:
 
 public:
     TS_API
-    bool operator==(const TsLoopParams &other) const;
+    bool operator==(const TsLoopParams& other) const;
 
     TS_API
-    bool operator!=(const TsLoopParams &other) const;
+    bool operator!=(const TsLoopParams& other) const;
 
     /// Returns the prototype region, [protoStart, protoEnd).
     TS_API
@@ -117,8 +112,7 @@ public:
 
 /// Extrapolation parameters for the ends of a spline beyond the knots.
 ///
-class TsExtrapolation
-{
+class TsExtrapolation {
 public:
     TsExtrapMode mode = TsExtrapHeld;
     double slope = 0.0;
@@ -131,10 +125,10 @@ public:
     TsExtrapolation(TsExtrapMode mode);
 
     TS_API
-    bool operator==(const TsExtrapolation &other) const;
+    bool operator==(const TsExtrapolation& other) const;
 
     TS_API
-    bool operator!=(const TsExtrapolation &other) const;
+    bool operator!=(const TsExtrapolation& other) const;
 
     /// Returns whether our mode is one of the looping extrapolation modes.
     TS_API
@@ -146,8 +140,7 @@ public:
 /// See \ref page_ts_regression for a general introduction to regression and
 /// anti-regression.
 ///
-enum TsAntiRegressionMode
-{
+enum TsAntiRegressionMode {
     /// Do not enforce.  If there is regression, runtime evaluation will use
     /// KeepRatio.
     TsAntiRegressionNone,
@@ -169,7 +162,6 @@ enum TsAntiRegressionMode
     /// This matches Maya behavior.
     TsAntiRegressionKeepStart
 };
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

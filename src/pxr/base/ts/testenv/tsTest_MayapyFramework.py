@@ -95,9 +95,8 @@ class TsTest_MayapyFramework(unittest.TestCase):
 
 
 if __name__ == "__main__":
-
     mayapyPath = sys.argv.pop()
     g_evaluator = _TestEvaluator(
-        mayapyPath, subprocessDebugFilePath = "debugMayapyDriver.txt")
+        mayapyPath, subprocessDebugFilePath="debugMayapyDriver.txt")
 
     unittest.main()

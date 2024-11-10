@@ -64,25 +64,25 @@ class TsTest_TsFramework(unittest.TestCase):
 
         self.assertTrue(comparator.GetMaxDiff() < 1.0)
 
-#    def test_Looping(self):
-#        """
-#        Verify that Grapher correctly displays loops.
-#        To really be sure, inspect the graph image output.
-#        """
-#        data = Museum.GetData(Museum.SimpleInnerLoop)
-#
-#        baked = Evaluator().BakeInnerLoops(data)
-#
-#        times = STimes(baked)
-#        times.AddStandardTimes()
-#
-#        samples = Evaluator().Eval(data, times)
-#
-#        grapher = Grapher("test_Looping")
-#        grapher.AddSpline("Looping", data, samples, baked = baked)
-#
-#        if Grapher.Init():
-#            grapher.Write("test_Looping.png")
+    #    def test_Looping(self):
+    #        """
+    #        Verify that Grapher correctly displays loops.
+    #        To really be sure, inspect the graph image output.
+    #        """
+    #        data = Museum.GetData(Museum.SimpleInnerLoop)
+    #
+    #        baked = Evaluator().BakeInnerLoops(data)
+    #
+    #        times = STimes(baked)
+    #        times.AddStandardTimes()
+    #
+    #        samples = Evaluator().Eval(data, times)
+    #
+    #        grapher = Grapher("test_Looping")
+    #        grapher.AddSpline("Looping", data, samples, baked = baked)
+    #
+    #        if Grapher.Init():
+    #            grapher.Write("test_Looping.png")
 
     def test_Baseline(self):
         """

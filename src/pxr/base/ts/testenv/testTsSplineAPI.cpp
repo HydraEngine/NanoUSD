@@ -15,18 +15,15 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-
-#define VERIFY_GET(knot, getter, type, expected)                \
-    {                                                           \
-        type actual = type();                                   \
-        TF_AXIOM(knot.getter(&actual));                         \
-        TF_AXIOM(GfIsClose(actual, expected, 1e-3));            \
+#define VERIFY_GET(knot, getter, type, expected)     \
+    {                                                \
+        type actual = type();                        \
+        TF_AXIOM(knot.getter(&actual));              \
+        TF_AXIOM(GfIsClose(actual, expected, 1e-3)); \
     }
 
-
 template <typename T>
-void TestKnotIO()
-{
+void TestKnotIO() {
     // Default-constructed knot.
     TsTypedKnot<T> knot;
     TF_AXIOM(knot.GetTime() == 0);
@@ -97,8 +94,7 @@ void TestKnotIO()
 }
 
 template <typename T>
-void TestSplineIO()
-{
+void TestSplineIO() {
     TF_AXIOM(TsSpline::IsSupportedValueType(Ts_GetType<T>()));
 
     // Default-constructed spline.
@@ -198,8 +194,7 @@ void TestSplineIO()
     TF_AXIOM(splineAR.Eval(4, &value) && value == 3);
 }
 
-int main()
-{
+int main() {
     TestKnotIO<double>();
     TestKnotIO<float>();
     TestKnotIO<GfHalf>();

@@ -21,7 +21,6 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class TsSpline;
 
-
 /// An authoring helper class that enforces non-regression in splines.
 ///
 /// See \ref page_ts_regression for a general introduction to regression and
@@ -32,8 +31,7 @@ class TsSpline;
 ///
 /// \bug This class does not yet work correctly with inner loops (TsLoopParams).
 ///
-class TsRegressionPreventer
-{
+class TsRegressionPreventer {
 public:
     /// Anti-regression modes that are specific to interactive usage.  These are
     /// similar to the modes in \ref TsAntiRegressionMode, except the
@@ -42,8 +40,7 @@ public:
     /// knot is the one that is being edited in an interactive case.  Batch
     /// cases can't use these modes because we are adjusting an existing spline,
     /// rather than editing a single knot.
-    enum TS_API InteractiveMode
-    {
+    enum TS_API InteractiveMode {
         /// Shorten the proposed tangents of the active knot so that there is no
         /// regression, leaving the neighbor tangents alone.
         ModeLimitActive = 100,
@@ -59,8 +56,7 @@ public:
     };
 
     /// Details of the result of an interactive Set call.
-    class SetResult
-    {
+    class SetResult {
     public:
         /// Whether any adjustments were made.
         bool adjusted = false;
@@ -93,21 +89,14 @@ public:
     /// adjustments that would be made.  The spline must remain valid for the
     /// lifetime of this object.
     TS_API
-    TsRegressionPreventer(
-        TsSpline *spline,
-        TsTime activeKnotTime,
-        bool limit = true);
+    TsRegressionPreventer(TsSpline* spline, TsTime activeKnotTime, bool limit = true);
 
     /// Same as the above, but with an InteractiveMode.  This form ignores
     /// GetAntiRegressionAuthoringMode(), because interactive modes can't be
     /// specified through that mechanism, since they apply only to
     /// RegressionPreventer.
     TS_API
-    TsRegressionPreventer(
-        TsSpline *spline,
-        TsTime activeKnotTime,
-        InteractiveMode mode,
-        bool limit = true);
+    TsRegressionPreventer(TsSpline* spline, TsTime activeKnotTime, InteractiveMode mode, bool limit = true);
 
     /// Set an edited version of the active knot into the spline, adjusting
     /// tangent widths if needed, based on the mode.  Any aspect of the active
@@ -143,16 +132,13 @@ public:
     /// Set.
     ///
     TS_API
-    bool Set(
-        const TsKnot &proposedActiveKnot,
-        SetResult *resultOut = nullptr);
+    bool Set(const TsKnot& proposedActiveKnot, SetResult* resultOut = nullptr);
 
 private:
     friend struct Ts_RegressionPreventerBatchAccess;
 
     // Unified enum for both interactive and batch use.
-    enum _Mode
-    {
+    enum _Mode {
         _ModeNone = TsAntiRegressionNone,
         _ModeContain = TsAntiRegressionContain,
         _ModeKeepRatio = TsAntiRegressionKeepRatio,
@@ -162,11 +148,7 @@ private:
     };
 
     // Private constructor to which the public constructors delegate.
-    TsRegressionPreventer(
-        TsSpline *spline,
-        TsTime activeKnotTime,
-        _Mode mode,
-        bool limit);
+    TsRegressionPreventer(TsSpline* spline, TsTime activeKnotTime, _Mode mode, bool limit);
 
     // NOTE: we store knot data in two different ways.  When we need access to
     // all the knot data, suitable for setting into the spline, we store a
@@ -181,13 +163,10 @@ private:
     // Knot state stored for the lifetime of an interactive Preventer.  Tracks
     // the original knot from construction time, and the current time parameters
     // in the spline.
-    struct _KnotState
-    {
+    struct _KnotState {
     public:
         // Uses the original value for both 'original' and 'current'.
-        _KnotState(
-            TsSpline *spline,
-            const TsKnot &originalKnot);
+        _KnotState(TsSpline* spline, const TsKnot& originalKnot);
 
         // Write the original back to the spline, undoing any prior writes.
         void RestoreOriginal();
@@ -197,8 +176,7 @@ private:
         void RemoveCurrent();
 
         // Write a new version of the knot, and record it as 'current'.
-        void Write(
-            const TsKnot &newKnot);
+        void Write(const TsKnot& newKnot);
 
     public:
         // The spline, so we can write into it.
@@ -214,27 +192,22 @@ private:
     // Knot state used for the duration of a single Preventer iteration (Set or
     // _ProcessSegment).  Tracks the proposed new knot, and a potentially
     // adjusted working version of the time parameters.
-    struct _WorkingKnotState
-    {
+    struct _WorkingKnotState {
     public:
         // Uses the proposed value for 'proposed' and 'working'.  This is for
         // interactive use with active knots, for which a proposed new value is
         // given as input.
-        _WorkingKnotState(
-            _KnotState *parentState,
-            const TsKnot &proposedKnot);
+        _WorkingKnotState(_KnotState* parentState, const TsKnot& proposedKnot);
 
         // Uses the parent's original for 'proposed' and 'working'.  This is for
         // interactive use with opposite knots, which always start out proposed
         // as the original knots.
-        _WorkingKnotState(
-            _KnotState *parentState);
+        _WorkingKnotState(_KnotState* parentState);
 
         // For batch use.  Stores only the proposed time parameters.  Has no
         // parent state, and cannot be used to write to the spline.  The only
         // output is 'working'.
-        _WorkingKnotState(
-            const Ts_KnotData &original);
+        _WorkingKnotState(const Ts_KnotData& original);
 
         // Write the proposed value to the spline, without adjustment.  Update
         // the parent state's 'current'.
@@ -258,21 +231,15 @@ private:
     // Encapsulates the core math, and the details specific to whether we're
     // operating on a pre-segment (the one before the active knot) or a
     // post-segment (the one after).
-    class _SegmentSolver
-    {
+    class _SegmentSolver {
     public:
-        enum WhichSegment
-        {
-            PreSegment,
-            PostSegment
-        };
+        enum WhichSegment { PreSegment, PostSegment };
 
-        _SegmentSolver(
-            WhichSegment whichSegment,
-            _Mode mode,
-            _WorkingKnotState *activeKnotState,
-            _WorkingKnotState *oppositeKnotState,
-            SetResult *result);
+        _SegmentSolver(WhichSegment whichSegment,
+                       _Mode mode,
+                       _WorkingKnotState* activeKnotState,
+                       _WorkingKnotState* oppositeKnotState,
+                       SetResult* result);
 
         // If adjustments are needed, update activeKnotState->working,
         // oppositeKnotState->working, and *result.  Does not immediately write
@@ -315,17 +282,10 @@ private:
 
 private:
     // Set() helpers.
-    void _InitSetResult(
-        const TsKnot &proposedActiveKnot,
-        SetResult *resultOut) const;
-    void _HandleInitialAdjustment(
-        const TsKnot &proposedActiveKnot,
-        SetResult* resultOut);
+    void _InitSetResult(const TsKnot& proposedActiveKnot, SetResult* resultOut) const;
+    void _HandleInitialAdjustment(const TsKnot& proposedActiveKnot, SetResult* resultOut);
     void _HandleTimeChange(TsTime proposedActiveTime);
-    void _DoSet(
-        const TsKnot &proposedActiveKnot,
-        _Mode mode,
-        SetResult* resultOut);
+    void _DoSet(const TsKnot& proposedActiveKnot, _Mode mode, SetResult* resultOut);
 
 private:
     TsSpline* const _spline;
@@ -341,25 +301,18 @@ private:
     std::optional<_KnotState> _overwrittenKnotState;
 };
 
-
-struct Ts_RegressionPreventerBatchAccess
-{
+struct Ts_RegressionPreventerBatchAccess {
     // Batch operation for one segment of a spline.  In Contain mode, this
     // method returns true for "bold" tangents that are non-regressive but
     // exceed the segment interval.
-    static bool IsSegmentRegressive(
-        const Ts_KnotData *startKnot,
-        const Ts_KnotData *endKnot,
-        TsAntiRegressionMode mode);
+    static bool IsSegmentRegressive(const Ts_KnotData* startKnot,
+                                    const Ts_KnotData* endKnot,
+                                    TsAntiRegressionMode mode);
 
     // Batch operation for one segment of a spline.  Returns whether anything
     // was changed.
-    static bool ProcessSegment(
-        Ts_KnotData *startKnot,
-        Ts_KnotData *endKnot,
-        TsAntiRegressionMode mode);
+    static bool ProcessSegment(Ts_KnotData* startKnot, Ts_KnotData* endKnot, TsAntiRegressionMode mode);
 };
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

@@ -1,4 +1,3 @@
-
 # Ts Library
 
 **The Ts library is IN DEVELOPMENT.**  It is not yet ready for general use.

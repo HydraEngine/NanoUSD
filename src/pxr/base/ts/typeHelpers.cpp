@@ -11,65 +11,52 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 template <>
-TfType Ts_GetType<double>()
-{
+TfType Ts_GetType<double>() {
     static const TfType tfType = TfType::Find<double>();
     return tfType;
 }
 
 template <>
-TfType Ts_GetType<float>()
-{
+TfType Ts_GetType<float>() {
     static const TfType tfType = TfType::Find<float>();
     return tfType;
 }
 
 template <>
-TfType Ts_GetType<GfHalf>()
-{
+TfType Ts_GetType<GfHalf>() {
     static const TfType tfType = TfType::Find<GfHalf>();
     return tfType;
 }
 
-TfType Ts_GetTypeFromTypeName(const std::string &typeName)
-{
-    if (typeName == "double")
-    {
+TfType Ts_GetTypeFromTypeName(const std::string& typeName) {
+    if (typeName == "double") {
         return Ts_GetType<double>();
     }
-    if (typeName == "float")
-    {
+    if (typeName == "float") {
         return Ts_GetType<float>();
     }
-    if (typeName == "half")
-    {
+    if (typeName == "half") {
         return Ts_GetType<GfHalf>();
     }
     return TfType();
 }
 
-std::string Ts_GetTypeNameFromType(const TfType valueType)
-{
-    if (valueType == Ts_GetType<double>())
-    {
+std::string Ts_GetTypeNameFromType(const TfType valueType) {
+    if (valueType == Ts_GetType<double>()) {
         return "double";
     }
-    if (valueType == Ts_GetType<float>())
-    {
+    if (valueType == Ts_GetType<float>()) {
         return "float";
     }
-    if (valueType == Ts_GetType<GfHalf>())
-    {
+    if (valueType == Ts_GetType<GfHalf>()) {
         return "half";
     }
     return "";
 }
 
 template <>
-bool Ts_IsFinite(const GfHalf value)
-{
+bool Ts_IsFinite(const GfHalf value) {
     return value.isFinite();
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

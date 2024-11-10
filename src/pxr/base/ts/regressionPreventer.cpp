@@ -16,7 +16,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 // NOTE TO MAINTAINERS
 //
 // Be sure to read doxygen/regression.md, which is intended for callers, but
@@ -150,13 +149,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 //
 // This equation is computed by the method _AdjustWithKeepRatio.
 
-
-TF_REGISTRY_FUNCTION(TfEnum)
-{
-    TF_ADD_ENUM_NAME(
-        TsRegressionPreventer::ModeLimitActive, "Limit Active");
-    TF_ADD_ENUM_NAME(
-        TsRegressionPreventer::ModeLimitOpposite, "Limit Opposite");
+TF_REGISTRY_FUNCTION(TfEnum) {
+    TF_ADD_ENUM_NAME(TsRegressionPreventer::ModeLimitActive, "Limit Active");
+    TF_ADD_ENUM_NAME(TsRegressionPreventer::ModeLimitOpposite, "Limit Opposite");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -188,147 +183,102 @@ static TsTime _ComputeOtherWidthForVert(TsTime width, TsTime hint);
 ////////////////////////////////////////////////////////////////////////////////
 // INITIALIZATION
 
-TsRegressionPreventer::TsRegressionPreventer(
-    TsSpline* const spline,
-    const TsTime activeKnotTime,
-    const bool limit)
-    : TsRegressionPreventer(
-        spline,
-        activeKnotTime,
-        _Mode(TsSpline::GetAntiRegressionAuthoringMode()),
-        limit)
-{
-}
+TsRegressionPreventer::TsRegressionPreventer(TsSpline* const spline, const TsTime activeKnotTime, const bool limit)
+    : TsRegressionPreventer(spline, activeKnotTime, _Mode(TsSpline::GetAntiRegressionAuthoringMode()), limit) {}
 
-TsRegressionPreventer::TsRegressionPreventer(
-    TsSpline* const spline,
-    const TsTime activeKnotTime,
-    const InteractiveMode mode,
-    const bool limit)
-    : TsRegressionPreventer(spline, activeKnotTime, _Mode(mode), limit)
-{
-}
+TsRegressionPreventer::TsRegressionPreventer(TsSpline* const spline,
+                                             const TsTime activeKnotTime,
+                                             const InteractiveMode mode,
+                                             const bool limit)
+    : TsRegressionPreventer(spline, activeKnotTime, _Mode(mode), limit) {}
 
-TsRegressionPreventer::TsRegressionPreventer(
-    TsSpline* const spline,
-    const TsTime activeKnotTime,
-    const _Mode mode,
-    const bool limit)
-    : _spline(spline),
-      _mode(_Mode(mode)),
-      _limit(limit),
-      _valid(true),
-      _initialAdjustmentDone(false)
-{
-    if (!_spline)
-    {
+TsRegressionPreventer::TsRegressionPreventer(TsSpline* const spline,
+                                             const TsTime activeKnotTime,
+                                             const _Mode mode,
+                                             const bool limit)
+    : _spline(spline), _mode(_Mode(mode)), _limit(limit), _valid(true), _initialAdjustmentDone(false) {
+    if (!_spline) {
         TF_CODING_ERROR("Null spline");
         _valid = false;
         return;
     }
 
-    if (_spline->GetCurveType() != TsCurveTypeBezier)
-    {
-        TF_CODING_ERROR(
-            "Cannot use TsRegressionPreventer on non-Bezier spline");
+    if (_spline->GetCurveType() != TsCurveTypeBezier) {
+        TF_CODING_ERROR("Cannot use TsRegressionPreventer on non-Bezier spline");
         _valid = false;
         return;
     }
 
     // Find the active knot.
-    const TsKnotMap &map = _spline->GetKnots();
+    const TsKnotMap& map = _spline->GetKnots();
     const TsKnotMap::const_iterator activeIt = map.find(activeKnotTime);
-    if (activeIt == map.end())
-    {
+    if (activeIt == map.end()) {
         TF_CODING_ERROR("No knot at time %g", activeKnotTime);
         _valid = false;
         return;
     }
 
     // Make sure the active knot isn't an echoed knot.
-    if (_spline->HasInnerLoops())
-    {
+    if (_spline->HasInnerLoops()) {
         const TsLoopParams lp = _spline->GetInnerLoopParams();
-        if (lp.GetLoopedInterval().Contains(activeKnotTime)
-            && !lp.GetPrototypeInterval().Contains(activeKnotTime))
-        {
-            TF_CODING_ERROR(
-                "Cannot edit echoed knot at time %g", activeKnotTime);
+        if (lp.GetLoopedInterval().Contains(activeKnotTime) && !lp.GetPrototypeInterval().Contains(activeKnotTime)) {
+            TF_CODING_ERROR("Cannot edit echoed knot at time %g", activeKnotTime);
             _valid = false;
             return;
         }
     }
 
     // Set up state for the active and neighbor knots.
-    const TsKnot &activeKnot = *activeIt;
+    const TsKnot& activeKnot = *activeIt;
     _activeKnotState.emplace(_spline, activeKnot);
-    if (activeIt != map.begin())
-    {
-        const TsKnot &preOppositeKnot = *(activeIt - 1);
-        if (preOppositeKnot.GetNextInterpolation() == TsInterpCurve)
-        {
+    if (activeIt != map.begin()) {
+        const TsKnot& preOppositeKnot = *(activeIt - 1);
+        if (preOppositeKnot.GetNextInterpolation() == TsInterpCurve) {
             _preKnotState.emplace(_spline, preOppositeKnot);
         }
     }
-    if (activeIt + 1 != map.end())
-    {
-        const TsKnot &postOppositeKnot = *(activeIt + 1);
-        if (activeKnot.GetNextInterpolation() == TsInterpCurve)
-        {
+    if (activeIt + 1 != map.end()) {
+        const TsKnot& postOppositeKnot = *(activeIt + 1);
+        if (activeKnot.GetNextInterpolation() == TsInterpCurve) {
             _postKnotState.emplace(_spline, postOppositeKnot);
         }
     }
 }
 
 // Init a SetResult to indicate unadjusted tangents.
-void TsRegressionPreventer::_InitSetResult(
-    const TsKnot &proposedActiveKnot,
-    SetResult* const resultOut) const
-{
-    if (!resultOut)
-    {
+void TsRegressionPreventer::_InitSetResult(const TsKnot& proposedActiveKnot, SetResult* const resultOut) const {
+    if (!resultOut) {
         return;
     }
 
     resultOut->havePreSegment = bool(_preKnotState);
     resultOut->havePostSegment = bool(_postKnotState);
-    
-    resultOut->preActiveAdjustedWidth =
-        proposedActiveKnot.GetPreTanWidth();
-    resultOut->postActiveAdjustedWidth =
-        proposedActiveKnot.GetPostTanWidth();
 
-    if (_preKnotState)
-    {
-        resultOut->preOppositeAdjustedWidth =
-            _preKnotState->originalKnot.GetPostTanWidth();
+    resultOut->preActiveAdjustedWidth = proposedActiveKnot.GetPreTanWidth();
+    resultOut->postActiveAdjustedWidth = proposedActiveKnot.GetPostTanWidth();
+
+    if (_preKnotState) {
+        resultOut->preOppositeAdjustedWidth = _preKnotState->originalKnot.GetPostTanWidth();
     }
 
-    if (_postKnotState)
-    {
-        resultOut->postOppositeAdjustedWidth =
-            _postKnotState->originalKnot.GetPreTanWidth();
+    if (_postKnotState) {
+        resultOut->postOppositeAdjustedWidth = _postKnotState->originalKnot.GetPreTanWidth();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // INTERACTIVE PROCESSING
 
-bool TsRegressionPreventer::Set(
-    const TsKnot &proposedActiveKnot,
-    SetResult* const resultOut)
-{
+bool TsRegressionPreventer::Set(const TsKnot& proposedActiveKnot, SetResult* const resultOut) {
     // Init the result to indicate unadjusted tangents.
     _InitSetResult(proposedActiveKnot, resultOut);
 
-    if (!_valid)
-    {
+    if (!_valid) {
         return false;
     }
 
     // If anti-regression is disabled, just write the knot as proposed.
-    if (_mode == _ModeNone)
-    {
+    if (_mode == _ModeNone) {
         _activeKnotState->Write(proposedActiveKnot);
         return true;
     }
@@ -344,13 +294,9 @@ bool TsRegressionPreventer::Set(
     return true;
 }
 
-void TsRegressionPreventer::_HandleInitialAdjustment(
-    const TsKnot &proposedActiveKnot,
-    SetResult* const resultOut)
-{
+void TsRegressionPreventer::_HandleInitialAdjustment(const TsKnot& proposedActiveKnot, SetResult* const resultOut) {
     // Have we already run?
-    if (_initialAdjustmentDone)
-    {
+    if (_initialAdjustmentDone) {
         return;
     }
 
@@ -359,35 +305,27 @@ void TsRegressionPreventer::_HandleInitialAdjustment(
     // Perform a no-op change to the active knot, using Contain or Limit
     // Opposite.  If there is initial regression, this will fix it.  If there is
     // no initial regression, this will do nothing.
-    const _Mode initialMode =
-        (_mode == _ModeContain ? _ModeContain : _ModeLimitOpposite);
+    const _Mode initialMode = (_mode == _ModeContain ? _ModeContain : _ModeLimitOpposite);
     _DoSet(_activeKnotState->originalKnot, initialMode, resultOut);
 
     // Latch any edits we made so that they are tracked as original.  This
     // ensures that, in restoring to prior values, we never restore to a
     // regressive state.
-    if (_preKnotState)
-    {
+    if (_preKnotState) {
         TsKnot knot = _preKnotState->originalKnot;
-        knot._GetData()->postTanWidth =
-            _preKnotState->currentParams.postTanWidth;
+        knot._GetData()->postTanWidth = _preKnotState->currentParams.postTanWidth;
         _preKnotState.emplace(_spline, knot);
     }
-    if (_postKnotState)
-    {
+    if (_postKnotState) {
         TsKnot knot = _postKnotState->originalKnot;
-        knot._GetData()->preTanWidth =
-            _postKnotState->currentParams.preTanWidth;
+        knot._GetData()->preTanWidth = _postKnotState->currentParams.preTanWidth;
         _postKnotState.emplace(_spline, knot);
     }
 }
 
-void TsRegressionPreventer::_HandleTimeChange(
-    const TsTime proposedActiveTime)
-{
+void TsRegressionPreventer::_HandleTimeChange(const TsTime proposedActiveTime) {
     // Do nothing if active knot time hasn't changed.
-    if (proposedActiveTime == _activeKnotState->currentParams.time)
-    {
+    if (proposedActiveTime == _activeKnotState->currentParams.time) {
         return;
     }
 
@@ -396,117 +334,85 @@ void TsRegressionPreventer::_HandleTimeChange(
     _activeKnotState->RemoveCurrent();
 
     // Do nothing further if we haven't crossed either neighbor.
-    if (!_overwrittenKnotState
-        && (!_preKnotState
-            || proposedActiveTime > _preKnotState->originalKnot.GetTime())
-        && (!_postKnotState
-            || proposedActiveTime < _postKnotState->originalKnot.GetTime()))
-    {
+    if (!_overwrittenKnotState && (!_preKnotState || proposedActiveTime > _preKnotState->originalKnot.GetTime()) &&
+        (!_postKnotState || proposedActiveTime < _postKnotState->originalKnot.GetTime())) {
         return;
     }
 
     // Restore tentatively overwritten knot, if any.
-    if (_overwrittenKnotState)
-    {
+    if (_overwrittenKnotState) {
         _overwrittenKnotState->RestoreOriginal();
         _overwrittenKnotState.reset();
     }
 
     // Restore original neighbors, if any, since we may have modified one of
     // them.
-    if (_preKnotState)
-    {
+    if (_preKnotState) {
         _preKnotState->RestoreOriginal();
         _preKnotState.reset();
     }
-    if (_postKnotState)
-    {
+    if (_postKnotState) {
         _postKnotState->RestoreOriginal();
         _postKnotState.reset();
     }
 
     // Find the insert position.
-    const TsKnotMap &map = _spline->GetKnots();
+    const TsKnotMap& map = _spline->GetKnots();
     const TsKnotMap::const_iterator lbIt = map.lower_bound(proposedActiveTime);
 
     // If we're tentatively overwriting a knot at this time, store its
     // original state for possible restoration.
-    if (lbIt != map.end() && lbIt->GetTime() == proposedActiveTime)
-    {
+    if (lbIt != map.end() && lbIt->GetTime() == proposedActiveTime) {
         _overwrittenKnotState.emplace(_spline, *lbIt);
     }
 
     // If there's a knot before this time, store its original state for
     // comparison and possible restoration.
-    if (lbIt != map.begin())
-    {
+    if (lbIt != map.begin()) {
         _preKnotState.emplace(_spline, *(lbIt - 1));
     }
 
     // If there's a knot after this time, store its original state for
     // comparison and possible restoration.
     const size_t postOffset = (_overwrittenKnotState ? 1 : 0);
-    if (lbIt + postOffset != map.end())
-    {
+    if (lbIt + postOffset != map.end()) {
         _postKnotState.emplace(_spline, *(lbIt + postOffset));
     }
 }
 
-void TsRegressionPreventer::_DoSet(
-    const TsKnot &proposedActiveKnot,
-    const _Mode mode,
-    SetResult* const resultOut)
-{
-    _WorkingKnotState activeWorking(
-        &*_activeKnotState, proposedActiveKnot);
+void TsRegressionPreventer::_DoSet(const TsKnot& proposedActiveKnot, const _Mode mode, SetResult* const resultOut) {
+    _WorkingKnotState activeWorking(&*_activeKnotState, proposedActiveKnot);
     std::optional<_WorkingKnotState> preWorking;
     std::optional<_WorkingKnotState> postWorking;
 
     // Adjust pre-segment, if it exists.
-    if (_preKnotState)
-    {
+    if (_preKnotState) {
         preWorking.emplace(&*_preKnotState);
 
-        _SegmentSolver preSolver(
-            _SegmentSolver::PreSegment,
-            mode,
-            &activeWorking,
-            &*preWorking,
-            resultOut);
+        _SegmentSolver preSolver(_SegmentSolver::PreSegment, mode, &activeWorking, &*preWorking, resultOut);
 
         preSolver.Adjust();
     }
 
     // Adjust post-segment, if it exists.
-    if (_postKnotState)
-    {
+    if (_postKnotState) {
         postWorking.emplace(&*_postKnotState);
 
-        _SegmentSolver postSolver(
-            _SegmentSolver::PostSegment,
-            mode,
-            &activeWorking,
-            &*postWorking,
-            resultOut);
+        _SegmentSolver postSolver(_SegmentSolver::PostSegment, mode, &activeWorking, &*postWorking, resultOut);
 
         postSolver.Adjust();
     }
 
-    if (_limit)
-    {
+    if (_limit) {
         // Write possibly adjusted knots to spline.
         activeWorking.WriteWorking();
-        if (preWorking)
-        {
+        if (preWorking) {
             preWorking->WriteWorking();
         }
-        if (postWorking)
-        {
+        if (postWorking) {
             postWorking->WriteWorking();
         }
-    }
-    else
-    {
+    } else {
         // Just write the active knot as proposed.  This doesn't mean the
         // adjustments above were pointless; their results are given in
         // *resultOut.
@@ -518,16 +424,13 @@ void TsRegressionPreventer::_DoSet(
 // BATCH PROCESSING
 
 // static
-bool Ts_RegressionPreventerBatchAccess::IsSegmentRegressive(
-    const Ts_KnotData* const startKnot,
-    const Ts_KnotData* const endKnot,
-    const TsAntiRegressionMode modeIn)
-{
+bool Ts_RegressionPreventerBatchAccess::IsSegmentRegressive(const Ts_KnotData* const startKnot,
+                                                            const Ts_KnotData* const endKnot,
+                                                            const TsAntiRegressionMode modeIn) {
     using RP = TsRegressionPreventer;
 
     // Determine whether this is a Bezier segment.
-    if (startKnot->nextInterp != TsInterpCurve)
-    {
+    if (startKnot->nextInterp != TsInterpCurve) {
         return false;
     }
 
@@ -538,8 +441,7 @@ bool Ts_RegressionPreventerBatchAccess::IsSegmentRegressive(
 
     // In Contain mode, check simple max.
     const RP::_Mode mode = RP::_Mode(modeIn);
-    if (mode == RP::_ModeContain)
-    {
+    if (mode == RP::_ModeContain) {
         return startWidth > kContainedMax || endWidth > kContainedMax;
     }
 
@@ -548,23 +450,19 @@ bool Ts_RegressionPreventerBatchAccess::IsSegmentRegressive(
 }
 
 // static
-bool Ts_RegressionPreventerBatchAccess::ProcessSegment(
-    Ts_KnotData* const startKnot,
-    Ts_KnotData* const endKnot,
-    const TsAntiRegressionMode modeIn)
-{
+bool Ts_RegressionPreventerBatchAccess::ProcessSegment(Ts_KnotData* const startKnot,
+                                                       Ts_KnotData* const endKnot,
+                                                       const TsAntiRegressionMode modeIn) {
     using RP = TsRegressionPreventer;
 
     // If anti-regression is disabled, nothing to do.
     const RP::_Mode mode = RP::_Mode(modeIn);
-    if (mode == RP::_ModeNone)
-    {
+    if (mode == RP::_ModeNone) {
         return false;
     }
 
     // Determine whether this is a Bezier segment.
-    if (startKnot->nextInterp != TsInterpCurve)
-    {
+    if (startKnot->nextInterp != TsInterpCurve) {
         return false;
     }
 
@@ -574,20 +472,16 @@ bool Ts_RegressionPreventerBatchAccess::ProcessSegment(
 
     // Create a solver for the segment.
     RP::SetResult setResult;
-    RP::_SegmentSolver solver(
-        RP::_SegmentSolver::PostSegment,
-        mode, &startWorking, &endWorking, &setResult);
+    RP::_SegmentSolver solver(RP::_SegmentSolver::PostSegment, mode, &startWorking, &endWorking, &setResult);
 
     // Find adjustments.
     solver.Adjust();
 
     // Write any adjusted tangent widths back to the knots.
-    if (setResult.postActiveAdjusted)
-    {
+    if (setResult.postActiveAdjusted) {
         startKnot->postTanWidth = startWorking.workingParams.postTanWidth;
     }
-    if (setResult.postOppositeAdjusted)
-    {
+    if (setResult.postOppositeAdjusted) {
         endKnot->preTanWidth = endWorking.workingParams.preTanWidth;
     }
 
@@ -598,28 +492,27 @@ bool Ts_RegressionPreventerBatchAccess::ProcessSegment(
 ////////////////////////////////////////////////////////////////////////////////
 // SEGMENT SOLVER MAIN LOGIC
 
-bool TsRegressionPreventer::_SegmentSolver::Adjust()
-{
+bool TsRegressionPreventer::_SegmentSolver::Adjust() {
     // Contain mode.  This adjusts tangents even when non-regressive.
-    if (_mode == _ModeContain)
-    {
+    if (_mode == _ModeContain) {
         return _AdjustWithContain();
     }
 
     // If no regression, nothing to do.
-    if (!_AreTanWidthsRegressive(
-            _GetProposedActiveWidth(), _GetProposedOppositeWidth()))
-    {
+    if (!_AreTanWidthsRegressive(_GetProposedActiveWidth(), _GetProposedOppositeWidth())) {
         return true;
     }
 
     // Other modes.
-    switch (_mode)
-    {
-        case _ModeKeepRatio: return _AdjustWithKeepRatio();
-        case _ModeKeepStart: return _AdjustWithKeepStart();
-        case _ModeLimitActive: return _AdjustWithLimitActive();
-        case _ModeLimitOpposite: return _AdjustWithLimitOpposite();
+    switch (_mode) {
+        case _ModeKeepRatio:
+            return _AdjustWithKeepRatio();
+        case _ModeKeepStart:
+            return _AdjustWithKeepStart();
+        case _ModeLimitActive:
+            return _AdjustWithLimitActive();
+        case _ModeLimitOpposite:
+            return _AdjustWithLimitOpposite();
 
         default:
             TF_CODING_ERROR("Unexpected mode");
@@ -628,50 +521,38 @@ bool TsRegressionPreventer::_SegmentSolver::Adjust()
     return false;
 }
 
-bool TsRegressionPreventer::_SegmentSolver::_AdjustWithContain()
-{
+bool TsRegressionPreventer::_SegmentSolver::_AdjustWithContain() {
     // Don't use write padding for Contain.  We want the maximum to exactly
     // equal the interval.  We rely on our math not losing precision in the
     // writing and reading of this condition; we are doing things like
     // multiplying and dividing by 1, or dividing a number by itself to yield 1.
 
     // Limit active tangent.
-    if (_GetProposedActiveWidth() > kContainedMax)
-    {
+    if (_GetProposedActiveWidth() > kContainedMax) {
         _SetActiveWidth(kContainedMax);
     }
 
     // Limit opposite tangent.
-    if (_GetProposedOppositeWidth() > kContainedMax)
-    {
+    if (_GetProposedOppositeWidth() > kContainedMax) {
         _SetOppositeWidth(kContainedMax);
     }
 
     return true;
 }
 
-bool TsRegressionPreventer::_SegmentSolver::_AdjustWithKeepRatio()
-{
-    if (_GetProposedActiveWidth() < kReadPadding)
-    {
+bool TsRegressionPreventer::_SegmentSolver::_AdjustWithKeepRatio() {
+    if (_GetProposedActiveWidth() < kReadPadding) {
         // Zero active width.  Clamp opposite to 1.
         _SetOppositeWidth(kContainedMax - kWritePadding);
-    }
-    else if (_GetProposedOppositeWidth() < kReadPadding)
-    {
+    } else if (_GetProposedOppositeWidth() < kReadPadding) {
         // Zero opposite width.  Clamp active to 1.
         _SetActiveWidth(kContainedMax - kWritePadding);
-    }
-    else
-    {
+    } else {
         // Find ratio of proposed active to opposite width.
-        const double ratio =
-            _GetProposedActiveWidth() / _GetProposedOppositeWidth();
+        const double ratio = _GetProposedActiveWidth() / _GetProposedOppositeWidth();
 
         // Solve for line / ellipse intersection.
-        const TsTime adjustedOpposite =
-            (std::sqrt(ratio) + ratio + 1)
-            / (ratio * ratio + ratio + 1);
+        const TsTime adjustedOpposite = (std::sqrt(ratio) + ratio + 1) / (ratio * ratio + ratio + 1);
         _SetActiveWidth(ratio * adjustedOpposite - kWritePadding);
         _SetOppositeWidth(adjustedOpposite - kWritePadding);
     }
@@ -679,71 +560,48 @@ bool TsRegressionPreventer::_SegmentSolver::_AdjustWithKeepRatio()
     return true;
 }
 
-bool TsRegressionPreventer::_SegmentSolver::_AdjustWithKeepStart()
-{
-    if (_GetProposedStartWidth() >= kVertMax)
-    {
+bool TsRegressionPreventer::_SegmentSolver::_AdjustWithKeepStart() {
+    if (_GetProposedStartWidth() >= kVertMax) {
         // Clamp to longest start width.
         _SetStartWidth(kVertMax - kWritePadding);
         _SetEndWidth(kVertMin - kWritePadding);
-    }
-    else
-    {
+    } else {
         // Keep start width; solve for end width.
-        const TsTime adjustedWidth =
-            _ComputeOtherWidthForVert(
-                _GetProposedStartWidth(), _GetProposedEndWidth());
+        const TsTime adjustedWidth = _ComputeOtherWidthForVert(_GetProposedStartWidth(), _GetProposedEndWidth());
         _SetEndWidth(adjustedWidth - kWritePadding);
     }
 
     return true;
 }
 
-bool TsRegressionPreventer::_SegmentSolver::_AdjustWithLimitActive()
-{
-    if (_GetProposedOppositeWidth() >= kVertMax)
-    {
+bool TsRegressionPreventer::_SegmentSolver::_AdjustWithLimitActive() {
+    if (_GetProposedOppositeWidth() >= kVertMax) {
         // Clamp to longest opposite width.
         _SetOppositeWidth(kVertMax - kWritePadding);
-        _SetActiveWidth(
-            GfMin(kVertMin - kWritePadding, _GetProposedActiveWidth()));
-    }
-    else
-    {
+        _SetActiveWidth(GfMin(kVertMin - kWritePadding, _GetProposedActiveWidth()));
+    } else {
         // Keep opposite width; solve for active width.
-        const TsTime adjustedWidth =
-            _ComputeOtherWidthForVert(
-                _GetProposedOppositeWidth(), _GetProposedActiveWidth());
+        const TsTime adjustedWidth = _ComputeOtherWidthForVert(_GetProposedOppositeWidth(), _GetProposedActiveWidth());
         _SetActiveWidth(adjustedWidth - kWritePadding);
     }
 
     return true;
 }
 
-bool TsRegressionPreventer::_SegmentSolver::_AdjustWithLimitOpposite()
-{
-    if (_GetProposedOppositeWidth() <= kVertMin)
-    {
+bool TsRegressionPreventer::_SegmentSolver::_AdjustWithLimitOpposite() {
+    if (_GetProposedOppositeWidth() <= kVertMin) {
         // Non-regressive limit will be in fringe.
         // Don't adjust opposite; just clamp active.
         // This avoids counter-intuitively forcing opposite to be longer.
-        const TsTime adjustedWidth =
-            _ComputeOtherWidthForVert(
-                _GetProposedOppositeWidth(), _GetProposedActiveWidth());
+        const TsTime adjustedWidth = _ComputeOtherWidthForVert(_GetProposedOppositeWidth(), _GetProposedActiveWidth());
         _SetActiveWidth(adjustedWidth - kWritePadding);
-    }
-    else if (_GetProposedActiveWidth() >= kVertMax)
-    {
+    } else if (_GetProposedActiveWidth() >= kVertMax) {
         // Clamp to longest active width.
         _SetActiveWidth(kVertMax - kWritePadding);
         _SetOppositeWidth(kVertMin - kWritePadding);
-    }
-    else
-    {
+    } else {
         // Keep active width; solve for opposite width.
-        const TsTime adjustedWidth =
-            _ComputeOtherWidthForVert(
-                _GetProposedActiveWidth(), _GetProposedOppositeWidth());
+        const TsTime adjustedWidth = _ComputeOtherWidthForVert(_GetProposedActiveWidth(), _GetProposedOppositeWidth());
         _SetOppositeWidth(adjustedWidth - kWritePadding);
     }
 
@@ -754,16 +612,12 @@ bool TsRegressionPreventer::_SegmentSolver::_AdjustWithLimitOpposite()
 // MATH HELPERS
 
 // static
-bool _AreTanWidthsRegressive(
-    const TsTime width1,
-    const TsTime width2)
-{
+bool _AreTanWidthsRegressive(const TsTime width1, const TsTime width2) {
     // If contained, then not regressive.  This helps performance, but it is
     // also for correctness.  There are non-regressive (w1, w2) points outside
     // the ellipse but inside the contained square.  See the note in
     // _AdjustWithContain regarding why we don't use padding in this check.
-    if (width1 <= kContainedMax && width2 <= kContainedMax)
-    {
+    if (width1 <= kContainedMax && width2 <= kContainedMax) {
         return false;
     }
 
@@ -776,13 +630,9 @@ bool _AreTanWidthsRegressive(
 }
 
 // static
-TsTime _ComputeOtherWidthForVert(
-    const TsTime width,
-    const TsTime hint)
-{
+TsTime _ComputeOtherWidthForVert(const TsTime width, const TsTime hint) {
     // Clamp to longest given width / shortest other width.
-    if (width > kVertMax)
-    {
+    if (width > kVertMax) {
         TF_WARN("Unexpectedly long tangent");
         return kVertMin;
     }
@@ -800,61 +650,45 @@ TsTime _ComputeOtherWidthForVert(
 ////////////////////////////////////////////////////////////////////////////////
 // SEGMENT SOLVER PLUMBING
 
-TsRegressionPreventer::_SegmentSolver::_SegmentSolver(
-    const WhichSegment whichSegment,
-    const _Mode mode,
-    _WorkingKnotState* const activeKnotState,
-    _WorkingKnotState* const oppositeKnotState,
-    SetResult* const result)
+TsRegressionPreventer::_SegmentSolver::_SegmentSolver(const WhichSegment whichSegment,
+                                                      const _Mode mode,
+                                                      _WorkingKnotState* const activeKnotState,
+                                                      _WorkingKnotState* const oppositeKnotState,
+                                                      SetResult* const result)
     : _whichSegment(whichSegment),
       _mode(mode),
       _activeKnotState(activeKnotState),
       _oppositeKnotState(oppositeKnotState),
-      _result(result)
-{
-}
+      _result(result) {}
 
-TsTime TsRegressionPreventer::_SegmentSolver::_GetProposedActiveWidth() const
-{
-    const TsTime width = (
-        _whichSegment == PreSegment ?
-        _activeKnotState->proposedKnot.GetPreTanWidth() :
-        _activeKnotState->proposedKnot.GetPostTanWidth());
+TsTime TsRegressionPreventer::_SegmentSolver::_GetProposedActiveWidth() const {
+    const TsTime width = (_whichSegment == PreSegment ? _activeKnotState->proposedKnot.GetPreTanWidth()
+                                                      : _activeKnotState->proposedKnot.GetPostTanWidth());
     return width / _GetSegmentWidth();
 }
 
-TsTime TsRegressionPreventer::_SegmentSolver::_GetProposedOppositeWidth() const
-{
-    const TsTime width = (
-        _whichSegment == PreSegment ?
-        _oppositeKnotState->proposedKnot.GetPostTanWidth() :
-        _oppositeKnotState->proposedKnot.GetPreTanWidth());
+TsTime TsRegressionPreventer::_SegmentSolver::_GetProposedOppositeWidth() const {
+    const TsTime width = (_whichSegment == PreSegment ? _oppositeKnotState->proposedKnot.GetPostTanWidth()
+                                                      : _oppositeKnotState->proposedKnot.GetPreTanWidth());
     return width / _GetSegmentWidth();
 }
 
-void TsRegressionPreventer::_SegmentSolver::_SetActiveWidth(
-    const TsTime width)
-{
+void TsRegressionPreventer::_SegmentSolver::_SetActiveWidth(const TsTime width) {
     const bool adjusted = (width != _GetProposedActiveWidth());
     const TsTime rawWidth = width * _GetSegmentWidth();
 
-    if (_whichSegment == PreSegment)
-    {
+    if (_whichSegment == PreSegment) {
         _activeKnotState->workingParams.SetPreTanWidth(rawWidth);
 
-        if (_result)
-        {
+        if (_result) {
             _result->adjusted |= adjusted;
             _result->preActiveAdjusted |= adjusted;
             _result->preActiveAdjustedWidth = rawWidth;
         }
-    }
-    else
-    {
+    } else {
         _activeKnotState->workingParams.SetPostTanWidth(rawWidth);
 
-        if (_result)
-        {
+        if (_result) {
             _result->adjusted |= adjusted;
             _result->postActiveAdjusted |= adjusted;
             _result->postActiveAdjustedWidth = rawWidth;
@@ -862,29 +696,22 @@ void TsRegressionPreventer::_SegmentSolver::_SetActiveWidth(
     }
 }
 
-void TsRegressionPreventer::_SegmentSolver::_SetOppositeWidth(
-    const TsTime width)
-{
+void TsRegressionPreventer::_SegmentSolver::_SetOppositeWidth(const TsTime width) {
     const bool adjusted = (width != _GetProposedOppositeWidth());
     const TsTime rawWidth = width * _GetSegmentWidth();
 
-    if (_whichSegment == PreSegment)
-    {
+    if (_whichSegment == PreSegment) {
         _oppositeKnotState->workingParams.SetPostTanWidth(rawWidth);
 
-        if (_result)
-        {
+        if (_result) {
             _result->adjusted |= adjusted;
             _result->preOppositeAdjusted |= adjusted;
             _result->preOppositeAdjustedWidth = rawWidth;
         }
-    }
-    else
-    {
+    } else {
         _oppositeKnotState->workingParams.SetPreTanWidth(rawWidth);
 
-        if (_result)
-        {
+        if (_result) {
             _result->adjusted |= adjusted;
             _result->postOppositeAdjusted |= adjusted;
             _result->postOppositeAdjustedWidth = rawWidth;
@@ -892,61 +719,38 @@ void TsRegressionPreventer::_SegmentSolver::_SetOppositeWidth(
     }
 }
 
-TsTime TsRegressionPreventer::_SegmentSolver::_GetProposedStartWidth() const
-{
-    return (
-        _whichSegment == PreSegment ?
-        _GetProposedOppositeWidth() :
-        _GetProposedActiveWidth());
+TsTime TsRegressionPreventer::_SegmentSolver::_GetProposedStartWidth() const {
+    return (_whichSegment == PreSegment ? _GetProposedOppositeWidth() : _GetProposedActiveWidth());
 }
 
-TsTime TsRegressionPreventer::_SegmentSolver::_GetProposedEndWidth() const
-{
-    return (
-        _whichSegment == PreSegment ?
-        _GetProposedActiveWidth() :
-        _GetProposedOppositeWidth());
+TsTime TsRegressionPreventer::_SegmentSolver::_GetProposedEndWidth() const {
+    return (_whichSegment == PreSegment ? _GetProposedActiveWidth() : _GetProposedOppositeWidth());
 }
 
-void TsRegressionPreventer::_SegmentSolver::_SetStartWidth(
-    const TsTime width)
-{
-    if (_whichSegment == PreSegment)
-    {
+void TsRegressionPreventer::_SegmentSolver::_SetStartWidth(const TsTime width) {
+    if (_whichSegment == PreSegment) {
         _SetOppositeWidth(width);
-    }
-    else
-    {
+    } else {
         _SetActiveWidth(width);
     }
 }
 
-void TsRegressionPreventer::_SegmentSolver::_SetEndWidth(
-    const TsTime width)
-{
-    if (_whichSegment == PreSegment)
-    {
+void TsRegressionPreventer::_SegmentSolver::_SetEndWidth(const TsTime width) {
+    if (_whichSegment == PreSegment) {
         _SetActiveWidth(width);
-    }
-    else
-    {
+    } else {
         _SetOppositeWidth(width);
     }
 }
 
-TsTime TsRegressionPreventer::_SegmentSolver::_GetSegmentWidth() const
-{
-    TsTime width =
-        _activeKnotState->proposedKnot.GetTime() -
-        _oppositeKnotState->proposedKnot.GetTime();
+TsTime TsRegressionPreventer::_SegmentSolver::_GetSegmentWidth() const {
+    TsTime width = _activeKnotState->proposedKnot.GetTime() - _oppositeKnotState->proposedKnot.GetTime();
 
-    if (_whichSegment == PostSegment)
-    {
+    if (_whichSegment == PostSegment) {
         width *= -1;
     }
 
-    if (!TF_VERIFY(width > 0))
-    {
+    if (!TF_VERIFY(width > 0)) {
         return 1.0;
     }
 
@@ -956,71 +760,44 @@ TsTime TsRegressionPreventer::_SegmentSolver::_GetSegmentWidth() const
 ////////////////////////////////////////////////////////////////////////////////
 // KNOT STATE PLUMBING
 
-TsRegressionPreventer::_KnotState::_KnotState(
-    TsSpline *spline,
-    const TsKnot &originalKnotIn)
-    : spline(spline),
-      originalKnot(originalKnotIn),
-      currentParams(*(originalKnotIn._GetData()))
-{
-}
+TsRegressionPreventer::_KnotState::_KnotState(TsSpline* spline, const TsKnot& originalKnotIn)
+    : spline(spline), originalKnot(originalKnotIn), currentParams(*(originalKnotIn._GetData())) {}
 
-void TsRegressionPreventer::_KnotState::RestoreOriginal()
-{
+void TsRegressionPreventer::_KnotState::RestoreOriginal() {
     spline->_SetKnotUnchecked(originalKnot);
 }
 
-void TsRegressionPreventer::_KnotState::RemoveCurrent()
-{
+void TsRegressionPreventer::_KnotState::RemoveCurrent() {
     spline->RemoveKnot(currentParams.time);
 }
 
-void TsRegressionPreventer::_KnotState::Write(
-    const TsKnot &newKnot)
-{
+void TsRegressionPreventer::_KnotState::Write(const TsKnot& newKnot) {
     RemoveCurrent();
     spline->_SetKnotUnchecked(newKnot);
     currentParams = *(newKnot._GetData());
 }
 
-TsRegressionPreventer::_WorkingKnotState::_WorkingKnotState(
-    _KnotState* const parentState,
-    const TsKnot &proposedKnotIn)
-    : parentState(parentState),
-      proposedKnot(proposedKnotIn),
-      workingParams(*(proposedKnotIn._GetData()))
-{
-}
+TsRegressionPreventer::_WorkingKnotState::_WorkingKnotState(_KnotState* const parentState, const TsKnot& proposedKnotIn)
+    : parentState(parentState), proposedKnot(proposedKnotIn), workingParams(*(proposedKnotIn._GetData())) {}
 
-TsRegressionPreventer::_WorkingKnotState::_WorkingKnotState(
-    _KnotState* const parentState)
+TsRegressionPreventer::_WorkingKnotState::_WorkingKnotState(_KnotState* const parentState)
     : parentState(parentState),
       proposedKnot(parentState->originalKnot),
-      workingParams(*(parentState->originalKnot._GetData()))
-{
-}
+      workingParams(*(parentState->originalKnot._GetData())) {}
 
-TsRegressionPreventer::_WorkingKnotState::_WorkingKnotState(
-    const Ts_KnotData &originalParamsIn)
+TsRegressionPreventer::_WorkingKnotState::_WorkingKnotState(const Ts_KnotData& originalParamsIn)
     : parentState(nullptr),
       // Not a real knot; just conforming to the storage.
-      proposedKnot(
-          new Ts_KnotData(originalParamsIn),
-          Ts_GetType<double>(),
-          VtDictionary()),
-      workingParams(originalParamsIn)
-{
-}
+      proposedKnot(new Ts_KnotData(originalParamsIn), Ts_GetType<double>(), VtDictionary()),
+      workingParams(originalParamsIn) {}
 
-void TsRegressionPreventer::_WorkingKnotState::WriteProposed()
-{
+void TsRegressionPreventer::_WorkingKnotState::WriteProposed() {
     parentState->spline->_SetKnotUnchecked(proposedKnot);
 
     parentState->currentParams = *(proposedKnot._GetData());
 }
 
-void TsRegressionPreventer::_WorkingKnotState::WriteWorking()
-{
+void TsRegressionPreventer::_WorkingKnotState::WriteWorking() {
     TsKnot knot = proposedKnot;
     Ts_KnotData* const knotData = knot._GetData();
     knotData->preTanWidth = workingParams.preTanWidth;
@@ -1035,10 +812,7 @@ void TsRegressionPreventer::_WorkingKnotState::WriteWorking()
 
 #define PRINT_MEMBER(m) ss << "  " #m ": " << m << std::endl
 
-std::string
-TsRegressionPreventer::SetResult::GetDebugDescription(
-    int precision) const
-{
+std::string TsRegressionPreventer::SetResult::GetDebugDescription(int precision) const {
     std::ostringstream ss;
     ss << std::fixed << std::setprecision(precision);
     ss << std::boolalpha;
@@ -1059,6 +833,5 @@ TsRegressionPreventer::SetResult::GetDebugDescription(
 
     return ss.str();
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -21,17 +21,14 @@ class GfInterval;
 
 // Perform test evaluation using Ts.
 //
-class TsTest_TsEvaluator
-{
+class TsTest_TsEvaluator {
 public:
     ////////////////////////////////////////////////////////////////////////////
     // EVALUATION
 
     // Evaluate at specified times.
     TS_API
-    TsTest_SampleVec Eval(
-        const TsTest_SplineData &splineData,
-        const TsTest_SampleTimes &sampleTimes) const;
+    TsTest_SampleVec Eval(const TsTest_SplineData& splineData, const TsTest_SampleTimes& sampleTimes) const;
 
     // Produce bulk samples for drawing.  Sample times are determined adaptively
     // and cannot be controlled.
@@ -48,13 +45,11 @@ public:
 
     // Convert a TsSpline into TsTest's SplineData form.
     TS_API
-    TsTest_SplineData SplineToSplineData(
-        const TsSpline &spline) const;
+    TsTest_SplineData SplineToSplineData(const TsSpline& spline) const;
 
     // Convert SplineData to a TsSpline.
     TS_API
-    TsSpline SplineDataToSpline(
-        const TsTest_SplineData &splineData) const;
+    TsSpline SplineDataToSpline(const TsTest_SplineData& splineData) const;
 
     ////////////////////////////////////////////////////////////////////////////
     // TEST DATA TRANSFORMATION

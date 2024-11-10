@@ -21,7 +21,7 @@ g_mayapyEvaluator = None
 
 class TsTest_MayapyVsAnimX(unittest.TestCase):
 
-    def _DoTest(self, case, dataId, tolerance, addRaw = False):
+    def _DoTest(self, case, dataId, tolerance, addRaw=False):
         """
         Verify mayapy and AnimX evaluation are close.
         To really be sure, inspect the graph image output.
@@ -41,7 +41,7 @@ class TsTest_MayapyVsAnimX(unittest.TestCase):
         comparator.AddSpline("AnimX", data, animXSamples)
 
         if addRaw:
-            checkSamples = SampleBezier(data, numSamples = 200)
+            checkSamples = SampleBezier(data, numSamples=200)
             comparator.AddSpline("Raw Bezier", data, checkSamples)
 
         if Comparator.Init():
@@ -54,7 +54,7 @@ class TsTest_MayapyVsAnimX(unittest.TestCase):
 
     def test_RegressiveLoop(self):
         self._DoTest("test_RegressiveLoop", Museum.RegressiveLoop,
-                     1e-5, addRaw = True)
+                     1e-5, addRaw=True)
 
     def test_BoldS(self):
         self._DoTest("test_BoldS", Museum.BoldS, 1e-5)
@@ -71,7 +71,6 @@ class TsTest_MayapyVsAnimX(unittest.TestCase):
 
 
 if __name__ == "__main__":
-
     mayapyPath = sys.argv.pop()
     g_mayapyEvaluator = MayapyEvaluator(mayapyPath)
 

@@ -1,4 +1,3 @@
-
 \mainpage Ts: Time Splines
 
 # Ts Library

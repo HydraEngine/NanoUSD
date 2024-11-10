@@ -18,7 +18,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 // Makes a call to a template functor based on a dynamic type.  No return value;
 // obtain outputs with out-params.  Supports all valid spline value types.
 //
@@ -41,30 +40,18 @@ PXR_NAMESPACE_OPEN_SCOPE
 //   TsDispatchToValueTypeTemplate<_HasNonzeroValue>(
 //       myKnot.GetValueType(), myKnot, &nonzero);
 //
-template <
-    template <typename T> class Cls,
-    typename... Args>
-void TsDispatchToValueTypeTemplate(
-    TfType valueType, Args&&... args)
-{
-    if (valueType == Ts_GetType<double>())
-    {
+template <template <typename T> class Cls, typename... Args>
+void TsDispatchToValueTypeTemplate(TfType valueType, Args&&... args) {
+    if (valueType == Ts_GetType<double>()) {
         Cls<double>()(std::forward<Args>(args)...);
-    }
-    else if (valueType == Ts_GetType<float>())
-    {
+    } else if (valueType == Ts_GetType<float>()) {
         Cls<float>()(std::forward<Args>(args)...);
-    }
-    else if (valueType == Ts_GetType<GfHalf>())
-    {
+    } else if (valueType == Ts_GetType<GfHalf>()) {
         Cls<GfHalf>()(std::forward<Args>(args)...);
-    }
-    else
-    {
+    } else {
         TF_CODING_ERROR("Unsupported spline value type");
     }
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

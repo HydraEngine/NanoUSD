@@ -22,7 +22,6 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 struct Ts_SplineData;
 
-
 /// The knots in a spline.  Stored as a vector, but unique and sorted like a
 /// map.  A knot's time is stored within the knot itself, but is also sometimes
 /// used as a key.  Some methods are vector-like, some are map-like, and some
@@ -33,8 +32,7 @@ struct Ts_SplineData;
 /// knots, provided by GetKnots, but collections included baked loop knots can
 /// also be obtained.
 ///
-class TsKnotMap
-{
+class TsKnotMap {
 public:
     using KnotVec = std::vector<TsKnot>;
 
@@ -54,10 +52,10 @@ public:
     TsKnotMap(std::initializer_list<TsKnot> knots);
 
     TS_API
-    bool operator==(const TsKnotMap &other) const;
+    bool operator==(const TsKnotMap& other) const;
 
     TS_API
-    bool operator!=(const TsKnotMap &other) const;
+    bool operator!=(const TsKnotMap& other) const;
 
     /// @}
     /// \name Iteration
@@ -129,14 +127,14 @@ public:
     void clear();
 
     TS_API
-    void swap(TsKnotMap &other);
+    void swap(TsKnotMap& other);
 
     /// Inserts a knot.  If there is already a knot at the same time, nothing is
     /// changed.  Returns an iterator to the newly inserted knot, or the
     /// existing one at the same time.  The second member of the returned pair
     /// indicates whether an insertion took place.
     TS_API
-    std::pair<iterator, bool> insert(const TsKnot &knot);
+    std::pair<iterator, bool> insert(const TsKnot& knot);
 
     /// Removes the knot at the specified time, if it exists.  Returns the
     /// number of knots erased (0 or 1).
@@ -210,13 +208,12 @@ private:
 
     // Constructor for copying knot data from SplineData into KnotMap.
     TS_API
-    TsKnotMap(const Ts_SplineData *data);
+    TsKnotMap(const Ts_SplineData* data);
 
 private:
     // Knot objects.
     KnotVec _knots;
 };
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

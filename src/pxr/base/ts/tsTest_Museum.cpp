@@ -17,8 +17,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 using SData = TsTest_SplineData;
 
-TF_REGISTRY_FUNCTION(TfEnum)
-{
+TF_REGISTRY_FUNCTION(TfEnum) {
     TF_ADD_ENUM_NAME(TsTest_Museum::TwoKnotBezier);
     TF_ADD_ENUM_NAME(TsTest_Museum::TwoKnotLinear);
     TF_ADD_ENUM_NAME(TsTest_Museum::FourKnotBezier);
@@ -59,9 +58,7 @@ TF_REGISTRY_FUNCTION(TfEnum)
     TF_ADD_ENUM_NAME(TsTest_Museum::ComplexParams);
 }
 
-
-static TsTest_SplineData _TwoKnotBezier()
-{
+static TsTest_SplineData _TwoKnotBezier() {
     SData::Knot knot1;
     knot1.time = 1.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -81,8 +78,7 @@ static TsTest_SplineData _TwoKnotBezier()
     return data;
 }
 
-static TsTest_SplineData _TwoKnotLinear()
-{
+static TsTest_SplineData _TwoKnotLinear() {
     SData::Knot knot1;
     knot1.time = 1.0;
     knot1.nextSegInterpMethod = SData::InterpLinear;
@@ -98,8 +94,7 @@ static TsTest_SplineData _TwoKnotLinear()
     return data;
 }
 
-static TsTest_SplineData _FourKnotBezier()
-{
+static TsTest_SplineData _FourKnotBezier() {
     SData::Knot knot1;
     knot1.time = 1.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -137,8 +132,7 @@ static TsTest_SplineData _FourKnotBezier()
     return data;
 }
 
-static TsTest_SplineData _SimpleInnerLoop()
-{
+static TsTest_SplineData _SimpleInnerLoop() {
     // proto len: 18
     // pre-loop len: 18 (1 iteration)
     // post-loop len: 18 (1 iteration)
@@ -207,8 +201,7 @@ static TsTest_SplineData _SimpleInnerLoop()
     return data;
 }
 
-static TsTest_SplineData _InnerLoop2and2()
-{
+static TsTest_SplineData _InnerLoop2and2() {
     // proto len: 10
     // pre-loop len: 20 (2 iterations)
     // post-loop len: 20 (2 iterations)
@@ -258,8 +251,7 @@ static TsTest_SplineData _InnerLoop2and2()
     return data;
 }
 
-static TsTest_SplineData _InnerLoopPre()
-{
+static TsTest_SplineData _InnerLoopPre() {
     // proto len: 10
     // pre-loop len: 20 (2 iterations)
     // post-loop len: 0 (0 iterations)
@@ -330,8 +322,7 @@ static TsTest_SplineData _InnerLoopPre()
     return data;
 }
 
-static TsTest_SplineData _InnerLoopPost()
-{
+static TsTest_SplineData _InnerLoopPost() {
     // proto len: 10
     // pre-loop len: 0 (0 iterations)
     // post-loop len: 20 (2 iterations)
@@ -402,8 +393,7 @@ static TsTest_SplineData _InnerLoopPost()
     return data;
 }
 
-static TsTest_SplineData _ExtrapLoopRepeat()
-{
+static TsTest_SplineData _ExtrapLoopRepeat() {
     SData::Knot knot1;
     knot1.time = 100.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -432,8 +422,7 @@ static TsTest_SplineData _ExtrapLoopRepeat()
     return data;
 }
 
-static TsTest_SplineData _ExtrapLoopReset()
-{
+static TsTest_SplineData _ExtrapLoopReset() {
     SData::Knot knot1;
     knot1.time = 100.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -462,8 +451,7 @@ static TsTest_SplineData _ExtrapLoopReset()
     return data;
 }
 
-static TsTest_SplineData _ExtrapLoopOscillate()
-{
+static TsTest_SplineData _ExtrapLoopOscillate() {
     SData::Knot knot1;
     knot1.time = 100.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -492,8 +480,7 @@ static TsTest_SplineData _ExtrapLoopOscillate()
     return data;
 }
 
-static TsTest_SplineData _InnerAndExtrapLoops()
-{
+static TsTest_SplineData _InnerAndExtrapLoops() {
     // Same knots and inner loop params as InnerLoop2and2
 
     SData::Knot knot1;
@@ -533,8 +520,7 @@ static TsTest_SplineData _InnerAndExtrapLoops()
     return data;
 }
 
-static TsTest_SplineData _RegressiveLoop()
-{
+static TsTest_SplineData _RegressiveLoop() {
     SData::Knot knot1;
     knot1.time = 156.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -558,8 +544,7 @@ static TsTest_SplineData _RegressiveLoop()
     return data;
 }
 
-static TsTest_SplineData _RegressiveS()
-{
+static TsTest_SplineData _RegressiveS() {
     SData::Knot knot1;
     knot1.time = 156.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -579,8 +564,7 @@ static TsTest_SplineData _RegressiveS()
     return data;
 }
 
-static TsTest_SplineData _RegressiveSStandard()
-{
+static TsTest_SplineData _RegressiveSStandard() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -600,8 +584,7 @@ static TsTest_SplineData _RegressiveSStandard()
     return data;
 }
 
-static TsTest_SplineData _RegressiveSPreOut()
-{
+static TsTest_SplineData _RegressiveSPreOut() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -621,8 +604,7 @@ static TsTest_SplineData _RegressiveSPreOut()
     return data;
 }
 
-static TsTest_SplineData _RegressiveSPostOut()
-{
+static TsTest_SplineData _RegressiveSPostOut() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -642,8 +624,7 @@ static TsTest_SplineData _RegressiveSPostOut()
     return data;
 }
 
-static TsTest_SplineData _RegressiveSBothOut()
-{
+static TsTest_SplineData _RegressiveSBothOut() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -663,8 +644,7 @@ static TsTest_SplineData _RegressiveSBothOut()
     return data;
 }
 
-static TsTest_SplineData _RegressivePreJ()
-{
+static TsTest_SplineData _RegressivePreJ() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -684,8 +664,7 @@ static TsTest_SplineData _RegressivePreJ()
     return data;
 }
 
-static TsTest_SplineData _RegressivePostJ()
-{
+static TsTest_SplineData _RegressivePostJ() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -705,8 +684,7 @@ static TsTest_SplineData _RegressivePostJ()
     return data;
 }
 
-static TsTest_SplineData _RegressivePreC()
-{
+static TsTest_SplineData _RegressivePreC() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -726,8 +704,7 @@ static TsTest_SplineData _RegressivePreC()
     return data;
 }
 
-static TsTest_SplineData _RegressivePostC()
-{
+static TsTest_SplineData _RegressivePostC() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -747,8 +724,7 @@ static TsTest_SplineData _RegressivePostC()
     return data;
 }
 
-static TsTest_SplineData _RegressivePreG()
-{
+static TsTest_SplineData _RegressivePreG() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -768,8 +744,7 @@ static TsTest_SplineData _RegressivePreG()
     return data;
 }
 
-static TsTest_SplineData _RegressivePostG()
-{
+static TsTest_SplineData _RegressivePostG() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -789,8 +764,7 @@ static TsTest_SplineData _RegressivePostG()
     return data;
 }
 
-static TsTest_SplineData _RegressivePreFringe()
-{
+static TsTest_SplineData _RegressivePreFringe() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -810,8 +784,7 @@ static TsTest_SplineData _RegressivePreFringe()
     return data;
 }
 
-static TsTest_SplineData _RegressivePostFringe()
-{
+static TsTest_SplineData _RegressivePostFringe() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -831,8 +804,7 @@ static TsTest_SplineData _RegressivePostFringe()
     return data;
 }
 
-static TsTest_SplineData _BoldS()
-{
+static TsTest_SplineData _BoldS() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -852,8 +824,7 @@ static TsTest_SplineData _BoldS()
     return data;
 }
 
-static TsTest_SplineData _Cusp()
-{
+static TsTest_SplineData _Cusp() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -873,8 +844,7 @@ static TsTest_SplineData _Cusp()
     return data;
 }
 
-static TsTest_SplineData _CenterVertical()
-{
+static TsTest_SplineData _CenterVertical() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -894,8 +864,7 @@ static TsTest_SplineData _CenterVertical()
     return data;
 }
 
-static TsTest_SplineData _NearCenterVertical()
-{
+static TsTest_SplineData _NearCenterVertical() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -915,8 +884,7 @@ static TsTest_SplineData _NearCenterVertical()
     return data;
 }
 
-static TsTest_SplineData _VerticalTorture()
-{
+static TsTest_SplineData _VerticalTorture() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -936,8 +904,7 @@ static TsTest_SplineData _VerticalTorture()
     return data;
 }
 
-static TsTest_SplineData _FourThirdOneThird()
-{
+static TsTest_SplineData _FourThirdOneThird() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -957,8 +924,7 @@ static TsTest_SplineData _FourThirdOneThird()
     return data;
 }
 
-static TsTest_SplineData _OneThirdFourThird()
-{
+static TsTest_SplineData _OneThirdFourThird() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -978,8 +944,7 @@ static TsTest_SplineData _OneThirdFourThird()
     return data;
 }
 
-static TsTest_SplineData _StartVert()
-{
+static TsTest_SplineData _StartVert() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -999,8 +964,7 @@ static TsTest_SplineData _StartVert()
     return data;
 }
 
-static TsTest_SplineData _EndVert()
-{
+static TsTest_SplineData _EndVert() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -1020,8 +984,7 @@ static TsTest_SplineData _EndVert()
     return data;
 }
 
-static TsTest_SplineData _FringeVert()
-{
+static TsTest_SplineData _FringeVert() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -1041,8 +1004,7 @@ static TsTest_SplineData _FringeVert()
     return data;
 }
 
-static TsTest_SplineData _MarginalN()
-{
+static TsTest_SplineData _MarginalN() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -1062,8 +1024,7 @@ static TsTest_SplineData _MarginalN()
     return data;
 }
 
-static TsTest_SplineData _ZeroTans()
-{
+static TsTest_SplineData _ZeroTans() {
     SData::Knot knot1;
     knot1.time = 0.0;
     knot1.nextSegInterpMethod = SData::InterpCurve;
@@ -1083,8 +1044,7 @@ static TsTest_SplineData _ZeroTans()
     return data;
 }
 
-static TsTest_SplineData _ComplexParams()
-{
+static TsTest_SplineData _ComplexParams() {
     SData data;
 
     data.SetPreExtrapolation(SData::Extrapolation(SData::ExtrapLinear));
@@ -1128,73 +1088,102 @@ static TsTest_SplineData _ComplexParams()
     return data;
 }
 
-TsTest_SplineData
-TsTest_Museum::GetData(const DataId id)
-{
-    switch (id)
-    {
-        case TwoKnotBezier: return _TwoKnotBezier();
-        case TwoKnotLinear: return _TwoKnotLinear();
-        case FourKnotBezier: return _FourKnotBezier();
-        case SimpleInnerLoop: return _SimpleInnerLoop();
-        case InnerLoop2and2: return _InnerLoop2and2();
-        case InnerLoopPre: return _InnerLoopPre();
-        case InnerLoopPost: return _InnerLoopPost();
-        case ExtrapLoopRepeat: return _ExtrapLoopRepeat();
-        case ExtrapLoopReset: return _ExtrapLoopReset();
-        case ExtrapLoopOscillate: return _ExtrapLoopOscillate();
-        case InnerAndExtrapLoops: return _InnerAndExtrapLoops();
-        case RegressiveLoop: return _RegressiveLoop();
-        case RegressiveS: return _RegressiveS();
-        case RegressiveSStandard: return _RegressiveSStandard();
-        case RegressiveSPreOut: return _RegressiveSPreOut();
-        case RegressiveSPostOut: return _RegressiveSPostOut();
-        case RegressiveSBothOut: return _RegressiveSBothOut();
-        case RegressivePreJ: return _RegressivePreJ();
-        case RegressivePostJ: return _RegressivePostJ();
-        case RegressivePreC: return _RegressivePreC();
-        case RegressivePostC: return _RegressivePostC();
-        case RegressivePreG: return _RegressivePreG();
-        case RegressivePostG: return _RegressivePostG();
-        case RegressivePreFringe: return _RegressivePreFringe();
-        case RegressivePostFringe: return _RegressivePostFringe();
-        case BoldS: return _BoldS();
-        case Cusp: return _Cusp();
-        case CenterVertical: return _CenterVertical();
-        case NearCenterVertical: return _NearCenterVertical();
-        case VerticalTorture: return _VerticalTorture();
-        case FourThirdOneThird: return _FourThirdOneThird();
-        case OneThirdFourThird: return _OneThirdFourThird();
-        case StartVert: return _StartVert();
-        case EndVert: return _EndVert();
-        case FringeVert: return _FringeVert();
-        case MarginalN: return _MarginalN();
-        case ZeroTans: return _ZeroTans();
-        case ComplexParams: return _ComplexParams();
+TsTest_SplineData TsTest_Museum::GetData(const DataId id) {
+    switch (id) {
+        case TwoKnotBezier:
+            return _TwoKnotBezier();
+        case TwoKnotLinear:
+            return _TwoKnotLinear();
+        case FourKnotBezier:
+            return _FourKnotBezier();
+        case SimpleInnerLoop:
+            return _SimpleInnerLoop();
+        case InnerLoop2and2:
+            return _InnerLoop2and2();
+        case InnerLoopPre:
+            return _InnerLoopPre();
+        case InnerLoopPost:
+            return _InnerLoopPost();
+        case ExtrapLoopRepeat:
+            return _ExtrapLoopRepeat();
+        case ExtrapLoopReset:
+            return _ExtrapLoopReset();
+        case ExtrapLoopOscillate:
+            return _ExtrapLoopOscillate();
+        case InnerAndExtrapLoops:
+            return _InnerAndExtrapLoops();
+        case RegressiveLoop:
+            return _RegressiveLoop();
+        case RegressiveS:
+            return _RegressiveS();
+        case RegressiveSStandard:
+            return _RegressiveSStandard();
+        case RegressiveSPreOut:
+            return _RegressiveSPreOut();
+        case RegressiveSPostOut:
+            return _RegressiveSPostOut();
+        case RegressiveSBothOut:
+            return _RegressiveSBothOut();
+        case RegressivePreJ:
+            return _RegressivePreJ();
+        case RegressivePostJ:
+            return _RegressivePostJ();
+        case RegressivePreC:
+            return _RegressivePreC();
+        case RegressivePostC:
+            return _RegressivePostC();
+        case RegressivePreG:
+            return _RegressivePreG();
+        case RegressivePostG:
+            return _RegressivePostG();
+        case RegressivePreFringe:
+            return _RegressivePreFringe();
+        case RegressivePostFringe:
+            return _RegressivePostFringe();
+        case BoldS:
+            return _BoldS();
+        case Cusp:
+            return _Cusp();
+        case CenterVertical:
+            return _CenterVertical();
+        case NearCenterVertical:
+            return _NearCenterVertical();
+        case VerticalTorture:
+            return _VerticalTorture();
+        case FourThirdOneThird:
+            return _FourThirdOneThird();
+        case OneThirdFourThird:
+            return _OneThirdFourThird();
+        case StartVert:
+            return _StartVert();
+        case EndVert:
+            return _EndVert();
+        case FringeVert:
+            return _FringeVert();
+        case MarginalN:
+            return _MarginalN();
+        case ZeroTans:
+            return _ZeroTans();
+        case ComplexParams:
+            return _ComplexParams();
     }
 
     return {};
 }
 
-std::vector<std::string>
-TsTest_Museum::GetAllNames()
-{
+std::vector<std::string> TsTest_Museum::GetAllNames() {
     return TfEnum::GetAllNames<DataId>();
 }
 
-TsTest_SplineData
-TsTest_Museum::GetDataByName(const std::string &name)
-{
+TsTest_SplineData TsTest_Museum::GetDataByName(const std::string& name) {
     bool found = false;
     const DataId id = TfEnum::GetValueFromName<DataId>(name, &found);
-    if (!found)
-    {
+    if (!found) {
         TF_CODING_ERROR("No Museum exhibit named '%s'", name.c_str());
         return TsTest_SplineData();
     }
 
     return GetData(id);
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

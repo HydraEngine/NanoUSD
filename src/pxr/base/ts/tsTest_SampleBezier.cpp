@@ -17,12 +17,7 @@ using SData = TsTest_SplineData;
 // Obtain one sample between knot0 and knot1, at parameter value t.
 // Uses de Casteljau algorithm.
 //
-static TsTest_Sample
-_ComputeSample(
-    const SData::Knot &knot0,
-    const SData::Knot &knot1,
-    const double t)
-{
+static TsTest_Sample _ComputeSample(const SData::Knot& knot0, const SData::Knot& knot1, const double t) {
     const GfVec2d p0(knot0.time, knot0.value);
     const GfVec2d tan1(knot0.postLen, knot0.postSlope * knot0.postLen);
     const GfVec2d p1 = p0 + tan1;
@@ -42,20 +37,14 @@ _ComputeSample(
     return TsTest_Sample(lerp31[0], lerp31[1]);
 }
 
-TsTest_SampleVec
-TsTest_SampleBezier(
-    const SData &splineData,
-    const int numSamples)
-{
-    if (splineData.GetRequiredFeatures() != SData::FeatureBezierSegments)
-    {
+TsTest_SampleVec TsTest_SampleBezier(const SData& splineData, const int numSamples) {
+    if (splineData.GetRequiredFeatures() != SData::FeatureBezierSegments) {
         TF_CODING_ERROR("SampleBezier supports only plain Beziers");
         return {};
     }
 
-    const SData::KnotSet &knots = splineData.GetKnots();
-    if (knots.size() < 2)
-    {
+    const SData::KnotSet& knots = splineData.GetKnots();
+    if (knots.size() < 2) {
         TF_CODING_ERROR("SampleBezier requires at least two knots");
         return {};
     }
@@ -68,12 +57,9 @@ TsTest_SampleBezier(
     TsTest_SampleVec result;
 
     // Process each segment.
-    for (auto knotIt = knots.begin(), knotNextIt = knotIt;
-         ++knotNextIt != knots.end(); knotIt++)
-    {
+    for (auto knotIt = knots.begin(), knotNextIt = knotIt; ++knotNextIt != knots.end(); knotIt++) {
         // Divide segment into samples.
-        for (int j = 0; j < samplesPerSegment; j++)
-        {
+        for (int j = 0; j < samplesPerSegment; j++) {
             // Sample at this 't' value.
             const double t = tPerSample * j;
             result.push_back(_ComputeSample(*knotIt, *knotNextIt, t));
@@ -81,7 +67,7 @@ TsTest_SampleBezier(
     }
 
     // Add one sample at the end of the last segment.
-    const SData::Knot &lastKnot = *knots.rbegin();
+    const SData::Knot& lastKnot = *knots.rbegin();
     result.push_back(TsTest_Sample(lastKnot.time, lastKnot.value));
 
     return result;

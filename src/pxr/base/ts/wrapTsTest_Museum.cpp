@@ -19,9 +19,7 @@ using namespace pxr_boost::python;
 
 using This = TsTest_Museum;
 
-
-void wrapTsTest_Museum()
-{
+void wrapTsTest_Museum() {
     // First the class object, so we can create a scope for it...
     class_<This> classObj("TsTest_Museum", no_init);
     scope classScope(classObj);
@@ -32,12 +30,11 @@ void wrapTsTest_Museum()
     // ...then the defs, which must occur after the nested type wrappings.
     classObj
 
-        .def("GetAllNames", &This::GetAllNames,
-            return_value_policy<TfPySequenceToList>())
+            .def("GetAllNames", &This::GetAllNames, return_value_policy<TfPySequenceToList>())
 
-        .def("GetData", &This::GetData)
+            .def("GetData", &This::GetData)
 
-        .def("GetDataByName", &This::GetDataByName)
+            .def("GetDataByName", &This::GetDataByName)
 
-        ;
+            ;
 }

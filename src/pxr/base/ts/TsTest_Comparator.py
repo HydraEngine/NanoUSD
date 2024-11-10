@@ -8,18 +8,19 @@
 from .TsTest_Grapher import TsTest_Grapher
 from pxr.Ts import TsTest_SampleTimes
 
+
 class TsTest_Comparator(object):
 
     @classmethod
     def Init(cls):
         return TsTest_Grapher.Init()
 
-    def __init__(self, title, widthPx = 1000, heightPx = 1500):
+    def __init__(self, title, widthPx=1000, heightPx=1500):
         self._sampleSets = []
         self._grapher = TsTest_Grapher(title, widthPx, heightPx)
         self._haveCompared = False
 
-    def AddSpline(self, name, splineData, samples, baked = None):
+    def AddSpline(self, name, splineData, samples, baked=None):
         """
         Must always add at least two splines.  The first two will be compared.
         Additional splines will be graphed, but will not participate in the
@@ -90,7 +91,6 @@ class TsTest_Comparator(object):
 
             absDiff = abs(diff)
             if absDiff > self._maxDiff:
-
                 self._maxDiff = absDiff
                 self._maxDiffSamples = (sample1, sample2)
 

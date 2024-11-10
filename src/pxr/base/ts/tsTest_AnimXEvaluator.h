@@ -17,23 +17,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 class TsTest_SplineData;
 class TsTest_SampleTimes;
 
-class TsTest_AnimXEvaluator
-{
+class TsTest_AnimXEvaluator {
 public:
-    enum AutoTanType
-    {
-        AutoTanAuto,
-        AutoTanSmooth
-    };
+    enum AutoTanType { AutoTanAuto, AutoTanSmooth };
 
     TS_API
-    TsTest_AnimXEvaluator(
-        AutoTanType autoTanType = AutoTanAuto);
+    TsTest_AnimXEvaluator(AutoTanType autoTanType = AutoTanAuto);
 
     TS_API
-    TsTest_SampleVec Eval(
-        const TsTest_SplineData &splineData,
-        const TsTest_SampleTimes &sampleTimes) const;
+    TsTest_SampleVec Eval(const TsTest_SplineData& splineData, const TsTest_SampleTimes& sampleTimes) const;
 
 private:
     const AutoTanType _autoTanType;

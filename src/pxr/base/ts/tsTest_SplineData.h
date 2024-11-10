@@ -19,39 +19,25 @@ PXR_NAMESPACE_OPEN_SCOPE
 // A generic way of encoding spline control parameters.  Allows us to pass the
 // same data to different backends (Ts, mayapy, etc) for evaluation.
 //
-class TsTest_SplineData
-{
+class TsTest_SplineData {
 public:
     // Interpolation method for a spline segment.
-    enum InterpMethod
-    {
-        InterpHeld,
-        InterpLinear,
-        InterpCurve
-    };
+    enum InterpMethod { InterpHeld, InterpLinear, InterpCurve };
 
     // Extrapolation method for the ends of a spline beyond the knots.
-    enum ExtrapMethod
-    {
-        ExtrapHeld,
-        ExtrapLinear,
-        ExtrapSloped,
-        ExtrapLoop
-    };
+    enum ExtrapMethod { ExtrapHeld, ExtrapLinear, ExtrapSloped, ExtrapLoop };
 
     // Looping modes.
-    enum LoopMode
-    {
+    enum LoopMode {
         LoopNone,
-        LoopContinue,   // Used by inner loops.  Copy whole knots.
-        LoopRepeat,     // Used by extrap loops.  Repeat with offset.
-        LoopReset,      // Used by extrap loops.  Repeat identically.
-        LoopOscillate   // Used by extrap loops.  Alternate forward / reverse.
+        LoopContinue,  // Used by inner loops.  Copy whole knots.
+        LoopRepeat,    // Used by extrap loops.  Repeat with offset.
+        LoopReset,     // Used by extrap loops.  Repeat identically.
+        LoopOscillate  // Used by extrap loops.  Alternate forward / reverse.
     };
 
     // Features that may be required by splines.
-    enum Feature
-    {
+    enum Feature {
         FeatureHeldSegments = 1 << 0,
         FeatureLinearSegments = 1 << 1,
         FeatureBezierSegments = 1 << 2,
@@ -65,8 +51,7 @@ public:
     using Features = unsigned int;
 
     // One knot in a spline.
-    struct Knot
-    {
+    struct Knot {
         double time = 0;
         InterpMethod nextSegInterpMethod = InterpHeld;
         double value = 0;
@@ -81,16 +66,13 @@ public:
 
     public:
         TS_API
-        bool operator==(
-            const Knot &other) const;
+        bool operator==(const Knot& other) const;
 
         TS_API
-        bool operator!=(
-            const Knot &other) const;
+        bool operator!=(const Knot& other) const;
 
         TS_API
-        bool operator<(
-            const Knot &other) const;
+        bool operator<(const Knot& other) const;
     };
     using KnotSet = std::set<Knot>;
 
@@ -116,8 +98,7 @@ public:
     // The value offset specifies the difference between the value at the starts
     // of consecutive iterations.
     //
-    struct InnerLoopParams
-    {
+    struct InnerLoopParams {
         bool enabled = false;
         double protoStart = 0;
         double protoEnd = 0;
@@ -127,20 +108,17 @@ public:
 
     public:
         TS_API
-        bool operator==(
-            const InnerLoopParams &other) const;
+        bool operator==(const InnerLoopParams& other) const;
 
         TS_API
-        bool operator!=(
-            const InnerLoopParams &other) const;
+        bool operator!=(const InnerLoopParams& other) const;
 
         TS_API
         bool IsValid() const;
     };
 
     // Extrapolation parameters for the ends of a spline beyond the knots.
-    struct Extrapolation
-    {
+    struct Extrapolation {
         ExtrapMethod method = ExtrapHeld;
         double slope = 0;
         LoopMode loopMode = LoopNone;
@@ -153,64 +131,51 @@ public:
         Extrapolation(ExtrapMethod method);
 
         TS_API
-        bool operator==(
-            const Extrapolation &other) const;
+        bool operator==(const Extrapolation& other) const;
 
         TS_API
-        bool operator!=(
-            const Extrapolation &other) const;
+        bool operator!=(const Extrapolation& other) const;
     };
 
 public:
     TS_API
-    bool operator==(
-        const TsTest_SplineData &other) const;
+    bool operator==(const TsTest_SplineData& other) const;
 
     TS_API
-    bool operator!=(
-        const TsTest_SplineData &other) const;
+    bool operator!=(const TsTest_SplineData& other) const;
 
     TS_API
     void SetIsHermite(bool hermite);
 
     TS_API
-    void AddKnot(
-        const Knot &knot);
+    void AddKnot(const Knot& knot);
 
     TS_API
-    void SetKnots(
-        const KnotSet &knots);
+    void SetKnots(const KnotSet& knots);
 
     TS_API
-    void SetPreExtrapolation(
-        const Extrapolation &preExtrap);
+    void SetPreExtrapolation(const Extrapolation& preExtrap);
 
     TS_API
-    void SetPostExtrapolation(
-        const Extrapolation &postExtrap);
+    void SetPostExtrapolation(const Extrapolation& postExtrap);
 
     TS_API
-    void SetInnerLoopParams(
-        const InnerLoopParams &params);
+    void SetInnerLoopParams(const InnerLoopParams& params);
 
     TS_API
     bool GetIsHermite() const;
 
     TS_API
-    const KnotSet&
-    GetKnots() const;
+    const KnotSet& GetKnots() const;
 
     TS_API
-    const Extrapolation&
-    GetPreExtrapolation() const;
+    const Extrapolation& GetPreExtrapolation() const;
 
     TS_API
-    const Extrapolation&
-    GetPostExtrapolation() const;
+    const Extrapolation& GetPostExtrapolation() const;
 
     TS_API
-    const InnerLoopParams&
-    GetInnerLoopParams() const;
+    const InnerLoopParams& GetInnerLoopParams() const;
 
     TS_API
     Features GetRequiredFeatures() const;

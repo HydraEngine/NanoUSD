@@ -20,16 +20,14 @@ PXR_NAMESPACE_USING_DIRECTIVE
 // values get larger and an epsilon based on subtraction would need to
 // increase as well. The ratio, however, stays close to 1.0 for close
 // values.
-inline bool
-IsClose(double a, double b, double epsilon) {
-    return fabs(1.0 - (a/b)) < epsilon;
+inline bool IsClose(double a, double b, double epsilon) {
+    return fabs(1.0 - (a / b)) < epsilon;
 }
 
 template <typename T>
-bool ExerciseConversions(TsTime width, T value)
-{
+bool ExerciseConversions(TsTime width, T value) {
     double epsilon = 1.0e-6;
-    
+
     double widthOut;
     T valueOut;
 
@@ -70,37 +68,35 @@ bool ExerciseConversions(TsTime width, T value)
 
     // Verify transforms
     TsConvertToStandardTangent(width, value,
-                               true,   // convertHeightToSlope
-                               true,   // divideValuesByThree
-                               true,   // negateHeight
+                               true,  // convertHeightToSlope
+                               true,  // divideValuesByThree
+                               true,  // negateHeight
                                &widthOut, &valueOut);
-    if (!IsClose(width/3, widthOut, epsilon)) {
-        std::cout << std::hexfloat
-                  << "ConvertToStandardTangent not close:\n"
+    if (!IsClose(width / 3, widthOut, epsilon)) {
+        std::cout << std::hexfloat << "ConvertToStandardTangent not close:\n"
                   << "    width             = " << width << "\n"
-                  << "    width/3           = " << width/3 << "\n"
+                  << "    width/3           = " << width / 3 << "\n"
                   << "    widthOut          = " << widthOut << "\n"
                   << std::endl;
     }
 
-    TF_AXIOM(IsClose(width/3, widthOut, epsilon));
-    TF_AXIOM(IsClose(T(value/width), -valueOut, epsilon));
+    TF_AXIOM(IsClose(width / 3, widthOut, epsilon));
+    TF_AXIOM(IsClose(T(value / width), -valueOut, epsilon));
 
     TsConvertFromStandardTangent(width, value,
-                                 true,   // convertSlopeToHeight
-                                 true,   // multiplyValuesByThree
-                                 true,   // negateHeight
+                                 true,  // convertSlopeToHeight
+                                 true,  // multiplyValuesByThree
+                                 true,  // negateHeight
                                  &widthOut, &valueOut);
-    if (!IsClose(width*3, widthOut, epsilon)) {
-        std::cout << std::hexfloat
-                  << "ConvertFromStandardTangent not close:\n"
+    if (!IsClose(width * 3, widthOut, epsilon)) {
+        std::cout << std::hexfloat << "ConvertFromStandardTangent not close:\n"
                   << "    width             = " << width << "\n"
-                  << "    width*3           = " << width*3 << "\n"
+                  << "    width*3           = " << width * 3 << "\n"
                   << "    widthOut          = " << widthOut << "\n"
                   << std::endl;
     }
-    TF_AXIOM(IsClose(width*3, widthOut, epsilon));
-    TF_AXIOM(IsClose(T(-value*3*width), valueOut, epsilon));
+    TF_AXIOM(IsClose(width * 3, widthOut, epsilon));
+    TF_AXIOM(IsClose(T(-value * 3 * width), valueOut, epsilon));
 
     // Verify safe round trips. This requires converting first to get rounded
     // values then, converting those back and forth and verifying that we get
@@ -108,24 +104,23 @@ bool ExerciseConversions(TsTime width, T value)
     double widthRounded, widthIntermediate;
     T valueRounded, valueIntermediate;
     TsConvertToStandardTangent(width, value,
-                               true,   // convertHeightToSlope
-                               true,   // divideValuesByThree
-                               true,   // negateHeight
+                               true,  // convertHeightToSlope
+                               true,  // divideValuesByThree
+                               true,  // negateHeight
                                &widthRounded, &valueRounded);
     TsConvertFromStandardTangent(widthRounded, valueRounded,
-                                 true,   // convertSlopeToHeight
-                                 true,   // multiplyValuesByThree
-                                 true,   // negateHeight
+                                 true,  // convertSlopeToHeight
+                                 true,  // multiplyValuesByThree
+                                 true,  // negateHeight
                                  &widthIntermediate, &valueIntermediate);
     TsConvertToStandardTangent(widthIntermediate, valueIntermediate,
-                               true,   // convertHeightToSlope
-                               true,   // divideValuesByThree
-                               true,   // negateHeight
+                               true,  // convertHeightToSlope
+                               true,  // divideValuesByThree
+                               true,  // negateHeight
                                &widthOut, &valueOut);
 
     if (widthRounded != widthOut || valueRounded != valueOut) {
-        std::cout << std::hexfloat
-                  << "Round trip failed for to - from - to:\n"
+        std::cout << std::hexfloat << "Round trip failed for to - from - to:\n"
                   << "    sizeof(value)     = " << sizeof(value) << "\n"
                   << "    width             = " << width << "\n"
                   << "    value             = " << double(value) << "\n"
@@ -141,24 +136,23 @@ bool ExerciseConversions(TsTime width, T value)
     // TF_AXIOM(valueRounded == valueOut);
 
     TsConvertFromStandardTangent(width, value,
-                                 true,   // convertHeightToSlope
-                                 true,   // divideValuesByThree
-                                 true,   // negateHeight
+                                 true,  // convertHeightToSlope
+                                 true,  // divideValuesByThree
+                                 true,  // negateHeight
                                  &widthRounded, &valueRounded);
     TsConvertToStandardTangent(widthRounded, valueRounded,
-                               true,   // convertSlopeToHeight
-                               true,   // multiplyValuesByThree
-                               true,   // negateHeight
+                               true,  // convertSlopeToHeight
+                               true,  // multiplyValuesByThree
+                               true,  // negateHeight
                                &widthIntermediate, &valueIntermediate);
     TsConvertFromStandardTangent(widthIntermediate, valueIntermediate,
-                                 true,   // convertHeightToSlope
-                                 true,   // divideValuesByThree
-                                 true,   // negateHeight
+                                 true,  // convertHeightToSlope
+                                 true,  // divideValuesByThree
+                                 true,  // negateHeight
                                  &widthOut, &valueOut);
 
     if (widthRounded != widthOut || valueRounded != valueOut) {
-        std::cout << std::hexfloat
-                  << "Round trip failed for from - to - from:\n"
+        std::cout << std::hexfloat << "Round trip failed for from - to - from:\n"
                   << "    sizeof(value)     = " << sizeof(value) << "\n"
                   << "    width             = " << width << "\n"
                   << "    value             = " << double(value) << "\n"
@@ -175,15 +169,12 @@ bool ExerciseConversions(TsTime width, T value)
 
     return true;
 }
-    
 
-    
 // Test a range of consecutive floating point numbers to verify
 // that conversion and rounding works correctly for all the
 // low order bit patterns.
 template <typename T>
-void TestNearbyValues()
-{
+void TestNearbyValues() {
     // std::numeric_limits<T>::epsilon() is the distance between consecutive
     // floating point numbers in the range between 1.0 and 2.0. That distance
     // is doubled between 2.0 and 4.0.
@@ -210,19 +201,18 @@ void TestNearbyValues()
         widths[i] = 2.0 + (i - 16) * 2 * widthEps;
     }
 
-    for (double width: widths) {
-        for (T value: values) {
+    for (double width : widths) {
+        for (T value : values) {
             ExerciseConversions(width, value);
         }
     }
 }
-    
+
 // Test a range of larger values. Note that they're note really all that
 // large since we're trying to make sur we don't overflow a half value
 // which tops out at 65504. So we need 3 * width * value < 65504.
 template <typename T>
-void TestLargeValues()
-{
+void TestLargeValues() {
     // Back to epsilon again. Use 2.0 - epsilon as a base value because it
     // has lots (all) of the mantissa bits set.
     const T valueBase = 2.0 - std::numeric_limits<T>::epsilon();
@@ -236,15 +226,14 @@ void TestLargeValues()
         widths[i] = std::ldexp(widthBase, i - 6);
     }
 
-    for (double width: widths) {
-        for (T value: values) {
+    for (double width : widths) {
+        for (T value : values) {
             ExerciseConversions(width, value);
         }
     }
 }
 
-int main()
-{
+int main() {
     TestNearbyValues<double>();
     TestNearbyValues<float>();
     TestNearbyValues<GfHalf>();

@@ -13,34 +13,24 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-namespace
-{
-    template <typename T>
-    struct _Creator
-    {
-        void operator()(Ts_SplineData** dataOut)
-        {
-            *dataOut = new Ts_TypedSplineData<T>();
-        }
-    };
-}
+namespace {
+template <typename T>
+struct _Creator {
+    void operator()(Ts_SplineData** dataOut) { *dataOut = new Ts_TypedSplineData<T>(); }
+};
+}  // namespace
 
 // static
-Ts_SplineData* Ts_SplineData::Create(
-    const TfType valueType,
-    const Ts_SplineData* const overallParamSource)
-{
+Ts_SplineData* Ts_SplineData::Create(const TfType valueType, const Ts_SplineData* const overallParamSource) {
     // If type wasn't specified, use double.
     const TfType actualType = (valueType ? valueType : Ts_GetType<double>());
 
     // Create the specific subtype.
-    Ts_SplineData *result = nullptr;
-    TsDispatchToValueTypeTemplate<_Creator>(
-        actualType, &result);
+    Ts_SplineData* result = nullptr;
+    TsDispatchToValueTypeTemplate<_Creator>(actualType, &result);
 
     // Calling code should always have verified supported value type.
-    if (!result)
-    {
+    if (!result) {
         return nullptr;
     }
 
@@ -53,8 +43,7 @@ Ts_SplineData* Ts_SplineData::Create(
     result->isTyped = bool(valueType);
 
     // If we are being created to replace temporary data, copy overall members.
-    if (overallParamSource)
-    {
+    if (overallParamSource) {
         result->curveType = overallParamSource->curveType;
         result->preExtrapolation = overallParamSource->preExtrapolation;
         result->postExtrapolation = overallParamSource->postExtrapolation;
@@ -66,32 +55,25 @@ Ts_SplineData* Ts_SplineData::Create(
 
 Ts_SplineData::~Ts_SplineData() = default;
 
-bool Ts_SplineData::HasInnerLoops(
-    size_t* const firstProtoIndexOut) const
-{
+bool Ts_SplineData::HasInnerLoops(size_t* const firstProtoIndexOut) const {
     // Must have nonzero, positive prototype interval width.
-    if (loopParams.protoEnd <= loopParams.protoStart)
-    {
+    if (loopParams.protoEnd <= loopParams.protoStart) {
         return false;
     }
 
     // Must have nonzero loop count in at least one direction.
-    if (!loopParams.numPreLoops && !loopParams.numPostLoops)
-    {
+    if (!loopParams.numPreLoops && !loopParams.numPostLoops) {
         return false;
     }
 
     // Must have a knot at the prototype start time.
-    const auto it =
-        std::lower_bound(times.begin(), times.end(), loopParams.protoStart);
-    if (it == times.end() || *it != loopParams.protoStart)
-    {
+    const auto it = std::lower_bound(times.begin(), times.end(), loopParams.protoStart);
+    if (it == times.end() || *it != loopParams.protoStart) {
         return false;
     }
 
     // Return the start knot index if requested.
-    if (firstProtoIndexOut)
-    {
+    if (firstProtoIndexOut) {
         *firstProtoIndexOut = it - times.begin();
     }
 
@@ -99,17 +81,12 @@ bool Ts_SplineData::HasInnerLoops(
     return true;
 }
 
-Ts_SplineData*
-Ts_GetSplineData(TsSpline &spline)
-{
+Ts_SplineData* Ts_GetSplineData(TsSpline& spline) {
     return spline._data.get();
 }
 
-const Ts_SplineData*
-Ts_GetSplineData(const TsSpline &spline)
-{
+const Ts_SplineData* Ts_GetSplineData(const TsSpline& spline) {
     return spline._data.get();
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

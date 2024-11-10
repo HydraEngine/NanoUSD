@@ -17,15 +17,12 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 // A collection of museum exhibits.  These are spline cases that can be used by
 // tests to exercise various behaviors.
 //
-class TsTest_Museum
-{
+class TsTest_Museum {
 public:
-    enum DataId
-    {
+    enum DataId {
         // Single-segment ordinary curves.
         TwoKnotBezier,
         TwoKnotLinear,
@@ -104,11 +101,9 @@ public:
 
     // Get a case by name.
     TS_API
-    static TsTest_SplineData GetDataByName(const std::string &name);
+    static TsTest_SplineData GetDataByName(const std::string& name);
 };
 
-
 PXR_NAMESPACE_CLOSE_SCOPE
-
 
 #endif

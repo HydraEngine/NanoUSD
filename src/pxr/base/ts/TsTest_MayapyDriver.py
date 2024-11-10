@@ -18,7 +18,6 @@ from maya.api.OpenMayaAnim import MFnAnimCurve as Curve
 from maya.api.OpenMaya import MTime
 import sys
 
-
 gDebugFilePath = None
 
 
@@ -28,8 +27,8 @@ class Ts(object):
     import into mayapy, we just use these equivalents as containers, so that we
     can use eval and repr to pass objects in and out of this script.
     """
-    class TsTest_SplineData(object):
 
+    class TsTest_SplineData(object):
         InterpHeld = 0
         InterpLinear = 1
         InterpCurve = 2
@@ -48,8 +47,8 @@ class Ts(object):
         def __init__(self,
                      isHermite,
                      preExtrapolation, postExtrapolation,
-                     knots = [],
-                     innerLoopParams = None):
+                     knots=[],
+                     innerLoopParams=None):
             self.isHermite = isHermite
             self.preExtrapolation = preExtrapolation
             self.postExtrapolation = postExtrapolation
@@ -60,7 +59,7 @@ class Ts(object):
             def __init__(self,
                          time, nextSegInterpMethod, value,
                          preSlope, postSlope, preLen, postLen, preAuto, postAuto,
-                         leftValue = None):
+                         leftValue=None):
                 self.time = time
                 self.nextSegInterpMethod = nextSegInterpMethod
                 self.value = value
@@ -84,7 +83,7 @@ class Ts(object):
                 self.numPostLoops = numPostLoops
 
         class Extrapolation(object):
-            def __init__(self, method, slope = 0.0, loopMode = 0):
+            def __init__(self, method, slope=0.0, loopMode=0):
                 self.method = method
                 self.slope = slope
                 self.loopMode = loopMode
@@ -107,12 +106,12 @@ class Ts(object):
 
         def __repr__(self):
             return "Ts.TsTest_Sample(" \
-                "float.fromhex('%s'), float.fromhex('%s'))" \
+                   "float.fromhex('%s'), float.fromhex('%s'))" \
                 % (float.hex(self.time), float.hex(self.value))
+
 
 # Convenience abbreviation
 SData = Ts.TsTest_SplineData
-
 
 _InterpTypeMap = {
     SData.InterpHeld: Curve.kTangentStep,
@@ -137,16 +136,16 @@ _ExtrapLoopMap = {
     SData.LoopOscillate: Curve.kOscillate
 }
 
-def _GetTanType(tanType, isAuto, opts):
 
+def _GetTanType(tanType, isAuto, opts):
     if tanType != Curve.kTangentGlobal \
             or not isAuto:
         return tanType
 
     return _AutoTypeMap[opts["autoTanMethod"]]
 
-def SetUpCurve(curve, data, opts):
 
+def SetUpCurve(curve, data, opts):
     # types: Curve.kTangent{Global,Linear,Step,Smooth,Auto}
     # XXX:
     # figure out what global means
@@ -284,10 +283,10 @@ def SetUpCurve(curve, data, opts):
     # Create keyframes.
     curve.addKeysWithTangents(
         [MTime(t) for t in times], values,
-        tangentInTypeArray = tanInTypes,
-        tangentInXArray = tanInXs, tangentInYArray = tanInYs,
-        tangentOutTypeArray = tanOutTypes,
-        tangentOutXArray = tanOutXs, tangentOutYArray = tanOutYs)
+        tangentInTypeArray=tanInTypes,
+        tangentInXArray=tanInXs, tangentInYArray=tanInYs,
+        tangentOutTypeArray=tanOutTypes,
+        tangentOutXArray=tanOutXs, tangentOutYArray=tanOutYs)
 
     # Re-establish certain tangent types that seem to get confused by
     # addKeysWithTangents.
@@ -306,8 +305,8 @@ def SetUpCurve(curve, data, opts):
     _Debug("tanInTypes again: %s" % debugInTypes)
     _Debug("tanOutTypes again: %s" % debugOutTypes)
 
-def DoEval(data, times, opts):
 
+def DoEval(data, times, opts):
     if data.innerLoopParams:
         raise Exception("Maya splines can't use inner loops")
 
@@ -340,8 +339,7 @@ def DoEval(data, times, opts):
     return result
 
 
-def _Debug(text, truncate = False):
-
+def _Debug(text, truncate=False):
     if not gDebugFilePath:
         return
 
@@ -349,7 +347,8 @@ def _Debug(text, truncate = False):
     # This is slow, but reliable.
     mode = "w" if truncate else "a"
     with open(gDebugFilePath, mode) as outfile:
-        print(text, file = outfile)
+        print(text, file=outfile)
+
 
 if __name__ == "__main__":
 
@@ -359,7 +358,7 @@ if __name__ == "__main__":
 
     # Initialize, then signal readiness with an empty line on stdout.
     # The initialize() call can take a long time, like 30 seconds.
-    _Debug("Initializing...", truncate = True)
+    _Debug("Initializing...", truncate=True)
     maya.standalone.initialize("Python")
     _Debug("Done initializing")
     print()

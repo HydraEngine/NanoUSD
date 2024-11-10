@@ -20,7 +20,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 // Ts API objects (Spline, Knot) are non-templated, but they can represent
 // different value types (double, float, half), and internally we handle those
 // different value types with templates.  Some knot members (like time) are
@@ -47,7 +46,6 @@ PXR_NAMESPACE_OPEN_SCOPE
 //   derived class that implements it.  Proxy objects have a vtable pointer, and
 //   contain a pointer to a templated derived data struct.
 
-
 // XXX TODO
 // review access patterns - do we need all?:
 //   SplineData -> AsDouble -> direct access
@@ -57,11 +55,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 //   Knot -> _TypedData -> direct access
 //   TsDispatchToValueTypeTemplate
 
-
 // Non-template base class for knot data.
 //
-struct Ts_KnotData
-{
+struct Ts_KnotData {
 public:
     // Typically used by Create(), but can be invoked directly for clients that
     // don't care about the value dimension, and instantiate this struct without
@@ -72,30 +68,18 @@ public:
     static Ts_KnotData* Create(TfType valueType);
 
     // Compares two KnotData structs.  Ignores subclasses.
-    bool operator==(const Ts_KnotData &other) const;
+    bool operator==(const Ts_KnotData& other) const;
 
 public:
     // Helpers that switch on flags.
 
-    TsTime GetPreTanWidth() const
-    {
-        return preTanWidth;
-    }
+    TsTime GetPreTanWidth() const { return preTanWidth; }
 
-    TsTime GetPostTanWidth() const
-    {
-        return postTanWidth;
-    }
+    TsTime GetPostTanWidth() const { return postTanWidth; }
 
-    void SetPreTanWidth(const TsTime width)
-    {
-        preTanWidth = width;
-    }
+    void SetPreTanWidth(const TsTime width) { preTanWidth = width; }
 
-    void SetPostTanWidth(const TsTime width)
-    {
-        postTanWidth = width;
-    }
+    void SetPostTanWidth(const TsTime width) { postTanWidth = width; }
 
 public:
     // Knot time.
@@ -129,19 +113,16 @@ public:
     bool dualValued : 1;
 };
 
-
 // Data for one knot in a spline.
 //
 // Tangents are expressed as width and slope.
 //
 template <typename T>
-struct Ts_TypedKnotData :
-    public Ts_KnotData
-{
+struct Ts_TypedKnotData : public Ts_KnotData {
 public:
     Ts_TypedKnotData();
 
-    bool operator==(const Ts_TypedKnotData<T> &other) const;
+    bool operator==(const Ts_TypedKnotData<T>& other) const;
 
 public:
     // Helpers that switch on flags.
@@ -171,18 +152,15 @@ public:
 // Exceeding this size may impact performance.
 static_assert(sizeof(Ts_TypedKnotData<double>) <= 64);
 
-
 // Virtual interface to TypedKnotData.
 //
 // VtValue parameters are not type-checked.  They are blindly cast.  Callers
 // must verify types.
 //
-class Ts_KnotDataProxy
-{
+class Ts_KnotDataProxy {
 public:
     // Creates an appropriately subtyped instance.
-    static std::unique_ptr<Ts_KnotDataProxy>
-    Create(Ts_KnotData *data, TfType valueType);
+    static std::unique_ptr<Ts_KnotDataProxy> Create(Ts_KnotData* data, TfType valueType);
 
     virtual ~Ts_KnotDataProxy();
 
@@ -190,73 +168,60 @@ public:
     virtual void DeleteData() = 0;
 
     virtual TfType GetValueType() const = 0;
-    virtual bool IsDataEqualTo(const Ts_KnotData &other) const = 0;
+    virtual bool IsDataEqualTo(const Ts_KnotData& other) const = 0;
 
     virtual void SetValue(VtValue value) = 0;
-    virtual void GetValue(VtValue *valueOut) const = 0;
+    virtual void GetValue(VtValue* valueOut) const = 0;
     virtual void SetPreValue(VtValue value) = 0;
-    virtual void GetPreValue(VtValue *valueOut) const = 0;
+    virtual void GetPreValue(VtValue* valueOut) const = 0;
 
     virtual void SetPreTanSlope(VtValue slope) = 0;
-    virtual void GetPreTanSlope(VtValue *slopeOut) const = 0;
+    virtual void GetPreTanSlope(VtValue* slopeOut) const = 0;
     virtual void SetPostTanSlope(VtValue slope) = 0;
-    virtual void GetPostTanSlope(VtValue *slopeOut) const = 0;
+    virtual void GetPostTanSlope(VtValue* slopeOut) const = 0;
 };
-
 
 // A means of accessing TypedKnotData.
 //
 template <typename T>
-class Ts_TypedKnotDataProxy final :
-    public Ts_KnotDataProxy
-{
+class Ts_TypedKnotDataProxy final : public Ts_KnotDataProxy {
 public:
-    explicit Ts_TypedKnotDataProxy(Ts_TypedKnotData<T> *data);
+    explicit Ts_TypedKnotDataProxy(Ts_TypedKnotData<T>* data);
 
     Ts_KnotData* CloneData() const override;
     void DeleteData() override;
 
     TfType GetValueType() const override;
-    bool IsDataEqualTo(const Ts_KnotData &other) const override;
+    bool IsDataEqualTo(const Ts_KnotData& other) const override;
 
     void SetValue(VtValue value) override;
-    void GetValue(VtValue *valueOut) const override;
+    void GetValue(VtValue* valueOut) const override;
     void SetPreValue(VtValue value) override;
-    void GetPreValue(VtValue *valueOut) const override;
+    void GetPreValue(VtValue* valueOut) const override;
 
     void SetPreTanSlope(VtValue slope) override;
-    void GetPreTanSlope(VtValue *slopeOut) const override;
+    void GetPreTanSlope(VtValue* slopeOut) const override;
     void SetPostTanSlope(VtValue slope) override;
-    void GetPostTanSlope(VtValue *slopeOut) const override;
+    void GetPostTanSlope(VtValue* slopeOut) const override;
 
 private:
-    Ts_TypedKnotData<T> *_data;
+    Ts_TypedKnotData<T>* _data;
 };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // TEMPLATE IMPLEMENTATIONS
 
 template <typename T>
 Ts_TypedKnotData<T>::Ts_TypedKnotData()
-    : Ts_KnotData(),
-      value(T()),
-      preValue(T()),
-      preTanSlope(T()),
-      postTanSlope(T())
-{
-}
+    : Ts_KnotData(), value(T()), preValue(T()), preTanSlope(T()), postTanSlope(T()) {}
 
-#define COMP(member)                                      \
-    if (member != other.member)                           \
-    {                                                     \
-        return false;                                     \
+#define COMP(member)              \
+    if (member != other.member) { \
+        return false;             \
     }
 
 template <typename T>
-bool Ts_TypedKnotData<T>::operator==(
-    const Ts_TypedKnotData<T> &other) const
-{
+bool Ts_TypedKnotData<T>::operator==(const Ts_TypedKnotData<T>& other) const {
     COMP(time);
     COMP(preTanWidth);
     COMP(postTanWidth);
@@ -275,32 +240,27 @@ bool Ts_TypedKnotData<T>::operator==(
 #undef COMP
 
 template <typename T>
-T Ts_TypedKnotData<T>::GetPreValue() const
-{
+T Ts_TypedKnotData<T>::GetPreValue() const {
     return (dualValued ? preValue : value);
 }
 
 template <typename T>
-T Ts_TypedKnotData<T>::GetPreTanSlope() const
-{
+T Ts_TypedKnotData<T>::GetPreTanSlope() const {
     return preTanSlope;
 }
 
 template <typename T>
-T Ts_TypedKnotData<T>::GetPreTanHeight() const
-{
+T Ts_TypedKnotData<T>::GetPreTanHeight() const {
     return -preTanWidth * preTanSlope;
 }
 
 template <typename T>
-T Ts_TypedKnotData<T>::GetPostTanSlope() const
-{
+T Ts_TypedKnotData<T>::GetPostTanSlope() const {
     return postTanSlope;
 }
 
 template <typename T>
-T Ts_TypedKnotData<T>::GetPostTanHeight() const
-{
+T Ts_TypedKnotData<T>::GetPostTanHeight() const {
     return postTanWidth * postTanSlope;
 }
 
@@ -308,96 +268,70 @@ T Ts_TypedKnotData<T>::GetPostTanHeight() const
 // TypedKnotDataProxy
 
 template <typename T>
-Ts_TypedKnotDataProxy<T>::Ts_TypedKnotDataProxy(
-    Ts_TypedKnotData<T> *data)
-    : _data(data)
-{
-}
+Ts_TypedKnotDataProxy<T>::Ts_TypedKnotDataProxy(Ts_TypedKnotData<T>* data) : _data(data) {}
 
 template <typename T>
-Ts_KnotData* Ts_TypedKnotDataProxy<T>::CloneData() const
-{
+Ts_KnotData* Ts_TypedKnotDataProxy<T>::CloneData() const {
     return new Ts_TypedKnotData<T>(*_data);
 }
 
 template <typename T>
-void Ts_TypedKnotDataProxy<T>::DeleteData()
-{
+void Ts_TypedKnotDataProxy<T>::DeleteData() {
     delete _data;
 }
 
 template <typename T>
-TfType Ts_TypedKnotDataProxy<T>::GetValueType() const
-{
+TfType Ts_TypedKnotDataProxy<T>::GetValueType() const {
     return Ts_GetType<T>();
 }
 
 template <typename T>
-bool Ts_TypedKnotDataProxy<T>::IsDataEqualTo(const Ts_KnotData &other) const
-{
+bool Ts_TypedKnotDataProxy<T>::IsDataEqualTo(const Ts_KnotData& other) const {
     // Force-downcast to our value type.  Callers must verify types match.
-    const Ts_TypedKnotData<T> *typedOther =
-        static_cast<const Ts_TypedKnotData<T>*>(&other);
+    const Ts_TypedKnotData<T>* typedOther = static_cast<const Ts_TypedKnotData<T>*>(&other);
 
     return *_data == *typedOther;
 }
 
 template <typename T>
-void Ts_TypedKnotDataProxy<T>::SetValue(
-    const VtValue value)
-{
+void Ts_TypedKnotDataProxy<T>::SetValue(const VtValue value) {
     _data->value = value.UncheckedGet<T>();
 }
 
 template <typename T>
-void Ts_TypedKnotDataProxy<T>::GetValue(
-    VtValue* const valueOut) const
-{
+void Ts_TypedKnotDataProxy<T>::GetValue(VtValue* const valueOut) const {
     *valueOut = VtValue(_data->value);
 }
 
 template <typename T>
-void Ts_TypedKnotDataProxy<T>::SetPreValue(
-    const VtValue value)
-{
+void Ts_TypedKnotDataProxy<T>::SetPreValue(const VtValue value) {
     _data->preValue = value.UncheckedGet<T>();
 }
 
 template <typename T>
-void Ts_TypedKnotDataProxy<T>::GetPreValue(
-    VtValue* const valueOut) const
-{
+void Ts_TypedKnotDataProxy<T>::GetPreValue(VtValue* const valueOut) const {
     *valueOut = VtValue(_data->preValue);
 }
 
 template <typename T>
-void Ts_TypedKnotDataProxy<T>::SetPreTanSlope(
-    const VtValue slope)
-{
+void Ts_TypedKnotDataProxy<T>::SetPreTanSlope(const VtValue slope) {
     _data->preTanSlope = slope.UncheckedGet<T>();
 }
 
 template <typename T>
-void Ts_TypedKnotDataProxy<T>::GetPreTanSlope(
-    VtValue* const slopeOut) const
-{
+void Ts_TypedKnotDataProxy<T>::GetPreTanSlope(VtValue* const slopeOut) const {
     *slopeOut = VtValue(_data->GetPreTanSlope());
 }
 
 template <typename T>
-void Ts_TypedKnotDataProxy<T>::SetPostTanSlope(
-    const VtValue slope)
-{
+void Ts_TypedKnotDataProxy<T>::SetPostTanSlope(const VtValue slope) {
     _data->postTanSlope = slope.UncheckedGet<T>();
 }
 
 template <typename T>
-void Ts_TypedKnotDataProxy<T>::GetPostTanSlope(
-    VtValue* const slopeOut) const
-{
+void Ts_TypedKnotDataProxy<T>::GetPostTanSlope(VtValue* const slopeOut) const {
     *slopeOut = VtValue(_data->GetPostTanSlope());
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

@@ -28,7 +28,7 @@ class TsTest_TsVsBezier(unittest.TestCase):
         data = Museum.GetDataByName(name)
 
         # Perform Bezier sampling.
-        bezSamples = SampleBezier(data, numSamples = 200)
+        bezSamples = SampleBezier(data, numSamples=200)
 
         # Copy the sample times that were returned.
         times = STimes()
@@ -38,7 +38,7 @@ class TsTest_TsVsBezier(unittest.TestCase):
         evalSamples = Evaluator().Eval(data, times)
 
         # Compare.
-        comparator = Comparator(title = name)
+        comparator = Comparator(title=name)
         comparator.AddSpline("Bezier", data, bezSamples)
         comparator.AddSpline("Ts", data, evalSamples)
 
@@ -79,8 +79,10 @@ if __name__ == "__main__":
         if data.GetRequiredFeatures() != SData.FeatureBezierSegments:
             continue
 
+
         def func(self, name):
             self._DoTest(name)
+
 
         method = functools.partialmethod(func, name)
         setattr(TsTest_TsVsBezier, f"test_{name}", method)

@@ -13,15 +13,13 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 template <typename T>
-bool Ts_ConvertToStandardHelper(
-    TsTime widthIn,
-    T slopeOrHeightIn,
-    bool convertHeightToSlope,
-    bool divideValuesByThree,
-    bool negateHeight,
-    TsTime* widthOut,
-    T* slopeOut)
-{
+bool Ts_ConvertToStandardHelper(TsTime widthIn,
+                                T slopeOrHeightIn,
+                                bool convertHeightToSlope,
+                                bool divideValuesByThree,
+                                bool negateHeight,
+                                TsTime* widthOut,
+                                T* slopeOut) {
     double width = widthIn;
     T slope = slopeOrHeightIn;
 
@@ -69,19 +67,17 @@ bool Ts_ConvertToStandardHelper(
 }
 
 template <typename T>
-bool Ts_ConvertFromStandardHelper(
-    TsTime widthIn,
-    T slopeIn,
-    bool convertSlopeToHeight,
-    bool multiplyValuesByThree,
-    bool negateHeight,
-    TsTime* widthOut,
-    T* slopeOrHeightOut)
-{
+bool Ts_ConvertFromStandardHelper(TsTime widthIn,
+                                  T slopeIn,
+                                  bool convertSlopeToHeight,
+                                  bool multiplyValuesByThree,
+                                  bool negateHeight,
+                                  TsTime* widthOut,
+                                  T* slopeOrHeightOut) {
     // Do math in double precision regardless of the data type.
     double width = widthIn;
     T slopeOrHeight = slopeIn;
-    
+
     if (convertSlopeToHeight || multiplyValuesByThree) {
         // We're going to do math on the values that may lose precision. This
         // will involve rounding but do the math at full precision.
@@ -106,7 +102,7 @@ bool Ts_ConvertFromStandardHelper(
             // XXX: we should be using std::numeric_limits<T>::lowest() here.
             soh = -std::numeric_limits<T>::max();
         }
-        
+
         slopeOrHeight = soh;
     }
 
@@ -126,92 +122,70 @@ bool Ts_ConvertFromStandardHelper(
 }
 
 // Instantiate versions we want in the library
-template
-TS_API
-bool Ts_ConvertToStandardHelper(
-    TsTime widthIn,
-    double slopeOrHeightIn,
-    bool convertHeightToSlope,
-    bool divideValuesByThree,
-    bool negateHeight,
-    TsTime* widthOut,
-    double* slopeOut);
+template TS_API bool Ts_ConvertToStandardHelper(TsTime widthIn,
+                                                double slopeOrHeightIn,
+                                                bool convertHeightToSlope,
+                                                bool divideValuesByThree,
+                                                bool negateHeight,
+                                                TsTime* widthOut,
+                                                double* slopeOut);
 
-template
-TS_API
-bool Ts_ConvertToStandardHelper(
-    TsTime widthIn,
-    float slopeOrHeightIn,
-    bool convertHeightToSlope,
-    bool divideValuesByThree,
-    bool negateHeight,
-    TsTime* widthOut,
-    float* slopeOut);
+template TS_API bool Ts_ConvertToStandardHelper(TsTime widthIn,
+                                                float slopeOrHeightIn,
+                                                bool convertHeightToSlope,
+                                                bool divideValuesByThree,
+                                                bool negateHeight,
+                                                TsTime* widthOut,
+                                                float* slopeOut);
 
-template
-TS_API
-bool Ts_ConvertToStandardHelper(
-    TsTime widthIn,
-    GfHalf slopeOrHeightIn,
-    bool convertHeightToSlope,
-    bool divideValuesByThree,
-    bool negateHeight,
-    TsTime* widthOut,
-    GfHalf* slopeOut);
+template TS_API bool Ts_ConvertToStandardHelper(TsTime widthIn,
+                                                GfHalf slopeOrHeightIn,
+                                                bool convertHeightToSlope,
+                                                bool divideValuesByThree,
+                                                bool negateHeight,
+                                                TsTime* widthOut,
+                                                GfHalf* slopeOut);
 
-template
-TS_API
-bool Ts_ConvertFromStandardHelper(
-    TsTime widthIn,
-    double slopeIn,
-    bool convertSlopeToHeight,
-    bool multiplyValuesByThree,
-    bool negateHeight,
-    TsTime* widthOut,
-    double* slopeOrHeightOut);
+template TS_API bool Ts_ConvertFromStandardHelper(TsTime widthIn,
+                                                  double slopeIn,
+                                                  bool convertSlopeToHeight,
+                                                  bool multiplyValuesByThree,
+                                                  bool negateHeight,
+                                                  TsTime* widthOut,
+                                                  double* slopeOrHeightOut);
 
-template
-TS_API
-bool Ts_ConvertFromStandardHelper(
-    TsTime widthIn,
-    float slopeIn,
-    bool convertSlopeToHeight,
-    bool multiplyValuesByThree,
-    bool negateHeight,
-    TsTime* widthOut,
-    float* slopeOrHeightOut);
+template TS_API bool Ts_ConvertFromStandardHelper(TsTime widthIn,
+                                                  float slopeIn,
+                                                  bool convertSlopeToHeight,
+                                                  bool multiplyValuesByThree,
+                                                  bool negateHeight,
+                                                  TsTime* widthOut,
+                                                  float* slopeOrHeightOut);
 
-template
-TS_API
-bool Ts_ConvertFromStandardHelper(
-    TsTime widthIn,
-    GfHalf slopeIn,
-    bool convertSlopeToHeight,
-    bool multiplyValuesByThree,
-    bool negateHeight,
-    TsTime* widthOut,
-    GfHalf* slopeOrHeightOut);
+template TS_API bool Ts_ConvertFromStandardHelper(TsTime widthIn,
+                                                  GfHalf slopeIn,
+                                                  bool convertSlopeToHeight,
+                                                  bool multiplyValuesByThree,
+                                                  bool negateHeight,
+                                                  TsTime* widthOut,
+                                                  GfHalf* slopeOrHeightOut);
 
-
-namespace { // anonymous namespace
+namespace {  // anonymous namespace
 
 template <typename T>
 struct _VtConvertToStandardHelper {
-    void operator()(
-        TsTime widthIn,
-        VtValue slopeOrHeightIn,
-        bool convertHeightToSlope,
-        bool divideValuesByThree,
-        bool negateHeight,
-        TsTime* widthOut,
-        VtValue* slopeOut,
-        bool *ok)
-    {
+    void operator()(TsTime widthIn,
+                    VtValue slopeOrHeightIn,
+                    bool convertHeightToSlope,
+                    bool divideValuesByThree,
+                    bool negateHeight,
+                    TsTime* widthOut,
+                    VtValue* slopeOut,
+                    bool* ok) {
         T soh = slopeOrHeightIn.UncheckedGet<T>();
         T so;
-        *ok = TsConvertToStandardTangent(
-            widthIn, soh, convertHeightToSlope, divideValuesByThree,
-            negateHeight, widthOut, &so);
+        *ok = TsConvertToStandardTangent(widthIn, soh, convertHeightToSlope, divideValuesByThree, negateHeight,
+                                         widthOut, &so);
         if (*ok) {
             if (slopeOut) {
                 *slopeOut = so;
@@ -222,21 +196,18 @@ struct _VtConvertToStandardHelper {
 
 template <typename T>
 struct _VtConvertFromStandardHelper {
-    void operator()(
-        TsTime widthIn,
-        VtValue slopeIn,
-        bool convertSlopeToHeight,
-        bool multiplyValuesByThree,
-        bool negateHeight,
-        TsTime* widthOut,
-        VtValue* slopeOrHeightOut,
-        bool *ok)
-    {
+    void operator()(TsTime widthIn,
+                    VtValue slopeIn,
+                    bool convertSlopeToHeight,
+                    bool multiplyValuesByThree,
+                    bool negateHeight,
+                    TsTime* widthOut,
+                    VtValue* slopeOrHeightOut,
+                    bool* ok) {
         T slope = slopeIn.UncheckedGet<T>();
         T soh;
-        *ok = TsConvertFromStandardTangent(
-            widthIn, slope, convertSlopeToHeight, multiplyValuesByThree,
-            negateHeight, widthOut, &soh);
+        *ok = TsConvertFromStandardTangent(widthIn, slope, convertSlopeToHeight, multiplyValuesByThree, negateHeight,
+                                           widthOut, &soh);
         if (*ok) {
             if (slopeOrHeightOut) {
                 *slopeOrHeightOut = soh;
@@ -245,47 +216,39 @@ struct _VtConvertFromStandardHelper {
     }
 };
 
-} // end anonymous namespace
+}  // end anonymous namespace
 
 // VtValue versions of the routines.
-bool TsConvertToStandardTangent(
-    TsTime widthIn,
-    const VtValue& slopeOrHeightIn,
-    bool convertHeightToSlope,
-    bool divideValuesByThree,
-    bool negateHeight,
-    TsTime* widthOut,
-    VtValue* slopeOut)
-{
+bool TsConvertToStandardTangent(TsTime widthIn,
+                                const VtValue& slopeOrHeightIn,
+                                bool convertHeightToSlope,
+                                bool divideValuesByThree,
+                                bool negateHeight,
+                                TsTime* widthOut,
+                                VtValue* slopeOut) {
     bool ok = true;
 
-    TsDispatchToValueTypeTemplate<_VtConvertToStandardHelper>(
-        slopeOrHeightIn.GetType(),
-        widthIn, slopeOrHeightIn, convertHeightToSlope, divideValuesByThree,
-        negateHeight, widthOut, slopeOut, &ok);
+    TsDispatchToValueTypeTemplate<_VtConvertToStandardHelper>(slopeOrHeightIn.GetType(), widthIn, slopeOrHeightIn,
+                                                              convertHeightToSlope, divideValuesByThree, negateHeight,
+                                                              widthOut, slopeOut, &ok);
 
     return ok;
 }
 
-bool TsConvertFromStandardTangent(
-    TsTime widthIn,
-    const VtValue& slopeIn,
-    bool convertSlopeToHeight,
-    bool multiplyValuesByThree,
-    bool negateHeight,
-    TsTime* widthOut,
-    VtValue* slopeOrHeightOut)
-{
-
+bool TsConvertFromStandardTangent(TsTime widthIn,
+                                  const VtValue& slopeIn,
+                                  bool convertSlopeToHeight,
+                                  bool multiplyValuesByThree,
+                                  bool negateHeight,
+                                  TsTime* widthOut,
+                                  VtValue* slopeOrHeightOut) {
     bool ok = true;
 
-    TsDispatchToValueTypeTemplate<_VtConvertFromStandardHelper>(
-        slopeIn.GetType(),
-        widthIn, slopeIn, convertSlopeToHeight, multiplyValuesByThree,
-        negateHeight, widthOut, slopeOrHeightOut, &ok);
+    TsDispatchToValueTypeTemplate<_VtConvertFromStandardHelper>(slopeIn.GetType(), widthIn, slopeIn,
+                                                                convertSlopeToHeight, multiplyValuesByThree,
+                                                                negateHeight, widthOut, slopeOrHeightOut, &ok);
 
     return ok;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

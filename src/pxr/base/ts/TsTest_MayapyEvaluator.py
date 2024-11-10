@@ -32,7 +32,7 @@ class TsTest_MayapyEvaluator(object):
     def _DebugLog(self, msg):
         pass
 
-    def __init__(self, mayapyPath, subprocessDebugFilePath = None):
+    def __init__(self, mayapyPath, subprocessDebugFilePath=None):
 
         self._stderrThread = None
 
@@ -59,18 +59,18 @@ class TsTest_MayapyEvaluator(object):
         self._DebugLog(str.join(" ", args) + "\n")
         self._mayapyProcess = subprocess.Popen(
             args,
-            env = envDict,
-            stdin = subprocess.PIPE,
-            stdout = subprocess.PIPE,
-            stderr = subprocess.PIPE,
-            text = True)
+            env=envDict,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True)
         if not self._IsMayapyRunning():
             raise Exception("Can't start MayapyDriver")
 
         # Start stderr reader thread for nonblocking reads.
         self._stderrQueue = queue.SimpleQueue()
         self._stderrThread = threading.Thread(
-            target = self._StderrThreadMain)
+            target=self._StderrThreadMain)
         self._stderrThreadExit = False
         self._stderrThread.start()
 
@@ -85,9 +85,9 @@ class TsTest_MayapyEvaluator(object):
         self._DebugLog("Done starting MayapyDriver\n")
 
     def __del__(self):
-        self.Shutdown(wait = False)
+        self.Shutdown(wait=False)
 
-    def Shutdown(self, wait = True):
+    def Shutdown(self, wait=True):
 
         # Tell thread to exit.
         self._stderrThreadExit = True
@@ -142,7 +142,7 @@ class TsTest_MayapyEvaluator(object):
                     or not self._IsMayapyRunning():
                 # Child has died.
                 break
-            if self._stdoutSelector.select(timeout = 1):
+            if self._stdoutSelector.select(timeout=1):
                 # Ready to read; assume we will be able read an entire line,
                 # possibly after blocking.  The child could theoretically die in
                 # the middle of sending output, but that hasn't been observed.
@@ -174,7 +174,7 @@ class TsTest_MayapyEvaluator(object):
 
         return stdoutStr
 
-    def Eval(self, data, times, opts = {}):
+    def Eval(self, data, times, opts={}):
         """
         Send repr((data, times, opts)) to the MayapyDriver process.
         Wait; read, eval, and return result from the MayapyDriver process.
@@ -191,7 +191,7 @@ class TsTest_MayapyEvaluator(object):
         # Send input.  Use repr for serialization.  The print() function
         # includes a newline terminator, which will signal end of input.
         inputStr = repr((data, times, opts))
-        print(inputStr, file = self._mayapyProcess.stdin, flush = True)
+        print(inputStr, file=self._mayapyProcess.stdin, flush=True)
 
         # Wait for output.  Deserialize with eval.
         outputStr = self._ReadFromChild()

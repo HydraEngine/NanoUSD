@@ -18,41 +18,41 @@ import argparse
 ################################################################################
 
 parser = argparse.ArgumentParser(
-    description = "Make a graph of a Museum spline.")
+    description="Make a graph of a Museum spline.")
 
 parser.add_argument("case",
-                    help = "Name of Museum case.")
+                    help="Name of Museum case.")
 
 group = parser.add_argument_group("Evaluators (choose one or more)")
-group.add_argument("--bez", action = "store_true",
-                   help = "Sample with de Casteljau.")
-group.add_argument("--ts", action = "store_true",
-                   help = "Evaluate with Ts.")
-group.add_argument("--contain", action = "store_true",
-                   help = "De-regress with Contain, then evaluate with Ts.")
-group.add_argument("--keepRatio", action = "store_true",
-                   help = "De-regress with Keep Ratio, then evaluate with Ts.")
-group.add_argument("--keepStart", action = "store_true",
-                   help = "De-regress with Keep Start, then evaluate with Ts.")
+group.add_argument("--bez", action="store_true",
+                   help="Sample with de Casteljau.")
+group.add_argument("--ts", action="store_true",
+                   help="Evaluate with Ts.")
+group.add_argument("--contain", action="store_true",
+                   help="De-regress with Contain, then evaluate with Ts.")
+group.add_argument("--keepRatio", action="store_true",
+                   help="De-regress with Keep Ratio, then evaluate with Ts.")
+group.add_argument("--keepStart", action="store_true",
+                   help="De-regress with Keep Start, then evaluate with Ts.")
 
 group = parser.add_argument_group("Output")
 group.add_argument("--out",
-                   help = "Output file.  If omitted, the graph "
-                   "will be shown in a window.")
+                   help="Output file.  If omitted, the graph "
+                        "will be shown in a window.")
 
 group = parser.add_argument_group("Size")
-group.add_argument("--width", type = int, default = 1000,
-                   help = "Image pixel width.  Default 1000.")
-group.add_argument("--height", type = int, default = 750,
-                   help = "Image pixel height.  Default 750.")
+group.add_argument("--width", type=int, default=1000,
+                   help="Image pixel width.  Default 1000.")
+group.add_argument("--height", type=int, default=750,
+                   help="Image pixel height.  Default 750.")
 
 group = parser.add_argument_group("Bells and whistles (off by default)")
 group.add_argument("--title",
-                   help = "Graph title.")
-group.add_argument("--box", action = "store_true",
-                   help = "Include box around image.")
-group.add_argument("--scales", action = "store_true",
-                   help = "Include numeric scales.")
+                   help="Graph title.")
+group.add_argument("--box", action="store_true",
+                   help="Include box around image.")
+group.add_argument("--scales", action="store_true",
+                   help="Include numeric scales.")
 
 args = parser.parse_args()
 
@@ -71,8 +71,9 @@ if not args.box:
     kwargs["includeBox"] = False
 
 grapher = Grapher(
-    widthPx = args.width, heightPx = args.height,
+    widthPx=args.width, heightPx=args.height,
     **kwargs)
+
 
 def EvalWithAntiRegression(name, mode, colorIndex):
     spline = Evaluator().SplineDataToSpline(data)
@@ -80,23 +81,24 @@ def EvalWithAntiRegression(name, mode, colorIndex):
         spline.AdjustRegressiveTangents()
     adjustedData = Evaluator().SplineToSplineData(spline)
     samples = Evaluator().Eval(adjustedData, times)
-    grapher.AddSpline(name, adjustedData, samples, colorIndex = colorIndex)
+    grapher.AddSpline(name, adjustedData, samples, colorIndex=colorIndex)
+
 
 if args.bez:
-    samples = SampleBezier(data, numSamples = 200)
-    grapher.AddSpline("Bezier", data, samples, colorIndex = 0)
+    samples = SampleBezier(data, numSamples=200)
+    grapher.AddSpline("Bezier", data, samples, colorIndex=0)
 if args.ts:
     samples = Evaluator().Eval(data, times)
-    grapher.AddSpline("Ts", data, samples, colorIndex = 1)
+    grapher.AddSpline("Ts", data, samples, colorIndex=1)
 if args.contain:
     EvalWithAntiRegression(
-        "Contain", Ts.AntiRegressionContain, colorIndex = 2)
+        "Contain", Ts.AntiRegressionContain, colorIndex=2)
 if args.keepRatio:
     EvalWithAntiRegression(
-        "Keep Ratio", Ts.AntiRegressionKeepRatio, colorIndex = 3)
+        "Keep Ratio", Ts.AntiRegressionKeepRatio, colorIndex=3)
 if args.keepStart:
     EvalWithAntiRegression(
-        "Keep Start", Ts.AntiRegressionKeepStart, colorIndex = 4)
+        "Keep Start", Ts.AntiRegressionKeepStart, colorIndex=4)
 
 if args.out:
     grapher.Write(args.out)

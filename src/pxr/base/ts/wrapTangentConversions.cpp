@@ -21,20 +21,16 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 using namespace pxr_boost::python;
 
-
-static object _WrapConvertToStandardTangent(
-    const double widthIn,
-    const double slopeOrHeightIn,
-    bool convertHeightToSlope,
-    bool divideValuesByThree,
-    bool negateHeight)
-{
+static object _WrapConvertToStandardTangent(const double widthIn,
+                                            const double slopeOrHeightIn,
+                                            bool convertHeightToSlope,
+                                            bool divideValuesByThree,
+                                            bool negateHeight) {
     bool ok;
     double widthOut, slopeOut;
 
-    ok = TsConvertToStandardTangent(
-        widthIn, slopeOrHeightIn, convertHeightToSlope, divideValuesByThree,
-        negateHeight, &widthOut, &slopeOut);
+    ok = TsConvertToStandardTangent(widthIn, slopeOrHeightIn, convertHeightToSlope, divideValuesByThree, negateHeight,
+                                    &widthOut, &slopeOut);
 
     if (ok) {
         return make_tuple(widthOut, slopeOut);
@@ -43,19 +39,16 @@ static object _WrapConvertToStandardTangent(
     }
 }
 
-static object _WrapConvertFromStandardTangent(
-    const double widthIn,
-    const double slopeIn,
-    bool convertSlopeToHeight,
-    bool multiplyValuesByThree,
-    bool negateHeight)
-{
+static object _WrapConvertFromStandardTangent(const double widthIn,
+                                              const double slopeIn,
+                                              bool convertSlopeToHeight,
+                                              bool multiplyValuesByThree,
+                                              bool negateHeight) {
     bool ok;
     double widthOut, slopeOrHeightOut;
 
-    ok = TsConvertFromStandardTangent(
-        widthIn, slopeIn, convertSlopeToHeight, multiplyValuesByThree,
-        negateHeight, &widthOut, &slopeOrHeightOut);
+    ok = TsConvertFromStandardTangent(widthIn, slopeIn, convertSlopeToHeight, multiplyValuesByThree, negateHeight,
+                                      &widthOut, &slopeOrHeightOut);
 
     if (ok) {
         return make_tuple(widthOut, slopeOrHeightOut);
@@ -64,19 +57,12 @@ static object _WrapConvertFromStandardTangent(
     }
 }
 
-void wrapTangentConversions()
-{
+void wrapTangentConversions() {
     def("ConvertToStandardTangent", &_WrapConvertToStandardTangent,
-        (arg("widthIn"),
-         arg("slopeOrHeightIn"),
-         arg("convertHeightToSlope")=false,
-         arg("divideValuesByThree")=false,
-         arg("negateHeight")=false));
+        (arg("widthIn"), arg("slopeOrHeightIn"), arg("convertHeightToSlope") = false,
+         arg("divideValuesByThree") = false, arg("negateHeight") = false));
 
     def("ConvertFromStandardTangent", &_WrapConvertFromStandardTangent,
-        (arg("widthIn"),
-         arg("slopeIn"),
-         arg("convertSlopeToHeight")=false,
-         arg("multiplyValuesByThree")=false,
-         arg("negateHeight")=false));
+        (arg("widthIn"), arg("slopeIn"), arg("convertSlopeToHeight") = false, arg("multiplyValuesByThree") = false,
+         arg("negateHeight") = false));
 }

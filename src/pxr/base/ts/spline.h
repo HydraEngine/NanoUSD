@@ -28,7 +28,6 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class VtDictionary;
 
-
 /// A mathematical description of a curved function from time to value.
 ///
 /// This class is <b>STILL IN DEVELOPMENT.</b>
@@ -55,8 +54,7 @@ class VtDictionary;
 /// copies, will incur the cost of duplicating the data, including all the
 /// knots.
 ///
-class TsSpline
-{
+class TsSpline {
 public:
     /// \name Construction and value semantics
     ///
@@ -76,16 +74,16 @@ public:
     TsSpline(TfType valueType);
 
     TS_API
-    TsSpline(const TsSpline &other);
+    TsSpline(const TsSpline& other);
 
     TS_API
-    TsSpline& operator=(const TsSpline &other);
+    TsSpline& operator=(const TsSpline& other);
 
     TS_API
-    bool operator==(const TsSpline &other) const;
+    bool operator==(const TsSpline& other) const;
 
     TS_API
-    bool operator!=(const TsSpline &other) const;
+    bool operator!=(const TsSpline& other) const;
 
     /// @}
     /// \name Value types
@@ -121,15 +119,13 @@ public:
     /// @{
 
     TS_API
-    void SetPreExtrapolation(
-        const TsExtrapolation &extrap);
+    void SetPreExtrapolation(const TsExtrapolation& extrap);
 
     TS_API
     TsExtrapolation GetPreExtrapolation() const;
 
     TS_API
-    void SetPostExtrapolation(
-        const TsExtrapolation &extrap);
+    void SetPostExtrapolation(const TsExtrapolation& extrap);
 
     TS_API
     TsExtrapolation GetPostExtrapolation() const;
@@ -154,8 +150,7 @@ public:
     /// @{
 
     TS_API
-    void SetInnerLoopParams(
-        const TsLoopParams &params);
+    void SetInnerLoopParams(const TsLoopParams& params);
 
     TS_API
     TsLoopParams GetInnerLoopParams() const;
@@ -165,20 +160,15 @@ public:
     /// @{
 
     TS_API
-    void SetKnots(
-        const TsKnotMap &knots);
+    void SetKnots(const TsKnotMap& knots);
 
     TS_API
-    bool CanSetKnot(
-        const TsKnot &knot,
-        std::string *reasonOut = nullptr) const;
+    bool CanSetKnot(const TsKnot& knot, std::string* reasonOut = nullptr) const;
 
     /// <b>Incompletely implemented</b>; \p affectedIntervalOut is not yet
     /// populated.
     TS_API
-    bool SetKnot(
-        const TsKnot &knot,
-        GfInterval *affectedIntervalOut = nullptr);
+    bool SetKnot(const TsKnot& knot, GfInterval* affectedIntervalOut = nullptr);
 
     /// Returns the spline's knots.  These are the original knots; if inner or
     /// extrapolating loops are present, this set of knots does not reflect
@@ -190,9 +180,7 @@ public:
     /// must be an original knot, not a knot that is echoed due to looping.
     /// Returns true on success, false if there is no such knot.
     TS_API
-    bool GetKnot(
-        TsTime time,
-        TsKnot *knotOut) const;
+    bool GetKnot(TsTime time, TsKnot* knotOut) const;
 
     /// @}
     /// \name Removing knots
@@ -204,15 +192,12 @@ public:
     /// <b>Incompletely implemented</b>; \p affectedIntervalOut is not yet
     /// populated.
     TS_API
-    void RemoveKnot(
-        TsTime time,
-        GfInterval *affectedIntervalOut = nullptr);
+    void RemoveKnot(TsTime time, GfInterval* affectedIntervalOut = nullptr);
 
     /// <b>Not yet implemented.</b>
     TS_API
-    bool ClearRedundantKnots(
-        VtValue defaultValue = VtValue(),
-        const GfInterval &interval = GfInterval::GetFullInterval());
+    bool ClearRedundantKnots(VtValue defaultValue = VtValue(),
+                             const GfInterval& interval = GfInterval::GetFullInterval());
 
     /// @}
     /// \name Loop baking
@@ -220,8 +205,7 @@ public:
 
     /// <b>Not yet implemented.</b>
     TS_API
-    bool BakeLoops(
-        const GfInterval &interval);
+    bool BakeLoops(const GfInterval& interval);
 
     /// <b>Not yet implemented.</b>
     //
@@ -234,8 +218,7 @@ public:
     // Bakes inner loops (finite) and extrapolating loops (infinite)
     // Result cached, but only for last specified interval
     TS_API
-    const TsKnotMap& GetKnotsWithLoopsBaked(
-        const GfInterval &interval) const;
+    const TsKnotMap& GetKnotsWithLoopsBaked(const GfInterval& interval) const;
 
     /// @}
     /// \name Splitting
@@ -246,9 +229,7 @@ public:
     /// Adds a knot at the specified time.  The new knot is arranged so that the
     /// shape of the curve is as unchanged as possible.
     TS_API
-    bool Split(
-        TsTime time,
-        GfInterval *affectedIntervalOut = nullptr);
+    bool Split(TsTime time, GfInterval* affectedIntervalOut = nullptr);
 
     /// @}
     /// \name Anti-regression
@@ -287,38 +268,25 @@ public:
     /// of the spline (double/float/GfHalf), or VtValue.
 
     template <typename T>
-    bool Eval(
-        TsTime time,
-        T *valueOut) const;
+    bool Eval(TsTime time, T* valueOut) const;
 
     template <typename T>
-    bool EvalPreValue(
-        TsTime time,
-        T *valueOut) const;
+    bool EvalPreValue(TsTime time, T* valueOut) const;
 
     template <typename T>
-    bool EvalDerivative(
-        TsTime time,
-        T *valueOut) const;
+    bool EvalDerivative(TsTime time, T* valueOut) const;
 
     template <typename T>
-    bool EvalPreDerivative(
-        TsTime time,
-        T *valueOut) const;
+    bool EvalPreDerivative(TsTime time, T* valueOut) const;
 
     template <typename T>
-    bool EvalHeld(
-        TsTime time,
-        T *valueOut) const;
+    bool EvalHeld(TsTime time, T* valueOut) const;
 
     template <typename T>
-    bool EvalPreValueHeld(
-        TsTime time,
-        T *valueOut) const;
+    bool EvalPreValueHeld(TsTime time, T* valueOut) const;
 
     TS_API
-    bool DoSidesDiffer(
-        TsTime time) const;
+    bool DoSidesDiffer(TsTime time) const;
 
     /// @}
     /// \name Whole-spline queries
@@ -362,39 +330,30 @@ public:
 
     /// <b>Not yet implemented.</b>
     TS_API
-    bool GetValueRange(
-        const GfInterval &timeSpan,
-        std::pair<VtValue, VtValue> *rangeOut) const;
+    bool GetValueRange(const GfInterval& timeSpan, std::pair<VtValue, VtValue>* rangeOut) const;
 
     /// <b>Not yet implemented.</b>
     template <typename T>
-    bool GetValueRange(
-        const GfInterval &timeSpan,
-        std::pair<T, T> *rangeOut) const;
+    bool GetValueRange(const GfInterval& timeSpan, std::pair<T, T>* rangeOut) const;
 
     /// @}
     /// \name Within-spline queries
     /// @{
 
     TS_API
-    bool HasValueBlockAtTime(
-        TsTime time) const;
+    bool HasValueBlockAtTime(TsTime time) const;
 
     /// <b>Not yet implemented.</b>
     TS_API
-    bool IsSegmentFlat(
-        TsTime startTime) const;
+    bool IsSegmentFlat(TsTime startTime) const;
 
     /// <b>Not yet implemented.</b>
     TS_API
-    bool IsSegmentMonotonic(
-        TsTime startTime) const;
+    bool IsSegmentMonotonic(TsTime startTime) const;
 
     /// <b>Not yet implemented.</b>
     TS_API
-    bool IsKnotRedundant(
-        TsTime time,
-        VtValue defaultValue = VtValue()) const;
+    bool IsKnotRedundant(TsTime time, VtValue defaultValue = VtValue()) const;
 
     /// @}
 
@@ -403,20 +362,17 @@ public:
     // If there are two identical but independent splines, they will hash
     // unequal.
     template <typename HashState>
-    friend void TfHashAppend(
-        HashState &h,
-        const TsSpline &spline)
-    {
+    friend void TfHashAppend(HashState& h, const TsSpline& spline) {
         h.Append(spline._data.get());
     }
 
 private:
     friend class TsRegressionPreventer;
-    void _SetKnotUnchecked(const TsKnot & knot);
+    void _SetKnotUnchecked(const TsKnot& knot);
 
     // External helpers provide direct data access for Ts implementation.
-    friend Ts_SplineData* Ts_GetSplineData(TsSpline &spline);
-    friend const Ts_SplineData* Ts_GetSplineData(const TsSpline &spline);
+    friend Ts_SplineData* Ts_GetSplineData(TsSpline& spline);
+    friend const Ts_SplineData* Ts_GetSplineData(const TsSpline& spline);
 
     friend struct Ts_BinaryDataAccess;
     friend struct Ts_SplineOffsetAccess;
@@ -432,11 +388,7 @@ private:
     void _PrepareForWrite(TfType valueType = TfType());
 
     template <typename T>
-    bool _Eval(
-        TsTime time,
-        T *valueOut,
-        Ts_EvalAspect aspect,
-        Ts_EvalLocation location) const;
+    bool _Eval(TsTime time, T* valueOut, Ts_EvalAspect aspect, Ts_EvalLocation location) const;
 
 private:
     // Our parameter data.  Copy-on-write.  Null only if we are in the default
@@ -448,34 +400,27 @@ private:
 
 /// Output a text representation of a spline to a stream.
 TS_API
-std::ostream& operator<<(std::ostream& out, const TsSpline &spline);
+std::ostream& operator<<(std::ostream& out, const TsSpline& spline);
 
 // XXX: This should not be necessary.  All it does is call std::swap.  This is
 // here as a workaround for a downstream library that tries to call swap on
 // splines, with a "using namespace std" that doesn't appear to work when pxr
 // namespaces are in use.
 TS_API
-void swap(TsSpline &lhs, TsSpline &rhs);
+void swap(TsSpline& lhs, TsSpline& rhs);
 
 // For applying layer offsets.
-struct Ts_SplineOffsetAccess
-{
+struct Ts_SplineOffsetAccess {
     TS_API
-    static void ApplyOffsetAndScale(
-        TsSpline *spline,
-        const TsTime offset,
-        const double scale);
+    static void ApplyOffsetAndScale(TsSpline* spline, const TsTime offset, const double scale);
 };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // TEMPLATE IMPLEMENTATIONS
 
 template <typename T>
-bool TsSpline::IsHolding() const
-{
-    if constexpr (!Ts_IsSupportedValueType<T>::value)
-    {
+bool TsSpline::IsHolding() const {
+    if constexpr (!Ts_IsSupportedValueType<T>::value) {
         return false;
     }
 
@@ -483,17 +428,13 @@ bool TsSpline::IsHolding() const
 }
 
 template <typename T>
-bool TsSpline::_Eval(
-    const TsTime time,
-    T* const valueOut,
-    const Ts_EvalAspect aspect,
-    const Ts_EvalLocation location) const
-{
-    const std::optional<double> result =
-        Ts_Eval(_GetData(), time, aspect, location);
+bool TsSpline::_Eval(const TsTime time,
+                     T* const valueOut,
+                     const Ts_EvalAspect aspect,
+                     const Ts_EvalLocation location) const {
+    const std::optional<double> result = Ts_Eval(_GetData(), time, aspect, location);
 
-    if (!result)
-    {
+    if (!result) {
         return false;
     }
 
@@ -502,41 +443,34 @@ bool TsSpline::_Eval(
 }
 
 template <typename T>
-bool TsSpline::Eval(const TsTime time, T* const valueOut) const
-{
+bool TsSpline::Eval(const TsTime time, T* const valueOut) const {
     return _Eval(time, valueOut, Ts_EvalValue, Ts_EvalAtTime);
 }
 
 template <typename T>
-bool TsSpline::EvalPreValue(const TsTime time, T* const valueOut) const
-{
+bool TsSpline::EvalPreValue(const TsTime time, T* const valueOut) const {
     return _Eval(time, valueOut, Ts_EvalValue, Ts_EvalPre);
 }
 
 template <typename T>
-bool TsSpline::EvalDerivative(const TsTime time, T* const valueOut) const
-{
+bool TsSpline::EvalDerivative(const TsTime time, T* const valueOut) const {
     return _Eval(time, valueOut, Ts_EvalDerivative, Ts_EvalAtTime);
 }
 
 template <typename T>
-bool TsSpline::EvalPreDerivative(const TsTime time, T* const valueOut) const
-{
+bool TsSpline::EvalPreDerivative(const TsTime time, T* const valueOut) const {
     return _Eval(time, valueOut, Ts_EvalDerivative, Ts_EvalPre);
 }
 
 template <typename T>
-bool TsSpline::EvalHeld(const TsTime time, T* const valueOut) const
-{
+bool TsSpline::EvalHeld(const TsTime time, T* const valueOut) const {
     return _Eval(time, valueOut, Ts_EvalHeldValue, Ts_EvalAtTime);
 }
 
 template <typename T>
-bool TsSpline::EvalPreValueHeld(const TsTime time, T* const valueOut) const
-{
+bool TsSpline::EvalPreValueHeld(const TsTime time, T* const valueOut) const {
     return _Eval(time, valueOut, Ts_EvalHeldValue, Ts_EvalPre);
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

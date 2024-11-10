@@ -18,19 +18,14 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 using TestFunction = std::function<void()>;
 
-
 // This test takes a single starting spline, then (repeatedly and in parallel)
 // makes copies of the spline object, and either modifies them or evaluates
 // them.  Modifications should always invoke copy-on-write behavior, so the
 // evaluation steps should always get the same results, which use the original,
 // unmodified spline data.
 
-
 template <typename T>
-void ExecuteAndCompare(
-    const std::function<T()> &function,
-    const T &expectedResult)
-{
+void ExecuteAndCompare(const std::function<T()>& function, const T& expectedResult) {
     T result = function();
     TF_AXIOM(result == expectedResult);
 }
@@ -43,11 +38,10 @@ TsSpline SetKnot(TsSpline source, double time, double val) {
     return source;
 }
 
-TestFunction CreateSetKnotTest(const TsSpline &baseSpline)
-{
+TestFunction CreateSetKnotTest(const TsSpline& baseSpline) {
     // Choose some randomized arguments.
     double time = rand() % 100;
-    double value = rand() / ((double) RAND_MAX);
+    double value = rand() / ((double)RAND_MAX);
 
     // Create a closure that will add a knot with the randomized arguments.
     // This closure contains a copy of the baseSpline object, and when the
@@ -55,8 +49,7 @@ TestFunction CreateSetKnotTest(const TsSpline &baseSpline)
     // parameter of the SetKnot function.  This should mean that neither the
     // original spline, nor the copy stored in the closure, will be modified
     // when SetKnot is called.
-    std::function<TsSpline()> f = 
-        std::bind(SetKnot, baseSpline, time, value);
+    std::function<TsSpline()> f = std::bind(SetKnot, baseSpline, time, value);
 
     // Call the closure once now, make a copy of its result (the modified
     // spline), and store that copy in a second closure.  Each time this step is
@@ -68,17 +61,15 @@ TestFunction CreateSetKnotTest(const TsSpline &baseSpline)
     return std::bind(ExecuteAndCompare<TsSpline>, f, result);
 }
 
-double Eval(TsSpline source, double time)
-{
+double Eval(TsSpline source, double time) {
     double result = 0;
     source.Eval(time, &result);
     return result;
 }
 
-TestFunction CreateEvalTest(const TsSpline &baseSpline)
-{
+TestFunction CreateEvalTest(const TsSpline& baseSpline) {
     // Choose a randomized time argument.
-    double time = 10.0 * (rand() / (double) RAND_MAX);
+    double time = 10.0 * (rand() / (double)RAND_MAX);
 
     // Create a closure that will evaluate the spline at the randomized time.
     std::function<double()> f = std::bind(Eval, baseSpline, time);
@@ -93,11 +84,9 @@ TestFunction CreateEvalTest(const TsSpline &baseSpline)
     return std::bind(ExecuteAndCompare<double>, f, result);
 }
 
-void RunTests(const std::vector<TestFunction> &tests, size_t iterations)
-{
+void RunTests(const std::vector<TestFunction>& tests, size_t iterations) {
     const std::thread::id id = std::this_thread::get_id();
-    std::cout << "Running " << iterations
-              << " tests in thread " << id << std::endl;
+    std::cout << "Running " << iterations << " tests in thread " << id << std::endl;
 
     for (size_t i = 0; i < iterations; i++) {
         tests[i % tests.size()]();
@@ -106,16 +95,14 @@ void RunTests(const std::vector<TestFunction> &tests, size_t iterations)
     std::cout << "Done running tests in thread " << id << std::endl;
 }
 
-void AddKnot(TsSpline *spline, double time, double value)
-{
+void AddKnot(TsSpline* spline, double time, double value) {
     TsKnot knot;
     knot.SetTime(time);
     knot.SetValue(value);
     spline->SetKnot(knot);
 }
 
-int main()
-{
+int main() {
     TsSpline baseSpline;
     AddKnot(&baseSpline, 1.0, 1.0);
     AddKnot(&baseSpline, 5.0, 5.0);
@@ -142,7 +129,7 @@ int main()
     }
 
     // Wait for all threads to complete.
-    for (std::thread &thread : threads) {
+    for (std::thread& thread : threads) {
         thread.join();
     }
 
