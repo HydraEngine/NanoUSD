@@ -23,8 +23,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// overhead over runtime performance and avoids clever metaprogramming.
 /// Please resist the urge to add functionality to this class (e.g. small
 /// object optimization, pxr_boost::python interoperability.)
-class TfAnyUniquePtr
-{
+class TfAnyUniquePtr {
 public:
     template <typename T>
     static TfAnyUniquePtr New() {
@@ -33,22 +32,19 @@ public:
     }
 
     template <typename T>
-    static TfAnyUniquePtr New(T const &v) {
+    static TfAnyUniquePtr New(T const& v) {
         static_assert(!std::is_array<T>::value, "Array types not supported");
         return TfAnyUniquePtr(new T(v));
     }
 
-    TfAnyUniquePtr(TfAnyUniquePtr &&other)
-        : _ptr(other._ptr)
-        , _delete(other._delete)
-    {
+    TfAnyUniquePtr(TfAnyUniquePtr&& other) : _ptr(other._ptr), _delete(other._delete) {
         other._ptr = nullptr;
         // We don't set other._delete to nullptr here on purpose.  Invoking
         // delete on a null pointer is not an error so if we can ensure that
         // _delete is never null we can call it unconditionally.
     }
 
-    TfAnyUniquePtr& operator=(TfAnyUniquePtr &&other) {
+    TfAnyUniquePtr& operator=(TfAnyUniquePtr&& other) {
         if (this != &other) {
             _delete(_ptr);
             _ptr = other._ptr;
@@ -61,30 +57,23 @@ public:
     TfAnyUniquePtr(TfAnyUniquePtr const&) = delete;
     TfAnyUniquePtr& operator=(TfAnyUniquePtr const&) = delete;
 
-    ~TfAnyUniquePtr() {
-        _delete(_ptr);
-    }
+    ~TfAnyUniquePtr() { _delete(_ptr); }
 
     /// Return a pointer to the owned object.
-    void const *Get() const {
-        return _ptr;
-    }
+    void const* Get() const { return _ptr; }
 
 private:
     template <typename T>
-    explicit TfAnyUniquePtr(T const *ptr)
-        : _ptr(ptr)
-        , _delete(&_Delete<T>)
-    {}
+    explicit TfAnyUniquePtr(T const* ptr) : _ptr(ptr), _delete(&_Delete<T>) {}
 
     template <typename T>
-    static void _Delete(void const *ptr) {
-        delete static_cast<T const *>(ptr);
+    static void _Delete(void const* ptr) {
+        delete static_cast<T const*>(ptr);
     }
 
 private:
-    void const *_ptr;
-    void (*_delete)(void const *);
+    void const* _ptr;
+    void (*_delete)(void const*);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

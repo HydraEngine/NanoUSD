@@ -48,7 +48,7 @@ class TfBits;
 /// zeroes, followed by 1 one, followed by 1 zero, followed by 1 one, followed
 /// by three zeroes. Each word is called a "platform".
 ///
-/// Compressed bits are very fast when used for logical operations (conjugate, 
+/// Compressed bits are very fast when used for logical operations (conjugate,
 /// and, or, xor, etc.), and when iterated over. Contains and Overlaps are also
 /// very fast. The representation is lightweight in memory and hence very cache
 /// efficient.
@@ -57,8 +57,7 @@ class TfBits;
 /// requirement, however, TfBits will perform better, since finding a specific
 /// bit requires a linear search.
 ///
-class TfCompressedBits
-{
+class TfCompressedBits {
 private:
     // Type of one word stored in the word array
     typedef uint32_t _WordType;
@@ -68,28 +67,19 @@ private:
     // Note, this is not a std::vector, because we really want a container,
     // which is optimized for native types, allowing fast memcpy capabilities,
     // and providing local storage optimizations.
-    class _WordArray
-    {
+    class _WordArray {
     public:
         static const uint32_t LOCAL_SIZE = 6;
 
-        _WordArray() :
-            _data(_local),
-            _numAllocated(LOCAL_SIZE),
-            _num(0) {}
+        _WordArray() : _data(_local), _numAllocated(LOCAL_SIZE), _num(0) {}
 
-        _WordArray(const _WordArray &rhs) :
-            _data(_local),
-            _numAllocated(LOCAL_SIZE),
-            _num(rhs._num) {
+        _WordArray(const _WordArray& rhs) : _data(_local), _numAllocated(LOCAL_SIZE), _num(rhs._num) {
             _Duplicate(rhs);
         }
 
-        ~_WordArray() {
-            _Deallocate();
-        }
+        ~_WordArray() { _Deallocate(); }
 
-        _WordArray& operator=(const _WordArray &rhs) {
+        _WordArray& operator=(const _WordArray& rhs) {
             if (this == &rhs) {
                 return *this;
             }
@@ -99,9 +89,7 @@ private:
         }
 
         // Clear all words
-        void Clear() {
-            _num = 0;
-        }
+        void Clear() { _num = 0; }
 
         // Add a word (may cause re-allocation)
         void PushBack(_WordType value) {
@@ -116,18 +104,14 @@ private:
         }
 
         // Remove a word
-        void PopBack() {
-            --_num;
-        }
+        void PopBack() { --_num; }
 
         // Remove multiple words
-        void PopBackNum(uint32_t popNum) {
-            _num -= popNum;
-        }
+        void PopBackNum(uint32_t popNum) { _num -= popNum; }
 
         // Move this representation into rhs. This representation will be
         // invalid after this operation.
-        void MoveInto(_WordArray &rhs) {
+        void MoveInto(_WordArray& rhs) {
             rhs._numAllocated = _numAllocated;
             rhs._num = _num;
 
@@ -154,11 +138,11 @@ private:
         }
 
         // Swap two representations
-        void Swap(_WordArray &rhs) {
+        void Swap(_WordArray& rhs) {
             if (!_IsStoredLocally() && !rhs._IsStoredLocally()) {
                 std::swap(_data, rhs._data);
                 std::swap(_numAllocated, rhs._numAllocated);
-                std::swap(_num,  rhs._num);
+                std::swap(_num, rhs._num);
             } else {
                 // Fall back to a copy. This could be optimized.
                 std::swap(*this, rhs);
@@ -166,56 +150,34 @@ private:
         }
 
         // Index operator
-        _WordType &operator[](size_t index) {
-            return _data[index];
-        }
+        _WordType& operator[](size_t index) { return _data[index]; }
 
-        const _WordType &operator[](size_t index) const {
-            return _data[index];
-        }
+        const _WordType& operator[](size_t index) const { return _data[index]; }
 
         // Returns the number of words stored (not allocated)
-        uint32_t GetNum() const {
-            return _num;
-        }
+        uint32_t GetNum() const { return _num; }
 
         // Return the number of allocated words
-        uint32_t GetNumAllocated() const {
-            return _numAllocated;
-        }
+        uint32_t GetNumAllocated() const { return _numAllocated; }
 
         // Return a pointer to the first word
-        const _WordType *Begin() const {
-            return _data;
-        }
+        const _WordType* Begin() const { return _data; }
 
         // Return a pointer one past the end of the array.
-        const _WordType *End() const {
-            return _data + _num;
-        }
+        const _WordType* End() const { return _data + _num; }
 
         // Returns the first word
-        _WordType &Front() {
-            return _data[0];
-        }
+        _WordType& Front() { return _data[0]; }
 
-        const _WordType &Front() const {
-            return _data[0];
-        }
+        const _WordType& Front() const { return _data[0]; }
 
         // Returns the last word
-        _WordType &Back() {
-            return _data[_num - 1];
-        }
+        _WordType& Back() { return _data[_num - 1]; }
 
-        const _WordType &Back() const {
-            return _data[_num - 1];
-        }
+        const _WordType& Back() const { return _data[_num - 1]; }
 
     private:
-        bool _IsStoredLocally() const {
-            return _data == _local;
-        }
+        bool _IsStoredLocally() const { return _data == _local; }
 
         void _Deallocate() {
             if (!_IsStoredLocally()) {
@@ -224,7 +186,7 @@ private:
             }
         }
 
-        void _Duplicate(const _WordArray &rhs) {
+        void _Duplicate(const _WordArray& rhs) {
             if (rhs._num > 0) {
                 if (_numAllocated < rhs._num) {
                     _Deallocate();
@@ -248,14 +210,14 @@ private:
 
         void _Reallocate() {
             _numAllocated <<= 1;
-            _WordType *newData = new _WordType[_numAllocated];
+            _WordType* newData = new _WordType[_numAllocated];
             memcpy(newData, _data, sizeof(_WordType) * _num);
             _Deallocate();
             _data = newData;
         }
 
         // Pointer to the data
-        _WordType *_data;
+        _WordType* _data;
 
         // Local storage optimization
         _WordType _local[LOCAL_SIZE];
@@ -268,7 +230,6 @@ private:
     };
 
 public:
-
     // View and iterator modes: All bits, all set bits, all unset bits,
     // platforms (iterator provides platform size and value)
     enum class Mode { All, AllSet, AllUnset, Platforms };
@@ -280,9 +241,7 @@ public:
     /// your needs.
     ///
     struct Hash {
-        size_t operator()(const TfCompressedBits &bits) const {
-            return bits.GetHash();
-        }
+        size_t operator()(const TfCompressedBits& bits) const { return bits.GetHash(); }
     };
 
     /// A hash functor for TfCompressedBits that is faster than Hash.
@@ -292,21 +251,16 @@ public:
     /// the number of words and the first cache line of words.
     ///
     struct FastHash {
-        size_t operator()(const TfCompressedBits &bits) const {
+        size_t operator()(const TfCompressedBits& bits) const {
             if (bits.GetSize() == 0) {
                 return 0;
             }
 
             // Hash the running bit and number of platforms.
-            size_t hash = TfHash::Combine(
-                bits.GetSize(),
-                bits._runningBit,
-                bits._platforms.GetNum());
+            size_t hash = TfHash::Combine(bits.GetSize(), bits._runningBit, bits._platforms.GetNum());
 
             // Hash a single cache line of platform data.
-            const uint32_t n = std::min<uint32_t>(
-                bits._platforms.GetNum(),
-                ARCH_CACHE_LINE_SIZE / sizeof(uint32_t));
+            const uint32_t n = std::min<uint32_t>(bits._platforms.GetNum(), ARCH_CACHE_LINE_SIZE / sizeof(uint32_t));
             for (uint32_t i = 0; i < n; ++i) {
                 hash = TfHash::Combine(hash, bits._platforms[i]);
             }
@@ -317,18 +271,11 @@ public:
 
     /// Constructs a fixed size bit array, clears all bits.
     ///
-    explicit TfCompressedBits(size_t num = 0) :
-        _num(num),
-        _runningBit(0) {
-        _platforms.PushBack(num);
-    }
+    explicit TfCompressedBits(size_t num = 0) : _num(num), _runningBit(0) { _platforms.PushBack(num); }
 
     /// Constructs a fixed size bit array, with a range of bits set.
     ///
-    explicit TfCompressedBits(size_t num, size_t first, size_t last) :
-        _num(num),
-        _runningBit(0) {
-
+    explicit TfCompressedBits(size_t num, size_t first, size_t last) : _num(num), _runningBit(0) {
         // Empty bitset
         if (num == 0) {
             _platforms.PushBack(0);
@@ -363,19 +310,15 @@ public:
 
     /// Copy-constructs a fixed size bit array.
     ///
-    TfCompressedBits(const TfCompressedBits &rhs) :
-        _platforms(rhs._platforms),
-        _num(rhs._num),
-        _runningBit(rhs._runningBit) {}
+    TfCompressedBits(const TfCompressedBits& rhs)
+        : _platforms(rhs._platforms), _num(rhs._num), _runningBit(rhs._runningBit) {}
 
     /// Copy-construct a fixed sized bit array, from the complement of the
     /// \p rhs bitset.
     ///
     enum ComplementTagType { ComplementTag };
-    TfCompressedBits(const TfCompressedBits &rhs, ComplementTagType) :
-        _platforms(rhs._platforms),
-        _num(rhs._num),
-        _runningBit(1 - rhs._runningBit) {
+    TfCompressedBits(const TfCompressedBits& rhs, ComplementTagType)
+        : _platforms(rhs._platforms), _num(rhs._num), _runningBit(1 - rhs._runningBit) {
         if (_num == 0) {
             _runningBit = 0;
         }
@@ -384,13 +327,11 @@ public:
     /// Construct a TfCompressedBits array from a TfBits array.
     ///
     TF_API
-    explicit TfCompressedBits(const TfBits &bits);
+    explicit TfCompressedBits(const TfBits& bits);
 
     /// Move Constructor
     ///
-    TfCompressedBits(TfCompressedBits &&rhs) :
-        _num(rhs._num),
-        _runningBit(rhs._runningBit) {
+    TfCompressedBits(TfCompressedBits&& rhs) : _num(rhs._num), _runningBit(rhs._runningBit) {
         rhs._platforms.MoveInto(_platforms);
         rhs._platforms.Clear();
         rhs._num = 0;
@@ -403,13 +344,13 @@ public:
 
     /// Assignment operator
     ///
-    TfCompressedBits &operator=(const TfCompressedBits &rhs) {
+    TfCompressedBits& operator=(const TfCompressedBits& rhs) {
         if (this == &rhs) {
             return *this;
         }
 
-        _platforms  = rhs._platforms;
-        _num        = rhs._num;
+        _platforms = rhs._platforms;
+        _num = rhs._num;
         _runningBit = rhs._runningBit;
 
         return *this;
@@ -417,7 +358,7 @@ public:
 
     /// Move assignment operator.
     ///
-    TfCompressedBits &operator=(TfCompressedBits &&rhs) {
+    TfCompressedBits& operator=(TfCompressedBits&& rhs) {
         if (this == &rhs) {
             return *this;
         }
@@ -450,8 +391,7 @@ public:
 
         // Grow
         if (_num < num) {
-            if ((UINT32_C(1) - _runningBit) == 
-                    (_platforms.GetNum() & UINT32_C(1))) {
+            if ((UINT32_C(1) - _runningBit) == (_platforms.GetNum() & UINT32_C(1))) {
                 _platforms.Back() += (num - _num);
             } else {
                 _platforms.PushBack(num - _num);
@@ -473,9 +413,9 @@ public:
 
     /// Provides a fast swap.
     ///
-    void Swap(TfCompressedBits &rhs) {
-        std::swap(_num,         rhs._num);
-        std::swap(_runningBit,  rhs._runningBit);
+    void Swap(TfCompressedBits& rhs) {
+        std::swap(_num, rhs._num);
+        std::swap(_runningBit, rhs._runningBit);
         _platforms.Swap(rhs._platforms);
     }
 
@@ -540,7 +480,7 @@ public:
         *this |= tmp;
     }
 
-    /// Append a number of bits with the given \p value to this bitset. 
+    /// Append a number of bits with the given \p value to this bitset.
     /// This also increases the size of the bitset by the number of bits added.
     ///
     void Append(size_t num, bool value) {
@@ -586,7 +526,7 @@ public:
         // If the running bit is 0, just increment the first word (num zeroes)
         if (_runningBit == 0) {
             _platforms.Front() += bits;
-        } 
+        }
 
         // If the running bit is 1, shift all the _platforms to the right and
         // flip the running bit. Set the first platform (num zeroes) to the
@@ -619,8 +559,7 @@ public:
         // How many platforms to trim on the left?
         size_t trimBits = bits;
         size_t platformIndex = 0;
-        while (platformIndex < _platforms.GetNum() && 
-            _platforms[platformIndex] <= trimBits) {
+        while (platformIndex < _platforms.GetNum() && _platforms[platformIndex] <= trimBits) {
             trimBits -= _platforms[platformIndex];
             ++platformIndex;
         }
@@ -653,8 +592,7 @@ public:
 
         // Extend on the right, by adding zeros, if the last platform
         // is zeros ...
-        if ((UINT32_C(1) - _runningBit) ==
-                (_platforms.GetNum() & UINT32_C(1))) {
+        if ((UINT32_C(1) - _runningBit) == (_platforms.GetNum() & UINT32_C(1))) {
             _platforms.Back() += bits;
             return;
         }
@@ -679,11 +617,11 @@ public:
     }
 
     /// Returns the index of the n-th bit set in this bit set.
-    /// 
+    ///
     /// This function counts the set bits up to the \p nth bit, and returns
     /// the index of that n-th set bit. If there are less than \p nth bits set,
     /// returns GetSize().
-    /// 
+    ///
     /// Note: This operation is slower than using an iterator. For forward or
     ///       reverse iteration, use the iterator instead.
     ///
@@ -715,14 +653,13 @@ public:
         return _num;
     }
 
-    /// Find the next bit set that is higher or equal to index. 
+    /// Find the next bit set that is higher or equal to index.
     /// If no more set bits are found, index returns 'GetSize()'.
     ///
     /// Note: This is a slow operation on TfCompressedBits.
     ///       Please, use an iterator if possible. Iterators are fast!
     ///
-    size_t FindNextSet(size_t index) const
-    {
+    size_t FindNextSet(size_t index) const {
         if (index >= _num) {
             return _num;
         }
@@ -743,8 +680,7 @@ public:
     /// Note: This is a slow operation on TfCompressedBits.
     ///       Please, use an iterator if possible. Iterators are fast!
     ///
-    size_t FindPrevSet(size_t index) const
-    {
+    size_t FindPrevSet(size_t index) const {
         if (index >= _num) {
             return _num;
         }
@@ -770,8 +706,7 @@ public:
     /// Note: This is a slow operation on TfCompressedBits.
     ///       Please, use an iterator if possible. Iterators are fast!
     ///
-    size_t FindNextUnset(size_t index) const
-    {
+    size_t FindNextUnset(size_t index) const {
         if (index >= _num) {
             return _num;
         }
@@ -782,13 +717,13 @@ public:
         if (bit == 0) {
             return index;
         }
-        
+
         return bitCount;
     }
 
     /// Count the bits set, and also return the largest gap between bits.
     ///
-    void Count(size_t *numSet, size_t *maxGap) const {
+    void Count(size_t* numSet, size_t* maxGap) const {
         const uint32_t lastIndex = _platforms.GetNum() - 1;
         uint32_t num = 0;
         uint32_t max = 0;
@@ -810,15 +745,11 @@ public:
 
     /// Returns the size of the bit array, ie. the # of bits it can hold.
     ///
-    size_t GetSize() const {
-        return _num;
-    }
+    size_t GetSize() const { return _num; }
 
     /// Returns \c true if this bit array is empty, i.e. it is of size zero.
     ///
-    bool IsEmpty() const {
-        return _num == 0;
-    }
+    bool IsEmpty() const { return _num == 0; }
 
     /// Returns the index of the first bit set in the bit array.  If no bits
     /// are set, the return value is 'GetSize()'.
@@ -893,27 +824,19 @@ public:
 
     /// Returns true, if all the bits in this bit array are set.
     ///
-    bool AreAllSet() const {
-        return _num == 0 || (_runningBit == 1 && _platforms.GetNum() == 1);
-    }
+    bool AreAllSet() const { return _num == 0 || (_runningBit == 1 && _platforms.GetNum() == 1); }
 
     /// Returns true, if all the bits in this bit array are unset.
-    ///    
-    bool AreAllUnset() const {
-        return !IsAnySet();
-    }
+    ///
+    bool AreAllUnset() const { return !IsAnySet(); }
 
     /// Returns true, if there is at least a single set bit.
-    /// 
-    bool IsAnySet() const {
-        return _num > 0 && (_runningBit == 1 || _platforms.GetNum() > 1);
-    }
+    ///
+    bool IsAnySet() const { return _num > 0 && (_runningBit == 1 || _platforms.GetNum() > 1); }
 
     /// Returns true, if there is at least a single unset bit.
     ///
-    bool IsAnyUnset() const {
-        return _num > 0 && (_runningBit == 0 || _platforms.GetNum() > 1);
-    }
+    bool IsAnyUnset() const { return _num > 0 && (_runningBit == 0 || _platforms.GetNum() > 1); }
 
     /// Returns true if the set bits in this bit array are contiguous.
     ///
@@ -921,21 +844,17 @@ public:
     ///
     bool AreContiguouslySet() const {
         const uint32_t numP = _platforms.GetNum();
-        return
-            _num > 0 && numP <= 3 &&
-                (numP == 2 ||
-                (_runningBit == 1 && numP == 1) || 
-                (_runningBit == 0 && numP == 3));
+        return _num > 0 && numP <= 3 &&
+               (numP == 2 || (_runningBit == 1 && numP == 1) || (_runningBit == 0 && numP == 3));
     }
 
     /// Returns the amount of memory this object holds on to.
     ///
-    size_t GetAllocatedSize() const
-    {
+    size_t GetAllocatedSize() const {
         size_t size = sizeof(TfCompressedBits);
         if (_platforms.GetNumAllocated() > _WordArray::LOCAL_SIZE) {
             size += sizeof(_WordType) * _platforms.GetNumAllocated();
-        } 
+        }
         return size;
     }
 
@@ -976,23 +895,20 @@ public:
     /// an empty bitset.
     ///
     TF_API
-    static TfCompressedBits FromString(const std::string &source);
+    static TfCompressedBits FromString(const std::string& source);
 
     /// \name Operators
     /// @{
 
     /// Returns true if this == \p rhs.
     ///
-    bool operator==(const TfCompressedBits &rhs) const {
+    bool operator==(const TfCompressedBits& rhs) const {
         if (this == &rhs || (_num == 0 && rhs._num == 0)) {
             return true;
         }
-        
-        // Fast comparisons, first
-        if (_num == rhs._num &&
-            _runningBit == rhs._runningBit &&
-            _platforms.GetNum() == rhs._platforms.GetNum()) {
 
+        // Fast comparisons, first
+        if (_num == rhs._num && _runningBit == rhs._runningBit && _platforms.GetNum() == rhs._platforms.GetNum()) {
             // Worst case, scenario: Must compare every word
             for (size_t i = 0; i < _platforms.GetNum(); ++i) {
                 // Early bailout, if two words don't match
@@ -1011,17 +927,14 @@ public:
 
     /// Returns true if this != \p rhs.
     ///
-    bool operator!=(const TfCompressedBits &rhs) const {
-        return !(*this == rhs);
-    }
+    bool operator!=(const TfCompressedBits& rhs) const { return !(*this == rhs); }
 
     /// Ands these bits with the \p rhs bits.
     ///
     /// The resulting bit set is the intersection of the two bit sets.
     ///
-    TfCompressedBits &operator&=(const TfCompressedBits &rhs) {
-        if (!TF_VERIFY(_num == rhs._num) ||
-            _num == 0 || rhs._num == 0) {
+    TfCompressedBits& operator&=(const TfCompressedBits& rhs) {
+        if (!TF_VERIFY(_num == rhs._num) || _num == 0 || rhs._num == 0) {
             return *this;
         }
 
@@ -1062,7 +975,7 @@ public:
 
     /// Returns these bits and'ed with \p rhs.
     ///
-    TfCompressedBits operator&(const TfCompressedBits &rhs) const {
+    TfCompressedBits operator&(const TfCompressedBits& rhs) const {
         TfCompressedBits r(*this);
         r &= rhs;
         return r;
@@ -1072,9 +985,8 @@ public:
     ///
     /// The resulting bit set is the union of the two bit sets.
     ///
-    TfCompressedBits &operator|=(const TfCompressedBits &rhs) {
-        if (!TF_VERIFY(_num == rhs._num) ||
-            _num == 0 || rhs._num == 0) {
+    TfCompressedBits& operator|=(const TfCompressedBits& rhs) {
+        if (!TF_VERIFY(_num == rhs._num) || _num == 0 || rhs._num == 0) {
             return *this;
         }
 
@@ -1119,7 +1031,7 @@ public:
 
     /// Returns these bits or'ed with the \p rhs.
     ///
-    TfCompressedBits operator|(const TfCompressedBits &rhs) const {
+    TfCompressedBits operator|(const TfCompressedBits& rhs) const {
         TfCompressedBits r(*this);
         r |= rhs;
         return r;
@@ -1130,9 +1042,8 @@ public:
     /// The resulting bit set is the union of the two bit sets minus the
     /// intersection of the two bit sets.
     ///
-    TfCompressedBits &operator^=(const TfCompressedBits &rhs) {
-        if (!TF_VERIFY(_num == rhs._num) ||
-            _num == 0 || rhs._num == 0) {
+    TfCompressedBits& operator^=(const TfCompressedBits& rhs) {
+        if (!TF_VERIFY(_num == rhs._num) || _num == 0 || rhs._num == 0) {
             return *this;
         }
 
@@ -1152,7 +1063,7 @@ public:
 
     /// Returns these bits xor'ed with \p rhs.
     ///
-    TfCompressedBits operator^(const TfCompressedBits &rhs) const {
+    TfCompressedBits operator^(const TfCompressedBits& rhs) const {
         TfCompressedBits r(*this);
         r ^= rhs;
         return r;
@@ -1163,9 +1074,8 @@ public:
     /// The resulting bit set is the asymmetric set difference of
     /// the two bit sets.
     ///
-    TfCompressedBits &operator-=(const TfCompressedBits &rhs) {
-        if (!TF_VERIFY(_num == rhs._num) ||
-            _num == 0 || rhs._num == 0) {
+    TfCompressedBits& operator-=(const TfCompressedBits& rhs) {
+        if (!TF_VERIFY(_num == rhs._num) || _num == 0 || rhs._num == 0) {
             return *this;
         }
 
@@ -1209,7 +1119,7 @@ public:
 
     /// Returns bits with all the bits in \p rhs removed from these bits.
     ///
-    TfCompressedBits operator-(const TfCompressedBits &rhs) const {
+    TfCompressedBits operator-(const TfCompressedBits& rhs) const {
         TfCompressedBits r(*this);
         r -= rhs;
         return r;
@@ -1219,8 +1129,8 @@ public:
     ///
     /// The resulting bit set is the complement of this bit set.
     ///
-    TfCompressedBits &Complement() {
-        if (_num != 0) {        
+    TfCompressedBits& Complement() {
+        if (_num != 0) {
             _runningBit = 1 - _runningBit;
         }
         return *this;
@@ -1230,13 +1140,11 @@ public:
     ///
     /// Note: This is a slow operation on TfCompressedBits!
     ///
-    bool operator[](size_t index) const {
-        return IsSet(index);
-    }
+    bool operator[](size_t index) const { return IsSet(index); }
 
     /// Shifts to the right (see ShiftRight)
     ///
-    TfCompressedBits &operator>>=(size_t bits) {
+    TfCompressedBits& operator>>=(size_t bits) {
         ShiftRight(bits);
         return *this;
     }
@@ -1251,7 +1159,7 @@ public:
 
     /// Shifts to the left (see ShiftLeft)
     ///
-    TfCompressedBits &operator<<=(size_t bits) {
+    TfCompressedBits& operator<<=(size_t bits) {
         ShiftLeft(bits);
         return *this;
     }
@@ -1266,16 +1174,14 @@ public:
 
     /// @}
 
-
     /// Returns true if the result of the intersection with \p rhs would be
     /// non-zero.
     ///
     /// This method can be used for efficiency because it doesn't perform
     /// the full AND operation on a copy, and it can return early.
     ///
-    bool HasNonEmptyIntersection(const TfCompressedBits &rhs) const {
-        if (!TF_VERIFY(_num == rhs._num) ||
-            _num == 0 || rhs._num == 0) {
+    bool HasNonEmptyIntersection(const TfCompressedBits& rhs) const {
+        if (!TF_VERIFY(_num == rhs._num) || _num == 0 || rhs._num == 0) {
             return false;
         }
 
@@ -1316,9 +1222,8 @@ public:
     ///    return (this - rhs).GetNumSet() != 0
     /// but avoids creating temporary copies.
     ///
-    bool HasNonEmptyDifference(const TfCompressedBits &rhs) const {
-        if (!TF_VERIFY(_num == rhs._num) ||
-            _num == 0 || rhs._num == 0) {
+    bool HasNonEmptyDifference(const TfCompressedBits& rhs) const {
+        if (!TF_VERIFY(_num == rhs._num) || _num == 0 || rhs._num == 0) {
             return false;
         }
 
@@ -1358,9 +1263,7 @@ public:
         // If we still haven't bailed out yet, check the last set bit.
         const size_t lastSet = GetLastSet();
         const size_t rhsLastSet = rhs.GetLastSet();
-        if (lastSet > rhsLastSet ||
-            firstSet > rhsLastSet ||
-            lastSet < rhsFirstSet) {
+        if (lastSet > rhsLastSet || firstSet > rhsLastSet || lastSet < rhsFirstSet) {
             return true;
         }
 
@@ -1369,16 +1272,14 @@ public:
 
     /// Returns true if this bit array contains \p rhs by computing:
     /// (rhs - this).GetNumSet() == 0.
-    /// 
+    ///
     /// Ie. it will return true if all bits of \p rhs are also set in this.
     ///
-    bool Contains(const TfCompressedBits &rhs) const {
-        return !rhs.HasNonEmptyDifference(*this);
-    }
+    bool Contains(const TfCompressedBits& rhs) const { return !rhs.HasNonEmptyDifference(*this); }
 
     /// Returns an empty TfBits.
     ///
-    static const TfCompressedBits &GetEmpty() {
+    static const TfCompressedBits& GetEmpty() {
         static TfStaticData<TfCompressedBits> emptyBits;
         return *emptyBits;
     }
@@ -1386,7 +1287,7 @@ public:
     /// Decompress the bits into a TfBits array.
     ///
     TF_API
-    void Decompress(TfBits *bits) const;
+    void Decompress(TfBits* bits) const;
 
     /// Iterator support.
     ///
@@ -1416,31 +1317,25 @@ public:
 private:
     // Functor for logical operation: AND
     struct _And {
-        inline uint8_t operator() (uint8_t a, uint8_t b) {
-            return a & b;
-        }
+        inline uint8_t operator()(uint8_t a, uint8_t b) { return a & b; }
     };
 
     // Functor for logical operation: OR
     struct _Or {
-        inline uint8_t operator() (uint8_t a, uint8_t b) {
-            return a | b;
-        }
+        inline uint8_t operator()(uint8_t a, uint8_t b) { return a | b; }
     };
 
     // Functor for logical operation: XOR
     struct _Xor {
-        inline uint8_t operator() (uint8_t a, uint8_t b) {
-            return a ^ b;
-        }
+        inline uint8_t operator()(uint8_t a, uint8_t b) { return a ^ b; }
     };
 
     // This method performs a logical operation on the passed in running bit
     // and word array. OP denotes a functor implementing the logical operation.
     // The idea is that the compiler will be smart enough to inline the
     // operation, without actually having to call the function.
-    template < class OP > TfCompressedBits &
-    _Logical(uint8_t rhsRunningBit, const _WordArray &rhsPlatforms) {
+    template <class OP>
+    TfCompressedBits& _Logical(uint8_t rhsRunningBit, const _WordArray& rhsPlatforms) {
         OP op;
 
         const uint32_t numA = _platforms.GetNum();
@@ -1501,7 +1396,7 @@ private:
                 platformA = platformA - platformB;
                 if (indexB == numB) {
                     platformB = _num - newTotal;
-                } else if(indexB < numB) {
+                } else if (indexB < numB) {
                     platformB = rhsPlatforms[indexB];
                 }
 
@@ -1519,8 +1414,7 @@ private:
                     b = newBit;
                 }
 
-                if (newTotal >= _num)
-                    break;
+                if (newTotal >= _num) break;
 
                 // Move on to the next platforms
                 ++indexA;
@@ -1546,8 +1440,8 @@ private:
     // Performs a logical operation, but breaks out and returns true, as soon
     // as the logical operation returns true. If the logical operation never
     // returns true, false is returned.
-    template < class OP > bool
-    _HasLogical(uint8_t rhsRunningBit, const _WordArray &rhsPlatforms) const {
+    template <class OP>
+    bool _HasLogical(uint8_t rhsRunningBit, const _WordArray& rhsPlatforms) const {
         OP op;
 
         uint8_t bitA = _runningBit;
@@ -1596,8 +1490,7 @@ private:
     // Also returns the index of that bit in the word array, as well as the
     // bitCount denoting the number of bits counted up until the range that
     // terminates the current word, the index is found in.
-    uint8_t _LinearSearch(
-        size_t index, size_t *platformIndex, size_t *bitCount) const { 
+    uint8_t _LinearSearch(size_t index, size_t* platformIndex, size_t* bitCount) const {
         uint8_t bit = _runningBit;
         size_t count = 0;
         size_t i;
@@ -1617,16 +1510,14 @@ private:
 
     // Returns true if this bit array's bounds are disjoint from the bounds
     // of the rhs bit array. The two are considered disjoint if the last bit
-    // set of array A is at a lower index than the first bit set on array B 
+    // set of array A is at a lower index than the first bit set on array B
     // (or vice versa).
     // Note, that the bit arrays may still be disjoint, even if this method
     // returns false, but if this method returns true, the bit arrays are
     // guaranteed to be disjoint. This is basically a very cheap early out for
-    // the Overlaps() method. 
-    bool _AreBoundsDisjoint(const TfCompressedBits &rhs) const {
-        return 
-            GetLastSet() < rhs.GetFirstSet() || 
-            GetFirstSet() > rhs.GetLastSet();
+    // the Overlaps() method.
+    bool _AreBoundsDisjoint(const TfCompressedBits& rhs) const {
+        return GetLastSet() < rhs.GetFirstSet() || GetFirstSet() > rhs.GetLastSet();
     }
 
     // The word array, storing the bit platforms.
@@ -1638,29 +1529,20 @@ private:
     // The value of the running bit, indicating what the bit value of the first
     // word is.
     uint8_t _runningBit;
-
 };
 
 template <TfCompressedBits::Mode mode>
-class TfCompressedBits::View
-{
+class TfCompressedBits::View {
 public:
-    class const_iterator
-    {
+    class const_iterator {
     public:
         using iterator_category = std::forward_iterator_tag;
         using value_type = const uint32_t;
-        using reference = const uint32_t &;
-        using pointer = const uint32_t *;
+        using reference = const uint32_t&;
+        using pointer = const uint32_t*;
         using difference_type = const uint32_t;
 
-        const_iterator() :
-            _bits(nullptr),
-            _platformIndex(0),
-            _bitIndex(0),
-            _bitCounter(0),
-            _value(0)
-        {}
+        const_iterator() : _bits(nullptr), _platformIndex(0), _bitIndex(0), _bitCounter(0), _value(0) {}
 
         reference operator*() const { return dereference(); }
         pointer operator->() const { return &(dereference()); }
@@ -1676,17 +1558,11 @@ public:
             return r;
         }
 
-        bool operator==(const const_iterator& rhs) const {
-            return equal(rhs);
-        }
+        bool operator==(const const_iterator& rhs) const { return equal(rhs); }
 
-        bool operator!=(const const_iterator& rhs) const {
-            return !equal(rhs);
-        }
+        bool operator!=(const const_iterator& rhs) const { return !equal(rhs); }
 
-        bool IsSet() const {
-            return _value == 1;
-        }
+        bool IsSet() const { return _value == 1; }
 
         bool IsAtEnd() const {
             if (!_bits) {
@@ -1698,21 +1574,10 @@ public:
     private:
         friend class View;
 
-        const_iterator(
-            const TfCompressedBits *bits,
-            uint32_t platformIndex,
-            uint32_t bitIndex,
-            uint8_t value) :
-            _bits(bits),
-            _platformIndex(platformIndex),
-            _bitIndex(bitIndex),
-            _bitCounter(0),
-            _value(value)
-        {}
+        const_iterator(const TfCompressedBits* bits, uint32_t platformIndex, uint32_t bitIndex, uint8_t value)
+            : _bits(bits), _platformIndex(platformIndex), _bitIndex(bitIndex), _bitCounter(0), _value(value) {}
 
-        bool equal(const const_iterator &rhs) const {
-            return _bits == rhs._bits && _bitIndex == rhs._bitIndex;
-        }
+        bool equal(const const_iterator& rhs) const { return _bits == rhs._bits && _bitIndex == rhs._bitIndex; }
 
         void increment() {
             // Note, this looks like quite a bit of logic, but mode is a
@@ -1730,16 +1595,13 @@ public:
             // If the bit counter surpasses the current word,
             // skip ahead to the next word
             if (_bitCounter >= _bits->_platforms[_platformIndex]) {
-
                 // If the iterator mode is not All, look at
                 // every other word
-                const uint32_t numP =
-                    _bits->_platforms.GetNum();
-                if ((mode == Mode::AllSet || mode == Mode::AllUnset) &&
-                    (_platformIndex + 1) < numP) {
+                const uint32_t numP = _bits->_platforms.GetNum();
+                if ((mode == Mode::AllSet || mode == Mode::AllUnset) && (_platformIndex + 1) < numP) {
                     _bitIndex += _bits->_platforms[_platformIndex + 1];
                     _platformIndex += 2;
-                } 
+                }
 
                 // Otherwise, look at every word and toggle
                 // the value bit
@@ -1753,11 +1615,9 @@ public:
             }
         }
 
-        const uint32_t &dereference() const {
-            return _bitIndex;
-        }
+        const uint32_t& dereference() const { return _bitIndex; }
 
-        const TfCompressedBits *_bits;
+        const TfCompressedBits* _bits;
         uint32_t _platformIndex;
         uint32_t _bitIndex;
         uint32_t _bitCounter;
@@ -1772,57 +1632,43 @@ public:
 
         // Skip ahead one word, if looking at AllSet/AllUnset and the
         // first word describes an unset/set platform of bits
-        if ((mode == Mode::AllSet && bit == 0) ||
-            (mode == Mode::AllUnset && bit == 1)) {
+        if ((mode == Mode::AllSet && bit == 0) || (mode == Mode::AllUnset && bit == 1)) {
             return const_iterator(_bits, 1, _bits->_platforms[0], 1 - bit);
         }
 
         return const_iterator(_bits, 0, 0, bit);
     }
 
-    const_iterator end() const {
-        return const_iterator(_bits, 0, _bits->GetSize(), 0);
-    }
+    const_iterator end() const { return const_iterator(_bits, 0, _bits->GetSize(), 0); }
 
     /// Return true, if the view is empty.
     ///
-    bool IsEmpty() const {
-        return begin() == end();
-    }
+    bool IsEmpty() const { return begin() == end(); }
 
 private:
-
     // The TfCompressedBits can create new views.
     friend class TfCompressedBits;
 
     // Ctor.
-    View(const TfCompressedBits *bits) :
-        _bits(bits)
-    {}
+    View(const TfCompressedBits* bits) : _bits(bits) {}
 
-    const TfCompressedBits *_bits;
+    const TfCompressedBits* _bits;
 };
 
 // Specialize the platform view because its iterators are much simpler than
 // the per-bit views.
 template <>
-class TfCompressedBits::View<TfCompressedBits::Mode::Platforms>
-{
+class TfCompressedBits::View<TfCompressedBits::Mode::Platforms> {
 public:
-    class const_iterator
-    {
+    class const_iterator {
     public:
         using iterator_category = std::forward_iterator_tag;
         using value_type = const uint32_t;
-        using reference = const uint32_t &;
-        using pointer = const uint32_t *;
+        using reference = const uint32_t&;
+        using pointer = const uint32_t*;
         using difference_type = const uint32_t;
 
-        const_iterator() :
-            _platform(nullptr),
-            _bitIndex(0),
-            _value(0)
-        {}
+        const_iterator() : _platform(nullptr), _bitIndex(0), _value(0) {}
 
         reference operator*() const { return dereference(); }
         pointer operator->() const { return &(dereference()); }
@@ -1838,36 +1684,20 @@ public:
             return r;
         }
 
-        bool operator==(const const_iterator& rhs) const {
-            return equal(rhs);
-        }
+        bool operator==(const const_iterator& rhs) const { return equal(rhs); }
 
-        bool operator!=(const const_iterator& rhs) const {
-            return !equal(rhs);
-        }
+        bool operator!=(const const_iterator& rhs) const { return !equal(rhs); }
 
-        bool IsSet() const {
-            return _value == 1;
-        }
+        bool IsSet() const { return _value == 1; }
 
-        uint32_t GetPlatformSize() const {
-            return *_platform;
-        }
+        uint32_t GetPlatformSize() const { return *_platform; }
 
     private:
         friend class View;
 
-        const_iterator(
-            const uint32_t *platform,
-            uint8_t value)
-            : _platform(platform)
-            , _bitIndex(0)
-            , _value(value)
-        {}
+        const_iterator(const uint32_t* platform, uint8_t value) : _platform(platform), _bitIndex(0), _value(value) {}
 
-        bool equal(const const_iterator &rhs) const {
-            return _platform == rhs._platform;
-        }
+        bool equal(const const_iterator& rhs) const { return _platform == rhs._platform; }
 
         void increment() {
             _bitIndex += *_platform;
@@ -1875,86 +1705,60 @@ public:
             _value = 1 - _value;
         }
 
-        const uint32_t &dereference() const {
-            return _bitIndex;
-        }
+        const uint32_t& dereference() const { return _bitIndex; }
 
-        const uint32_t *_platform;
+        const uint32_t* _platform;
         uint32_t _bitIndex;
         uint8_t _value;
     };
 
-    const_iterator begin() const {
-        return const_iterator(_bits->_platforms.Begin(), _bits->_runningBit);
-    }
+    const_iterator begin() const { return const_iterator(_bits->_platforms.Begin(), _bits->_runningBit); }
 
-    const_iterator end() const {
-        return const_iterator(_bits->_platforms.End(), 0);
-    }
+    const_iterator end() const { return const_iterator(_bits->_platforms.End(), 0); }
 
     /// Return true, if the view is empty.
     ///
-    bool IsEmpty() const {
-        return begin() == end();
-    }
+    bool IsEmpty() const { return begin() == end(); }
 
 private:
-
     // The TfCompressedBits can create new views.
     friend class TfCompressedBits;
 
     // Ctor.
-    View(const TfCompressedBits *bits) :
-        _bits(bits)
-    {}
+    View(const TfCompressedBits* bits) : _bits(bits) {}
 
-    const TfCompressedBits *_bits;
+    const TfCompressedBits* _bits;
 };
 
-TfCompressedBits::AllView
-TfCompressedBits::GetAllView() const
-{
+TfCompressedBits::AllView TfCompressedBits::GetAllView() const {
     return View<Mode::All>(this);
 }
 
-TfCompressedBits::AllSetView
-TfCompressedBits::GetAllSetView() const
-{
+TfCompressedBits::AllSetView TfCompressedBits::GetAllSetView() const {
     return View<Mode::AllSet>(this);
 }
 
-TfCompressedBits::AllUnsetView
-TfCompressedBits::GetAllUnsetView() const
-{
+TfCompressedBits::AllUnsetView TfCompressedBits::GetAllUnsetView() const {
     return View<Mode::AllUnset>(this);
 }
 
-TfCompressedBits::PlatformsView
-TfCompressedBits::GetPlatformsView() const
-{
+TfCompressedBits::PlatformsView TfCompressedBits::GetPlatformsView() const {
     return View<Mode::Platforms>(this);
 }
 
 // Specializing, so TfIterator knows to retain a copy when iterating.
-template<>
-struct Tf_ShouldIterateOverCopy<TfCompressedBits::AllView> :
-    std::true_type
-{};
+template <>
+struct Tf_ShouldIterateOverCopy<TfCompressedBits::AllView> : std::true_type {};
 
-template<>
-struct Tf_ShouldIterateOverCopy<TfCompressedBits::AllSetView> :
-    std::true_type
-{};
+template <>
+struct Tf_ShouldIterateOverCopy<TfCompressedBits::AllSetView> : std::true_type {};
 
-template<>
-struct Tf_ShouldIterateOverCopy<TfCompressedBits::AllUnsetView> :
-    std::true_type
-{};
+template <>
+struct Tf_ShouldIterateOverCopy<TfCompressedBits::AllUnsetView> : std::true_type {};
 
 //! \brief Output a TfBits, as a stream of 0s and 1s.
 // \ingroup group_tf_DebuggingOutput
-inline std::ostream&
-operator<<(std::ostream &out, const TfCompressedBits &bits) {
+inline std::ostream& operator<<(std::ostream& out, const TfCompressedBits& bits) {
     out << bits.GetAsStringLeftToRight();
     return out;
 }

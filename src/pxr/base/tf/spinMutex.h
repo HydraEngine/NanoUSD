@@ -37,40 +37,31 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// inlined for tbb:spin_mutex at the time of this writing.  Correspondingly
 /// tbb::spin_mutex offers ~2% better throughput under high contention.  But
 /// again, avoid spin locks if you have contention.
-/// 
-class TfSpinMutex
-{
+///
+class TfSpinMutex {
 public:
-
     /// Construct a mutex, initially unlocked.
     TfSpinMutex() : _lockState(false) {}
 
     /// Scoped lock utility class.  API modeled roughly after
     /// tbb::spin_rw_mutex::scoped_lock.
     struct ScopedLock {
-
         /// Construct a scoped lock for mutex \p m and acquire a lock.
-        explicit ScopedLock(TfSpinMutex &m)
-            : _mutex(&m)
-            , _acquired(false) {
-            Acquire();
-        }
+        explicit ScopedLock(TfSpinMutex& m) : _mutex(&m), _acquired(false) { Acquire(); }
 
         /// Construct a scoped lock not associated with a \p mutex.
         ScopedLock() : _mutex(nullptr), _acquired(false) {}
 
         /// If this scoped lock is acquired, Release() it.
-        ~ScopedLock() {
-            Release();
-        }
+        ~ScopedLock() { Release(); }
 
         /// If the current scoped lock is acquired, Release() it, then associate
         /// this lock with \p m and acquire a lock.
-        void Acquire(TfSpinMutex &m) {
+        void Acquire(TfSpinMutex& m) {
             Release();
             _mutex = &m;
             Acquire();
-        }            
+        }
 
         /// Release the currently required lock on the associated mutex.  If
         /// this lock is not currently acquired, silently do nothing.
@@ -79,7 +70,7 @@ public:
                 _Release();
             }
         }
-        
+
         /// Acquire a lock on this lock's associated mutex.  This lock must not
         /// already be acquired when calling \p Acquire().
         void Acquire() {
@@ -89,14 +80,13 @@ public:
         }
 
     private:
-
         void _Release() {
             TF_DEV_AXIOM(_acquired);
             _mutex->Release();
             _acquired = false;
         }
 
-        TfSpinMutex *_mutex;
+        TfSpinMutex* _mutex;
         bool _acquired;
     };
 
@@ -104,9 +94,7 @@ public:
     /// thread. Return true if the lock was acquired, or false if it was not
     /// because another thread held the lock.  This thread must not already hold
     /// a lock on this mutex.
-    inline bool TryAcquire() {
-        return _lockState.exchange(true, std::memory_order_acquire) == false;
-    }
+    inline bool TryAcquire() { return _lockState.exchange(true, std::memory_order_acquire) == false; }
 
     /// Acquire a lock on this mutex.  If another thread holds a lock on this
     /// mutex, wait until it is released and this thread successfully acquires
@@ -119,17 +107,14 @@ public:
     }
 
     /// Release this thread's lock on this mutex.
-    inline void Release() {
-        _lockState.store(false, std::memory_order_release);
-    }
+    inline void Release() { _lockState.store(false, std::memory_order_release); }
 
 private:
-    
     TF_API void _AcquireContended();
-    
+
     std::atomic<bool> _lockState;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_SPIN_MUTEX_H
+#endif  // PXR_BASE_TF_SPIN_MUTEX_H

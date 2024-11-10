@@ -28,9 +28,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 // including anything else.
 
 #ifndef TF_MAX_ARITY
-#  define TF_MAX_ARITY 7
-#endif // TF_MAX_ARITY
-
+#define TF_MAX_ARITY 7
+#endif  // TF_MAX_ARITY
 
 /// This value may be used by functions that return a \c size_t to indicate
 /// that a special or error condition has occurred.
@@ -97,12 +96,12 @@ inline T TfMax(const T& v1, const T& v2) {
 /// \ingroup group_tf_Stl
 struct TfDeleter {
     template <class T>
-    void operator() (T* t) const {
+    void operator()(T* t) const {
         delete t;
     }
 
     template <class T1, class T2>
-    void operator() (std::pair<T1, T2*> p) const {
+    void operator()(std::pair<T1, T2*> p) const {
         delete p.second;
     }
 };
@@ -145,7 +144,7 @@ struct TfDeleter {
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // defined(__cplusplus)
+#endif  // defined(__cplusplus)
 
 /// Stops compiler from producing unused argument or variable warnings.
 /// This is useful mainly in C, because in C++ you can just leave
@@ -161,10 +160,10 @@ PXR_NAMESPACE_CLOSE_SCOPE
 /// #else
 ///     // do something that needs foo
 /// #endif
-/// } 
+/// }
 /// \endcode
 ///
 /// \ingroup group_tf_TfCompilerAids
-#define TF_UNUSED(x)    (void) x
+#define TF_UNUSED(x) (void)x
 
-#endif // TF_H
+#endif  // TF_H

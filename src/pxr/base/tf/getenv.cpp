@@ -15,49 +15,37 @@ using std::string;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-string
-TfGetenv(const string& envName, const string& defaultValue)
-{
+string TfGetenv(const string& envName, const string& defaultValue) {
     string value = ArchGetEnv(envName);
 
     if (value.empty())
         return defaultValue;
-    else 
+    else
         return value;
 }
 
-int
-TfGetenvInt(const string& envName, int defaultValue)
-{
+int TfGetenvInt(const string& envName, int defaultValue) {
     string value = ArchGetEnv(envName);
 
     if (value.empty())
         return defaultValue;
-    else 
+    else
         return std::stoi(value);
 }
 
-bool
-TfGetenvBool(const string& envName, bool defaultValue)
-{
+bool TfGetenvBool(const string& envName, bool defaultValue) {
     string value = ArchGetEnv(envName);
 
     if (value.empty())
         return defaultValue;
     else {
-        for (char& c: value)
-            c = tolower(c);
+        for (char& c : value) c = tolower(c);
 
-        return value == "true" ||
-               value == "yes"  ||
-               value == "on"   ||
-               value == "1";
+        return value == "true" || value == "yes" || value == "on" || value == "1";
     }
 }
 
-double
-TfGetenvDouble(const string& envName, double defaultValue)
-{
+double TfGetenvDouble(const string& envName, double defaultValue) {
     string value = ArchGetEnv(envName);
 
     if (value.empty())

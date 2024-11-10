@@ -20,19 +20,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 template <class ValueType, class MapType, bool UseInt64 = true>
 struct Js_ValueToInt {
     static ValueType Apply(const JsValue& value) {
-        return value.IsUInt64() ?
-            ValueType(value.GetUInt64()) : ValueType(value.GetInt64());
+        return value.IsUInt64() ? ValueType(value.GetUInt64()) : ValueType(value.GetInt64());
     }
 };
 
 // Converts a \c JsValue \p value holding an \c int value to a \c ValueType
 // holding an \c int.
 template <class ValueType, class MapType>
-struct Js_ValueToInt<ValueType, MapType, false>
-{
-    static ValueType Apply(const JsValue& value) {
-        return ValueType(value.GetInt());
-    }
+struct Js_ValueToInt<ValueType, MapType, false> {
+    static ValueType Apply(const JsValue& value) { return ValueType(value.GetInt()); }
 };
 
 /// \class JsValueTypeConverter
@@ -59,38 +55,36 @@ struct Js_ValueToInt<ValueType, MapType, false>
 /// int on this platform.
 ///
 template <class ValueType, class MapType, bool UseInt64 = true>
-class JsValueTypeConverter
-{
+class JsValueTypeConverter {
     typedef std::vector<ValueType> VectorType;
+
 public:
     /// Converts the given \p value recursively to a structure using the value
     /// and map types specified by the \c ValueType and \c MapType class
     /// template parameters.
-    static ValueType Convert(const JsValue& value) {
-        return _ToValueType(value);
-    }
+    static ValueType Convert(const JsValue& value) { return _ToValueType(value); }
 
 private:
     /// Converts \p value to \c ValueType.
     static ValueType _ToValueType(const JsValue& value) {
         switch (value.GetType()) {
-        case JsValue::ObjectType:
-            return ValueType(_ObjectToMap(value.GetJsObject()));
-        case JsValue::ArrayType:
-            return ValueType(_ArrayToVector(value.GetJsArray()));
-        case JsValue::BoolType:
-            return ValueType(value.GetBool());
-        case JsValue::StringType:
-            return ValueType(value.GetString());
-        case JsValue::RealType:
-            return ValueType(value.GetReal());
-        case JsValue::IntType:
-            return Js_ValueToInt<ValueType, MapType, UseInt64>::Apply(value);
-        case JsValue::NullType:
-            return ValueType();
-        default: {
-            TF_CODING_ERROR("unknown value type");
-            return ValueType();
+            case JsValue::ObjectType:
+                return ValueType(_ObjectToMap(value.GetJsObject()));
+            case JsValue::ArrayType:
+                return ValueType(_ArrayToVector(value.GetJsArray()));
+            case JsValue::BoolType:
+                return ValueType(value.GetBool());
+            case JsValue::StringType:
+                return ValueType(value.GetString());
+            case JsValue::RealType:
+                return ValueType(value.GetReal());
+            case JsValue::IntType:
+                return Js_ValueToInt<ValueType, MapType, UseInt64>::Apply(value);
+            case JsValue::NullType:
+                return ValueType();
+            default: {
+                TF_CODING_ERROR("unknown value type");
+                return ValueType();
             }
         }
     }
@@ -125,4 +119,4 @@ ValueType JsConvertToContainerType(const JsValue& value) {
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_JS_CONVERTER_H
+#endif  // PXR_BASE_JS_CONVERTER_H

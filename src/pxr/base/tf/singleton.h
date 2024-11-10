@@ -32,10 +32,10 @@
 /// works in conjunction with a macro in the source file
 /// TF_INSTANTIATE_SINGLETON(), which is itself defined by  including the file
 /// "pxr/base/tf/instantiateSingleton.h".
-/// 
+///
 /// \anchor TfSingleton_typicalUse
 /// <B> Typical Use </B>
-/// 
+///
 /// The typical use of \c TfSingleton is as follows:
 /// \code
 ///     // file: registry.h
@@ -63,7 +63,7 @@
 ///     #include "pxr/base/tf/instantiateSingleton.h"
 ///
 ///     TF_INSTANTIATE_SINGLETON(Registry);
-///     
+///
 ///
 ///     // file: RandomCode.cpp
 ///     #include "common/astrology/registry.h"
@@ -123,7 +123,7 @@ public:
         // the TF_INSTANTIATE_SINGLETON macro.
         ARCH_PRAGMA_PUSH
         ARCH_PRAGMA_UNDEFINED_VAR_TEMPLATE
-        T *p = _instance.load();
+        T* p = _instance.load();
         if (!p) {
             p = _CreateInstance(_instance);
         }
@@ -164,7 +164,7 @@ public:
     /// function. Calling this function anyplace but within the call chain of
     /// \c T's constructor will generate a fatal coding error.
     inline static void SetInstanceConstructed(T& instance);
-     
+
     /// Destroy the sole instance object of type \c T, if it exists.
     ///
     /// A singleton can be destroyed by a call to \c DeleteInstance. This call
@@ -174,11 +174,11 @@ public:
     /// delete the instance from another thread.  After being destroyed, a
     /// call to \c GetInstance() will create a new instance.
     inline static void DeleteInstance();
-    
+
 private:
-    static T *_CreateInstance(std::atomic<T *> &instance);
-    
-    static std::atomic<T *> _instance;
+    static T* _CreateInstance(std::atomic<T*>& instance);
+
+    static std::atomic<T*> _instance;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

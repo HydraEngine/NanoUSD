@@ -33,22 +33,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 using std::string;
 
-TfAtomicOfstreamWrapper::TfAtomicOfstreamWrapper(
-    const string& filePath)
-    : _filePath(filePath)
-{
+TfAtomicOfstreamWrapper::TfAtomicOfstreamWrapper(const string& filePath) : _filePath(filePath) {
     // Do Nothing.
 }
 
-TfAtomicOfstreamWrapper::~TfAtomicOfstreamWrapper()
-{
+TfAtomicOfstreamWrapper::~TfAtomicOfstreamWrapper() {
     Cancel();
 }
 
-bool
-TfAtomicOfstreamWrapper::Open(
-    string* reason)
-{
+bool TfAtomicOfstreamWrapper::Open(string* reason) {
     if (_stream.is_open()) {
         if (reason) {
             *reason = "Stream is already open";
@@ -57,28 +50,25 @@ TfAtomicOfstreamWrapper::Open(
     }
 
     std::string localError, *err = reason ? reason : &localError;
-    int tmpFd = Tf_CreateSiblingTempFile(
-        _filePath, &_filePath, &_tmpFilePath, err);
+    int tmpFd = Tf_CreateSiblingTempFile(_filePath, &_filePath, &_tmpFilePath, err);
     if (tmpFd == -1) {
         return false;
     }
-    
+
     // Close the temp file descriptor returned by Arch, and open this buffer
     // with the same file name.
     ArchCloseFile(tmpFd);
 
 #if defined(ARCH_OS_WINDOWS)
     _stream.open(ArchWindowsUtf8ToUtf16(_tmpFilePath).c_str(),
-                 std::fstream::out|std::fstream::binary|std::fstream::trunc);
+                 std::fstream::out | std::fstream::binary | std::fstream::trunc);
 #else
-    _stream.open(_tmpFilePath.c_str(),
-        std::fstream::out | std::fstream::binary | std::fstream::trunc);
+    _stream.open(_tmpFilePath.c_str(), std::fstream::out | std::fstream::binary | std::fstream::trunc);
 #endif
     if (!_stream) {
         if (reason) {
-            *reason = TfStringPrintf(
-                "Unable to open '%s' for writing: %s",
-                _tmpFilePath.c_str(), ArchStrerror().c_str());
+            *reason =
+                    TfStringPrintf("Unable to open '%s' for writing: %s", _tmpFilePath.c_str(), ArchStrerror().c_str());
         }
         return false;
     }
@@ -86,10 +76,7 @@ TfAtomicOfstreamWrapper::Open(
     return true;
 }
 
-bool
-TfAtomicOfstreamWrapper::Commit(
-    string* reason)
-{
+bool TfAtomicOfstreamWrapper::Commit(string* reason) {
     if (!_stream.is_open()) {
         if (reason) {
             *reason = "Stream is not open";
@@ -105,10 +92,7 @@ TfAtomicOfstreamWrapper::Commit(
     return Tf_AtomicRenameFileOver(_tmpFilePath, _filePath, err);
 }
 
-bool
-TfAtomicOfstreamWrapper::Cancel(
-    string* reason)
-{
+bool TfAtomicOfstreamWrapper::Cancel(string* reason) {
     if (!_stream.is_open()) {
         if (reason) {
             *reason = "Buffer is not open";
@@ -125,10 +109,8 @@ TfAtomicOfstreamWrapper::Cancel(
     if (ArchUnlinkFile(_tmpFilePath.c_str()) != 0) {
         if (errno != ENOENT) {
             if (reason) {
-                *reason = TfStringPrintf(
-                    "Unable to remove temporary file '%s': %s",
-                    _tmpFilePath.c_str(),
-                    ArchStrerror(errno).c_str());
+                *reason = TfStringPrintf("Unable to remove temporary file '%s': %s", _tmpFilePath.c_str(),
+                                         ArchStrerror(errno).c_str());
             }
             success = false;
         }

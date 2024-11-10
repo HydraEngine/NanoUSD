@@ -50,7 +50,7 @@
 //
 //   1) Static functions in templates with __attribute__((constructor))
 //      are run separately from those not in templates.
-//      
+//
 //   2) Static functions in templates with __attribute__((constructor))
 //      are run separately for each template in an object file and
 //      object files are processed in the order they appear on the
@@ -134,26 +134,19 @@ namespace {
 
 // Convenience for moving the contents of one list to the front of another.
 template <class L>
-void
-MoveToFront(L& dst, L& src)
-{
+void MoveToFront(L& dst, L& src) {
     dst.splice(dst.begin(), src);
 }
 
 // Convenience for moving the contents of one list to the back of another.
 template <class L>
-void
-MoveToBack(L& dst, L& src)
-{
+void MoveToBack(L& dst, L& src) {
     dst.splice(dst.end(), src);
 }
 
-std::string
-GetLibraryPath(const char* libraryName,
-               TfRegistryManager::RegistrationFunctionType func)
-{
+std::string GetLibraryPath(const char* libraryName, TfRegistryManager::RegistrationFunctionType func) {
     std::string result = libraryName;
-    ArchGetAddressInfo(reinterpret_cast<void*>(func), &result, NULL, NULL,NULL);
+    ArchGetAddressInfo(reinterpret_cast<void*>(func), &result, NULL, NULL, NULL);
     return result;
 }
 
@@ -166,9 +159,7 @@ public:
     typedef TfRegistryManager::RegistrationFunctionType RegistrationFunction;
     typedef TfRegistryManager::UnloadFunctionType UnloadFunction;
 
-    static Tf_RegistryManagerImpl& GetInstance() {
-         return TfSingleton<Tf_RegistryManagerImpl>::GetInstance();
-    }
+    static Tf_RegistryManagerImpl& GetInstance() { return TfSingleton<Tf_RegistryManagerImpl>::GetInstance(); }
 
     /// Stores the active library's registration functions and runs those
     /// that are subscribed to then makes no library active. Returns an
@@ -186,9 +177,7 @@ public:
     /// constructor functions for a given library before calling those
     /// on any other library.  The first call from a library makes that
     /// library active and it remains so until \c ClearActiveLibrary().
-    void AddRegistrationFunction(const char* libraryName,
-                                 RegistrationFunction,
-                                 const char* typeName);
+    void AddRegistrationFunction(const char* libraryName, RegistrationFunction, const char* typeName);
 
     /// Adds a function for unload for the library associated with the
     /// running registry function.  Reports an error and otherwise does
@@ -226,26 +215,22 @@ private:
     void _UnloadNoLock(const char* libraryName);
 
 private:
-
     typedef string TypeName;
     typedef map<LibraryName, LibraryIdentifier> _LibraryNameMap;
     struct _RegistrationValue {
-        _RegistrationValue(RegistrationFunction function_,
-                           LibraryIdentifier identifier_) :
-            function(function_), unloadKey(identifier_) { }
+        _RegistrationValue(RegistrationFunction function_, LibraryIdentifier identifier_)
+            : function(function_), unloadKey(identifier_) {}
 
         RegistrationFunction function;
         LibraryIdentifier unloadKey;
     };
     typedef list<_RegistrationValue> _RegistrationValueList;
-    typedef TfHashMap<TypeName, _RegistrationValueList,
-                      TfHash> _RegistrationFunctionMap;
+    typedef TfHashMap<TypeName, _RegistrationValueList, TfHash> _RegistrationFunctionMap;
     typedef list<UnloadFunction> _UnloadFunctionList;
-    typedef TfHashMap<LibraryIdentifier,
-                      _UnloadFunctionList, TfHash> _UnloadFunctionMap;
+    typedef TfHashMap<LibraryIdentifier, _UnloadFunctionList, TfHash> _UnloadFunctionMap;
 
     struct _ActiveLibraryState {
-        _ActiveLibraryState() : identifier(0) { }
+        _ActiveLibraryState() : identifier(0) {}
 
         LibraryIdentifier identifier;
         LibraryName name;
@@ -274,22 +259,18 @@ private:
 
 bool Tf_RegistryManagerImpl::runUnloadersAtExit = false;
 
-Tf_RegistryManagerImpl::Tf_RegistryManagerImpl()
-{
+Tf_RegistryManagerImpl::Tf_RegistryManagerImpl() {
     // Call SetInstanceConstructed since TfDebug will end up calling back here.
     TfSingleton<Tf_RegistryManagerImpl>::SetInstanceConstructed(*this);
 
     TF_DEBUG(TF_DISCOVERY_TERSE).Msg("TfRegistryManager: initialized\n");
 }
 
-Tf_RegistryManagerImpl::~Tf_RegistryManagerImpl()
-{
+Tf_RegistryManagerImpl::~Tf_RegistryManagerImpl() {
     // Do nothing
 }
 
-void
-Tf_RegistryManagerImpl::ClearActiveLibrary(const char* libraryName)
-{
+void Tf_RegistryManagerImpl::ClearActiveLibrary(const char* libraryName) {
     TF_AXIOM(libraryName && libraryName[0]);
 
     // If the name doesn't match then libraryName has already been processed.
@@ -299,21 +280,17 @@ Tf_RegistryManagerImpl::ClearActiveLibrary(const char* libraryName)
     }
 }
 
-void
-Tf_RegistryManagerImpl::AddRegistrationFunction(
-    const char* libraryName,
-    RegistrationFunction func,
-    const char* typeName)
-{
+void Tf_RegistryManagerImpl::AddRegistrationFunction(const char* libraryName,
+                                                     RegistrationFunction func,
+                                                     const char* typeName) {
     if (!TF_VERIFY(libraryName && libraryName[0],
-                      "TfRegistryManager: "
-                      "Ignoring library with no name")) {
+                   "TfRegistryManager: "
+                   "Ignoring library with no name")) {
         return;
-    }
-    else if (!TF_VERIFY(typeName && typeName[0],
-                      "TfRegistryManager: "
-                      "Ignoring registration with no type in %s",
-                      libraryName)) {
+    } else if (!TF_VERIFY(typeName && typeName[0],
+                          "TfRegistryManager: "
+                          "Ignoring registration with no type in %s",
+                          libraryName)) {
         return;
     }
 
@@ -328,10 +305,10 @@ Tf_RegistryManagerImpl::AddRegistrationFunction(
     }
 
     if (!active.identifier) {
-        TF_DEBUG(TF_DISCOVERY_TERSE).
-            Msg("TfRegistryManager: "
-                "Library %s\n",
-                GetLibraryPath(libraryName, func).c_str());
+        TF_DEBUG(TF_DISCOVERY_TERSE)
+                .Msg("TfRegistryManager: "
+                     "Library %s\n",
+                     GetLibraryPath(libraryName, func).c_str());
 
         // Set active.
         active.name = libraryName;
@@ -342,36 +319,28 @@ Tf_RegistryManagerImpl::AddRegistrationFunction(
     }
     TF_AXIOM(active.identifier);
 
-    active.registrationFunctions[typeName].
-        push_back(_RegistrationValue(func, active.identifier));
+    active.registrationFunctions[typeName].push_back(_RegistrationValue(func, active.identifier));
 }
 
-bool
-Tf_RegistryManagerImpl::AddFunctionForUnload(const UnloadFunction& func)
-{
+bool Tf_RegistryManagerImpl::AddFunctionForUnload(const UnloadFunction& func) {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
 
     if (_UnloadFunctionList* unloadList = _currentUnloadList.local()) {
         unloadList->push_back(func);
         return true;
-    }
-    else {
+    } else {
         return false;
     }
 }
 
-void
-Tf_RegistryManagerImpl::UnloadLibrary(const char* libraryName)
-{
+void Tf_RegistryManagerImpl::UnloadLibrary(const char* libraryName) {
     if (Tf_DlCloseIsActive() || runUnloadersAtExit) {
         std::lock_guard<std::recursive_mutex> lock(_mutex);
         _UnloadNoLock(libraryName);
     }
 }
 
-void
-Tf_RegistryManagerImpl::SubscribeTo(const string& typeName)
-{
+void Tf_RegistryManagerImpl::SubscribeTo(const string& typeName) {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
 
     // It's possible to get here before our indication that we've finished
@@ -387,18 +356,14 @@ Tf_RegistryManagerImpl::SubscribeTo(const string& typeName)
     }
 }
 
-void
-Tf_RegistryManagerImpl::UnsubscribeFrom(const string& typeName)
-{
+void Tf_RegistryManagerImpl::UnsubscribeFrom(const string& typeName) {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
     if (_subscriptions.erase(typeName)) {
         _orderedSubscriptions.remove(typeName);
     }
 }
 
-Tf_RegistryManagerImpl::LibraryIdentifier
-Tf_RegistryManagerImpl::_RegisterLibraryNoLock(const char* libraryName)
-{
+Tf_RegistryManagerImpl::LibraryIdentifier Tf_RegistryManagerImpl::_RegisterLibraryNoLock(const char* libraryName) {
     // Return a unique identifier for libraryName.
     LibraryIdentifier& identifier = _libraryNameMap[libraryName];
     if (identifier == 0) {
@@ -407,9 +372,7 @@ Tf_RegistryManagerImpl::_RegisterLibraryNoLock(const char* libraryName)
     return identifier;
 }
 
-void
-Tf_RegistryManagerImpl::_ProcessLibraryNoLock()
-{
+void Tf_RegistryManagerImpl::_ProcessLibraryNoLock() {
     if (_active.local().identifier) {
         // Going inactive.  Move active library state over to global state.
         if (_TransferActiveLibraryNoLock()) {
@@ -419,22 +382,18 @@ Tf_RegistryManagerImpl::_ProcessLibraryNoLock()
     }
 }
 
-void
-Tf_RegistryManagerImpl::_UpdateSubscribersNoLock()
-{
+void Tf_RegistryManagerImpl::_UpdateSubscribersNoLock() {
     for (const auto& typeName : _orderedSubscriptions) {
         _RunRegistrationFunctionsNoLock(typeName);
     }
 }
 
-bool
-Tf_RegistryManagerImpl::_TransferActiveLibraryNoLock()
-{
+bool Tf_RegistryManagerImpl::_TransferActiveLibraryNoLock() {
     bool movedAny = false;
 
     // Move active library functions to non-thread local storage type by type.
     _ActiveLibraryState& active = _active.local();
-    for(auto& v : active.registrationFunctions) {
+    for (auto& v : active.registrationFunctions) {
         if (!movedAny && !v.second.empty()) {
             movedAny = (_subscriptions.count(v.first) != 0);
         }
@@ -449,25 +408,24 @@ Tf_RegistryManagerImpl::_TransferActiveLibraryNoLock()
     return movedAny;
 }
 
-void
-Tf_RegistryManagerImpl::_RunRegistrationFunctionsNoLock(const string& typeName)
-{
+void Tf_RegistryManagerImpl::_RunRegistrationFunctionsNoLock(const string& typeName) {
     _RegistrationFunctionMap::iterator i = _registrationFunctions.find(typeName);
     if (i == _registrationFunctions.end()) {
-        TF_DEBUG(TF_DISCOVERY_TERSE).Msg("TfRegistryManager: "
-                                         "no functions to run for %s\n",
-                                         typeName.c_str());
+        TF_DEBUG(TF_DISCOVERY_TERSE)
+                .Msg("TfRegistryManager: "
+                     "no functions to run for %s\n",
+                     typeName.c_str());
         return;
     }
-    
+
     /*
      * Transfer from registration table onto the worklist queue,
      * running *our* stuff first...
      */
-    TF_DEBUG(TF_DISCOVERY_TERSE).Msg("TfRegistryManager: "
-                                     "running %zd functions for %s\n",
-                                     i->second.size(),
-                                     typeName.c_str());
+    TF_DEBUG(TF_DISCOVERY_TERSE)
+            .Msg("TfRegistryManager: "
+                 "running %zd functions for %s\n",
+                 i->second.size(), typeName.c_str());
     MoveToFront(_registrationWorklist, i->second);
     TF_AXIOM(i->second.empty());
 
@@ -491,16 +449,15 @@ Tf_RegistryManagerImpl::_RunRegistrationFunctionsNoLock(const string& typeName)
     }
 }
 
-void 
-Tf_RegistryManagerImpl::_UnloadNoLock(const char* libraryName)
-{
-    TF_DEBUG(TF_DISCOVERY_TERSE).Msg("TfRegistryManager: "
-                                     "unloading '%s'\n", 
-                                     libraryName);
+void Tf_RegistryManagerImpl::_UnloadNoLock(const char* libraryName) {
+    TF_DEBUG(TF_DISCOVERY_TERSE)
+            .Msg("TfRegistryManager: "
+                 "unloading '%s'\n",
+                 libraryName);
 
     TF_AXIOM(libraryName && libraryName[0]);
 
-    LibraryIdentifier identifier   = _RegisterLibraryNoLock(libraryName);
+    LibraryIdentifier identifier = _RegisterLibraryNoLock(libraryName);
     _UnloadFunctionMap::iterator i = _unloadFunctions.find(identifier);
     if (i != _unloadFunctions.end()) {
         // Unload functions were registered.
@@ -526,91 +483,68 @@ Tf_RegistryManagerImpl::_UnloadNoLock(const char* libraryName)
         while (regValueIt != regValues.end()) {
             if (regValueIt->unloadKey == identifier) {
                 regValues.erase(regValueIt++);
-            }
-            else {
+            } else {
                 ++regValueIt;
             }
         }
     }
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
 TF_INSTANTIATE_SINGLETON(Tf_RegistryManagerImpl);
 
-TfRegistryManager::TfRegistryManager()
-{
+TfRegistryManager::TfRegistryManager() {
     /*
      * Our own debug symbols need to get defined in debug.cpp,
      * because of initialization order issues.
      */
 }
 
-TfRegistryManager::~TfRegistryManager()
-{
+TfRegistryManager::~TfRegistryManager() {
     // Do nothing
 }
 
-TfRegistryManager&
-TfRegistryManager::GetInstance()
-{
+TfRegistryManager& TfRegistryManager::GetInstance() {
     // We don't bother with a TfSingleton here.  The real singleton
     // (Tf_RegistryManagerImpl) is behind the scenes.
     static TfRegistryManager manager;
     return manager;
 }
 
-void 
-TfRegistryManager::RunUnloadersAtExit()
-{
+void TfRegistryManager::RunUnloadersAtExit() {
     Tf_RegistryManagerImpl::runUnloadersAtExit = true;
 }
 
-bool
-TfRegistryManager::AddFunctionForUnload(const UnloadFunctionType& func)
-{
+bool TfRegistryManager::AddFunctionForUnload(const UnloadFunctionType& func) {
     return Tf_RegistryManagerImpl::GetInstance().AddFunctionForUnload(func);
 }
 
-void 
-TfRegistryManager::_SubscribeTo(const type_info& ti)
-{
+void TfRegistryManager::_SubscribeTo(const type_info& ti) {
     Tf_RegistryManagerImpl::GetInstance().SubscribeTo(ArchGetDemangled(ti));
 }
 
-void
-TfRegistryManager::_UnsubscribeFrom(const type_info& ti)
-{
+void TfRegistryManager::_UnsubscribeFrom(const type_info& ti) {
     Tf_RegistryManagerImpl::GetInstance().UnsubscribeFrom(ArchGetDemangled(ti));
 }
 
-void
-Tf_RegistryInitCtor(char const *name)
-{
+void Tf_RegistryInitCtor(char const* name) {
     // Finished registering functions.
     if (TfSingleton<Tf_RegistryManagerImpl>::CurrentlyExists()) {
         Tf_RegistryManagerImpl::GetInstance().ClearActiveLibrary(name);
     }
 }
 
-void
-Tf_RegistryInitDtor(char const *name)
-{
+void Tf_RegistryInitDtor(char const* name) {
     if (TfSingleton<Tf_RegistryManagerImpl>::CurrentlyExists()) {
         Tf_RegistryManagerImpl::GetInstance().UnloadLibrary(name);
     }
 }
 
-void
-Tf_RegistryInit::Add(
-    const char* libName,
-    TfRegistryManager::RegistrationFunctionType func,
-    const char* typeName)
-{
+void Tf_RegistryInit::Add(const char* libName, TfRegistryManager::RegistrationFunctionType func, const char* typeName) {
     // Note that we can't use _name because the instance hasn't been
     // created yet, which is why this function is static.
-    Tf_RegistryManagerImpl::GetInstance().
-            AddRegistrationFunction(libName, func, typeName);
+    Tf_RegistryManagerImpl::GetInstance().AddRegistrationFunction(libName, func, typeName);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

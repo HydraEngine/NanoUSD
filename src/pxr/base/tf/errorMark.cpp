@@ -24,44 +24,32 @@ using std::vector;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool
-TfErrorMark::_IsCleanImpl(TfDiagnosticMgr &mgr) const
-{
+bool TfErrorMark::_IsCleanImpl(TfDiagnosticMgr& mgr) const {
     Iterator b = mgr.GetErrorBegin(), e = mgr.GetErrorEnd();
     return b == e || std::prev(e)->_serial < _mark;
 }
 
-void
-TfErrorMark::_ReportErrors(TfDiagnosticMgr &mgr) const
-{
+void TfErrorMark::_ReportErrors(TfDiagnosticMgr& mgr) const {
     Iterator b = GetBegin(), e = mgr.GetErrorEnd();
-    for (Iterator i = b; i != e; ++i)
-        mgr._ReportError(*i);
+    for (Iterator i = b; i != e; ++i) mgr._ReportError(*i);
     mgr.EraseRange(b, e);
 }
-
 
 // To enable tracking stack traces for error marks when
 // TF_ERROR_MARK_TRACKING is enabled, change the 'false' to 'true' below.
 static const bool _enableTfErrorMarkStackTraces = false;
-using _ActiveMarkStacksMap = TfHashMap<TfErrorMark const *, vector<uintptr_t>, 
-                                       TfHash>;
-static _ActiveMarkStacksMap &
-TfErrorMark_GetActiveMarkStacks() 
-{
+using _ActiveMarkStacksMap = TfHashMap<TfErrorMark const*, vector<uintptr_t>, TfHash>;
+static _ActiveMarkStacksMap& TfErrorMark_GetActiveMarkStacks() {
     static _ActiveMarkStacksMap activeMarkStacks;
     return activeMarkStacks;
 }
 static tbb::spin_mutex _activeMarkStacksLock;
 
-
-TfErrorMark::TfErrorMark()
-{
+TfErrorMark::TfErrorMark() {
     TfDiagnosticMgr::GetInstance()._CreateErrorMark();
     SetMark();
 
-    if (_enableTfErrorMarkStackTraces &&
-        TfDebug::IsEnabled(TF_ERROR_MARK_TRACKING)) {
+    if (_enableTfErrorMarkStackTraces && TfDebug::IsEnabled(TF_ERROR_MARK_TRACKING)) {
         vector<uintptr_t> trace;
         trace.reserve(64);
         ArchGetStackFrames(trace.capacity(), &trace);
@@ -70,27 +58,22 @@ TfErrorMark::TfErrorMark()
     }
 }
 
-TfErrorMark::~TfErrorMark()
-{
-    if (_enableTfErrorMarkStackTraces &&
-        TfDebug::IsEnabled(TF_ERROR_MARK_TRACKING)) {
+TfErrorMark::~TfErrorMark() {
+    if (_enableTfErrorMarkStackTraces && TfDebug::IsEnabled(TF_ERROR_MARK_TRACKING)) {
         tbb::spin_mutex::scoped_lock lock(_activeMarkStacksLock);
         TfErrorMark_GetActiveMarkStacks().erase(this);
     }
 
-    TfDiagnosticMgr &mgr = TfDiagnosticMgr::GetInstance();
-    if (mgr._DestroyErrorMark() && !IsClean())
-        _ReportErrors(mgr);
+    TfDiagnosticMgr& mgr = TfDiagnosticMgr::GetInstance();
+    if (mgr._DestroyErrorMark() && !IsClean()) _ReportErrors(mgr);
 }
 
-void
-TfReportActiveErrorMarks()
-{
+void TfReportActiveErrorMarks() {
     string msg;
 
     if (!_enableTfErrorMarkStackTraces) {
         msg += "- Set _enableTfErrorMarkStackTraces and recompile "
-            "tf/errorMark.cpp.\n";
+               "tf/errorMark.cpp.\n";
     }
 
     if (!TfDebug::IsEnabled(TF_ERROR_MARK_TRACKING)) {
@@ -99,7 +82,8 @@ TfReportActiveErrorMarks()
 
     if (!msg.empty()) {
         printf("Active error mark stack traces are disabled.  "
-               "To enable, please do the following:\n%s", msg.c_str());
+               "To enable, please do the following:\n%s",
+               msg.c_str());
         return;
     }
 
@@ -110,8 +94,7 @@ TfReportActiveErrorMarks()
     }
 
     TF_FOR_ALL(i, localStacks) {
-        printf("== TfErrorMark @ %p created from ===========================\n",
-               i->first);
+        printf("== TfErrorMark @ %p created from ===========================\n", i->first);
         std::stringstream ss;
         ArchPrintStackFrames(ss, i->second);
         printf("%s\n", ss.str().c_str());

@@ -20,7 +20,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-template <class U> class TfRefPtr;
+template <class U>
+class TfRefPtr;
 
 template <template <class> class PtrTemplate, class DataType>
 class TfWeakPtrFacade;
@@ -36,22 +37,22 @@ public:
     friend class TfWeakPtrFacade;
 
     template <class Facade>
-    static typename Facade::DataType *FetchPointer(Facade const &f) {
+    static typename Facade::DataType* FetchPointer(Facade const& f) {
         return f._FetchPointer();
     }
 
     template <class Facade>
-    static void const *GetUniqueIdentifier(Facade const &f) {
+    static void const* GetUniqueIdentifier(Facade const& f) {
         return f._GetUniqueIdentifier();
     }
 
     template <class Facade>
-    static void EnableExtraNotification(Facade const &f) {
+    static void EnableExtraNotification(Facade const& f) {
         return f._EnableExtraNotification();
     }
 
     template <class Facade>
-    static bool IsInvalid(Facade const &f) {
+    static bool IsInvalid(Facade const& f) {
         return f._IsInvalid();
     }
 
@@ -63,7 +64,7 @@ private:
 // unqualified calls to get_pointer to get the underlying pointer from a smart
 // pointer, expecting the right overload will be found by ADL.
 template <template <class> class X, class Y>
-Y *get_pointer(TfWeakPtrFacade<X, Y> const &p) {
+Y* get_pointer(TfWeakPtrFacade<X, Y> const& p) {
     return TfWeakPtrFacadeAccess::FetchPointer(p);
 }
 
@@ -72,7 +73,7 @@ PXR_NAMESPACE_CLOSE_SCOPE
 // Inject the global-scope operator for clients that make qualified calls to our
 // previous overload in the boost namespace.
 namespace boost {
-    using PXR_NS::get_pointer;
+using PXR_NS::get_pointer;
 };
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -82,86 +83,77 @@ class TfWeakPtrFacadeBase {};
 
 template <template <class> class PtrTemplate, class Type>
 class TfWeakPtrFacade : public TfWeakPtrFacadeBase {
-
 public:
-
     friend class TfWeakPtrFacadeAccess;
-    
+
     typedef Type DataType;
     typedef PtrTemplate<DataType> Derived;
     typedef TfWeakPtrFacadeAccess Access;
 
     typedef Type element_type;
-    
+
     template <class Other>
-    bool operator == (PtrTemplate<Other> const &p) const {
-        if (false)
-            return _FetchPointer() == TfWeakPtrFacadeAccess::FetchPointer(p);
+    bool operator==(PtrTemplate<Other> const& p) const {
+        if (false) return _FetchPointer() == TfWeakPtrFacadeAccess::FetchPointer(p);
         return GetUniqueIdentifier() == p.GetUniqueIdentifier();
     }
 
     template <class Other>
-    bool operator != (PtrTemplate<Other> const &p) const {
+    bool operator!=(PtrTemplate<Other> const& p) const {
         return !(*this == p);
     }
 
     template <class T>
-    bool operator == (TfRefPtr<T> const &p) const {
-        if (!GetUniqueIdentifier())
-            return !p;
-        DataType *ptr = _FetchPointer();
+    bool operator==(TfRefPtr<T> const& p) const {
+        if (!GetUniqueIdentifier()) return !p;
+        DataType* ptr = _FetchPointer();
         return ptr && ptr == get_pointer(p);
     }
 
     template <class T>
-    bool operator != (TfRefPtr<T> const &p) const {
+    bool operator!=(TfRefPtr<T> const& p) const {
         return !(*this == p);
     }
 
     template <class T>
-    friend bool operator == (const TfRefPtr<T>& p1, Derived const &p2) {
+    friend bool operator==(const TfRefPtr<T>& p1, Derived const& p2) {
         return p2 == p1;
     }
 
     template <class T>
-    friend bool operator != (const TfRefPtr<T>& p1, Derived const &p2) {
+    friend bool operator!=(const TfRefPtr<T>& p1, Derived const& p2) {
         return !(p1 == p2);
     }
 
     template <class Other>
-    bool operator < (PtrTemplate<Other> const &p) const {
-        if (false)
-            return _FetchPointer() < TfWeakPtrFacadeAccess::FetchPointer(p);
+    bool operator<(PtrTemplate<Other> const& p) const {
+        if (false) return _FetchPointer() < TfWeakPtrFacadeAccess::FetchPointer(p);
         return GetUniqueIdentifier() < p.GetUniqueIdentifier();
     }
 
     template <class Other>
-    bool operator > (PtrTemplate<Other> const &p) const {
+    bool operator>(PtrTemplate<Other> const& p) const {
         return !(*this < p) && !(*this == p);
     }
 
     template <class Other>
-    bool operator <= (PtrTemplate<Other> const &p) const {
+    bool operator<=(PtrTemplate<Other> const& p) const {
         return (*this < p) || (*this == p);
     }
 
     template <class Other>
-    bool operator >= (PtrTemplate<Other> const &p) const {
+    bool operator>=(PtrTemplate<Other> const& p) const {
         return !(*this < p);
     }
 
-    using UnspecifiedBoolType = DataType * (TfWeakPtrFacade::*)(void) const;
+    using UnspecifiedBoolType = DataType* (TfWeakPtrFacade::*)(void) const;
 
-    operator UnspecifiedBoolType () const {
-        return _FetchPointer() ? &TfWeakPtrFacade::_FetchPointer : nullptr;
-    }
+    operator UnspecifiedBoolType() const { return _FetchPointer() ? &TfWeakPtrFacade::_FetchPointer : nullptr; }
 
-    bool operator ! () const {
-        return !(bool(*this));
-    }
+    bool operator!() const { return !(bool(*this)); }
 
     template <class T>
-    bool PointsTo(T const &obj) const {
+    bool PointsTo(T const& obj) const {
         return _FetchPointer() == &obj;
     }
 
@@ -170,67 +162,44 @@ public:
     /// must be polymorphic.
     template <class T>
     bool PointsToA() const {
-        return dynamic_cast<T *>(_FetchPointer());
+        return dynamic_cast<T*>(_FetchPointer());
     }
 
-    bool IsInvalid() const {
-        return Access::IsInvalid(_Derived());
-    }
-    
-    void const *GetUniqueIdentifier() const {
-        return Access::GetUniqueIdentifier(_Derived());
-    }
+    bool IsInvalid() const { return Access::IsInvalid(_Derived()); }
 
-    TfWeakBase const *GetWeakBase() const {
-        return &_Derived()->__GetTfWeakBase__();
-    }
+    void const* GetUniqueIdentifier() const { return Access::GetUniqueIdentifier(_Derived()); }
 
-    void EnableExtraNotification() const {
-        Access::EnableExtraNotification(_Derived());
-    }
-    
-    DataType *operator -> () const {
-        DataType *ptr = _FetchPointer();
+    TfWeakBase const* GetWeakBase() const { return &_Derived()->__GetTfWeakBase__(); }
+
+    void EnableExtraNotification() const { Access::EnableExtraNotification(_Derived()); }
+
+    DataType* operator->() const {
+        DataType* ptr = _FetchPointer();
         if (ptr) {
             return ptr;
         }
-        Tf_PostNullSmartPtrDereferenceFatalError(
-            TF_CALL_CONTEXT, typeid(Derived).name());
+        Tf_PostNullSmartPtrDereferenceFatalError(TF_CALL_CONTEXT, typeid(Derived).name());
     }
 
-    DataType &operator * () const {
-        return * operator->();
-    }
+    DataType& operator*() const { return *operator->(); }
 
     /// Reset this pointer to point at no object. Equivalent to assignment
     /// with \a TfNullPtr.
-    void Reset() {
-        _Derived() = TfNullPtr;
-    }
-    
-private:
+    void Reset() { _Derived() = TfNullPtr; }
 
-    friend std::type_info const &TfTypeid(Derived const &p) {
+private:
+    friend std::type_info const& TfTypeid(Derived const& p) {
         if (ARCH_UNLIKELY(!p))
-            TF_FATAL_ERROR("Called TfTypeid on invalid %s",
-                           ArchGetDemangled(typeid(Derived)).c_str());
+            TF_FATAL_ERROR("Called TfTypeid on invalid %s", ArchGetDemangled(typeid(Derived)).c_str());
         return typeid(*get_pointer(p));
     }
 
-    DataType *_FetchPointer() const {
-        return Access::FetchPointer(_Derived());
-    }
+    DataType* _FetchPointer() const { return Access::FetchPointer(_Derived()); }
 
-    Derived &_Derived() {
-        return static_cast<Derived &>(*this);
-    }
+    Derived& _Derived() { return static_cast<Derived&>(*this); }
 
-    Derived const &_Derived() const {
-        return static_cast<Derived const &>(*this);
-    }
-            
+    Derived const& _Derived() const { return static_cast<Derived const&>(*this); }
 };
-
 
 /// \section nullptr comparisons
 ///@{
@@ -242,95 +211,79 @@ private:
 ///
 
 template <template <class> class X, class Y>
-inline bool operator== (TfWeakPtrFacade<X, Y> const &p, std::nullptr_t)
-{
+inline bool operator==(TfWeakPtrFacade<X, Y> const& p, std::nullptr_t) {
     return !p;
 }
 template <template <class> class X, class Y>
-inline bool operator== (std::nullptr_t, TfWeakPtrFacade<X, Y> const &p)
-{
+inline bool operator==(std::nullptr_t, TfWeakPtrFacade<X, Y> const& p) {
     return !p;
 }
 
 template <template <class> class X, class Y>
-inline bool operator!= (TfWeakPtrFacade<X, Y> const &p, std::nullptr_t)
-{
+inline bool operator!=(TfWeakPtrFacade<X, Y> const& p, std::nullptr_t) {
     return !(p == nullptr);
 }
 template <template <class> class X, class Y>
-inline bool operator!= (std::nullptr_t, TfWeakPtrFacade<X, Y> const &p)
-{
+inline bool operator!=(std::nullptr_t, TfWeakPtrFacade<X, Y> const& p) {
     return !(nullptr == p);
 }
 
 template <template <class> class X, class Y>
-inline bool operator< (TfWeakPtrFacade<X, Y> const &p, std::nullptr_t)
-{
-    return std::less<void const *>()(p.GetUniqueIdentifier(), nullptr);
+inline bool operator<(TfWeakPtrFacade<X, Y> const& p, std::nullptr_t) {
+    return std::less<void const*>()(p.GetUniqueIdentifier(), nullptr);
 }
 template <template <class> class X, class Y>
-inline bool operator< (std::nullptr_t, TfWeakPtrFacade<X, Y> const &p)
-{
-    return std::less<void const *>()(nullptr, p.GetUniqueIdentifier());
+inline bool operator<(std::nullptr_t, TfWeakPtrFacade<X, Y> const& p) {
+    return std::less<void const*>()(nullptr, p.GetUniqueIdentifier());
 }
 
 template <template <class> class X, class Y>
-inline bool operator<= (TfWeakPtrFacade<X, Y> const &p, std::nullptr_t)
-{
+inline bool operator<=(TfWeakPtrFacade<X, Y> const& p, std::nullptr_t) {
     return !(nullptr < p);
 }
 template <template <class> class X, class Y>
-inline bool operator<= (std::nullptr_t, TfWeakPtrFacade<X, Y> const &p)
-{
+inline bool operator<=(std::nullptr_t, TfWeakPtrFacade<X, Y> const& p) {
     return !(p < nullptr);
 }
 
 template <template <class> class X, class Y>
-inline bool operator> (TfWeakPtrFacade<X, Y> const &p, std::nullptr_t)
-{
+inline bool operator>(TfWeakPtrFacade<X, Y> const& p, std::nullptr_t) {
     return nullptr < p;
 }
 template <template <class> class X, class Y>
-inline bool operator> (std::nullptr_t, TfWeakPtrFacade<X, Y> const &p)
-{
+inline bool operator>(std::nullptr_t, TfWeakPtrFacade<X, Y> const& p) {
     return p < nullptr;
 }
 
 template <template <class> class X, class Y>
-inline bool operator>= (TfWeakPtrFacade<X, Y> const &p, std::nullptr_t)
-{
+inline bool operator>=(TfWeakPtrFacade<X, Y> const& p, std::nullptr_t) {
     return !(p < nullptr);
 }
 template <template <class> class X, class Y>
-inline bool operator>= (std::nullptr_t, TfWeakPtrFacade<X, Y> const &p)
-{
+inline bool operator>=(std::nullptr_t, TfWeakPtrFacade<X, Y> const& p) {
     return !(nullptr < p);
 }
 
 ///@}
 
 template <class ToPtr, template <class> class X, class Y>
-ToPtr TfDynamic_cast(TfWeakPtrFacade<X, Y> const &p) {
-    return ToPtr(dynamic_cast<typename ToPtr::DataType *>
-                 (get_pointer(p)));
+ToPtr TfDynamic_cast(TfWeakPtrFacade<X, Y> const& p) {
+    return ToPtr(dynamic_cast<typename ToPtr::DataType*>(get_pointer(p)));
 }
 
 template <class ToPtr, template <class> class X, class Y>
-ToPtr TfSafeDynamic_cast(TfWeakPtrFacade<X, Y> const &p) {
-    return ToPtr(TfSafeDynamic_cast<typename ToPtr::DataType *>
-                 (get_pointer(p)));
+ToPtr TfSafeDynamic_cast(TfWeakPtrFacade<X, Y> const& p) {
+    return ToPtr(TfSafeDynamic_cast<typename ToPtr::DataType*>(get_pointer(p)));
 }
 
 template <class ToPtr, template <class> class X, class Y>
-ToPtr TfStatic_cast(TfWeakPtrFacade<X, Y> const &p) {
-    return ToPtr(static_cast<typename ToPtr::DataType *>
-                 (get_pointer(p)));
+ToPtr TfStatic_cast(TfWeakPtrFacade<X, Y> const& p) {
+    return ToPtr(static_cast<typename ToPtr::DataType*>(get_pointer(p)));
 }
 
 template <class ToPtr, template <class> class X, class Y>
-ToPtr TfConst_cast(TfWeakPtrFacade<X, Y> const &p) {
-    return ToPtr(const_cast<typename ToPtr::DataType *>
-                 (get_pointer(p)));
+ToPtr TfConst_cast(TfWeakPtrFacade<X, Y> const& p) {
+    return ToPtr(const_cast<typename ToPtr::DataType*>(get_pointer(p)));
 }
 
 //
@@ -343,11 +296,8 @@ ToPtr TfConst_cast(TfWeakPtrFacade<X, Y> const &p) {
 template <class T>
 template <template <class> class X, class U>
 inline TfRefPtr<T>::TfRefPtr(const TfWeakPtrFacade<X, U>& p,
-                             typename std::enable_if<
-                                 std::is_convertible<U*, T*>::value
-                             >::type *)
-    : _refBase(get_pointer(p))
-{
+                             typename std::enable_if<std::is_convertible<U*, T*>::value>::type*)
+    : _refBase(get_pointer(p)) {
     _AddRef();
     Tf_RefPtrTracker_New(this, _refBase, _NullT);
 }
@@ -356,64 +306,40 @@ inline TfRefPtr<T>::TfRefPtr(const TfWeakPtrFacade<X, U>& p,
 // See typeFunctions.h for documention.
 //
 template <template <class> class Ptr, class T>
-struct TfTypeFunctions<Ptr<T>,
-                       std::enable_if_t<
-                           std::is_base_of<TfWeakPtrFacadeBase, Ptr<T>>::value
-                       >>
-{
-    static T* GetRawPtr(const Ptr<T>& t) {
-        return get_pointer(t);
-    }
+struct TfTypeFunctions<Ptr<T>, std::enable_if_t<std::is_base_of<TfWeakPtrFacadeBase, Ptr<T>>::value>> {
+    static T* GetRawPtr(const Ptr<T>& t) { return get_pointer(t); }
 
-    static Ptr<T> ConstructFromRawPtr(T* ptr) {
-        return Ptr<T>(ptr);
-    }
+    static Ptr<T> ConstructFromRawPtr(T* ptr) { return Ptr<T>(ptr); }
 
-    static bool IsNull(const Ptr<T>& t) {
-        return !t;
-    }
+    static bool IsNull(const Ptr<T>& t) { return !t; }
 
-    static void Class_Object_MUST_Be_Passed_By_Address() { }
-    static void Class_Object_MUST_Not_Be_Const() { }
+    static void Class_Object_MUST_Be_Passed_By_Address() {}
+    static void Class_Object_MUST_Not_Be_Const() {}
 };
 
 template <template <class> class Ptr, class T>
-struct TfTypeFunctions<Ptr<const T>,
-                       std::enable_if_t<
-                           std::is_base_of<TfWeakPtrFacadeBase, Ptr<const T>>::value
-                       >>
-{
-    static const T* GetRawPtr(const Ptr<const T>& t) {
-        return get_pointer(t);
-    }
+struct TfTypeFunctions<Ptr<const T>, std::enable_if_t<std::is_base_of<TfWeakPtrFacadeBase, Ptr<const T>>::value>> {
+    static const T* GetRawPtr(const Ptr<const T>& t) { return get_pointer(t); }
 
-    static Ptr<const T> ConstructFromRawPtr(const T* ptr) {
-        return Ptr<const T>(ptr);
-    }
+    static Ptr<const T> ConstructFromRawPtr(const T* ptr) { return Ptr<const T>(ptr); }
 
-    static bool IsNull(const Ptr<const T>& t) {
-        return !t;
-    }
+    static bool IsNull(const Ptr<const T>& t) { return !t; }
 
-    static void Class_Object_MUST_Be_Passed_By_Address() { }
+    static void Class_Object_MUST_Be_Passed_By_Address() {}
 };
 
 // TfHash support.
 template <class HashState, template <class> class X, class T>
-inline void
-TfHashAppend(HashState &h, TfWeakPtrFacade<X, T> const &ptr)
-{
+inline void TfHashAppend(HashState& h, TfWeakPtrFacade<X, T> const& ptr) {
     return h.Append(ptr.GetUniqueIdentifier());
 }
 
 // Extend boost::hash to support TfWeakPtrFacade.
 template <template <class> class X, class T>
-inline size_t
-hash_value(TfWeakPtrFacade<X, T> const &ptr)
-{
+inline size_t hash_value(TfWeakPtrFacade<X, T> const& ptr) {
     return TfHash()(ptr);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_WEAK_PTR_FACADE_H
+#endif  // PXR_BASE_TF_WEAK_PTR_FACADE_H

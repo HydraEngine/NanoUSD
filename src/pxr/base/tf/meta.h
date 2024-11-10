@@ -19,15 +19,15 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Simple compile-time type list.
-template <class... Args> struct TfMetaList {};
+template <class... Args>
+struct TfMetaList {};
 
 // Helper for TfMetaApply.
-template<template <class...> class Cls, class List>
+template <template <class...> class Cls, class List>
 struct Tf_MetaApplyImpl;
- 
-template<template <class...> class Cls, class... Args>
-struct Tf_MetaApplyImpl<Cls, TfMetaList<Args...>>
-{
+
+template <template <class...> class Cls, class... Args>
+struct Tf_MetaApplyImpl<Cls, TfMetaList<Args...>> {
     using Type = Cls<Args...>;
 };
 
@@ -55,4 +55,4 @@ using TfMetaLength = std::integral_constant<size_t, sizeof...(Xs)>;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_META_H
+#endif  // PXR_BASE_TF_META_H

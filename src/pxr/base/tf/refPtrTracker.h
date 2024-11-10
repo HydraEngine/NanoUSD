@@ -23,7 +23,8 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 class TfRefBase;
-template <class T> class TfRefPtr;
+template <class T>
+class TfRefPtr;
 
 /// \class TfRefPtrTracker
 ///
@@ -79,13 +80,11 @@ template <class T> class TfRefPtr;
 class TfRefPtrTracker : public TfWeakBase {
     TfRefPtrTracker(const TfRefPtrTracker&) = delete;
     TfRefPtrTracker& operator=(const TfRefPtrTracker&) = delete;
+
 public:
     enum TraceType { Add, Assign };
 
-    TF_API static TfRefPtrTracker& GetInstance()
-    {
-         return TfSingleton<TfRefPtrTracker>::GetInstance();
-    }
+    TF_API static TfRefPtrTracker& GetInstance() { return TfSingleton<TfRefPtrTracker>::GetInstance(); }
 
     /// Returns the maximum stack trace depth.
     TF_API
@@ -135,25 +134,18 @@ public:
 
     /// Writes traces for all owners of \p watched.
     TF_API
-    void ReportTracesForWatched(std::ostream& stream,
-                                const TfRefBase* watched) const;
+    void ReportTracesForWatched(std::ostream& stream, const TfRefBase* watched) const;
 
     /// Handy function to pass as second argument to \c TF_DEFINE_REFPTR_TRACK.
     /// No objects of the type will be watched but you can watch derived types.
     /// This is important if you'll be holding TfRefPtr objects to base types;
     /// if you don't track the base types, you'll fail to track all uses of
     /// the derived objects.
-    static bool WatchNone(const void*)
-    {
-        return false;
-    }
+    static bool WatchNone(const void*) { return false; }
 
     /// Handy function to pass as second argument to \c TF_DEFINE_REFPTR_TRACK.
     /// All objects of the type will be watched.
-    static bool WatchAll(const void*)
-    {
-        return true;
-    }
+    static bool WatchAll(const void*) { return true; }
 
 private:
     TfRefPtrTracker();
@@ -190,69 +182,47 @@ TF_API_TEMPLATE_CLASS(TfSingleton<TfRefPtrTracker>);
 class Tf_RefPtrTrackerUtil {
 public:
     /// Start watching \p obj.  Only watched objects are traced.
-    static void Watch(const TfRefBase* obj)
-    {
-        TfRefPtrTracker::GetInstance()._Watch(obj);
-    }
+    static void Watch(const TfRefBase* obj) { TfRefPtrTracker::GetInstance()._Watch(obj); }
 
     /// Stop watching \p obj.  Existing traces for \p obj are kept.
-    static void Unwatch(const TfRefBase* obj)
-    {
-        TfRefPtrTracker::GetInstance()._Unwatch(obj);
-    }
+    static void Unwatch(const TfRefBase* obj) { TfRefPtrTracker::GetInstance()._Unwatch(obj); }
 
     /// Add a trace for a new owner \p owner of object \p obj if \p obj
     /// is being watched.
-    static void AddTrace(const void* owner, const TfRefBase* obj,
-                         TfRefPtrTracker::TraceType type = TfRefPtrTracker::Add)
-    {
+    static void AddTrace(const void* owner,
+                         const TfRefBase* obj,
+                         TfRefPtrTracker::TraceType type = TfRefPtrTracker::Add) {
         TfRefPtrTracker::GetInstance()._AddTrace(owner, obj, type);
     }
 
     /// Remove traces for owner \p owner.
-    static void RemoveTraces(const void* owner)
-    {
-        TfRefPtrTracker::GetInstance()._RemoveTraces(owner);
-    }
+    static void RemoveTraces(const void* owner) { TfRefPtrTracker::GetInstance()._RemoveTraces(owner); }
 };
 
-#define TF_DECLARE_REFPTR_TRACK(T)                                             \
-    inline void                                                                \
-    Tf_RefPtrTracker_FirstRef(const void*, const TfRefBase *obj, T*);          \
-    inline void                                                                \
-    Tf_RefPtrTracker_LastRef(const void*, const TfRefBase *obj, T*);           \
-    inline void                                                                \
-    Tf_RefPtrTracker_New(const void* owner, const TfRefBase *obj, T*);         \
-    inline void                                                                \
-    Tf_RefPtrTracker_Delete(const void* owner, const TfRefBase *obj, T*);      \
-    inline void                                                                \
-    Tf_RefPtrTracker_Assign(const void* owner,                                 \
-                            const TfRefBase *obj, const TfRefBase *oldObj, T*);
+#define TF_DECLARE_REFPTR_TRACK(T)                                                    \
+    inline void Tf_RefPtrTracker_FirstRef(const void*, const TfRefBase* obj, T*);     \
+    inline void Tf_RefPtrTracker_LastRef(const void*, const TfRefBase* obj, T*);      \
+    inline void Tf_RefPtrTracker_New(const void* owner, const TfRefBase* obj, T*);    \
+    inline void Tf_RefPtrTracker_Delete(const void* owner, const TfRefBase* obj, T*); \
+    inline void Tf_RefPtrTracker_Assign(const void* owner, const TfRefBase* obj, const TfRefBase* oldObj, T*);
 
-#define TF_DEFINE_REFPTR_TRACK(T, COND)                                        \
-    inline void                                                                \
-    Tf_RefPtrTracker_FirstRef(const void*, const TfRefBase *obj, T*) {         \
-        if (obj && COND(obj)) Tf_RefPtrTrackerUtil::Watch(obj);                \
-    }                                                                          \
-    inline void                                                                \
-    Tf_RefPtrTracker_LastRef(const void*, const TfRefBase *obj, T*) {          \
-        Tf_RefPtrTrackerUtil::Unwatch(obj);                                    \
-    }                                                                          \
-    inline void                                                                \
-    Tf_RefPtrTracker_New(const void* owner, const TfRefBase *obj, T*) {        \
-        Tf_RefPtrTrackerUtil::AddTrace(owner, obj);                            \
-    }                                                                          \
-    inline void                                                                \
-    Tf_RefPtrTracker_Delete(const void* owner, const TfRefBase *obj, T*) {     \
-        Tf_RefPtrTrackerUtil::RemoveTraces(owner);                             \
-    }                                                                          \
-    inline void                                                                \
-    Tf_RefPtrTracker_Assign(const void* owner, const TfRefBase *obj,           \
-                            const TfRefBase *oldObj, T*) {                     \
-        if (oldObj != obj) {                                                   \
-            Tf_RefPtrTrackerUtil::AddTrace(                                    \
-                owner, obj, TfRefPtrTracker::Assign);                          \
-        }                                                                      \
+#define TF_DEFINE_REFPTR_TRACK(T, COND)                                                                         \
+    inline void Tf_RefPtrTracker_FirstRef(const void*, const TfRefBase* obj, T*) {                              \
+        if (obj && COND(obj)) Tf_RefPtrTrackerUtil::Watch(obj);                                                 \
+    }                                                                                                           \
+    inline void Tf_RefPtrTracker_LastRef(const void*, const TfRefBase* obj, T*) {                               \
+        Tf_RefPtrTrackerUtil::Unwatch(obj);                                                                     \
+    }                                                                                                           \
+    inline void Tf_RefPtrTracker_New(const void* owner, const TfRefBase* obj, T*) {                             \
+        Tf_RefPtrTrackerUtil::AddTrace(owner, obj);                                                             \
+    }                                                                                                           \
+    inline void Tf_RefPtrTracker_Delete(const void* owner, const TfRefBase* obj, T*) {                          \
+        Tf_RefPtrTrackerUtil::RemoveTraces(owner);                                                              \
+    }                                                                                                           \
+    inline void Tf_RefPtrTracker_Assign(const void* owner, const TfRefBase* obj, const TfRefBase* oldObj, T*) { \
+        if (oldObj != obj) {                                                                                    \
+            Tf_RefPtrTrackerUtil::AddTrace(owner, obj, TfRefPtrTracker::Assign);                                \
+        }                                                                                                       \
     }
 
 PXR_NAMESPACE_CLOSE_SCOPE

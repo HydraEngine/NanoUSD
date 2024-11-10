@@ -78,7 +78,9 @@ target_include_directories(py_usd_ext PRIVATE
 
 target_link_libraries(py_usd_ext PRIVATE
         fmt::fmt
+        tf
         gf
+        json
 )
 
 # ==================================================================================================

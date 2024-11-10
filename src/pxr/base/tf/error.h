@@ -20,7 +20,7 @@ class TfDiagnosticMgr;
 /// \ingroup group_tf_Diagnostic
 ///
 /// Represents an object that contains error information.
-/// 
+///
 /// See \ref page_tf_Diagnostic in the C++ API reference for a detailed
 /// description of the error issuing API.  For a example of how to post an
 /// error, see \c TF_ERROR(), also in the C++ API reference.
@@ -29,27 +29,25 @@ class TfDiagnosticMgr;
 /// including coding errors (Tf.RaiseCodingError), run time errors
 /// (Tf.RaiseRuntimeError), fatal errors (Tf.Fatal).
 ///
-class TfError: public TfDiagnosticBase {
-
+class TfError : public TfDiagnosticBase {
 public:
     /// Return the error code posted.
-    TfEnum GetErrorCode() const {
-        return GetDiagnosticCode();
-    }
+    TfEnum GetErrorCode() const { return GetDiagnosticCode(); }
 
     /// Return the diagnostic code posted as a string.
-    const std::string& GetErrorCodeAsString() const {
-        return GetDiagnosticCodeAsString();
-    }
+    const std::string& GetErrorCodeAsString() const { return GetDiagnosticCodeAsString(); }
 
 private:
-    TfError(TfEnum errorCode, char const *errCodeString,
-            TfCallContext const &context, const std::string& commentary,
-            TfDiagnosticInfo info, bool quiet);
+    TfError(TfEnum errorCode,
+            char const* errCodeString,
+            TfCallContext const& context,
+            const std::string& commentary,
+            TfDiagnosticInfo info,
+            bool quiet);
 
     friend class TfDiagnosticMgr;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_ERROR_H
+#endif  // PXR_BASE_TF_ERROR_H

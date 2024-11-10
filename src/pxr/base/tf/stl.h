@@ -32,13 +32,11 @@ struct Tf_MapLookupHelper {
     typedef T Container;
 
     template <class Key, class Result>
-    static bool Lookup(Container const& map, Key const &key, Result* valuePtr)
-    {
+    static bool Lookup(Container const& map, Key const& key, Result* valuePtr) {
         typename Container::const_iterator i = map.find(key);
         if (i == map.end()) {
             return false;
-        }
-        else {
+        } else {
             *valuePtr = i->second;
             return true;
         }
@@ -66,8 +64,7 @@ struct Tf_MapLookupHelper {
 ///
 /// \ingroup group_tf_Stl
 template <class Container, class Key, class Result>
-bool TfMapLookup(Container const &map, Key const &key, Result* valuePtr)
-{
+bool TfMapLookup(Container const& map, Key const& key, Result* valuePtr) {
     return Tf_MapLookupHelper<Container>::Lookup(map, key, valuePtr);
 }
 
@@ -92,9 +89,7 @@ bool TfMapLookup(Container const &map, Key const &key, Result* valuePtr)
 ///
 /// \ingroup group_tf_Stl
 template <class Container, class Key, class Result>
-const Result TfMapLookupByValue(Container const &map,
-                 Key const &key, const Result &defaultValue)
-{
+const Result TfMapLookupByValue(Container const& map, Key const& key, const Result& defaultValue) {
     typename Container::const_iterator i = map.find(key);
     if (i == map.end()) {
         return defaultValue;
@@ -113,24 +108,20 @@ const Result TfMapLookupByValue(Container const &map,
 ///    TfHashMap<string, BigData, TfHash> m = ...;
 ///
 ///    if (BigData* bigPtr = TfMapLookupPtr(m, "someKey"))
-///        bigPtr->ModifyStuff(); 
+///        bigPtr->ModifyStuff();
 ///    else
 ///        printf("Value not found\n");
 /// \endcode
 ///
 /// \ingroup group_tf_Stl
 template <class Container, class Key>
-typename Container::mapped_type *
-TfMapLookupPtr(Container &map, Key const &key)
-{
+typename Container::mapped_type* TfMapLookupPtr(Container& map, Key const& key) {
     typename Container::iterator i = map.find(key);
     return (i != map.end()) ? &(i->second) : NULL;
 }
 
 template <class Container, class Key>
-typename Container::mapped_type const *
-TfMapLookupPtr(Container const &map, Key const &key)
-{
+typename Container::mapped_type const* TfMapLookupPtr(Container const& map, Key const& key) {
     typename Container::const_iterator i = map.find(key);
     return (i != map.end()) ? &(i->second) : NULL;
 }
@@ -144,13 +135,12 @@ TfMapLookupPtr(Container const &map, Key const &key)
 ///
 /// \ingroup group_tf_Stl
 template <typename T>
-inline std::pair<T,T>
-TfOrderedPair(T a, T b) {
-    return (a < b) ? std::pair<T,T>(a,b) : std::pair<T,T>(b,a);
+inline std::pair<T, T> TfOrderedPair(T a, T b) {
+    return (a < b) ? std::pair<T, T>(a, b) : std::pair<T, T>(b, a);
 }
 
 /// Reset \a obj to be an empty, space-optimized object.
-/// 
+///
 /// This can be used to clear c++ containers and reclaim their memory.  For
 /// instance, std::vector::clear() will not reclaim any memory, even if the
 /// vector previously had a large number of elements.  Often, this is what you
@@ -167,7 +157,7 @@ TfOrderedPair(T a, T b) {
 /// type T& be valid.  This is true for many classes, including the standard
 /// containers.
 template <class T>
-inline void TfReset(T &obj) {
+inline void TfReset(T& obj) {
     T().swap(obj);
 }
 
@@ -175,7 +165,7 @@ TF_API size_t Tf_GetEmptyHashMapBucketCount();
 
 /// Specialize for TfHashMap to make minimally sized hashes.
 template <class Key, class Value, class Hash, class Equal, class Alloc>
-inline void TfReset(TfHashMap<Key, Value, Hash, Equal, Alloc> &hash){
+inline void TfReset(TfHashMap<Key, Value, Hash, Equal, Alloc>& hash) {
     // If the implementation of the hash map allocates buckets when
     // constructed asking for zero then only swap a constructed object
     // if \p hash has more than that many buckets already, otherwise
@@ -194,7 +184,7 @@ TF_API size_t Tf_GetEmptyHashSetBucketCount();
 
 /// Specialize for TfHashSet to make minimally sized hashes.
 template <class Value, class Hash, class Equal, class Alloc>
-inline void TfReset(TfHashSet<Value, Hash, Equal, Alloc> &hash) {
+inline void TfReset(TfHashSet<Value, Hash, Equal, Alloc>& hash) {
     static size_t emptyCount = Tf_GetEmptyHashSetBucketCount();
 
     // See comment above about issues with TfHashSet(0).
@@ -216,11 +206,11 @@ inline void TfReset(TfHashSet<Value, Hash, Equal, Alloc> &hash) {
 /// is (1, 3, 3, 1) and the second sequence is (2, 3, 2), the result will be
 /// (1, 3, 1).
 template <class InputIterator1, class InputIterator2, class OutputIterator>
-void
-TfOrderedSetDifference(InputIterator1 first1, InputIterator1 last1,
-                       InputIterator2 first2, InputIterator2 last2,
-                       OutputIterator result)
-{
+void TfOrderedSetDifference(InputIterator1 first1,
+                            InputIterator1 last1,
+                            InputIterator2 first2,
+                            InputIterator2 last2,
+                            OutputIterator result) {
     typedef std::multiset<typename InputIterator2::value_type> SetType;
     SetType set2(first2, last2);
 
@@ -246,15 +236,13 @@ TfOrderedSetDifference(InputIterator1 first1, InputIterator1 last1,
 /// occurrences in the second sequence).  For example, if the first sequence
 /// is (1, 3, 3, 1) and the second sequence is (2, 3, 2), the result will be
 /// (1, 3, 1).
-template <class BackInsertionSequence,
-          class InputIterator1, class InputIterator2>
-BackInsertionSequence
-TfOrderedSetDifferenceToContainer(InputIterator1 first1, InputIterator1 last1,
-                                  InputIterator2 first2, InputIterator2 last2)
-{
+template <class BackInsertionSequence, class InputIterator1, class InputIterator2>
+BackInsertionSequence TfOrderedSetDifferenceToContainer(InputIterator1 first1,
+                                                        InputIterator1 last1,
+                                                        InputIterator2 first2,
+                                                        InputIterator2 last2) {
     BackInsertionSequence result;
-    TfOrderedSetDifference(first1, last1, first2, last2,
-                           std::back_inserter(result));
+    TfOrderedSetDifference(first1, last1, first2, last2, std::back_inserter(result));
     return result;
 }
 
@@ -270,11 +258,11 @@ TfOrderedSetDifferenceToContainer(InputIterator1 first1, InputIterator1 last1,
 /// if the first sequence is (1, 3, 3, 1) and the second sequence is (2, 3,
 /// 2), the result will be (1).
 template <class InputIterator1, class InputIterator2, class OutputIterator>
-void
-TfOrderedUniquingSetDifference(InputIterator1 first1, InputIterator1 last1,
-                               InputIterator2 first2, InputIterator2 last2,
-                               OutputIterator result)
-{
+void TfOrderedUniquingSetDifference(InputIterator1 first1,
+                                    InputIterator1 last1,
+                                    InputIterator2 first2,
+                                    InputIterator2 last2,
+                                    OutputIterator result) {
     typedef std::set<typename InputIterator1::value_type> Set1Type;
     typedef std::set<typename InputIterator2::value_type> Set2Type;
 
@@ -284,8 +272,7 @@ TfOrderedUniquingSetDifference(InputIterator1 first1, InputIterator1 last1,
     // Walk [first1, last1).  If the element is in set1, skip it.  Else insert
     // it into set1, and if the element is not in set2, output it.
     for (InputIterator1 i = first1; i != last1; ++i)
-        if (set1.insert(*i).second && !set2.count(*i))
-            *result++ = *i;
+        if (set1.insert(*i).second && !set2.count(*i)) *result++ = *i;
 }
 
 /// Produce a sequence consisting of the set difference of the unique elements
@@ -299,17 +286,13 @@ TfOrderedUniquingSetDifference(InputIterator1 first1, InputIterator1 last1,
 /// appears in the second sequence, and one time if it does not.  For example,
 /// if the first sequence is (1, 3, 3, 1) and the second sequence is (2, 3,
 /// 2), the result will be (1).
-template <class BackInsertionSequence,
-          class InputIterator1, class InputIterator2>
-BackInsertionSequence
-TfOrderedUniquingSetDifferenceToContainer(InputIterator1 first1,
-                                          InputIterator1 last1,
-                                          InputIterator2 first2,
-                                          InputIterator2 last2)
-{
+template <class BackInsertionSequence, class InputIterator1, class InputIterator2>
+BackInsertionSequence TfOrderedUniquingSetDifferenceToContainer(InputIterator1 first1,
+                                                                InputIterator1 last1,
+                                                                InputIterator2 first2,
+                                                                InputIterator2 last2) {
     BackInsertionSequence result;
-    TfOrderedUniquingSetDifference(first1, last1, first2, last2,
-                                   std::back_inserter(result));
+    TfOrderedUniquingSetDifference(first1, last1, first2, last2, std::back_inserter(result));
     return result;
 }
 
@@ -322,14 +305,11 @@ TfOrderedUniquingSetDifferenceToContainer(InputIterator1 first1,
 /// is true for every x in [first, mid) and false for every x in [mid, last),
 /// return mid.
 template <class ForwardIterator, class Predicate>
-static inline ForwardIterator
-TfFindBoundary(ForwardIterator first, ForwardIterator last,
-               Predicate const &pred)
-{
+static inline ForwardIterator TfFindBoundary(ForwardIterator first, ForwardIterator last, Predicate const& pred) {
     size_t len = std::distance(first, last);
     size_t half;
     ForwardIterator middle;
-    
+
     while (len > 0) {
         half = len >> 1;
         middle = first;
@@ -338,8 +318,7 @@ TfFindBoundary(ForwardIterator first, ForwardIterator last,
             first = middle;
             ++first;
             len = len - half - 1;
-        }
-        else
+        } else
             len = half;
     }
     return first;
@@ -358,32 +337,27 @@ TfFindBoundary(ForwardIterator first, ForwardIterator last,
 ///
 /// \ingroup group_tf_Stl
 template <size_t N>
-class TfGet
-{
+class TfGet {
 public:
     template <class PairOrTuple>
     using return_type = typename std::tuple_element<N, PairOrTuple>::type;
 
     template <class PairOrTuple>
-    constexpr return_type<PairOrTuple>& operator()(PairOrTuple& p) const 
-    {
+    constexpr return_type<PairOrTuple>& operator()(PairOrTuple& p) const {
         return std::get<N>(p);
     }
 
     template <class PairOrTuple>
-    constexpr const return_type<PairOrTuple>& operator()(
-        const PairOrTuple& p) const 
-    {
+    constexpr const return_type<PairOrTuple>& operator()(const PairOrTuple& p) const {
         return std::get<N>(p);
     }
 
     template <class PairOrTuple>
-    constexpr return_type<PairOrTuple>&& operator()(PairOrTuple&& p) const 
-    {
+    constexpr return_type<PairOrTuple>&& operator()(PairOrTuple&& p) const {
         return std::get<N>(std::move(p));
     }
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_STL_H
+#endif  // PXR_BASE_TF_STL_H

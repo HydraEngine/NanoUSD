@@ -28,33 +28,40 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 // Support integers.
 template <class HashState, class T>
-std::enable_if_t<std::is_integral<T>::value>
-TfHashAppend(HashState &h, T integral)
-{
+std::enable_if_t<std::is_integral<T>::value> TfHashAppend(HashState& h, T integral) {
     h.Append(integral);
 }
 
 // Simple metafunction that returns an unsigned integral type given a size in
 // bytes.
-template <size_t Size> struct Tf_SizedUnsignedInt;
-template <> struct Tf_SizedUnsignedInt<1> { using type = uint8_t; };
-template <> struct Tf_SizedUnsignedInt<2> { using type = uint16_t; };
-template <> struct Tf_SizedUnsignedInt<4> { using type = uint32_t; };
-template <> struct Tf_SizedUnsignedInt<8> { using type = uint64_t; };
+template <size_t Size>
+struct Tf_SizedUnsignedInt;
+template <>
+struct Tf_SizedUnsignedInt<1> {
+    using type = uint8_t;
+};
+template <>
+struct Tf_SizedUnsignedInt<2> {
+    using type = uint16_t;
+};
+template <>
+struct Tf_SizedUnsignedInt<4> {
+    using type = uint32_t;
+};
+template <>
+struct Tf_SizedUnsignedInt<8> {
+    using type = uint64_t;
+};
 
 // Support enums.
 template <class HashState, class Enum>
-std::enable_if_t<std::is_enum<Enum>::value>
-TfHashAppend(HashState &h, Enum e)
-{
+std::enable_if_t<std::is_enum<Enum>::value> TfHashAppend(HashState& h, Enum e) {
     h.Append(static_cast<std::underlying_type_t<Enum>>(e));
 }
 
 // Support floating point.
 template <class HashState, class T>
-std::enable_if_t<std::is_floating_point<T>::value>
-TfHashAppend(HashState &h, T fp)
-{
+std::enable_if_t<std::is_floating_point<T>::value> TfHashAppend(HashState& h, T fp) {
     // We want both positive and negative zero to hash the same, so we have to
     // check against zero here.
     typename Tf_SizedUnsignedInt<sizeof(T)>::type intbuf = 0;
@@ -66,18 +73,14 @@ TfHashAppend(HashState &h, T fp)
 
 // Support std::pair.
 template <class HashState, class T, class U>
-inline void
-TfHashAppend(HashState &h, std::pair<T, U> const &p)
-{
+inline void TfHashAppend(HashState& h, std::pair<T, U> const& p) {
     h.Append(p.first);
     h.Append(p.second);
 }
 
 // Support std::vector. std::vector<bool> specialized below.
 template <class HashState, class T>
-inline void
-TfHashAppend(HashState &h, std::vector<T> const &vec)
-{
+inline void TfHashAppend(HashState& h, std::vector<T> const& vec) {
     static_assert(!std::is_same_v<std::remove_cv_t<T>, bool>,
                   "Unexpected usage of vector of 'bool'."
                   "Expected explicit overload.");
@@ -86,9 +89,7 @@ TfHashAppend(HashState &h, std::vector<T> const &vec)
 
 // Support std::vector<bool>.
 template <class HashState>
-inline void
-TfHashAppend(HashState &h, std::vector<bool> const &vec)
-{
+inline void TfHashAppend(HashState& h, std::vector<bool> const& vec) {
     h.Append(std::hash<std::vector<bool>>{}(vec));
 }
 
@@ -96,9 +97,7 @@ TfHashAppend(HashState &h, std::vector<bool> const &vec)
 // NOTE: Supporting std::unordered_set is complicated because the traversal
 // order is not guaranteed
 template <class HashState, class T, class Compare>
-inline void
-TfHashAppend(HashState& h, std::set<T, Compare> const &elements)
-{
+inline void TfHashAppend(HashState& h, std::set<T, Compare> const& elements) {
     h.AppendRange(std::begin(elements), std::end(elements));
 }
 
@@ -106,25 +105,20 @@ TfHashAppend(HashState& h, std::set<T, Compare> const &elements)
 // NOTE: Supporting std::unordered_map is complicated because the traversal
 // order is not guaranteed
 template <class HashState, class Key, class Value, class Compare>
-inline void
-TfHashAppend(HashState& h, std::map<Key, Value, Compare> const &elements)
-{
+inline void TfHashAppend(HashState& h, std::map<Key, Value, Compare> const& elements) {
     h.AppendRange(std::begin(elements), std::end(elements));
 }
 
 // Support for hashing std::string.
 template <class HashState>
-inline void
-TfHashAppend(HashState &h, const std::string& s)
-{
+inline void TfHashAppend(HashState& h, const std::string& s) {
     return h.AppendContiguous(s.c_str(), s.length());
 }
 
 // Support for hashing pointers, but we explicitly delete the version for
 // [const] char pointers.  See more below.
 template <class HashState, class T>
-inline void
-TfHashAppend(HashState &h, const T* ptr) {
+inline void TfHashAppend(HashState& h, const T* ptr) {
     return h.Append(reinterpret_cast<uintptr_t>(ptr));
 }
 
@@ -135,16 +129,15 @@ TfHashAppend(HashState &h, const T* ptr) {
 // really want to hash the pointer then use static_cast<const void*>(ptr) or
 // TfHashCharPtr.
 template <class HashState>
-inline void TfHashAppend(HashState &h, char const *ptr) = delete;
+inline void TfHashAppend(HashState& h, char const* ptr) = delete;
 template <class HashState>
-inline void TfHashAppend(HashState &h, char *ptr) = delete;
+inline void TfHashAppend(HashState& h, char* ptr) = delete;
 
 /// A structure that wraps a char pointer, indicating intent that it should be
 /// hashed as a c-style null terminated string.  See TfhashAsCStr().
-struct TfCStrHashWrapper
-{
-    explicit TfCStrHashWrapper(char const *cstr) : cstr(cstr) {}
-    char const *cstr;
+struct TfCStrHashWrapper {
+    explicit TfCStrHashWrapper(char const* cstr) : cstr(cstr) {}
+    char const* cstr;
 };
 
 /// Indicate that a char pointer is intended to be hashed as a C-style null
@@ -154,15 +147,12 @@ struct TfCStrHashWrapper
 /// This structure provides a lightweight view on the char pointer passed to its
 /// constructor.  It does not copy the data or participate in its lifetime.  The
 /// passed char pointer must remain valid as long as this struct is used.
-inline TfCStrHashWrapper
-TfHashAsCStr(char const *cstr)
-{
+inline TfCStrHashWrapper TfHashAsCStr(char const* cstr) {
     return TfCStrHashWrapper(cstr);
 }
 
 template <class HashState>
-inline void TfHashAppend(HashState &h, TfCStrHashWrapper hcstr)
-{
+inline void TfHashAppend(HashState& h, TfCStrHashWrapper hcstr) {
     return h.AppendContiguous(hcstr.cstr, std::strlen(hcstr.cstr));
 }
 
@@ -174,45 +164,38 @@ inline void TfHashAppend(HashState &h, TfCStrHashWrapper hcstr)
 
 // std::hash version, attempted second.
 template <class HashState, class T>
-inline auto Tf_HashImpl(HashState &h, T &&obj, long)
-    -> decltype(std::hash<typename std::decay<T>::type>()(
-                    std::forward<T>(obj)), void())
-{
-    TfHashAppend(
-        h, std::hash<typename std::decay<T>::type>()(std::forward<T>(obj)));
+inline auto Tf_HashImpl(HashState& h,
+                        T&& obj,
+                        long) -> decltype(std::hash<typename std::decay<T>::type>()(std::forward<T>(obj)), void()) {
+    TfHashAppend(h, std::hash<typename std::decay<T>::type>()(std::forward<T>(obj)));
 }
 
 // hash_value, attempted last.
 template <class HashState, class T>
-inline auto Tf_HashImpl(HashState &h, T &&obj, ...)
-    -> decltype(hash_value(std::forward<T>(obj)), void())
-{
+inline auto Tf_HashImpl(HashState& h, T&& obj, ...) -> decltype(hash_value(std::forward<T>(obj)), void()) {
     TfHashAppend(h, hash_value(std::forward<T>(obj)));
 }
 
 // TfHashAppend, attempted first.
 template <class HashState, class T>
-inline auto Tf_HashImpl(HashState &h, T &&obj, int)
-    -> decltype(TfHashAppend(h, std::forward<T>(obj)), void())
-{
+inline auto Tf_HashImpl(HashState& h, T&& obj, int) -> decltype(TfHashAppend(h, std::forward<T>(obj)), void()) {
     TfHashAppend(h, std::forward<T>(obj));
 }
 
 // Implementation detail, CRTP base that provides the public interface for hash
 // state implementations.
 template <class Derived>
-class Tf_HashStateAPI
-{
+class Tf_HashStateAPI {
 public:
     // Append several objects to the hash state.
     template <class... Args>
-    void Append(Args &&... args) {
+    void Append(Args&&... args) {
         _AppendImpl(std::forward<Args>(args)...);
     }
 
     // Append contiguous objects to the hash state.
     template <class T>
-    void AppendContiguous(T const *elems, size_t numElems) {
+    void AppendContiguous(T const* elems, size_t numElems) {
         this->_AsDerived()._AppendContiguous(elems, numElems);
     }
 
@@ -223,13 +206,11 @@ public:
     }
 
     // Return the hash code for the current state.
-    size_t GetCode() const {
-        return this->_AsDerived()._GetCode();
-    }
+    size_t GetCode() const { return this->_AsDerived()._GetCode(); }
 
 private:
     template <class T, class... Args>
-    void _AppendImpl(T &&obj, Args &&... rest) {
+    void _AppendImpl(T&& obj, Args&&... rest) {
         this->_AsDerived()._Append(std::forward<T>(obj));
         _AppendImpl(std::forward<Args>(rest)...);
     }
@@ -237,53 +218,42 @@ private:
         // base case intentionally empty.
     }
 
-    Derived &_AsDerived() {
-        return *static_cast<Derived *>(this);
-    }
+    Derived& _AsDerived() { return *static_cast<Derived*>(this); }
 
-    Derived const &_AsDerived() const {
-        return *static_cast<Derived const *>(this);
-    }
+    Derived const& _AsDerived() const { return *static_cast<Derived const*>(this); }
 };
 
 // Implementation detail, accumulates hashes.
-class Tf_HashState : public Tf_HashStateAPI<Tf_HashState>
-{
+class Tf_HashState : public Tf_HashStateAPI<Tf_HashState> {
 private:
     friend class Tf_HashStateAPI<Tf_HashState>;
 
     // Go thru Tf_HashImpl for non-integers.
     template <class T>
-    std::enable_if_t<!std::is_integral<std::decay_t<T>>::value>
-    _Append(T &&obj) {
+    std::enable_if_t<!std::is_integral<std::decay_t<T>>::value> _Append(T&& obj) {
         Tf_HashImpl(*this, std::forward<T>(obj), 0);
     }
 
     // Integers bottom out here.
     template <class T>
-    std::enable_if_t<std::is_integral<T>::value>
-    _Append(T i) {
+    std::enable_if_t<std::is_integral<T>::value> _Append(T i) {
         if (!_didOne) {
             _state = i;
             _didOne = true;
-        }
-        else {
+        } else {
             _state = _Combine(_state, i);
         }
     }
 
     // Append contiguous objects.
     template <class T>
-    std::enable_if_t<std::is_integral<T>::value>
-    _AppendContiguous(T const *elems, size_t numElems) {
-        _AppendBytes(reinterpret_cast<char const *>(elems),
-                     numElems * sizeof(T));
+    std::enable_if_t<std::is_integral<T>::value> _AppendContiguous(T const* elems, size_t numElems) {
+        _AppendBytes(reinterpret_cast<char const*>(elems), numElems * sizeof(T));
     }
 
     // Append contiguous objects.
     template <class T>
-    std::enable_if_t<!std::is_integral<T>::value>
-    _AppendContiguous(T const *elems, size_t numElems) {
+    std::enable_if_t<!std::is_integral<T>::value> _AppendContiguous(T const* elems, size_t numElems) {
         while (numElems--) {
             Append(*elems++);
         }
@@ -298,7 +268,7 @@ private:
     }
 
     /// Append a number of bytes to the hash state.
-    TF_API void _AppendBytes(char const *bytes, size_t numBytes);
+    TF_API void _AppendBytes(char const* bytes, size_t numBytes);
 
     // Return the hash code for the accumulated hash state.
     size_t _GetCode() const {
@@ -313,17 +283,11 @@ private:
     }
 
     // This turns into a single bswap/pshufb type instruction on most compilers.
-    inline uint64_t
-    _SwapByteOrder(uint64_t val) const {
-        val =
-            ((val & 0xFF00000000000000u) >> 56u) |
-            ((val & 0x00FF000000000000u) >> 40u) |
-            ((val & 0x0000FF0000000000u) >> 24u) |
-            ((val & 0x000000FF00000000u) >>  8u) |
-            ((val & 0x00000000FF000000u) <<  8u) |
-            ((val & 0x0000000000FF0000u) << 24u) |
-            ((val & 0x000000000000FF00u) << 40u) |
-            ((val & 0x00000000000000FFu) << 56u);
+    inline uint64_t _SwapByteOrder(uint64_t val) const {
+        val = ((val & 0xFF00000000000000u) >> 56u) | ((val & 0x00FF000000000000u) >> 40u) |
+              ((val & 0x0000FF0000000000u) >> 24u) | ((val & 0x000000FF00000000u) >> 8u) |
+              ((val & 0x00000000FF000000u) << 8u) | ((val & 0x0000000000FF0000u) << 24u) |
+              ((val & 0x000000000000FF00u) << 40u) | ((val & 0x00000000000000FFu) << 56u);
         return val;
     }
 
@@ -462,9 +426,8 @@ public:
     /// Produce a hash code for \p obj.  See the class documentation for
     /// details.
     template <class T>
-    auto operator()(T &&obj) const ->
-        decltype(Tf_HashImpl(std::declval<Tf_HashState &>(),
-                             std::forward<T>(obj), 0), size_t()) {
+    auto operator()(T&& obj) const -> decltype(Tf_HashImpl(std::declval<Tf_HashState&>(), std::forward<T>(obj), 0),
+                                               size_t()) {
         Tf_HashState h;
         Tf_HashImpl(h, std::forward<T>(obj), 0);
         return h.GetCode();
@@ -472,7 +435,7 @@ public:
 
     /// Produce a hash code by combining the hash codes of several objects.
     template <class... Args>
-    static size_t Combine(Args &&... args) {
+    static size_t Combine(Args&&... args) {
         Tf_HashState h;
         _CombineImpl(h, std::forward<Args>(args)...);
         return h.GetCode();
@@ -480,15 +443,15 @@ public:
 
 private:
     template <class HashState, class T, class... Args>
-    static void _CombineImpl(HashState &h, T &&obj, Args &&... rest) {
+    static void _CombineImpl(HashState& h, T&& obj, Args&&... rest) {
         Tf_HashImpl(h, std::forward<T>(obj), 0);
         _CombineImpl(h, std::forward<Args>(rest)...);
     }
-    
+
     template <class HashState>
-    static void _CombineImpl(HashState &h) {
+    static void _CombineImpl(HashState& h) {
         // base case does nothing
-    }        
+    }
 };
 
 /// A hash function object that hashes the address of a char pointer.

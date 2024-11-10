@@ -12,12 +12,9 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfType)
-{
-    TfType::Define< TfDebugSymbolsChangedNotice,
-        TfType::Bases<TfNotice> >();
-    TfType::Define< TfDebugSymbolEnableChangedNotice,
-        TfType::Bases<TfNotice> >();
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<TfDebugSymbolsChangedNotice, TfType::Bases<TfNotice>>();
+    TfType::Define<TfDebugSymbolEnableChangedNotice, TfType::Bases<TfNotice>>();
 }
 
 TfDebugSymbolsChangedNotice::~TfDebugSymbolsChangedNotice() {}

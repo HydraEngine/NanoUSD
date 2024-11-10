@@ -32,39 +32,36 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 // This GIL-releasing helper is implemented in singleton.cpp.  We do it this way
 // to avoid including the Python headers here.
-struct Tf_SingletonPyGILDropper
-{
+struct Tf_SingletonPyGILDropper {
     TF_API
     Tf_SingletonPyGILDropper();
     TF_API
     ~Tf_SingletonPyGILDropper();
+
 private:
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
     std::unique_ptr<class TfPyLock> _pyLock;
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 };
 
-template <class T> std::atomic<T *> TfSingleton<T>::_instance;
+template <class T>
+std::atomic<T*> TfSingleton<T>::_instance;
 
 template <class T>
-void
-TfSingleton<T>::SetInstanceConstructed(T &instance)
-{
+void TfSingleton<T>::SetInstanceConstructed(T& instance) {
     if (_instance.exchange(&instance) != nullptr) {
-        TF_FATAL_ERROR("this function may not be called after "
-                       "GetInstance() or another SetInstanceConstructed() "
-                       "has completed");
+        TF_FATAL_ERROR(
+                "this function may not be called after "
+                "GetInstance() or another SetInstanceConstructed() "
+                "has completed");
     }
 }
 
 template <class T>
-T *
-TfSingleton<T>::_CreateInstance(std::atomic<T *> &instance)
-{
+T* TfSingleton<T>::_CreateInstance(std::atomic<T*>& instance) {
     static std::atomic<bool> isInitializing;
-    
-    TfAutoMallocTag2 tag("Tf", "TfSingleton::_CreateInstance",
-                         "Create Singleton " + ArchGetDemangled<T>());
+
+    TfAutoMallocTag2 tag("Tf", "TfSingleton::_CreateInstance", "Create Singleton " + ArchGetDemangled<T>());
 
     // Drop the GIL if we have it, before possibly locking to create the
     // singleton instance.
@@ -78,36 +75,32 @@ TfSingleton<T>::_CreateInstance(std::atomic<T *> &instance)
         if (!instance) {
             // Create it.  The constructor may set instance via
             // SetInstanceConstructed(), so check for that.
-            T *newInst = new T;
-            
-            T *curInst = instance.load();
+            T* newInst = new T;
+
+            T* curInst = instance.load();
             if (curInst) {
                 if (curInst != newInst) {
                     TF_FATAL_ERROR("race detected setting singleton instance");
                 }
-            }
-            else {
+            } else {
                 TF_AXIOM(instance.exchange(newInst) == nullptr);
-            }                
+            }
         }
         isInitializing = false;
-    }
-    else {
+    } else {
         while (!instance) {
             std::this_thread::yield();
         }
     }
-    
+
     return instance.load();
 }
 
 template <typename T>
-void
-TfSingleton<T>::DeleteInstance()
-{
+void TfSingleton<T>::DeleteInstance() {
     // Try to swap out a non-null instance for nullptr -- if we do it, we delete
     // it.
-    T *instance = _instance.load();
+    T* instance = _instance.load();
     while (instance && !_instance.compare_exchange_weak(instance, nullptr)) {
         std::this_thread::yield();
     }
@@ -121,8 +114,6 @@ TfSingleton<T>::DeleteInstance()
 /// for class \c T.
 ///
 /// \hideinitializer
-#define TF_INSTANTIATE_SINGLETON(T)                               \
-    template class PXR_NS_GLOBAL::TfSingleton<T>
-
+#define TF_INSTANTIATE_SINGLETON(T) template class PXR_NS_GLOBAL::TfSingleton<T>
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -35,7 +35,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \code
 /// // Create a new wrapper with the destination file path.
 /// TfAtomicOfstreamWrapper wrapper("/home/user/realFile.txt");
-/// 
+///
 /// // Open the wrapped stream.
 /// string reason;
 /// if (not wrapper.Open(&reason)) {
@@ -57,11 +57,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// // called, and the temporary file is removed.
 /// \endcode
 ///
-class TfAtomicOfstreamWrapper
-{
+class TfAtomicOfstreamWrapper {
     TfAtomicOfstreamWrapper(const TfAtomicOfstreamWrapper&) = delete;
-    TfAtomicOfstreamWrapper& operator=(
-        const TfAtomicOfstreamWrapper&) = delete;
+    TfAtomicOfstreamWrapper& operator=(const TfAtomicOfstreamWrapper&) = delete;
+
 public:
     /// Constructor.
     TF_API explicit TfAtomicOfstreamWrapper(const std::string& filePath);
@@ -100,4 +99,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_ATOMIC_OFSTREAM_WRAPPER_H
+#endif  // PXR_BASE_TF_ATOMIC_OFSTREAM_WRAPPER_H

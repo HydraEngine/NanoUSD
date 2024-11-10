@@ -25,7 +25,8 @@ CPP_FILE_NAME = "unicodeCharacterClasses.cpp"
 xid_start_range_pairs = []
 xid_continue_range_pairs = []
 
-def _write_cpp_file(source_template_path : str, destination_directory : str):
+
+def _write_cpp_file(source_template_path: str, destination_directory: str):
     """
     Writes the C++ code file that will initialize character class
     sets with the values read by this script.
@@ -73,6 +74,7 @@ def _write_cpp_file(source_template_path : str, destination_directory : str):
 
         generated_cpp_file.write(destination_template_content)
 
+
 def _parseArguments():
     """
     Parses the arguments sent to the script.
@@ -82,16 +84,17 @@ def _parseArguments():
     parser = ArgumentParser(
         description='Generate character class sets for Unicode characters.')
     parser.add_argument('--srcDir', required=False, default=os.getcwd(),
-        help='The source directory where the DerivedCoreProperties.txt \
+                        help='The source directory where the DerivedCoreProperties.txt \
 file exists.')
     parser.add_argument('--destDir', required=False, default=os.getcwd(),
-        help='The destination directory where the processed cpp file will \
+                        help='The destination directory where the processed cpp file will \
 be written to.')
-    parser.add_argument("--srcTemplate", required=False, 
-        default=os.path.join(os.getcwd(), TEMPLATE_FILE_NAME),
-        help='The full path to the source template file to use.')
+    parser.add_argument("--srcTemplate", required=False,
+                        default=os.path.join(os.getcwd(), TEMPLATE_FILE_NAME),
+                        help='The full path to the source template file to use.')
 
     return parser.parse_args()
+
 
 if __name__ == '__main__':
     arguments = _parseArguments()
@@ -125,7 +128,7 @@ if __name__ == '__main__':
                     start_code_point = int(code_points, 16)
                     end_code_point = start_code_point
 
-                xid_start_range_pairs.append((start_code_point, 
+                xid_start_range_pairs.append((start_code_point,
                                               end_code_point))
             elif "; XID_Continue" in line:
                 # this is an XID_Continue single code point or range
@@ -141,7 +144,7 @@ if __name__ == '__main__':
                     start_code_point = int(code_points, 16)
                     end_code_point = start_code_point
 
-                xid_continue_range_pairs.append((start_code_point, 
+                xid_continue_range_pairs.append((start_code_point,
                                                  end_code_point))
 
     _write_cpp_file(arguments.srcTemplate, arguments.destDir)

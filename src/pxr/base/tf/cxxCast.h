@@ -21,13 +21,11 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 template <class Src, class Dst>
 using Tf_CopyConst =
-    typename std::conditional<std::is_const<Src>::value,
-                              typename std::add_const<Dst>::type, Dst>::type;
+        typename std::conditional<std::is_const<Src>::value, typename std::add_const<Dst>::type, Dst>::type;
 
 template <class Src, class Dst>
 using Tf_CopyVolatile =
-    typename std::conditional<std::is_volatile<Src>::value,
-                              typename std::add_volatile<Dst>::type, Dst>::type;
+        typename std::conditional<std::is_volatile<Src>::value, typename std::add_volatile<Dst>::type, Dst>::type;
 
 template <class Src, class Dst>
 using Tf_CopyCV = Tf_CopyConst<Src, Tf_CopyVolatile<Src, Dst>>;
@@ -45,18 +43,14 @@ using Tf_CopyCV = Tf_CopyConst<Src, Tf_CopyVolatile<Src, Dst>>;
 ///
 /// \warning This function is public, but should be used sparingly (or not all).
 template <typename T>
-inline typename std::enable_if<
-    std::is_polymorphic<T>::value, Tf_CopyCV<T, void>*>::type
-TfCastToMostDerivedType(T* ptr)
-{
+inline typename std::enable_if<std::is_polymorphic<T>::value, Tf_CopyCV<T, void>*>::type TfCastToMostDerivedType(
+        T* ptr) {
     return dynamic_cast<Tf_CopyCV<T, void>*>(ptr);
 }
 
 template <typename T>
-inline typename std::enable_if<
-    !std::is_polymorphic<T>::value, Tf_CopyCV<T, void>*>::type
-TfCastToMostDerivedType(T* ptr)
-{
+inline typename std::enable_if<!std::is_polymorphic<T>::value, Tf_CopyCV<T, void>*>::type TfCastToMostDerivedType(
+        T* ptr) {
     return static_cast<Tf_CopyCV<T, void>*>(ptr);
 }
 

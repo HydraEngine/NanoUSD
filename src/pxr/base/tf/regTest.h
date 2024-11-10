@@ -86,9 +86,7 @@ public:
     /// other than the test name should be supplied.  Otherwise, the \c Main()
     /// passes \c argc-1 and \c argv+1 to the test function, and the test
     /// function is responsible for argument checking.
-    static int Main(int argc, char *argv[]) {
-        return GetInstance()._Main(argc, argv);
-    }
+    static int Main(int argc, char* argv[]) { return GetInstance()._Main(argc, argv); }
 
     TF_API
     static TfRegTest& GetInstance();
@@ -101,7 +99,7 @@ public:
     /// When \c Main(argc,argv) is requested to run a function of type
     /// \c RegFuncWithArgs, it invokes the function with arguments \c argc-1
     /// and \c argv+1.
-    typedef bool (*RegFuncWithArgs)(int argc, char *argv[]);
+    typedef bool (*RegFuncWithArgs)(int argc, char* argv[]);
 
     TF_API
     bool Register(const char* name, RegFunc);
@@ -111,7 +109,7 @@ public:
 private:
     friend class TfSingleton<TfRegTest>;
     TF_API
-    int _Main(int argc, char *argv[]);
+    int _Main(int argc, char* argv[]);
 
     void _PrintTestNames();
 
@@ -129,8 +127,7 @@ TF_API_TEMPLATE_CLASS(TfSingleton<TfRegTest>);
 ///
 /// \ingroup group_tf_Internal
 /// \hideinitializer
-#define TF_ADD_REGTEST(name)    \
-    bool Tf_RegTst##name = TfRegTest::GetInstance().Register(#name, Test_##name)
+#define TF_ADD_REGTEST(name) bool Tf_RegTst##name = TfRegTest::GetInstance().Register(#name, Test_##name)
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

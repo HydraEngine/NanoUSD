@@ -13,9 +13,7 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // A type used to create the \a TfNullPtr token.
-struct TfNullPtrType
-{
-};
+struct TfNullPtrType {};
 
 // A token to represent null for smart pointers like \a TfWeakPtr and \a
 // TfRefPtr.
@@ -23,4 +21,4 @@ TF_API extern const TfNullPtrType TfNullPtr;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_NULL_PTR_H
+#endif  // PXR_BASE_TF_NULL_PTR_H

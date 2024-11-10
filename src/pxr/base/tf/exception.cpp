@@ -16,25 +16,16 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TfBaseException::TfBaseException(std::string const &message)
-    : _message(message)
-{
-}
+TfBaseException::TfBaseException(std::string const& message) : _message(message) {}
 
-TfBaseException::~TfBaseException()
-{
-}
+TfBaseException::~TfBaseException() {}
 
-void
-TfBaseException::_ThrowImpl(TfCallContext const &cc,
-                            TfBaseException &exc,
-                            TfFunctionRef<void ()> thrower,
-                            int skipNCallerFrames)
-{
+void TfBaseException::_ThrowImpl(TfCallContext const& cc,
+                                 TfBaseException& exc,
+                                 TfFunctionRef<void()> thrower,
+                                 int skipNCallerFrames) {
     if (TfGetenvBool("TF_FATAL_THROW", false)) {
-        TF_FATAL_ERROR("%s (%s thrown)",
-                       exc.what(),
-                       ArchGetDemangled(typeid(exc)).c_str());
+        TF_FATAL_ERROR("%s (%s thrown)", exc.what(), ArchGetDemangled(typeid(exc)).c_str());
     }
 
     // Capture a stack trace here, from the throw-point.
@@ -49,11 +40,8 @@ TfBaseException::_ThrowImpl(TfCallContext const &cc,
     thrower();
 }
 
-const char *
-TfBaseException::what() const noexcept
-{
+const char* TfBaseException::what() const noexcept {
     return _message.c_str();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

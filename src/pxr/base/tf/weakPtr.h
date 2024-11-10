@@ -25,8 +25,10 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 class TfHash;
-template <class U> class TfRefPtr;
-template <class T> class TfWeakPtr;
+template <class U>
+class TfRefPtr;
+template <class T>
+class TfWeakPtr;
 
 /// \class TfWeakPtr
 /// \ingroup group_tf_Memory
@@ -124,17 +126,17 @@ template <class T> class TfWeakPtr;
 /// comparison.
 ///
 template <class T>
-class TfWeakPtr : public TfWeakPtrFacade<TfWeakPtr, T>
-{
+class TfWeakPtr : public TfWeakPtrFacade<TfWeakPtr, T> {
 public:
-    
     friend class TfWeakPtrFacadeAccess;
-    template <class U> friend class TfWeakPtr;
+    template <class U>
+    friend class TfWeakPtr;
 
-    template <class U> struct Rebind {
+    template <class U>
+    struct Rebind {
         typedef TfWeakPtr<U> Type;
     };
-    
+
     TfWeakPtr() : _rawPtr(0) {}
 
     /// Construction, implicit conversion from TfNullPtr.
@@ -144,96 +146,69 @@ public:
     TfWeakPtr(std::nullptr_t) : _rawPtr(nullptr) {}
 
     /// Copy construction
-    TfWeakPtr(TfWeakPtr const &p) = default;
+    TfWeakPtr(TfWeakPtr const& p) = default;
 
     /// Move construction
-    TfWeakPtr(TfWeakPtr &&p) noexcept
-        : _rawPtr(p._rawPtr), _remnant(std::move(p._remnant)) {
-        p._rawPtr = nullptr;
-    }
+    TfWeakPtr(TfWeakPtr&& p) noexcept : _rawPtr(p._rawPtr), _remnant(std::move(p._remnant)) { p._rawPtr = nullptr; }
 
     /// Conversion from \a RefPtr where \a U* is convertible to \a T* (this
     /// pointer type).
     template <class U>
-    TfWeakPtr(TfRefPtr<U> const &p,
-              typename std::enable_if<
-                  std::is_convertible<U*, T*>::value
-              >::type *dummy = 0) : _rawPtr(get_pointer(p))
-    {
+    TfWeakPtr(TfRefPtr<U> const& p, typename std::enable_if<std::is_convertible<U*, T*>::value>::type* dummy = 0)
+        : _rawPtr(get_pointer(p)) {
         TF_UNUSED(dummy);
-        if (ARCH_LIKELY(_rawPtr))
-            _remnant = Tf_WeakBaseAccess::
-                GetRemnant(_rawPtr->__GetTfWeakBase__());
+        if (ARCH_LIKELY(_rawPtr)) _remnant = Tf_WeakBaseAccess::GetRemnant(_rawPtr->__GetTfWeakBase__());
     }
 
     /// Explicitly construct from a raw pointer \a p.
     template <class U>
-    explicit TfWeakPtr(U *p, typename std::enable_if<
-        std::is_convertible<U*, T*>::value>::type *dummy = nullptr) : _rawPtr(p)
-    {
+    explicit TfWeakPtr(U* p, typename std::enable_if<std::is_convertible<U*, T*>::value>::type* dummy = nullptr)
+        : _rawPtr(p) {
         TF_UNUSED(dummy);
-        if (ARCH_LIKELY(_rawPtr))
-            _remnant = Tf_WeakBaseAccess::
-                GetRemnant(_rawPtr->__GetTfWeakBase__());
+        if (ARCH_LIKELY(_rawPtr)) _remnant = Tf_WeakBaseAccess::GetRemnant(_rawPtr->__GetTfWeakBase__());
     }
 
     template <class U>
-    TfWeakPtr(TfWeakPtr<U> const &p,
-              typename std::enable_if<
-                  std::is_convertible<U*, T*>::value
-              >::type *dummy = 0) : _rawPtr(p._rawPtr), _remnant(p._remnant)
-    {
-    }
+    TfWeakPtr(TfWeakPtr<U> const& p, typename std::enable_if<std::is_convertible<U*, T*>::value>::type* dummy = 0)
+        : _rawPtr(p._rawPtr), _remnant(p._remnant) {}
 
     /// Copy assignment
-    TfWeakPtr &operator=(TfWeakPtr const &p) = default;
+    TfWeakPtr& operator=(TfWeakPtr const& p) = default;
 
     /// Move assignment
-    TfWeakPtr &operator=(TfWeakPtr &&p) noexcept {
+    TfWeakPtr& operator=(TfWeakPtr&& p) noexcept {
         _rawPtr = p._rawPtr;
         _remnant = std::move(p._remnant);
         p._rawPtr = nullptr;
         return *this;
     }
 
-    bool IsExpired() const {
-        return this->IsInvalid();
-    }
-    
-private:
+    bool IsExpired() const { return this->IsInvalid(); }
 
-    T *_FetchPointer() const {
-        if (ARCH_LIKELY(_remnant && _remnant->_IsAlive()))
-            return _rawPtr;
+private:
+    T* _FetchPointer() const {
+        if (ARCH_LIKELY(_remnant && _remnant->_IsAlive())) return _rawPtr;
         return 0;
     }
 
-    bool _IsInvalid() const {
-        return _remnant && !_remnant->_IsAlive();
-    }
+    bool _IsInvalid() const { return _remnant && !_remnant->_IsAlive(); }
 
-    void const *_GetUniqueIdentifier() const {
-        return _remnant ? _remnant->_GetUniqueIdentifier() : 0;
-    }
+    void const* _GetUniqueIdentifier() const { return _remnant ? _remnant->_GetUniqueIdentifier() : 0; }
 
-    void _EnableExtraNotification() const {
-        _remnant->EnableNotification();
-    }
-    
-    T *_rawPtr;
+    void _EnableExtraNotification() const { _remnant->EnableNotification(); }
+
+    T* _rawPtr;
     mutable TfRefPtr<Tf_Remnant> _remnant;
-    
 };
 
-
 template <class U>
-TfWeakPtr<U> TfCreateWeakPtr(U *p) {
+TfWeakPtr<U> TfCreateWeakPtr(U* p) {
     return TfWeakPtr<U>(p);
 }
 
 template <class U>
-TfWeakPtr<U> TfCreateNonConstWeakPtr(U const *p) {
-    return TfWeakPtr<U>(const_cast<U *>(p));
+TfWeakPtr<U> TfCreateNonConstWeakPtr(U const* p) {
+    return TfWeakPtr<U>(const_cast<U*>(p));
 }
 
 /// Thread-safe creation of a Tf ref pointer from a Tf weak pointer.
@@ -256,10 +231,9 @@ TfWeakPtr<U> TfCreateNonConstWeakPtr(U const *p) {
 /// above guarantee.
 ///
 template <class T>
-TfRefPtr<T>
-TfCreateRefPtrFromProtectedWeakPtr(TfWeakPtr<T> const &p) {
+TfRefPtr<T> TfCreateRefPtrFromProtectedWeakPtr(TfWeakPtr<T> const& p) {
     typedef typename TfRefPtr<T>::_Counter Counter;
-    if (T *rawPtr = get_pointer(p)) {
+    if (T* rawPtr = get_pointer(p)) {
         // Atomically increment the ref-count iff it's nonzero.
         if (Counter::AddRefIfNonzero(rawPtr)) {
             // There was at least 1 other ref at the time we acquired our ref,
@@ -273,7 +247,6 @@ TfCreateRefPtrFromProtectedWeakPtr(TfWeakPtr<T> const &p) {
     return TfNullPtr;
 }
 
-
 #if !defined(doxygen)
 
 //
@@ -282,83 +255,68 @@ TfCreateRefPtrFromProtectedWeakPtr(TfWeakPtr<T> const &p) {
 template <>
 class TfWeakPtr<void> {
 public:
-    TfWeakPtr() {
-    }
+    TfWeakPtr() {}
 
     template <class U>
-    TfWeakPtr(TfWeakPtr<U> const& wp)
-        : _remnant(wp._remnant) {
-    }
+    TfWeakPtr(TfWeakPtr<U> const& wp) : _remnant(wp._remnant) {}
 
     template <template <class> class PtrTemplate, class Type>
-    TfWeakPtr(TfWeakPtrFacade<PtrTemplate, Type> const& wpf)
-        : _remnant(_GetRemnant(wpf)) {
-    }
+    TfWeakPtr(TfWeakPtrFacade<PtrTemplate, Type> const& wpf) : _remnant(_GetRemnant(wpf)) {}
 
     template <class U>
-    TfWeakPtr<void>&
-    operator= (TfWeakPtr<U> const& wp) {
+    TfWeakPtr<void>& operator=(TfWeakPtr<U> const& wp) {
         _remnant = wp._remnant;
         return *this;
     }
 
     template <template <class> class PtrTemplate, class Type>
-    TfWeakPtr<void>&
-    operator= (TfWeakPtrFacade<PtrTemplate, Type> const& wpf) {
+    TfWeakPtr<void>& operator=(TfWeakPtrFacade<PtrTemplate, Type> const& wpf) {
         _remnant = _GetRemnant(wpf);
         return *this;
     }
 
     template <class U>
-    bool operator== (TfWeakPtr<U> const& wp) const {
+    bool operator==(TfWeakPtr<U> const& wp) const {
         return wp._remnant == _remnant;
     }
-    
+
     template <template <class> class PtrTemplate, class Type>
-    bool operator== (TfWeakPtrFacade<PtrTemplate, Type> const& wpf) const {
+    bool operator==(TfWeakPtrFacade<PtrTemplate, Type> const& wpf) const {
         return _GetRemnant(wpf) == _remnant;
     }
-    
+
     template <class U>
-    bool operator!= (TfWeakPtr<U> const& wp) const {
+    bool operator!=(TfWeakPtr<U> const& wp) const {
         return wp._remnant != _remnant;
     }
 
     template <template <class> class PtrTemplate, class Type>
-    bool operator!= (TfWeakPtrFacade<PtrTemplate, Type> const& wpf) const {
+    bool operator!=(TfWeakPtrFacade<PtrTemplate, Type> const& wpf) const {
         return _GetRemnant(wpf) != _remnant;
     }
 
     template <class U>
-    bool operator< (TfWeakPtr<U> const& wp) {
+    bool operator<(TfWeakPtr<U> const& wp) {
         return wp._remnant < _remnant;
     }
 
     template <template <class> class PtrTemplate, class Type>
-    bool operator< (TfWeakPtrFacade<PtrTemplate, Type> const& wpf) {
+    bool operator<(TfWeakPtrFacade<PtrTemplate, Type> const& wpf) {
         return _GetRemnant(wpf) < _remnant;
     }
 
-    using UnspecifiedBoolType = TfRefPtr<Tf_Remnant> (TfWeakPtr::*);
+    using UnspecifiedBoolType = TfRefPtr<Tf_Remnant>(TfWeakPtr::*);
 
-    operator UnspecifiedBoolType() const {
-        return (_remnant && _remnant->_IsAlive())
-            ? &TfWeakPtr::_remnant : nullptr;
-    }
+    operator UnspecifiedBoolType() const { return (_remnant && _remnant->_IsAlive()) ? &TfWeakPtr::_remnant : nullptr; }
 
-    bool operator !() const {
-        return !bool(*this);
-    }
+    bool operator!() const { return !bool(*this); }
 
-    bool IsExpired() const {
-        return _remnant && !_remnant->_IsAlive();
-    }
+    bool IsExpired() const { return _remnant && !_remnant->_IsAlive(); }
 
 private:
     template <template <class> class PtrTemplate, class Type>
-    static TfRefPtr<Tf_Remnant>
-    _GetRemnant(TfWeakPtrFacade<PtrTemplate, Type> const& wpf) {
-        TfWeakBase const *weakBase = wpf.GetWeakBase();
+    static TfRefPtr<Tf_Remnant> _GetRemnant(TfWeakPtrFacade<PtrTemplate, Type> const& wpf) {
+        TfWeakBase const* weakBase = wpf.GetWeakBase();
         if (ARCH_LIKELY(weakBase)) {
             return Tf_WeakBaseAccess::GetRemnant(*weakBase);
         }
@@ -370,7 +328,6 @@ private:
 };
 
 #endif
-
 
 //
 // A mechanism to determine whether a class type has a method
@@ -386,25 +343,20 @@ private:
 // std::false_type and is viable for all types.
 //
 template <class T>
-struct Tf_HasGetWeakBase
-{
+struct Tf_HasGetWeakBase {
 private:
-
     // The required method signature of __GetTfWeakBase__ for implementations
     // of the weak pointable interface.
     template <class U>
-    using _SignatureOf__GetTfWeakBase__ = TfWeakBase const & (U::*)() const;
+    using _SignatureOf__GetTfWeakBase__ = TfWeakBase const& (U::*)() const;
 
     template <class U>
-    static std::true_type
-    _HasSig(_SignatureOf__GetTfWeakBase__<U>);
+    static std::true_type _HasSig(_SignatureOf__GetTfWeakBase__<U>);
 
     template <class U>
-    static decltype(_HasSig(&U::__GetTfWeakBase__))
-    _Deduce(U*);
+    static decltype(_HasSig(&U::__GetTfWeakBase__)) _Deduce(U*);
 
-    static std::false_type
-    _Deduce(...);
+    static std::false_type _Deduce(...);
 
 public:
     using type = decltype(_Deduce(static_cast<T*>(nullptr)));
@@ -413,23 +365,20 @@ public:
 };
 
 template <class T>
-struct Tf_SupportsWeakPtr
-{
-    static const bool value =
-        std::is_base_of<TfWeakBase, T>::value || Tf_HasGetWeakBase<T>::value;
+struct Tf_SupportsWeakPtr {
+    static const bool value = std::is_base_of<TfWeakBase, T>::value || Tf_HasGetWeakBase<T>::value;
 };
 
 #define TF_SUPPORTS_WEAKPTR(T) (Tf_SupportsWeakPtr<T>::value)
-#define TF_TRULY_SUPPORTS_WEAKPTR(T)   std::is_base_of<TfWeakBase, T >::value
+#define TF_TRULY_SUPPORTS_WEAKPTR(T) std::is_base_of<TfWeakBase, T>::value
 
-#define TF_DECLARE_WEAK_POINTABLE_INTERFACE                     \
-    virtual TfWeakBase const &__GetTfWeakBase__() const = 0
+#define TF_DECLARE_WEAK_POINTABLE_INTERFACE virtual TfWeakBase const& __GetTfWeakBase__() const = 0
 
-#define TF_IMPLEMENT_WEAK_POINTABLE_INTERFACE                   \
-    virtual TfWeakBase const &__GetTfWeakBase__() const {       \
-        return *this;                                           \
+#define TF_IMPLEMENT_WEAK_POINTABLE_INTERFACE             \
+    virtual TfWeakBase const& __GetTfWeakBase__() const { \
+        return *this;                                     \
     }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_WEAK_PTR_H
+#endif  // PXR_BASE_TF_WEAK_PTR_H

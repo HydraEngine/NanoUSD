@@ -19,9 +19,9 @@
 
 #if defined(__clang__)
 RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(c++98-compat)
+RAPIDJSON_DIAG_OFF(c++ 98 - compat)
 #elif defined(_MSC_VER)
-RAPIDJSON_DIAG_OFF(4512) // assignment operator could not be generated
+RAPIDJSON_DIAG_OFF(4512)  // assignment operator could not be generated
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
@@ -29,7 +29,7 @@ RAPIDJSON_NAMESPACE_BEGIN
 ///////////////////////////////////////////////////////////////////////////////
 // GenericUri
 
-template <typename ValueType, typename Allocator=CrtAllocator>
+template <typename ValueType, typename Allocator = CrtAllocator>
 class GenericUri {
 public:
     typedef typename ValueType::Ch Ch;
@@ -38,36 +38,43 @@ public:
 #endif
 
     //! Constructors
-    GenericUri(Allocator* allocator = 0) : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_(), allocator_(allocator), ownAllocator_() {
-    }
+    GenericUri(Allocator* allocator = 0)
+        : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_(), allocator_(allocator), ownAllocator_() {}
 
-    GenericUri(const Ch* uri, SizeType len, Allocator* allocator = 0) : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_(), allocator_(allocator), ownAllocator_() {
+    GenericUri(const Ch* uri, SizeType len, Allocator* allocator = 0)
+        : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_(), allocator_(allocator), ownAllocator_() {
         Parse(uri, len);
     }
 
-    GenericUri(const Ch* uri, Allocator* allocator = 0) : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_(), allocator_(allocator), ownAllocator_() {
+    GenericUri(const Ch* uri, Allocator* allocator = 0)
+        : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_(), allocator_(allocator), ownAllocator_() {
         Parse(uri, internal::StrLen<Ch>(uri));
     }
 
     // Use with specializations of GenericValue
-    template<typename T> GenericUri(const T& uri, Allocator* allocator = 0) : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_(), allocator_(allocator), ownAllocator_() {
-        const Ch* u = uri.template Get<const Ch*>(); // TypeHelper from document.h
+    template <typename T>
+    GenericUri(const T& uri, Allocator* allocator = 0)
+        : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_(), allocator_(allocator), ownAllocator_() {
+        const Ch* u = uri.template Get<const Ch*>();  // TypeHelper from document.h
         Parse(u, internal::StrLen<Ch>(u));
     }
 
 #if RAPIDJSON_HAS_STDSTRING
-    GenericUri(const String& uri, Allocator* allocator = 0) : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_(), allocator_(allocator), ownAllocator_() {
+    GenericUri(const String& uri, Allocator* allocator = 0)
+        : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_(), allocator_(allocator), ownAllocator_() {
         Parse(uri.c_str(), internal::StrLen<Ch>(uri.c_str()));
     }
 #endif
 
     //! Copy constructor
-    GenericUri(const GenericUri& rhs) : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_(), allocator_(), ownAllocator_() {
+    GenericUri(const GenericUri& rhs)
+        : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_(), allocator_(), ownAllocator_() {
         *this = rhs;
     }
 
     //! Copy constructor
-    GenericUri(const GenericUri& rhs, Allocator* allocator) : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_(), allocator_(allocator), ownAllocator_() {
+    GenericUri(const GenericUri& rhs, Allocator* allocator)
+        : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_(), allocator_(allocator), ownAllocator_() {
         *this = rhs;
     }
 
@@ -96,8 +103,9 @@ public:
 
     //! Getters
     // Use with specializations of GenericValue
-    template<typename T> void Get(T& uri, Allocator& allocator) {
-        uri.template Set<const Ch*>(this->GetString(), allocator); // TypeHelper from document.h
+    template <typename T>
+    void Get(T& uri, Allocator& allocator) {
+        uri.template Set<const Ch*>(this->GetString(), allocator);  // TypeHelper from document.h
     }
 
     const Ch* GetString() const { return uri_; }
@@ -118,7 +126,9 @@ public:
 #if RAPIDJSON_HAS_STDSTRING
     static String Get(const GenericUri& uri) { return String(uri.GetString(), uri.GetStringLength()); }
     static String GetBase(const GenericUri& uri) { return String(uri.GetBaseString(), uri.GetBaseStringLength()); }
-    static String GetScheme(const GenericUri& uri) { return String(uri.GetSchemeString(), uri.GetSchemeStringLength()); }
+    static String GetScheme(const GenericUri& uri) {
+        return String(uri.GetSchemeString(), uri.GetSchemeStringLength());
+    }
     static String GetAuth(const GenericUri& uri) { return String(uri.GetAuthString(), uri.GetAuthStringLength()); }
     static String GetPath(const GenericUri& uri) { return String(uri.GetPathString(), uri.GetPathStringLength()); }
     static String GetQuery(const GenericUri& uri) { return String(uri.GetQueryString(), uri.GetQueryStringLength()); }
@@ -126,13 +136,9 @@ public:
 #endif
 
     //! Equality operators
-    bool operator==(const GenericUri& rhs) const {
-        return Match(rhs, true);
-    }
+    bool operator==(const GenericUri& rhs) const { return Match(rhs, true); }
 
-    bool operator!=(const GenericUri& rhs) const {
-        return !Match(rhs, true);
-    }
+    bool operator!=(const GenericUri& rhs) const { return !Match(rhs, true); }
 
     bool Match(const GenericUri& uri, bool full = true) const {
         Ch* s1;
@@ -157,7 +163,7 @@ public:
         GenericUri resuri;
         resuri.allocator_ = allocator;
         // Ensure enough space for combining paths
-        resuri.Allocate(GetStringLength() + baseuri.GetStringLength() + 1); // + 1 for joining slash
+        resuri.Allocate(GetStringLength() + baseuri.GetStringLength() + 1);  // + 1 for joining slash
 
         if (!(GetSchemeStringLength() == 0)) {
             // Use all of this URI
@@ -233,8 +239,7 @@ private:
     // Returns total amount allocated
     std::size_t Allocate(std::size_t len) {
         // Create own allocator if user did not supply.
-        if (!allocator_)
-            ownAllocator_ =  allocator_ = RAPIDJSON_NEW(Allocator)();
+        if (!allocator_) ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator)();
 
         // Allocate one block containing each part of the URI (5) plus base plus full URI, all null terminated.
         // Order: scheme, auth, path, query, frag, base, uri
@@ -331,8 +336,7 @@ private:
             if (start != pos2) {
                 std::memcpy(path_, &uri[start], (pos2 - start) * sizeof(Ch));
                 path_[pos2 - start] = '\0';
-                if (path_[0] == '/')
-                    RemoveDotSegments();   // absolute path - normalize
+                if (path_[0] == '/') RemoveDotSegments();  // absolute path - normalize
                 start = pos2;
             }
         }
@@ -374,13 +378,13 @@ private:
     void SetBase() {
         Ch* next = base_;
         std::memcpy(next, scheme_, GetSchemeStringLength() * sizeof(Ch));
-        next+= GetSchemeStringLength();
+        next += GetSchemeStringLength();
         std::memcpy(next, auth_, GetAuthStringLength() * sizeof(Ch));
-        next+= GetAuthStringLength();
+        next += GetAuthStringLength();
         std::memcpy(next, path_, GetPathStringLength() * sizeof(Ch));
-        next+= GetPathStringLength();
+        next += GetPathStringLength();
         std::memcpy(next, query_, GetQueryStringLength() * sizeof(Ch));
-        next+= GetQueryStringLength();
+        next += GetQueryStringLength();
         *next = '\0';
     }
 
@@ -388,9 +392,9 @@ private:
     void SetUri() {
         Ch* next = uri_;
         std::memcpy(next, base_, GetBaseStringLength() * sizeof(Ch));
-        next+= GetBaseStringLength();
+        next += GetBaseStringLength();
         std::memcpy(next, frag_, GetFragStringLength() * sizeof(Ch));
-        next+= GetFragStringLength();
+        next += GetFragStringLength();
         *next = '\0';
     }
 
@@ -457,16 +461,16 @@ private:
         path_[newpos] = '\0';
     }
 
-    Ch* uri_;    // Everything
-    Ch* base_;   // Everything except fragment
-    Ch* scheme_; // Includes the :
-    Ch* auth_;   // Includes the //
-    Ch* path_;   // Absolute if starts with /
-    Ch* query_;  // Includes the ?
-    Ch* frag_;   // Includes the #
+    Ch* uri_;     // Everything
+    Ch* base_;    // Everything except fragment
+    Ch* scheme_;  // Includes the :
+    Ch* auth_;    // Includes the //
+    Ch* path_;    // Absolute if starts with /
+    Ch* query_;   // Includes the ?
+    Ch* frag_;    // Includes the #
 
-    Allocator* allocator_;      //!< The current allocator. It is either user-supplied or equal to ownAllocator_.
-    Allocator* ownAllocator_;   //!< Allocator owned by this Uri.
+    Allocator* allocator_;     //!< The current allocator. It is either user-supplied or equal to ownAllocator_.
+    Allocator* ownAllocator_;  //!< Allocator owned by this Uri.
 };
 
 //! GenericUri for Value (UTF-8, default allocator).
@@ -478,4 +482,4 @@ RAPIDJSON_NAMESPACE_END
 RAPIDJSON_DIAG_POP
 #endif
 
-#endif // RAPIDJSON_URI_H_
+#endif  // RAPIDJSON_URI_H_

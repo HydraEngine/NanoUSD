@@ -11,13 +11,9 @@
 
 #include <ostream>
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-
-std::ostream &
-operator<<(std::ostream& out, const TfStopwatch& s)
-{
+std::ostream& operator<<(std::ostream& out, const TfStopwatch& s) {
     return out << s.GetSeconds() << " seconds";
 }
 

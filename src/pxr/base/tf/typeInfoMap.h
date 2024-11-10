@@ -45,24 +45,20 @@ template <class VALUE>
 class TfTypeInfoMap {
     TfTypeInfoMap(const TfTypeInfoMap&) = delete;
     TfTypeInfoMap& operator=(const TfTypeInfoMap&) = delete;
-public:
 
+public:
     // Default constructor passes 0 to TfHashMap constructors to keep size
     // small. This is good since each defined TfType has one of these maps in it.
     TfTypeInfoMap() : _nameMap(0), _stringCache(0) {}
 
     /// Return true if the given key is present in the map.
-    bool Exists(const std::type_info& key) const {
-        return Find(key) != NULL;
-    }
+    bool Exists(const std::type_info& key) const { return Find(key) != NULL; }
 
     /// Return true if the given key is present in the map.
     ///
     /// Note that lookup by \c std::type_info is preferable for speed reasons.
-    bool Exists(const std::string& key) const {
-        return Find(key) != NULL;
-    }
-    
+    bool Exists(const std::string& key) const { return Find(key) != NULL; }
+
     /// Return a pointer to the value stored under \p key, and NULL if \p key
     /// is not a key in the map.
     VALUE* Find(const std::type_info& key) const {
@@ -160,25 +156,22 @@ public:
         else
             return false;
     }
-    
+
     /// Remove this key (and any aliases associated with it).
-    void Remove(const std::type_info& key) {
-        Remove(key.name());
-    }
+    void Remove(const std::type_info& key) { Remove(key.name()); }
 
     /// Remove this key (and any aliases associated with it).
     void Remove(const std::string& key) {
         typename _StringCache::iterator i = _stringCache.find(key);
-        if (i == _stringCache.end())
-            return;
-        
+        if (i == _stringCache.end()) return;
+
         _Entry* e = i->second;
 
         for (TfIterator<_TypeInfoList> j = e->typeInfoAliases; j; ++j) {
             _typeInfoCache.erase(*j);
         }
-        
-        for (TfIterator<std::list<std::string> > j = e->stringAliases; j; ++j) {
+
+        for (TfIterator<std::list<std::string>> j = e->stringAliases; j; ++j) {
             _stringCache.erase(*j);
         }
 
@@ -192,19 +185,18 @@ public:
     }
 
 private:
-     typedef std::list<const std::type_info*> _TypeInfoList;
-     
-     struct _Entry {
-         mutable _TypeInfoList typeInfoAliases;
-         mutable std::list<std::string> stringAliases;
-         std::string primaryKey;
-         VALUE value;
-     };
+    typedef std::list<const std::type_info*> _TypeInfoList;
+
+    struct _Entry {
+        mutable _TypeInfoList typeInfoAliases;
+        mutable std::list<std::string> stringAliases;
+        std::string primaryKey;
+        VALUE value;
+    };
 
     void _CreateAlias(const std::type_info& alias, const std::string& key) {
         typename _StringCache::iterator i = _stringCache.find(key);
-        if (i != _stringCache.end())
-            _CreateAlias(alias, i->second);
+        if (i != _stringCache.end()) _CreateAlias(alias, i->second);
     }
 
     void _CreateAlias(const std::type_info& alias, _Entry* e) {
@@ -222,8 +214,7 @@ private:
     }
 
     typedef TfHashMap<std::string, _Entry, TfHash> _NameMap;
-    typedef TfHashMap<const std::type_info*, _Entry*, TfHash>
-        _TypeInfoCache;
+    typedef TfHashMap<const std::type_info*, _Entry*, TfHash> _TypeInfoCache;
     typedef TfHashMap<std::string, _Entry*, TfHash> _StringCache;
 
     _NameMap _nameMap;
@@ -234,4 +225,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_TYPE_INFO_MAP_H
+#endif  // PXR_BASE_TF_TYPE_INFO_MAP_H

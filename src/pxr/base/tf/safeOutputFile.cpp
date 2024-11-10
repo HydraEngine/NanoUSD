@@ -24,45 +24,37 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TfSafeOutputFile::~TfSafeOutputFile()
-{
+TfSafeOutputFile::~TfSafeOutputFile() {
     Close();
 }
 
-bool
-TfSafeOutputFile::IsOpenForUpdate() const
-{
+bool TfSafeOutputFile::IsOpenForUpdate() const {
     return _file && _tempFileName.empty();
 }
 
-FILE *
-TfSafeOutputFile::ReleaseUpdatedFile()
-{
+FILE* TfSafeOutputFile::ReleaseUpdatedFile() {
     if (!IsOpenForUpdate()) {
-        TF_CODING_ERROR("Invalid output file (failed to open, or opened for "
-                        "replace)");
+        TF_CODING_ERROR(
+                "Invalid output file (failed to open, or opened for "
+                "replace)");
         return nullptr;
     }
-    FILE *ret = _file;
+    FILE* ret = _file;
     _file = nullptr;
     _tempFileName.clear();
     _targetFileName.clear();
     return ret;
 }
 
-void
-TfSafeOutputFile::Close()
-{
-    if (!_file)
-        return;
+void TfSafeOutputFile::Close() {
+    if (!_file) return;
 
     // Close the file.
     fclose(_file);
     _file = nullptr;
 
     // If this was for update, we have nothing else to do.
-    if (_tempFileName.empty())
-        return;
+    if (_tempFileName.empty()) return;
 
     std::string error;
     if (!Tf_AtomicRenameFileOver(_tempFileName, _targetFileName, &error)) {
@@ -73,12 +65,11 @@ TfSafeOutputFile::Close()
     _targetFileName.clear();
 }
 
-void 
-TfSafeOutputFile::Discard()
-{
+void TfSafeOutputFile::Discard() {
     if (IsOpenForUpdate()) {
-        TF_CODING_ERROR("Invalid output file (failed to open, or opened for "
-                        "update)");
+        TF_CODING_ERROR(
+                "Invalid output file (failed to open, or opened for "
+                "update)");
         return;
     }
 
@@ -93,30 +84,22 @@ TfSafeOutputFile::Discard()
     }
 }
 
-TfSafeOutputFile
-TfSafeOutputFile::Update(std::string const &fileName)
-{
+TfSafeOutputFile TfSafeOutputFile::Update(std::string const& fileName) {
     TfSafeOutputFile result;
     result._targetFileName = fileName;
-    FILE *file = ArchOpenFile(fileName.c_str(), "rb+");
+    FILE* file = ArchOpenFile(fileName.c_str(), "rb+");
     if (!file) {
-        TF_RUNTIME_ERROR("Unable to open file '%s' for writing",
-                         fileName.c_str());
+        TF_RUNTIME_ERROR("Unable to open file '%s' for writing", fileName.c_str());
         return result;
     }
     result._file = file;
     return result;
 }
 
-TfSafeOutputFile
-TfSafeOutputFile::Replace(std::string const &fileName)
-{
+TfSafeOutputFile TfSafeOutputFile::Replace(std::string const& fileName) {
     TfSafeOutputFile result;
     std::string error;
-    int tmpFd = Tf_CreateSiblingTempFile(fileName,
-                                         &result._targetFileName,
-                                         &result._tempFileName,
-                                         &error);
+    int tmpFd = Tf_CreateSiblingTempFile(fileName, &result._targetFileName, &result._tempFileName, &error);
     if (tmpFd == -1) {
         TF_RUNTIME_ERROR(error);
         return result;
@@ -125,8 +108,7 @@ TfSafeOutputFile::Replace(std::string const &fileName)
     // Obtain a FILE *.
     result._file = ArchFdOpen(tmpFd, "wb");
     if (!result._file) {
-        TF_RUNTIME_ERROR("Unable to obtain writable FILE pointer: %s",
-                         ArchStrerror(errno).c_str());
+        TF_RUNTIME_ERROR("Unable to obtain writable FILE pointer: %s", ArchStrerror(errno).c_str());
     }
 
     return result;

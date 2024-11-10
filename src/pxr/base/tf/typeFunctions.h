@@ -40,51 +40,39 @@ struct TfTypeFunctions {
         return &t;
     }
 #endif
-    
-    static const T* GetRawPtr(const T& t) {
-        return &t;
-    }
+
+    static const T* GetRawPtr(const T& t) { return &t; }
 
     static T& ConstructFromRawPtr(T* ptr) { return *ptr; }
 
-    static bool IsNull(const T&) {
-        return false;
-    }
+    static bool IsNull(const T&) { return false; }
 
-    static void Class_Object_MUST_Not_Be_Const() { }
-    static void Object_CANNOT_Be_a_Pointer() { }
+    static void Class_Object_MUST_Not_Be_Const() {}
+    static void Object_CANNOT_Be_a_Pointer() {}
 };
 
 template <class T>
 struct TfTypeFunctions<T*> {
-    static T* GetRawPtr(T* t) {
-        return t;
-    }
+    static T* GetRawPtr(T* t) { return t; }
 
     static T* ConstructFromRawPtr(T* ptr) { return ptr; }
 
-    static bool IsNull(T* ptr) {
-        return !ptr;
-    }
+    static bool IsNull(T* ptr) { return !ptr; }
 
-    static void Class_Object_MUST_Be_Passed_By_Address() { }
-    static void Class_Object_MUST_Not_Be_Const() { }
+    static void Class_Object_MUST_Be_Passed_By_Address() {}
+    static void Class_Object_MUST_Not_Be_Const() {}
 };
 
 template <class T>
 struct TfTypeFunctions<const T*> {
-    static const T* GetRawPtr(const T* t) {
-        return t;
-    }
+    static const T* GetRawPtr(const T* t) { return t; }
 
-    static bool IsNull(const T* ptr) {
-        return !ptr;
-    }
+    static bool IsNull(const T* ptr) { return !ptr; }
 
     static const T* ConstructFromRawPtr(T* ptr) { return ptr; }
-    static void Class_Object_MUST_Be_Passed_By_Address() { }
+    static void Class_Object_MUST_Be_Passed_By_Address() {}
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_TYPE_FUNCTIONS_H
+#endif  // PXR_BASE_TF_TYPE_FUNCTIONS_H

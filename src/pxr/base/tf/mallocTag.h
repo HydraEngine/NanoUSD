@@ -61,12 +61,11 @@ public:
         /// node (\c siteName) corresponds to the tag name of the final tag in
         /// the path.
         struct PathNode {
-            size_t nBytes,          ///< Allocated bytes by this or descendant nodes.
-                   nBytesDirect;    ///< Allocated bytes (only for this node).
-            size_t nAllocations;    ///< The number of allocations for this node.
-            std::string siteName;   ///< Tag name.
-            std::vector<PathNode>
-                        children;   ///< Children nodes.
+            size_t nBytes,                   ///< Allocated bytes by this or descendant nodes.
+                    nBytesDirect;            ///< Allocated bytes (only for this node).
+            size_t nAllocations;             ///< The number of allocations for this node.
+            std::string siteName;            ///< Tag name.
+            std::vector<PathNode> children;  ///< Children nodes.
         };
 
         /// \struct CallSite
@@ -78,17 +77,16 @@ public:
         /// call-site are recorded in \c nBytes, while the name of the call
         /// site is available as \c name.
         struct CallSite {
-            std::string name;       ///< Tag name.
-            size_t nBytes;          ///< Allocated bytes.
+            std::string name;  ///< Tag name.
+            size_t nBytes;     ///< Allocated bytes.
         };
 
         /// Specify which parts of the report to print.
         enum PrintSetting {
-            TREE = 0,                   ///< Print the full call tree
-            CALLSITES,                  ///< Print just the call sites > 0.1%
-            BOTH                        ///< Print both tree and call sites
+            TREE = 0,   ///< Print the full call tree
+            CALLSITES,  ///< Print just the call sites > 0.1%
+            BOTH        ///< Print both tree and call sites
         };
-
 
         /// \name Input/Output
         /// @{
@@ -114,32 +112,26 @@ public:
         ///
         /// \b %%Totl : (%% Total). BytesExcl / TotalBytes * 100
         TF_API
-        std::string GetPrettyPrintString(PrintSetting setting = BOTH,
-                                         size_t maxPrintedNodes = 100000) const;
+        std::string GetPrettyPrintString(PrintSetting setting = BOTH, size_t maxPrintedNodes = 100000) const;
 
         /// Generates a report to the ostream \p out.
         ///
         /// If \p rootName is non-empty it will replace the name of the tree
         /// root in the report.
         TF_API
-        void Report(
-            std::ostream &out,
-            const std::string &rootName) const;
+        void Report(std::ostream& out, const std::string& rootName) const;
 
         /// Generates a report to the ostream \p out.
         TF_API
-        void Report(
-            std::ostream &out) const;
+        void Report(std::ostream& out) const;
 
         /// Load the contents of \p in into the root of the call tree.
         ///
         /// Returns true if the report loaded successfully, false otherwise.
         TF_API
-        bool LoadReport(
-            std::istream &in);
+        bool LoadReport(std::istream& in);
 
         /// @}
-
 
         /// All call sites.
         std::vector<CallSite> callSites;
@@ -154,8 +146,7 @@ public:
     /// \struct CallStackInfo
     /// This struct is used to represent a call stack taken for an allocation
     /// that was  billed under a specific malloc tag.
-    struct CallStackInfo
-    {
+    struct CallStackInfo {
         /// The stack frame pointers.
         std::vector<uintptr_t> stack;
 
@@ -185,9 +176,7 @@ public:
     ///
     /// If \c Initialize() has been successfully called, this function returns
     /// \c true.
-    static bool IsInitialized() {
-        return TfMallocTag::_isInitialized;
-    }
+    static bool IsInitialized() { return TfMallocTag::_isInitialized; }
 
     /// Return total number of allocated bytes.
     ///
@@ -218,11 +207,9 @@ public:
     TF_API static bool GetCallTree(CallTree* tree, bool skipRepeated = true);
 
 private:
-
     struct _ThreadData;
 
 public:
-
     /// \class Auto
     /// \ingroup group_tf_MallocTag
     ///
@@ -248,11 +235,11 @@ public:
     /// encountered.
     class Auto {
     public:
-        Auto(const Auto &) = delete;
-        Auto& operator=(const Auto &) = delete;
+        Auto(const Auto&) = delete;
+        Auto& operator=(const Auto&) = delete;
 
-        Auto(Auto &&) = delete;
-        Auto& operator=(Auto &&) = delete;
+        Auto(Auto&&) = delete;
+        Auto& operator=(Auto&&) = delete;
 
         /// Push one or more memory tags onto the local-call stack with names \p
         /// name1 ... \p nameN.  The passed names should be either string
@@ -272,12 +259,11 @@ public:
         /// manual calls to \c TfMallocTag::Push() and \c TfMallocTag::Pop(),
         /// though you should do this only as a last resort.
         template <class Str, class... Strs>
-        explicit Auto(Str &&name1, Strs &&... nameN)
-            : _threadData(TfMallocTag::_Push(_CStr(std::forward<Str>(name1))))
-            , _nTags(_threadData ? 1 + sizeof...(Strs) : 0) {
+        explicit Auto(Str&& name1, Strs&&... nameN)
+            : _threadData(TfMallocTag::_Push(_CStr(std::forward<Str>(name1)))),
+              _nTags(_threadData ? 1 + sizeof...(Strs) : 0) {
             if (_threadData) {
-                (..., TfMallocTag::_Begin(
-                    _CStr(std::forward<Strs>(nameN)), _threadData));
+                (..., TfMallocTag::_Begin(_CStr(std::forward<Strs>(nameN)), _threadData));
             }
         }
 
@@ -303,14 +289,11 @@ public:
         /// If \c TfMallocTag::Initialize() was not called when this tag was
         /// pushed onto the stack, popping the tag from the stack does
         /// essentially no (measurable) work.
-        inline ~Auto() {
-            Release();
-        }
+        inline ~Auto() { Release(); }
 
     private:
-
-        char const *_CStr(char const *cstr) const { return cstr; }
-        char const *_CStr(std::string const &str) const { return str.c_str(); }
+        char const* _CStr(char const* cstr) const { return cstr; }
+        char const* _CStr(std::string const& str) const { return str.c_str(); }
 
         _ThreadData* _threadData;
         int _nTags;
@@ -332,14 +315,10 @@ public:
     /// Note that initializing the tagging system between matching calls to \c
     /// Push() and \c Pop() is ill-advised, which is yet another reason to
     /// prefer using \c TfAutoMallocTag whenever possible.
-    static void Push(const std::string& name) {
-        _Push(name.c_str());
-    }
+    static void Push(const std::string& name) { _Push(name.c_str()); }
 
     /// \overload
-    static void Push(const char* name) {
-        _Push(name);
-    }
+    static void Push(const char* name) { _Push(name); }
 
     /// Manually pop a tag from the stack.
     ///
@@ -399,7 +378,7 @@ public:
     ///
     /// \note This method also clears the internally held set of captured
     /// stacks.
-    TF_API static std::vector<std::vector<uintptr_t> > GetCapturedMallocStacks();
+    TF_API static std::vector<std::vector<uintptr_t>> GetCapturedMallocStacks();
 
 private:
     friend struct _TemporaryDisabler;
@@ -408,21 +387,20 @@ private:
 
     static bool _Initialize(std::string* errMsg);
 
-    static inline _ThreadData *_Push(char const *name) {
+    static inline _ThreadData* _Push(char const* name) {
         if (TfMallocTag::_isInitialized) {
             return _Begin(name);
         }
         return nullptr;
     }
 
-    TF_API static _ThreadData *_Begin(char const *name,
-                                      _ThreadData *threadData = nullptr);
-    TF_API static void _End(int nTags = 1, _ThreadData *threadData = nullptr);
+    TF_API static _ThreadData* _Begin(char const* name, _ThreadData* threadData = nullptr);
+    TF_API static void _End(int nTags = 1, _ThreadData* threadData = nullptr);
 
     static void* _MallocWrapper(size_t, const void*);
     static void* _ReallocWrapper(void*, size_t, const void*);
     static void* _MemalignWrapper(size_t, size_t, const void*);
-    static void  _FreeWrapper(void*, const void*);
+    static void _FreeWrapper(void*, const void*);
 
     friend class TfMallocTag::Auto;
     class Tls;
@@ -470,33 +448,33 @@ using TfAutoMallocTag2 = TfMallocTag::Auto;
 ///
 /// \hideinitializer
 //
-PXR_NAMESPACE_CLOSE_SCOPE                                                 
+PXR_NAMESPACE_CLOSE_SCOPE
 
-#define TF_MALLOC_TAG_NEW(name1, name2)                                       \
-    /* this is for STL purposes */                                            \
-    inline void* operator new(::std::size_t, void* ptr) {                     \
-        return ptr;                                                           \
-    }                                                                         \
-                                                                              \
-    inline void* operator new(::std::size_t s) {                              \
-        PXR_NS::TfAutoMallocTag tag(name1, name2);                            \
-        return malloc(s);                                                     \
-    }                                                                         \
-                                                                              \
-    inline void* operator new[](::std::size_t s) {                            \
-        PXR_NS::TfAutoMallocTag tag(name1, name2);                            \
-        return malloc(s);                                                     \
-    }                                                                         \
-                                                                              \
-    /* Required due to the placement-new override above. */                   \
-    inline void operator delete(void* ptr, void* place) {}                    \
-                                                                              \
-    inline void operator delete(void* ptr, size_t) {                          \
-        free(ptr);                                                            \
-    }                                                                         \
-                                                                              \
-    inline void operator delete[] (void* ptr, size_t) {                       \
-        free(ptr);                                                            \
-    }                                                                         \
+#define TF_MALLOC_TAG_NEW(name1, name2)                     \
+    /* this is for STL purposes */                          \
+    inline void* operator new(::std::size_t, void* ptr) {   \
+        return ptr;                                         \
+    }                                                       \
+                                                            \
+    inline void* operator new(::std::size_t s) {            \
+        PXR_NS::TfAutoMallocTag tag(name1, name2);          \
+        return malloc(s);                                   \
+    }                                                       \
+                                                            \
+    inline void* operator new[](::std::size_t s) {          \
+        PXR_NS::TfAutoMallocTag tag(name1, name2);          \
+        return malloc(s);                                   \
+    }                                                       \
+                                                            \
+    /* Required due to the placement-new override above. */ \
+    inline void operator delete(void* ptr, void* place) {}  \
+                                                            \
+    inline void operator delete(void* ptr, size_t) {        \
+        free(ptr);                                          \
+    }                                                       \
+                                                            \
+    inline void operator delete[](void* ptr, size_t) {      \
+        free(ptr);                                          \
+    }
 
 #endif

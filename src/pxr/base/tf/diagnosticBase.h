@@ -35,44 +35,34 @@ class TfDiagnosticMgr;
 /// \ingroup group_tf_TfError
 ///
 /// Represents the base class of an object representing a diagnostic message.
-/// 
+///
 /// This forms the base class for specific types associated with errors,
 /// warnings and status messages. It associates a diagnostic code (which is an
 /// enum value) with the message. It can also hold on to arbitrary information
 /// associated with the message in a TfDiagnosticInfo.
-/// 
+///
 /// See \ref page_tf_TfError in the C++ API reference for a detailed example.
 /// For a description of how to post an error, warning or a status message see
 /// \c TF_ERROR(), \c TF_WARN and \c TF_STATUS also in the C++ API reference.
 ///
 class TfDiagnosticBase {
 public:
-
     /// Return the call context where the message was issued.
-    const TfCallContext &GetContext() const {
-        return _context;
-    }
+    const TfCallContext& GetContext() const { return _context; }
 
     /// Return the source file name that the diagnostic message was posted from.
-    std::string GetSourceFileName() const {
-        return _context.GetFile();
-    }
+    std::string GetSourceFileName() const { return _context.GetFile(); }
 
     /// Return the source line number that the diagnostic message was posted
     /// from.
-    size_t GetSourceLineNumber() const {
-        return _context.GetLine();
-    }
+    size_t GetSourceLineNumber() const { return _context.GetLine(); }
 
     /// Return the commentary string describing this diagnostic message.
-    std::string const &GetCommentary() const {
-        return _commentary;
-    }
+    std::string const& GetCommentary() const { return _commentary; }
 
     /// Return the source function that the diagnostic message was posted from.
     std::string GetSourceFunction() const {
-        return ArchGetPrettierFunctionName(_context.GetFunction(),
-                                           _context.GetPrettyFunction());
+        return ArchGetPrettierFunctionName(_context.GetFunction(), _context.GetPrettyFunction());
     }
 
     /// Add to the commentary string describing this diagnostic message.
@@ -95,10 +85,7 @@ public:
     }
 
     /// Return the diagnostic code posted.
-    TfEnum GetDiagnosticCode() const {
-        return _code;
-    }
-    
+    TfEnum GetDiagnosticCode() const { return _code; }
 
     /// Return the diagnostic code posted as a string.
     ///
@@ -118,10 +105,8 @@ public:
     /// \endcode
     /// will result in \c GetDiagnosticCodeAsString() returning the
     /// (uninformative) string "c".
-    const std::string& GetDiagnosticCodeAsString() const {
-        return _codeString;
-    }
-    
+    const std::string& GetDiagnosticCodeAsString() const { return _codeString; }
+
     /// Return a (possibly NULL) const pointer to the info object associated
     /// with this message.
     ///
@@ -148,9 +133,7 @@ public:
 
     /// Set the info object associated with this diagnostic message.
     /// \see GetInfo()
-    void SetInfo(TfDiagnosticInfo any) {
-        _info = any;
-    }
+    void SetInfo(TfDiagnosticInfo any) { _info = any; }
 
     /// Return true if the message was posted via \c PostQuietly().
     ///
@@ -158,9 +141,7 @@ public:
     /// printout of the error is not desirable, because someone higher up on
     /// the stack may actually handle this error. This is rare, but it does
     /// happen on occasion.
-    bool GetQuiet() const {
-        return _quiet;
-    }
+    bool GetQuiet() const { return _quiet; }
 
     /// Return true if this diagnostic's code is a fatal code.
     TF_API
@@ -170,13 +151,15 @@ public:
     /// coding error.
     TF_API
     bool IsCodingError() const;
-    
+
     /// Construct an instance.
     TF_API
-    TfDiagnosticBase(TfEnum code, char const *codeString,
-                     TfCallContext const &context,
+    TfDiagnosticBase(TfEnum code,
+                     char const* codeString,
+                     TfCallContext const& context,
                      const std::string& commentary,
-                     TfDiagnosticInfo info, bool quiet);
+                     TfDiagnosticInfo info,
+                     bool quiet);
 
 protected:
     TfCallContext _context;
@@ -195,4 +178,4 @@ protected:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_DIAGNOSTIC_BASE_H
+#endif  // PXR_BASE_TF_DIAGNOSTIC_BASE_H

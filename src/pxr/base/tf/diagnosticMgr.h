@@ -37,12 +37,10 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEBUG_CODES(
-    TF_LOG_STACK_TRACE_ON_ERROR,
-    TF_LOG_STACK_TRACE_ON_WARNING,
-    TF_ERROR_MARK_TRACKING,
-    TF_PRINT_ALL_POSTED_ERRORS_TO_STDERR
-    );
+TF_DEBUG_CODES(TF_LOG_STACK_TRACE_ON_ERROR,
+               TF_LOG_STACK_TRACE_ON_WARNING,
+               TF_ERROR_MARK_TRACKING,
+               TF_PRINT_ALL_POSTED_ERRORS_TO_STDERR);
 
 class TfError;
 class TfErrorMark;
@@ -53,7 +51,6 @@ class TfErrorMark;
 /// Singleton class through which all errors and diagnostics pass.
 class TfDiagnosticMgr : public TfWeakBase {
 public:
-
     typedef TfDiagnosticMgr This;
 
     typedef std::list<TfError> ErrorList;
@@ -80,16 +77,17 @@ public:
 
     /// Returns the name of the given diagnostic code.
     TF_API
-    static std::string GetCodeName(const TfEnum &code);
+    static std::string GetCodeName(const TfEnum& code);
 
-    /// Return a human-readable diagnostic message. The TfDiagnosticMgr uses 
-    /// this function to print diagnostics when no diagnostic delegates are 
-    /// installed. Diagnostic delegate implementations can call this to produce 
+    /// Return a human-readable diagnostic message. The TfDiagnosticMgr uses
+    /// this function to print diagnostics when no diagnostic delegates are
+    /// installed. Diagnostic delegate implementations can call this to produce
     /// messages in the same format, if desired.
     TF_API
-    static std::string FormatDiagnostic(const TfEnum &code, 
-            const TfCallContext &context, const std::string &msg, 
-            const TfDiagnosticInfo &info);
+    static std::string FormatDiagnostic(const TfEnum& code,
+                                        const TfCallContext& context,
+                                        const std::string& msg,
+                                        const TfDiagnosticInfo& info);
 
     /// \class Delegate
     /// One may set a delegate with the \c TfDiagnosticMgr which will be
@@ -106,26 +104,25 @@ public:
     /// - TF_WARN
     /// - TF_STATUS
     ///
-    /// For a more complete list, see diagnostic.h 
+    /// For a more complete list, see diagnostic.h
     ///
     class Delegate {
-      public:
-        TF_API 
+    public:
+        TF_API
         virtual ~Delegate() = 0;
 
         /// Called when a \c TfError is posted.
-        virtual void IssueError(TfError const &err) = 0;
+        virtual void IssueError(TfError const& err) = 0;
 
         /// Called when a \c TF_FATAL_ERROR is issued (or a failed
         /// \c TF_AXIOM).
-        virtual void IssueFatalError(TfCallContext const &context,
-                                     std::string const &msg) = 0;
+        virtual void IssueFatalError(TfCallContext const& context, std::string const& msg) = 0;
 
         /// Called when a \c TF_STATUS() is issued.
-        virtual void IssueStatus(TfStatus const &status) = 0;
+        virtual void IssueStatus(TfStatus const& status) = 0;
 
         /// Called when a \c TF_WARNING() is issued.
-        virtual void IssueWarning(TfWarning const &warning) = 0;
+        virtual void IssueWarning(TfWarning const& warning) = 0;
 
     protected:
         /// Abort the program, but avoid the session logging mechanism. This
@@ -136,9 +133,7 @@ public:
     };
 
     /// Return the singleton instance.
-    TF_API static This &GetInstance() {
-        return TfSingleton<This>::GetInstance();
-    }
+    TF_API static This& GetInstance() { return TfSingleton<This>::GetInstance(); }
 
     /// Add the delegate \p delegate to the list of current delegates.
     ///
@@ -160,7 +155,7 @@ public:
     /// to the terminal.
     TF_API
     void SetQuiet(bool quiet) { _quiet = quiet; }
-    
+
     /// Return an iterator to the beginning of this thread's error list.
     ErrorIterator GetErrorBegin() { return _errorList.local().begin(); }
 
@@ -183,19 +178,21 @@ public:
     /// which translates tf errors to and from python exceptions can manage
     /// errors.
     TF_API
-    void AppendError(TfError const &e);
-    
+    void AppendError(TfError const& e);
+
     /// This method will create a TfError, append it to the error list, and
     /// pass it to all delegates.
     ///
     /// If no delegates have been registered and no error mark is active, this
     /// method will print the error to stderr.
     TF_API
-    void PostError(TfEnum errorCode, const char* errorCodeString,
-        TfCallContext const &context,  
-        const std::string& commentary, TfDiagnosticInfo info,
-        bool quiet);
-    
+    void PostError(TfEnum errorCode,
+                   const char* errorCodeString,
+                   TfCallContext const& context,
+                   const std::string& commentary,
+                   TfDiagnosticInfo info,
+                   bool quiet);
+
     /// This method will create a TfError, append it to the error list, and
     /// pass it to all delegates.
     ///
@@ -209,9 +206,12 @@ public:
     /// If no delegates have been registered, this method will print the
     /// warning msg to stderr.
     TF_API
-    void PostWarning(TfEnum warningCode, const char *warningCodeString,
-        TfCallContext const &context, std::string const &commentary,
-        TfDiagnosticInfo info, bool quiet) const;
+    void PostWarning(TfEnum warningCode,
+                     const char* warningCodeString,
+                     TfCallContext const& context,
+                     std::string const& commentary,
+                     TfDiagnosticInfo info,
+                     bool quiet) const;
 
     /// This method will create a TfWarning and pass it to all delegates.
     ///
@@ -225,9 +225,12 @@ public:
     /// If no delegates have been registered, this method will print the
     /// status msg to stderr.
     TF_API
-    void PostStatus(TfEnum statusCode, const char *statusCodeString,
-        TfCallContext const &context, std::string const &commentary,
-        TfDiagnosticInfo info, bool quiet) const;
+    void PostStatus(TfEnum statusCode,
+                    const char* statusCodeString,
+                    TfCallContext const& context,
+                    std::string const& commentary,
+                    TfDiagnosticInfo info,
+                    bool quiet) const;
 
     /// This method will create a TfStatus and pass it to all delegates.
     ///
@@ -241,9 +244,7 @@ public:
     /// If no delegates have been registered, or if none of the delegates abort
     /// the process, this method will print the error msg and abort the process.
     [[noreturn]]
-    TF_API
-    void PostFatal(TfCallContext const &context, TfEnum statusCode,
-                   std::string const &msg) const;
+    TF_API void PostFatal(TfCallContext const& context, TfEnum statusCode, std::string const& msg) const;
 
     /// Return true if an instance of TfErrorMark exists in the current thread
     /// of execution, false otherwise.
@@ -255,133 +256,104 @@ public:
     //
     /// \private
     class ErrorHelper {
-      public:
-        ErrorHelper(TfCallContext const &context, TfEnum errorCode,
-                    const char* errorCodeString)
-            : _context(context), _errorCode(errorCode),
-              _errorCodeString(errorCodeString)
-        {
-        }
+    public:
+        ErrorHelper(TfCallContext const& context, TfEnum errorCode, const char* errorCodeString)
+            : _context(context), _errorCode(errorCode), _errorCodeString(errorCodeString) {}
 
         TF_API
-        void Post(const char* fmt, ...) const
-            ARCH_PRINTF_FUNCTION(2,3);
+        void Post(const char* fmt, ...) const ARCH_PRINTF_FUNCTION(2, 3);
 
         TF_API
-        void PostQuietly(const char* fmt, ...) const
-            ARCH_PRINTF_FUNCTION(2,3);
+        void PostQuietly(const char* fmt, ...) const ARCH_PRINTF_FUNCTION(2, 3);
 
         TF_API
         void Post(const std::string& msg) const;
 
         TF_API
-        void PostWithInfo(
-                const std::string& msg,
-                TfDiagnosticInfo info = TfDiagnosticInfo()) const;
+        void PostWithInfo(const std::string& msg, TfDiagnosticInfo info = TfDiagnosticInfo()) const;
 
         TF_API
-        void PostQuietly(const std::string& msg,
-                         TfDiagnosticInfo info = TfDiagnosticInfo()) const;
+        void PostQuietly(const std::string& msg, TfDiagnosticInfo info = TfDiagnosticInfo()) const;
 
-      private:
+    private:
         TfCallContext _context;
         TfEnum _errorCode;
-        const char *_errorCodeString;
+        const char* _errorCodeString;
     };
 
     struct WarningHelper {
-        WarningHelper(TfCallContext const &context, TfEnum warningCode,
-                      const char *warningCodeString)
-            : _context(context), _warningCode(warningCode),
-              _warningCodeString(warningCodeString)
-        {
-        }
+        WarningHelper(TfCallContext const& context, TfEnum warningCode, const char* warningCodeString)
+            : _context(context), _warningCode(warningCode), _warningCodeString(warningCodeString) {}
 
         TF_API
-        void Post(const char* fmt, ...) const
-            ARCH_PRINTF_FUNCTION(2,3);
+        void Post(const char* fmt, ...) const ARCH_PRINTF_FUNCTION(2, 3);
 
         TF_API
-        void PostQuietly(const char* fmt, ...) const
-            ARCH_PRINTF_FUNCTION(2,3);
+        void PostQuietly(const char* fmt, ...) const ARCH_PRINTF_FUNCTION(2, 3);
 
         TF_API
-        void Post(const std::string &str) const;
+        void Post(const std::string& str) const;
 
         TF_API
-        void PostWithInfo(
-                const std::string& msg,
-                TfDiagnosticInfo info = TfDiagnosticInfo()) const;
+        void PostWithInfo(const std::string& msg, TfDiagnosticInfo info = TfDiagnosticInfo()) const;
 
         TF_API
         void PostQuietly(const std::string& msg) const;
 
-      private:
+    private:
         TfCallContext _context;
         TfEnum _warningCode;
-        const char *_warningCodeString;
+        const char* _warningCodeString;
     };
 
     struct StatusHelper {
-        StatusHelper(TfCallContext const &context, TfEnum statusCode,
-                     const char *statusCodeString)
-            : _context(context), _statusCode(statusCode),
-              _statusCodeString(statusCodeString)
-        {
-        }
+        StatusHelper(TfCallContext const& context, TfEnum statusCode, const char* statusCodeString)
+            : _context(context), _statusCode(statusCode), _statusCodeString(statusCodeString) {}
 
         TF_API
-        void Post(const char* fmt, ...) const
-            ARCH_PRINTF_FUNCTION(2,3);
+        void Post(const char* fmt, ...) const ARCH_PRINTF_FUNCTION(2, 3);
 
         TF_API
-        void PostQuietly(const char* fmt, ...) const
-            ARCH_PRINTF_FUNCTION(2,3);
+        void PostQuietly(const char* fmt, ...) const ARCH_PRINTF_FUNCTION(2, 3);
 
         TF_API
-        void Post(const std::string &str) const;
+        void Post(const std::string& str) const;
 
         TF_API
-        void PostWithInfo(
-                const std::string& msg,
-                TfDiagnosticInfo info = TfDiagnosticInfo()) const;
+        void PostWithInfo(const std::string& msg, TfDiagnosticInfo info = TfDiagnosticInfo()) const;
 
         TF_API
         void PostQuietly(const std::string& msg) const;
 
-      private:
+    private:
         TfCallContext _context;
         TfEnum _statusCode;
-        const char *_statusCodeString;
+        const char* _statusCodeString;
     };
 
     struct FatalHelper {
-        FatalHelper(TfCallContext const &context, TfEnum statusCode)
-            : _context(context),
-              _statusCode(statusCode)
-        {
-        }
+        FatalHelper(TfCallContext const& context, TfEnum statusCode) : _context(context), _statusCode(statusCode) {}
         [[noreturn]]
-        void Post(const std::string &str) const {
+        void Post(const std::string& str) const {
             This::GetInstance().PostFatal(_context, _statusCode, str);
         }
-      private:
+
+    private:
         TfCallContext _context;
         TfEnum _statusCode;
     };
-        
-#endif
-    
-private:
 
+#endif
+
+private:
     TfDiagnosticMgr();
     virtual ~TfDiagnosticMgr();
     friend class TfSingleton<This>;
-    
+
     // Return an iterator to the first error with serial number >= mark, or the
     // past-the-end iterator, if no such errors exist.
     TF_API
-    ErrorIterator _GetErrorMarkBegin(size_t mark, size_t *nErrors);
+    ErrorIterator _GetErrorMarkBegin(size_t mark, size_t* nErrors);
 
     // Invoked by ErrorMark ctor.
     inline void _CreateErrorMark() { ++_errorMarkCounts.local(); }
@@ -391,12 +363,12 @@ private:
 
     // Report an error, either via delegate or print to stderr, and issue a
     // notice if this thread of execution is the main thread.
-    void _ReportError(const TfError &err);
+    void _ReportError(const TfError& err);
 
     // Splice the errors in src into this thread's local list.  Also reassign
     // serial numbers to all the spliced errors to ensure they work correctly
     // with local error marks.
-    void _SpliceErrors(ErrorList &src);
+    void _SpliceErrors(ErrorList& src);
 
     // Helper to append pending error messages to the crash log.
     void _AppendErrorsToLogText(ErrorIterator i);
@@ -406,7 +378,7 @@ private:
     void _RebuildErrorLogText();
 
     // Helper to actually publish log text into the Arch crash handler.
-    void _SetLogInfoForErrors(std::vector<std::string> const &logText) const;
+    void _SetLogInfoForErrors(std::vector<std::string> const& logText) const;
 
     // A guard used to protect reentrency when adding/removing
     // delegates as well as posting errors/warnings/statuses
@@ -427,21 +399,19 @@ private:
     struct _LogText {
         void AppendAndPublish(ErrorIterator i, ErrorIterator end);
         void RebuildAndPublish(ErrorIterator i, ErrorIterator end);
-        
-        std::pair<std::vector<std::string>,
-                  std::vector<std::string>> texts;
+
+        std::pair<std::vector<std::string>, std::vector<std::string>> texts;
         bool parity = false;
+
     private:
-        void _AppendAndPublishImpl(bool clear,
-                                   ErrorIterator i, ErrorIterator end);
+        void _AppendAndPublishImpl(bool clear, ErrorIterator i, ErrorIterator end);
     };
     tbb::enumerable_thread_specific<_LogText> _logText;
 
     // Thread-specific error mark counts.  Use a native key for best performance
     // here.
-    tbb::enumerable_thread_specific<
-        size_t, tbb::cache_aligned_allocator<size_t>,
-        tbb::ets_key_per_instance> _errorMarkCounts;
+    tbb::enumerable_thread_specific<size_t, tbb::cache_aligned_allocator<size_t>, tbb::ets_key_per_instance>
+            _errorMarkCounts;
 
     bool _quiet;
 
@@ -454,4 +424,4 @@ TF_API_TEMPLATE_CLASS(TfSingleton<TfDiagnosticMgr>);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_DIAGNOSTIC_MGR_H
+#endif  // PXR_BASE_TF_DIAGNOSTIC_MGR_H

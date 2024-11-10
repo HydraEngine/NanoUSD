@@ -28,7 +28,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This is a wrapper around ArchLibraryOpen() in the sense that this function
 /// calls \c ArchLibraryOpen(\p filename, \p flag) but it will additionally
 /// load script bindings if scripting is initialized and loading is requested.
-/// 
+///
 /// If \p error is not \c NULL it will be set to a system reported error
 /// if opening the library failed, otherwise it will be cleared.
 ///
@@ -38,10 +38,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This returns an opaque handle to the opened library or \c NULL on
 /// failure.
 TF_API
-void* TfDlopen(const std::string &filename,
-               int flag, 
-               std::string *error = NULL,
-               bool loadScriptBindings = true);
+void* TfDlopen(const std::string& filename, int flag, std::string* error = NULL, bool loadScriptBindings = true);
 
 /// Close a dynamic library.
 TF_API

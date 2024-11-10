@@ -35,29 +35,29 @@ struct Tf_ShouldIterateOverCopy : std::false_type {};
 template <class T, bool Reverse>
 struct Tf_IteratorInterface {
     typedef typename T::iterator IteratorType;
-    static IteratorType Begin(T &c) { return c.begin(); }
-    static IteratorType End(T &c) { return c.end(); }
+    static IteratorType Begin(T& c) { return c.begin(); }
+    static IteratorType End(T& c) { return c.end(); }
 };
 
 template <class T, bool Reverse>
 struct Tf_IteratorInterface<const T, Reverse> {
     typedef typename T::const_iterator IteratorType;
-    static IteratorType Begin(T const &c) { return c.begin(); }
-    static IteratorType End(T const &c) { return c.end(); }
+    static IteratorType Begin(T const& c) { return c.begin(); }
+    static IteratorType End(T const& c) { return c.end(); }
 };
 
 template <class T>
 struct Tf_IteratorInterface<T, true> {
     typedef typename T::reverse_iterator IteratorType;
-    static IteratorType Begin(T &c) { return c.rbegin(); }
-    static IteratorType End(T &c) { return c.rend(); }
+    static IteratorType Begin(T& c) { return c.rbegin(); }
+    static IteratorType End(T& c) { return c.rend(); }
 };
 
 template <class T>
 struct Tf_IteratorInterface<const T, true> {
     typedef typename T::const_reverse_iterator IteratorType;
-    static IteratorType Begin(T const &c) { return c.rbegin(); }
-    static IteratorType End(T const &c) { return c.rend(); }
+    static IteratorType Begin(T const& c) { return c.rbegin(); }
+    static IteratorType End(T const& c) { return c.rend(); }
 };
 
 /// \class TfIterator
@@ -120,7 +120,7 @@ struct Tf_IteratorInterface<const T, true> {
 ///         int x = *iterator++;
 ///     }
 /// \endcode
-/// 
+///
 /// \anchor iterator_pattern
 /// <b>The Simple Iterator Pattern</b>
 ///
@@ -155,19 +155,16 @@ struct Tf_IteratorInterface<const T, true> {
 ///
 /// \param T  container type
 ///
-template <class T, bool Reverse=false>
+template <class T, bool Reverse = false>
 class TfIterator {
-
     // Forward declare implementation structs.
     struct _IteratorPairAndCopy;
     struct _IteratorPair;
 
     // Select the correct data storage depending on whether we should iterate
     // over a copy of the container.
-    typedef typename std::conditional<
-        Tf_ShouldIterateOverCopy<T>::value, 
-        _IteratorPairAndCopy, _IteratorPair
-        >::type _Data;
+    typedef typename std::conditional<Tf_ShouldIterateOverCopy<T>::value, _IteratorPairAndCopy, _IteratorPair>::type
+            _Data;
 
 public:
     // Choose either iterator or const_iterator for Iterator depending on
@@ -178,21 +175,18 @@ public:
     typedef typename std::iterator_traits<Iterator>::reference Reference;
 
     /// Default constructor.  This iterator is uninitialized.
-    TfIterator() { }
+    TfIterator() {}
 
     /// Constructs an iterator to traverse each element of the specified
     /// \c STL container object.
     /// \param container  container object
-    TfIterator(T &container) : _data(container) {}
+    TfIterator(T& container) : _data(container) {}
 
     /// Allow rvalues only if the container type T should be copied by TfIterator.
-    TfIterator(T &&container)
-        : _data(container)
-    {
-        static_assert(
-            Tf_ShouldIterateOverCopy<typename std::decay<T>::type>::value,
-            "TfIterator only allows rvalues that it has been told to copy "
-            "via Tf_ShouldIterateOverCopy");
+    TfIterator(T&& container) : _data(container) {
+        static_assert(Tf_ShouldIterateOverCopy<typename std::decay<T>::type>::value,
+                      "TfIterator only allows rvalues that it has been told to copy "
+                      "via Tf_ShouldIterateOverCopy");
     }
 
     /// Constructs an iterator to traverse a subset of the elements in a
@@ -200,30 +194,21 @@ public:
     /// iterator.
     /// \param begin  iterator at the beginning of the sequence
     /// \param end  iterator at the end of the sequence
-    TfIterator(Iterator const &begin, Iterator const &end)
-        : _data(begin, end)
-    {
-    }
+    TfIterator(Iterator const& begin, Iterator const& end) : _data(begin, end) {}
 
     /// Returns true if this iterator is exhausted.
     /// \return true if this iterator is exhausted
-    bool operator!() const {
-        return _data.current == _data.end;
-    }
+    bool operator!() const { return _data.current == _data.end; }
 
     /// Returns true if this Iterator.has the same position in the sequence as
     /// the specified iterator.  The end of the sequence need not be the same.
     /// \param iterator  iterator to compare
     /// \return true if this Iterator.has the same position as \e iterator
-    bool operator==(const TfIterator& iterator) const {
-        return _data.current == iterator._data.current;
-    }
+    bool operator==(const TfIterator& iterator) const { return _data.current == iterator._data.current; }
 
     /// Returns false if (*this == \a iterator) returns true, returns true
     /// otherwise.
-    bool operator!=(const TfIterator& iterator) const {
-        return !(*this == iterator);
-    }
+    bool operator!=(const TfIterator& iterator) const { return !(*this == iterator); }
 
     /// Pre-increment operator.  Advances this iterator to the next element in
     /// the sequence.
@@ -250,46 +235,37 @@ public:
     /// Returns the element referenced by this iterator.
     /// \return element
     Reference operator*() {
-        if (ARCH_UNLIKELY(!*this))
-            TF_FATAL_ERROR("iterator exhausted");
+        if (ARCH_UNLIKELY(!*this)) TF_FATAL_ERROR("iterator exhausted");
         return *_data.current;
     }
 
     /// Returns the element referenced by this iterator.
     /// \return element
     Reference operator*() const {
-        if (ARCH_UNLIKELY(!*this))
-            TF_FATAL_ERROR("iterator exhausted");
+        if (ARCH_UNLIKELY(!*this)) TF_FATAL_ERROR("iterator exhausted");
         return *_data.current;
     }
 
     /// Returns a pointer to the element referenced by this iterator.
     /// \return pointer to element
     Iterator& operator->() {
-        if (ARCH_UNLIKELY(!*this))
-            TF_FATAL_ERROR("iterator exhausted");
+        if (ARCH_UNLIKELY(!*this)) TF_FATAL_ERROR("iterator exhausted");
         return _data.current;
-    }   
+    }
 
     /// Explicit bool conversion operator.
     /// The Iterator object converts to true if it has not been exhausted.
-    explicit operator bool() const {
-        return !(_data.current == _data.end);
-    }
+    explicit operator bool() const { return !(_data.current == _data.end); }
 
     /// Returns an \c STL iterator that has the same position as this
     /// iterator.
     /// \return \c STL iterator at the same position as this iterator
-    operator Iterator() const {
-        return _data.current;
-    }
+    operator Iterator() const { return _data.current; }
 
     /// Returns an \c STL iterator that has the same position as this
     /// iterator.
     /// \return \c STL iterator at the same position as this iterator
-    const Iterator& base() const {
-        return _data.current;
-    }
+    const Iterator& base() const { return _data.current; }
 
     /// Returns an iterator that is positioned at the next element in the
     /// sequence.
@@ -300,19 +276,17 @@ public:
         return next;
     }
 
-  private:  // state
-
+private:  // state
     // Normal iteration just holds onto the begin/end pair of iterators.
     struct _IteratorPair {
         _IteratorPair() {}
-        explicit _IteratorPair(T &c) {
+        explicit _IteratorPair(T& c) {
             // Use assignment rather than initializer-list here to work around
             // a GCC 4.1.2 bug when using TfIterator with TfHashMap.
             current = IterInterface::Begin(c);
             end = IterInterface::End(c);
         }
-        _IteratorPair(Iterator const &b, Iterator const &e) :
-            current(b), end(e) {}
+        _IteratorPair(Iterator const& b, Iterator const& e) : current(b), end(e) {}
         Iterator current;
         Iterator end;
     };
@@ -321,36 +295,30 @@ public:
     // 'container' and iterators into the copy.
     struct _IteratorPairAndCopy : public _IteratorPair {
         _IteratorPairAndCopy() {}
-        explicit _IteratorPairAndCopy(T const &c) : _IteratorPair(), _copy(c) {
+        explicit _IteratorPairAndCopy(T const& c) : _IteratorPair(), _copy(c) {
             current = IterInterface::Begin(_copy);
             end = IterInterface::End(_copy);
         }
         using _IteratorPair::current;
         using _IteratorPair::end;
+
     private:
         T _copy;
     };
 
     _Data _data;
-
 };
 
 /// Helper functions for creating TfIterator objects.
 /// \ingroup group_tf_Containers
 template <class T>
-TfIterator<typename std::remove_reference<T>::type>
-TfMakeIterator(T&& container)
-{
-    return TfIterator<typename std::remove_reference<T>::type>(
-        std::forward<T>(container));
+TfIterator<typename std::remove_reference<T>::type> TfMakeIterator(T&& container) {
+    return TfIterator<typename std::remove_reference<T>::type>(std::forward<T>(container));
 }
 
 template <class T>
-TfIterator<typename std::remove_reference<T>::type, /* Reverse = */ true>
-TfMakeReverseIterator(T&& container)
-{
-    return TfIterator<typename std::remove_reference<T>::type, true>(
-        std::forward<T>(container));
+TfIterator<typename std::remove_reference<T>::type, /* Reverse = */ true> TfMakeReverseIterator(T&& container) {
+    return TfIterator<typename std::remove_reference<T>::type, true>(std::forward<T>(container));
 }
 
 /// Macro for iterating over a container.
@@ -370,25 +338,22 @@ TfMakeReverseIterator(T&& container)
 ///
 /// \ingroup group_tf_Containers
 /// \hideinitializer
-#define TF_FOR_ALL(iter, c) \
-    for (auto iter = TfMakeIterator(c); iter; ++iter)
+#define TF_FOR_ALL(iter, c) for (auto iter = TfMakeIterator(c); iter; ++iter)
 
 /// Macro for iterating over a container in reverse.
 ///
 /// Operates like \a TF_FOR_ALL, but iterates the container in reverse order.
-/// 
+///
 /// \ingroup group_tf_Containers
 /// \hideinitializer
-#define TF_REVERSE_FOR_ALL(iter, c) \
-    for (auto iter = TfMakeReverseIterator(c); iter; ++iter)
+#define TF_REVERSE_FOR_ALL(iter, c) for (auto iter = TfMakeReverseIterator(c); iter; ++iter)
 
 /// Returns the number of elements in a statically sized array.
 ///
 /// This function is an implementation of the array version of C++17's
 /// std::size()
 template <class T, size_t N>
-constexpr size_t TfArraySize(const T (&array)[N]) noexcept
-{
+constexpr size_t TfArraySize(const T (&array)[N]) noexcept {
     return N;
 }
 
@@ -399,17 +364,15 @@ constexpr size_t TfArraySize(const T (&array)[N]) noexcept
 /// This implementation was written for use with random access iterators but
 /// could be extended to bidirectional iterators if necessary.
 template <typename UnderlyingIterator>
-class Tf_ProxyReferenceReverseIterator :
-    private std::reverse_iterator<UnderlyingIterator> {
+class Tf_ProxyReferenceReverseIterator : private std::reverse_iterator<UnderlyingIterator> {
     // private API for interacting with an STL reverse_iterator of the
     // UnderlyingIterator
     using ReverseIterator = std::reverse_iterator<UnderlyingIterator>;
-    const ReverseIterator& _reverse_iterator() const {  return *this; }
+    const ReverseIterator& _reverse_iterator() const { return *this; }
     ReverseIterator& _reverse_iterator() { return *this; }
-    explicit Tf_ProxyReferenceReverseIterator(const ReverseIterator& it)
-        : ReverseIterator(it) {}
-    explicit Tf_ProxyReferenceReverseIterator(ReverseIterator&& it)
-        : ReverseIterator(it) {}
+    explicit Tf_ProxyReferenceReverseIterator(const ReverseIterator& it) : ReverseIterator(it) {}
+    explicit Tf_ProxyReferenceReverseIterator(ReverseIterator&& it) : ReverseIterator(it) {}
+
 public:
     using iterator_type = typename ReverseIterator::iterator_type;
     using iterator_category = typename ReverseIterator::iterator_category;
@@ -419,19 +382,16 @@ public:
     using difference_type = typename ReverseIterator::difference_type;
 
     static_assert(!std::is_reference<reference>::value,
-                 "Tf_ProxyReferenceReverseIterator should only be used "
-                 "when the underlying iterator's reference type is a "
-                 "proxy (MyTypeRef) and not a true reference (MyType&)."
-                 "Use std::reverse_iterator instead.");
-    static_assert(std::is_same<iterator_category,
-                               std::random_access_iterator_tag>::value,
-                 "Tf_ProxyReferenceReverseIterator must wrap a random "
-                 "access iterator.");
+                  "Tf_ProxyReferenceReverseIterator should only be used "
+                  "when the underlying iterator's reference type is a "
+                  "proxy (MyTypeRef) and not a true reference (MyType&)."
+                  "Use std::reverse_iterator instead.");
+    static_assert(std::is_same<iterator_category, std::random_access_iterator_tag>::value,
+                  "Tf_ProxyReferenceReverseIterator must wrap a random "
+                  "access iterator.");
 
     Tf_ProxyReferenceReverseIterator() = default;
-    explicit Tf_ProxyReferenceReverseIterator(UnderlyingIterator it) :
-        ReverseIterator(it) {
-    }
+    explicit Tf_ProxyReferenceReverseIterator(UnderlyingIterator it) : ReverseIterator(it) {}
 
     // Operators and functions which can just use the underlying STL
     // implementation
@@ -476,8 +436,7 @@ public:
     }
 
     template <typename OtherIt>
-    difference_type operator-(
-        const Tf_ProxyReferenceReverseIterator<OtherIt>& other) const {
+    difference_type operator-(const Tf_ProxyReferenceReverseIterator<OtherIt>& other) const {
         return _reverse_iterator() - other._reverse_iterator();
     }
 
@@ -491,11 +450,9 @@ public:
         return *this;
     }
 
-    inline friend Tf_ProxyReferenceReverseIterator
-    operator+(const difference_type increment,
-              const Tf_ProxyReferenceReverseIterator& iterator) {
-        return Tf_ProxyReferenceReverseIterator(
-            increment + iterator._reverse_iterator());
+    inline friend Tf_ProxyReferenceReverseIterator operator+(const difference_type increment,
+                                                             const Tf_ProxyReferenceReverseIterator& iterator) {
+        return Tf_ProxyReferenceReverseIterator(increment + iterator._reverse_iterator());
     }
 
     // Comparison operators defer to the STL implementation

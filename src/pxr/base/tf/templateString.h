@@ -87,8 +87,7 @@ public:
 
 private:
     struct _PlaceHolder {
-        _PlaceHolder(const std::string& n, size_t p, size_t l)
-            : name(n), pos(p), len(l) {}
+        _PlaceHolder(const std::string& n, size_t p, size_t l) : name(n), pos(p), len(l) {}
         std::string name;
         size_t pos;
         size_t len;
@@ -111,10 +110,9 @@ private:
     void _EmitParseErrors() const;
 
     // Structure side-allocated and shared between copies.
-    struct _Data
-    {
-        _Data(_Data const &) = delete;
-        _Data &operator=(_Data const &) = delete;
+    struct _Data {
+        _Data(_Data const&) = delete;
+        _Data& operator=(_Data const&) = delete;
 
         _Data() : parsed(false) {}
 
@@ -130,4 +128,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_TEMPLATE_STRING_H 
+#endif  // PXR_BASE_TF_TEMPLATE_STRING_H

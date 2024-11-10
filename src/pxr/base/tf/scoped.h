@@ -30,22 +30,23 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///     }
 /// \endcode
 ///
-template <typename T = std::function<void ()> >
+template <typename T = std::function<void()>>
 class TfScoped {
-    TfScoped(TfScoped const &) = delete;
-    TfScoped &operator=(TfScoped const &) = delete;
+    TfScoped(TfScoped const&) = delete;
+    TfScoped& operator=(TfScoped const&) = delete;
+
 public:
     /// The type of the function executed on destruction.
     typedef T Procedure;
 
     /// Execute \p leave when this object goes out of scope.
-    explicit TfScoped(const Procedure& leave) : _onExit(leave) { }
+    explicit TfScoped(const Procedure& leave) : _onExit(leave) {}
 
     ~TfScoped() { _onExit(); }
 
 private:
     // Can't put these on the heap.  No implementation needed.
-    static void *operator new(::std::size_t size);
+    static void* operator new(::std::size_t size);
 
 private:
     Procedure _onExit;
@@ -54,21 +55,21 @@ private:
 // Specialization of TfScoped for member functions.
 template <typename T>
 class TfScoped<void (T::*)()> {
-    TfScoped(TfScoped const &) = delete;
-    TfScoped &operator=(TfScoped const &) = delete;
+    TfScoped(TfScoped const&) = delete;
+    TfScoped& operator=(TfScoped const&) = delete;
+
 public:
     /// The type of the function executed on destruction.
-    typedef void (T::*Procedure)();
+    typedef void (T::* Procedure)();
 
     /// Execute \p leave on \p obj when this object goes out of scope.
-    explicit TfScoped(T* obj, const Procedure& leave) :
-        _obj(obj), _onExit(leave) { }
+    explicit TfScoped(T* obj, const Procedure& leave) : _obj(obj), _onExit(leave) {}
 
     ~TfScoped() { (_obj->*_onExit)(); }
 
 private:
     // Can't put these on the heap.  No implementation needed.
-    static void *operator new(::std::size_t size);
+    static void* operator new(::std::size_t size);
 
 private:
     T* _obj;
@@ -78,21 +79,21 @@ private:
 // Specialization of TfScoped for functions taking one pointer argument.
 template <typename T>
 class TfScoped<void (*)(T*)> {
-    TfScoped(TfScoped const &) = delete;
-    TfScoped &operator=(TfScoped const &) = delete;
+    TfScoped(TfScoped const&) = delete;
+    TfScoped& operator=(TfScoped const&) = delete;
+
 public:
     /// The type of the function executed on destruction.
     typedef void (*Procedure)(T*);
 
     /// Execute \p leave, passing \p obj, when this object goes out of scope.
-    explicit TfScoped(const Procedure& leave, T* obj) :
-        _obj(obj), _onExit(leave) { }
+    explicit TfScoped(const Procedure& leave, T* obj) : _obj(obj), _onExit(leave) {}
 
     ~TfScoped() { _onExit(_obj); }
 
 private:
     // Can't put these on the heap.  No implementation needed.
-    static void *operator new(::std::size_t size);
+    static void* operator new(::std::size_t size);
 
 private:
     T* _obj;
@@ -114,25 +115,21 @@ private:
 /// \endcode
 template <typename T>
 class TfScopedVar {
-    TfScopedVar(TfScopedVar const &) = delete;
-    TfScopedVar &operator=(TfScopedVar const &) = delete;
+    TfScopedVar(TfScopedVar const&) = delete;
+    TfScopedVar& operator=(TfScopedVar const&) = delete;
+
 public:
     /// Set/reset variable
     ///
     /// Sets \p x to \p val immediately and restores its old value when this
     /// goes out of scope.
-    explicit TfScopedVar(T& x, const T& val) :
-        _x(&x),
-        _old(x)
-    {
-        x = val;
-    }
+    explicit TfScopedVar(T& x, const T& val) : _x(&x), _old(x) { x = val; }
 
     ~TfScopedVar() { *_x = _old; }
 
 private:
     // Can't put these on the heap.  No implementation needed.
-    static void *operator new(::std::size_t size);
+    static void* operator new(::std::size_t size);
 
 private:
     T* _x;
@@ -161,30 +158,28 @@ private:
 ///
 /// \see TfScopedVar
 class TfScopedAutoVar {
-    TfScopedAutoVar(TfScopedAutoVar const &) = delete;
-    TfScopedAutoVar &operator=(TfScopedAutoVar const &) = delete;
+    TfScopedAutoVar(TfScopedAutoVar const&) = delete;
+    TfScopedAutoVar& operator=(TfScopedAutoVar const&) = delete;
+
 public:
     /// Set/reset variable
     ///
     /// Sets \p x to \p val immediately and restores its old value when this
     /// goes out of scope.
     template <typename T>
-    explicit TfScopedAutoVar(T& x, const T& val) :
-        _scope(std::bind(&TfScopedAutoVar::_Set<T>, &x, x))
-    {
+    explicit TfScopedAutoVar(T& x, const T& val) : _scope(std::bind(&TfScopedAutoVar::_Set<T>, &x, x)) {
         x = val;
     }
 
 private:
     // Restore value function
     template <typename T>
-    static void _Set(T* x, const T& val)
-    {
+    static void _Set(T* x, const T& val) {
         *x = val;
     }
 
     // Can't put these on the heap.  No implementation needed.
-    static void *operator new(::std::size_t size);
+    static void* operator new(::std::size_t size);
 
 private:
     TfScoped<> _scope;
@@ -192,4 +187,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_SCOPED_H
+#endif  // PXR_BASE_TF_SCOPED_H

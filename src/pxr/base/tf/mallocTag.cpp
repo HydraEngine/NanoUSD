@@ -42,8 +42,8 @@
 #include <type_traits>
 #include <vector>
 
-using std::map;
 using std::make_pair;
+using std::map;
 using std::pair;
 using std::string;
 using std::vector;
@@ -73,24 +73,21 @@ static const size_t _IgnoreStackFramesCount = 3;
 struct Tf_MallocPathNode;
 struct Tf_MallocGlobalData;
 
-static ArchMallocHook _mallocHook;      // zero-initialized POD
+static ArchMallocHook _mallocHook;  // zero-initialized POD
 static Tf_MallocGlobalData* _mallocGlobalData = nullptr;
-std::atomic<bool> TfMallocTag::_isInitialized { false };
+std::atomic<bool> TfMallocTag::_isInitialized{false};
 
 static bool Tf_MatchesMallocTagDebugName(const string& name);
 static bool Tf_MatchesMallocTagTraceName(const string& name);
 static void Tf_MallocTagDebugHook(const void* ptr, size_t size) ARCH_NOINLINE;
 
-static void Tf_MallocTagDebugHook(const void* ptr, size_t size)
-{
+static void Tf_MallocTagDebugHook(const void* ptr, size_t size) {
     // Clients don't call this directly so the debugger can conveniently
     // see the pointer and size in the stack trace.
     ARCH_DEBUGGER_TRAP;
 }
 
-static inline size_t
-Tf_GetMallocBlockSize(void* ptr, size_t requestedSize)
-{
+static inline size_t Tf_GetMallocBlockSize(void* ptr, size_t requestedSize) {
     // The allocator-agnostic implementation keeps track of the exact memory
     // block sizes requested by consumers. This ignores allocator-specific
     // overhead, such as alignment, associated metadata, etc. We believe this
@@ -108,16 +105,13 @@ Tf_GetMallocBlockSize(void* ptr, size_t requestedSize)
 
 struct Tf_MallocBlockInfo {
     Tf_MallocBlockInfo() = default;
-    Tf_MallocBlockInfo(size_t sz, Tf_MallocPathNode *pn)
-        : blockSize(sz)
-        , pathNode(pn) {}
+    Tf_MallocBlockInfo(size_t sz, Tf_MallocPathNode* pn) : blockSize(sz), pathNode(pn) {}
     size_t blockSize = 0;
-    Tf_MallocPathNode *pathNode = nullptr;
+    Tf_MallocPathNode* pathNode = nullptr;
 };
 
 #if !defined(ARCH_OS_WINDOWS)
-static_assert(sizeof(Tf_MallocBlockInfo) == 16, 
-              "Unexpected size for Tf_MallocBlockInfo");
+static_assert(sizeof(Tf_MallocBlockInfo) == 16, "Unexpected size for Tf_MallocBlockInfo");
 #endif
 
 /*
@@ -145,18 +139,14 @@ private:
     struct _MatchString {
         _MatchString(const std::string&);
 
-        std::string str;    // String to match.
-        bool allow;         // New result if str matches.
-        bool wildcard;      // str has a suffix wildcard.
+        std::string str;  // String to match.
+        bool allow;       // New result if str matches.
+        bool wildcard;    // str has a suffix wildcard.
     };
     std::vector<_MatchString> _matchStrings;
 };
 
-Tf_MallocTagStringMatchTable::_MatchString::_MatchString(const std::string& s) :
-    str(s),
-    allow(true),
-    wildcard(false)
-{
+Tf_MallocTagStringMatchTable::_MatchString::_MatchString(const std::string& s) : str(s), allow(true), wildcard(false) {
     if (!str.empty()) {
         if (str[str.size() - 1] == '*') {
             wildcard = true;
@@ -166,28 +156,22 @@ Tf_MallocTagStringMatchTable::_MatchString::_MatchString(const std::string& s) :
             if (str[0] == '-') {
                 allow = false;
                 str.erase(0, 1);
-            }
-            else if (str[0] == '+') {
+            } else if (str[0] == '+') {
                 str.erase(0, 1);
             }
         }
     }
 }
 
-Tf_MallocTagStringMatchTable::Tf_MallocTagStringMatchTable()
-{
+Tf_MallocTagStringMatchTable::Tf_MallocTagStringMatchTable() {
     // Do nothing
 }
 
-Tf_MallocTagStringMatchTable::Tf_MallocTagStringMatchTable(
-    const std::string& matchList)
-{
+Tf_MallocTagStringMatchTable::Tf_MallocTagStringMatchTable(const std::string& matchList) {
     SetMatchList(matchList);
 }
 
-void
-Tf_MallocTagStringMatchTable::SetMatchList(const std::string& matchList)
-{
+void Tf_MallocTagStringMatchTable::SetMatchList(const std::string& matchList) {
     _matchStrings.clear();
     std::vector<std::string> items = TfStringTokenize(matchList, ",\t\n");
     TF_FOR_ALL(i, items) {
@@ -195,9 +179,7 @@ Tf_MallocTagStringMatchTable::SetMatchList(const std::string& matchList)
     }
 }
 
-bool
-Tf_MallocTagStringMatchTable::Match(const char* s) const
-{
+bool Tf_MallocTagStringMatchTable::Match(const char* s) const {
     // The last match defines the overall result.  If the last match had
     // a '-' prefix then we don't match, otherwise we do.
     TF_REVERSE_FOR_ALL(i, _matchStrings) {
@@ -210,8 +192,7 @@ Tf_MallocTagStringMatchTable::Match(const char* s) const
             if (*m != '\0') {
                 continue;
             }
-        }
-        else {
+        } else {
             // Check exact match.
             if (i->str != s) {
                 continue;
@@ -230,20 +211,17 @@ Tf_MallocTagStringMatchTable::Match(const char* s) const
  * There is a different call-site object associated with each different
  * tag string used to construct a TfAutoMallocTag.
  */
-struct Tf_MallocCallSite
-{
+struct Tf_MallocCallSite {
     Tf_MallocCallSite(const string& name)
-        : _name(std::make_unique<char []>(strlen(name.c_str()) + 1))
-        , _totalBytes(0)
-        , _flags(
-            (Tf_MatchesMallocTagDebugName(name) ? _DebugFlag : 0) |
-            (Tf_MatchesMallocTagTraceName(name) ? _TraceFlag : 0))
-        {
-            strcpy(_name.get(), name.c_str());
-        }
-    
-    std::unique_ptr<char []> _name;
-    
+        : _name(std::make_unique<char[]>(strlen(name.c_str()) + 1)),
+          _totalBytes(0),
+          _flags((Tf_MatchesMallocTagDebugName(name) ? _DebugFlag : 0) |
+                 (Tf_MatchesMallocTagTraceName(name) ? _TraceFlag : 0)) {
+        strcpy(_name.get(), name.c_str());
+    }
+
+    std::unique_ptr<char[]> _name;
+
     std::atomic<int64_t> _totalBytes;
 
     static constexpr unsigned _TraceFlag = 1u;
@@ -259,25 +237,14 @@ struct Tf_MallocCallSite
 
 namespace {
 
-struct _HashEqCStr
-{
-    inline bool equal(char const *l, char const *r) const {
-        return !strcmp(l, r);
-    }
-    inline size_t hash(char const *k) const {
-        return TfHashCString()(k);
-    }
+struct _HashEqCStr {
+    inline bool equal(char const* l, char const* r) const { return !strcmp(l, r); }
+    inline size_t hash(char const* k) const { return TfHashCString()(k); }
 };
 
-using Tf_MallocCallSiteTable =
-    tbb::concurrent_hash_map<
-    const char*, struct Tf_MallocCallSite *, _HashEqCStr>;
+using Tf_MallocCallSiteTable = tbb::concurrent_hash_map<const char*, struct Tf_MallocCallSite*, _HashEqCStr>;
 
-static inline
-Tf_MallocCallSite *
-Tf_GetOrCreateCallSite(Tf_MallocCallSiteTable* table,
-                       const char* name) {
-
+static inline Tf_MallocCallSite* Tf_GetOrCreateCallSite(Tf_MallocCallSiteTable* table, const char* name) {
     // Callsites persist after first insertion, so optimistically assume
     // presence.
     {
@@ -295,8 +262,7 @@ Tf_GetOrCreateCallSite(Tf_MallocCallSiteTable* table,
     if (table->emplace(acc, newSite->_name.get(), newSite.get())) {
         // We emplaced the new site, so release it from the unique_ptr.
         return newSite.release();
-    }
-    else {
+    } else {
         // We lost the race, this site has been created in the meantime.  Just
         // return the table's pointer, and let the unique_ptr dispose of the one
         // we created.
@@ -304,32 +270,20 @@ Tf_GetOrCreateCallSite(Tf_MallocCallSiteTable* table,
     }
 }
 
-
-struct _HashEqPathNodeTable
-{
-    inline bool
-    equal(std::pair<Tf_MallocPathNode *, Tf_MallocCallSite *> const &l,
-          std::pair<Tf_MallocPathNode *, Tf_MallocCallSite *> const &r) const {
+struct _HashEqPathNodeTable {
+    inline bool equal(std::pair<Tf_MallocPathNode*, Tf_MallocCallSite*> const& l,
+                      std::pair<Tf_MallocPathNode*, Tf_MallocCallSite*> const& r) const {
         return l == r;
     }
-    inline size_t
-    hash(std::pair<Tf_MallocPathNode *, Tf_MallocCallSite *> const &p) const {
-        return TfHash()(p);
-    }    
+    inline size_t hash(std::pair<Tf_MallocPathNode*, Tf_MallocCallSite*> const& p) const { return TfHash()(p); }
 };
 
+using Tf_MallocPathNodeTable = tbb::concurrent_hash_map<std::pair<Tf_MallocPathNode*, Tf_MallocCallSite*>,
+                                                        Tf_MallocPathNode*,
+                                                        _HashEqPathNodeTable>;
 
-using Tf_MallocPathNodeTable =
-    tbb::concurrent_hash_map<
-    std::pair<Tf_MallocPathNode *, Tf_MallocCallSite *>,
-    Tf_MallocPathNode *, _HashEqPathNodeTable>;
-
-static inline
-Tf_MallocPathNode *
-Tf_GetOrCreateChild(
-    Tf_MallocPathNodeTable *table,
-    std::pair<Tf_MallocPathNode *, Tf_MallocCallSite *> parentAndCallSite)
-{
+static inline Tf_MallocPathNode* Tf_GetOrCreateChild(
+        Tf_MallocPathNodeTable* table, std::pair<Tf_MallocPathNode*, Tf_MallocCallSite*> parentAndCallSite) {
     // Children persist after first insertion, so optimistically assume
     // presence.
     {
@@ -341,15 +295,13 @@ Tf_GetOrCreateChild(
 
     // Otherwise new up a child node and attempt to insert.  If we lose a race
     // here we'll drop the node we created.
-    auto newChild =
-        std::make_unique<Tf_MallocPathNode>(parentAndCallSite.second);
+    auto newChild = std::make_unique<Tf_MallocPathNode>(parentAndCallSite.second);
 
     Tf_MallocPathNodeTable::accessor acc;
     if (table->emplace(acc, parentAndCallSite, newChild.get())) {
         // We emplaced the new node, so release it from the unique_ptr.
         return newChild.release();
-    }
-    else {
+    } else {
         // We lost the race, this node has been created in the meantime.  Just
         // return the table's pointer, and let the unique_ptr dispose of the one
         // we created.
@@ -357,11 +309,9 @@ Tf_GetOrCreateChild(
     }
 }
 
-using Tf_PathNodeChildrenTable = pxr_tsl::robin_map<
-    Tf_MallocPathNode const *, std::vector<Tf_MallocPathNode const *>
-    >;
+using Tf_PathNodeChildrenTable = pxr_tsl::robin_map<Tf_MallocPathNode const*, std::vector<Tf_MallocPathNode const*>>;
 
-} // anon
+}  // namespace
 
 /*
  * This is a singleton.  Because access to this structure is gated via checks to
@@ -398,29 +348,17 @@ using Tf_PathNodeChildrenTable = pxr_tsl::robin_map<
  * rules) take a "write" (or "exclusive") lock on _mutex: they block all other
  * access until they complete.
  */
-struct Tf_MallocGlobalData
-{
-    Tf_MallocGlobalData()
-        : _rootNode(nullptr)
-        , _totalBytes(0)
-        , _maxTotalBytes(0) {}
+struct Tf_MallocGlobalData {
+    Tf_MallocGlobalData() : _rootNode(nullptr), _totalBytes(0), _maxTotalBytes(0) {}
 
-    Tf_MallocCallSite *_GetOrCreateCallSite(const char* name) {
-        return Tf_GetOrCreateCallSite(&_callSiteTable, name);
-    }
+    Tf_MallocCallSite* _GetOrCreateCallSite(const char* name) { return Tf_GetOrCreateCallSite(&_callSiteTable, name); }
 
-    Tf_MallocPathNode *
-    _GetOrCreateChild(
-        std::pair<Tf_MallocPathNode *,
-        Tf_MallocCallSite *> parentAndCallSite) {
+    Tf_MallocPathNode* _GetOrCreateChild(std::pair<Tf_MallocPathNode*, Tf_MallocCallSite*> parentAndCallSite) {
         return Tf_GetOrCreateChild(&_pathNodeTable, parentAndCallSite);
     }
 
-    inline void
-    _RegisterBlock(const void* block, size_t blockSize,
-                   Tf_MallocPathNode* pathNode);
-    inline void
-    _UnregisterBlock(const void* block);
+    inline void _RegisterBlock(const void* block, size_t blockSize, Tf_MallocPathNode* pathNode);
+    inline void _UnregisterBlock(const void* block);
 
     Tf_PathNodeChildrenTable _BuildPathNodeChildrenTable() const;
 
@@ -429,26 +367,21 @@ struct Tf_MallocGlobalData
     void _SetTraceNames(const std::string& matchList);
     bool _MatchesTraceName(const std::string& name);
 
-    void _CaptureStackOrDebug(
-        const Tf_MallocPathNode* node, const void *ptr, size_t size);
-    inline void _MaybeCaptureStackOrDebug(
-        const Tf_MallocPathNode* node, const void *ptr, size_t size);
+    void _CaptureStackOrDebug(const Tf_MallocPathNode* node, const void* ptr, size_t size);
+    inline void _MaybeCaptureStackOrDebug(const Tf_MallocPathNode* node, const void* ptr, size_t size);
 
-    void _ReleaseStackOrDebug(
-        const Tf_MallocPathNode* node, const void *ptr, size_t size);
-    inline void _MaybeReleaseStackOrDebug(
-        const Tf_MallocPathNode* node, const void *ptr, size_t size);
+    void _ReleaseStackOrDebug(const Tf_MallocPathNode* node, const void* ptr, size_t size);
+    inline void _MaybeReleaseStackOrDebug(const Tf_MallocPathNode* node, const void* ptr, size_t size);
 
     void _BuildUniqueMallocStacks(TfMallocTag::CallTree* tree);
 
     void _SetDebugNames(const std::string& matchList);
     bool _MatchesDebugName(const std::string& name);
 
-    using _CallStackTableType =
-        tbb::concurrent_hash_map<const void *, TfMallocTag::CallStackInfo>;
+    using _CallStackTableType = tbb::concurrent_hash_map<const void*, TfMallocTag::CallStackInfo>;
 
     TfBigRWMutex _mutex;
-    
+
     Tf_MallocPathNode* _rootNode;
 
     std::atomic<int64_t> _totalBytes;
@@ -456,8 +389,7 @@ struct Tf_MallocGlobalData
 
     // Mapping from memory block to information about that block.
     // Used by allocator-agnostic implementation.
-    using _BlockInfoTable =
-        tbb::concurrent_hash_map<const void *, Tf_MallocBlockInfo>;
+    using _BlockInfoTable = tbb::concurrent_hash_map<const void*, Tf_MallocBlockInfo>;
 
     _BlockInfoTable _blockInfo;
     Tf_MallocCallSiteTable _callSiteTable;
@@ -466,7 +398,6 @@ struct Tf_MallocGlobalData
     Tf_MallocTagStringMatchTable _debugMatchTable;
     Tf_MallocTagStringMatchTable _traceMatchTable;
     _CallStackTableType _callStackTable;
-    
 };
 
 /*
@@ -474,24 +405,18 @@ struct Tf_MallocGlobalData
  * However, a given call-site can occur only once in a given path -- recursive
  * call loops are excised.
  */
-struct Tf_MallocPathNode
-{
+struct Tf_MallocPathNode {
     explicit Tf_MallocPathNode(Tf_MallocCallSite* callSite)
-        : _callSite(callSite)
-        , _totalBytes(0)
-        , _numAllocations(0)
-        , _repeated(false)
-    {
-    }
+        : _callSite(callSite), _totalBytes(0), _numAllocations(0), _repeated(false) {}
 
-    void _BuildTree(Tf_PathNodeChildrenTable const &nodeChildren,
+    void _BuildTree(Tf_PathNodeChildrenTable const& nodeChildren,
                     TfMallocTag::CallTree::PathNode* node,
                     bool skipRepeated) const;
 
     Tf_MallocCallSite* _callSite;
     std::atomic<int64_t> _totalBytes;
     std::atomic<int64_t> _numAllocations;
-    std::atomic<bool> _repeated;    // repeated node
+    std::atomic<bool> _repeated;  // repeated node
 };
 
 // Enum describing whether allocations are being tagged in an associated
@@ -504,17 +429,14 @@ enum _TaggingState {
 // Per-thread data for TfMallocTag.
 struct TfMallocTag::_ThreadData {
     _ThreadData() : _taggingState(_TaggingEnabled) {}
-    _ThreadData(const _ThreadData &) = delete;
+    _ThreadData(const _ThreadData&) = delete;
     _ThreadData(_ThreadData&&) = delete;
-    _ThreadData& operator=(const _ThreadData &rhs) = delete;
+    _ThreadData& operator=(const _ThreadData& rhs) = delete;
     _ThreadData& operator=(_ThreadData&&) = delete;
 
-    inline bool TaggingEnabled() const {
-        return _taggingState == _TaggingEnabled;
-    }
+    inline bool TaggingEnabled() const { return _taggingState == _TaggingEnabled; }
 
-    inline void Push(Tf_MallocCallSite *site,
-                     Tf_MallocPathNode *node) {
+    inline void Push(Tf_MallocCallSite* site, Tf_MallocPathNode* node) {
         if (!_callSitesOnStack.insert(site).second) {
             node->_repeated = true;
             // Push a nullptr onto the _nodeStack preceding repeated nodes.
@@ -526,7 +448,7 @@ struct TfMallocTag::_ThreadData {
     }
 
     inline void Pop() {
-        Tf_MallocPathNode *node = _nodeStack.back();
+        Tf_MallocPathNode* node = _nodeStack.back();
         _nodeStack.pop_back();
         // If _nodeStack is not empty check to see if there's a nullptr.  If so,
         // this is a repeated node, so just pop the nullptr.  Otherwise we need
@@ -534,28 +456,24 @@ struct TfMallocTag::_ThreadData {
         if (!_nodeStack.empty() && !_nodeStack.back()) {
             // Pop the nullptr, leave the repeated node in _callSitesOnStack.
             _nodeStack.pop_back();
-        }
-        else {
+        } else {
             // Remove from _callSitesOnStack.
             _callSitesOnStack.erase(node->_callSite);
         }
     }
 
-    inline Tf_MallocPathNode *GetCurrentPathNode() const {
-        return !_nodeStack.empty()
-            ? _nodeStack.back()
-            : _mallocGlobalData->_rootNode;
+    inline Tf_MallocPathNode* GetCurrentPathNode() const {
+        return !_nodeStack.empty() ? _nodeStack.back() : _mallocGlobalData->_rootNode;
     }
 
     _TaggingState _taggingState;
     std::vector<Tf_MallocPathNode*> _nodeStack;
-    pxr_tsl::robin_set<Tf_MallocCallSite *, TfHash> _callSitesOnStack;
+    pxr_tsl::robin_set<Tf_MallocCallSite*, TfHash> _callSitesOnStack;
 };
 
 class TfMallocTag::Tls {
 public:
-    static
-    TfMallocTag::_ThreadData &Find() {
+    static TfMallocTag::_ThreadData& Find() {
 #if defined(ARCH_HAS_THREAD_LOCAL)
         // This thread_local must be placed in static TLS to prevent re-entry.
         // Starting in glibc 2.25, dynamic TLS allocation uses malloc.  Making
@@ -571,14 +489,14 @@ public:
         // destroyed and objects destroyed after the _ThreadData may do heap
         // (de)allocation, which requires the _ThreadData object.  We leak the
         // heap allocated blocks in the _ThreadData.
-        void *dataBuffer = _mallocHook.IsInitialized()
-            ? _mallocHook.Memalign(alignof(_ThreadData), sizeof(_ThreadData))
-            : ArchAlignedAlloc(alignof(_ThreadData), sizeof(_ThreadData));
+        void* dataBuffer = _mallocHook.IsInitialized() ? _mallocHook.Memalign(alignof(_ThreadData), sizeof(_ThreadData))
+                                                       : ArchAlignedAlloc(alignof(_ThreadData), sizeof(_ThreadData));
         data = new (dataBuffer) _ThreadData();
         return *data;
 #else
-        TF_FATAL_ERROR("TfMallocTag not supported on platforms "
-                       "without thread_local");
+        TF_FATAL_ERROR(
+                "TfMallocTag not supported on platforms "
+                "without thread_local");
 #endif
     }
 };
@@ -590,24 +508,19 @@ public:
 // willy-nilly, and not within any recursive contexts.
 struct _TemporaryDisabler {
 public:
-    explicit _TemporaryDisabler(TfMallocTag::_ThreadData *threadData = nullptr)
+    explicit _TemporaryDisabler(TfMallocTag::_ThreadData* threadData = nullptr)
         : _tls(threadData ? *threadData : TfMallocTag::Tls::Find()) {
         TF_AXIOM(_tls._taggingState == _TaggingEnabled);
         _tls._taggingState = _TaggingDisabled;
     }
-        
-    ~_TemporaryDisabler() {
-        _tls._taggingState = _TaggingEnabled;
-    }
+
+    ~_TemporaryDisabler() { _tls._taggingState = _TaggingEnabled; }
 
 private:
-    TfMallocTag::_ThreadData &_tls;
+    TfMallocTag::_ThreadData& _tls;
 };
 
-inline void
-Tf_MallocGlobalData::_RegisterBlock(
-    const void* block, size_t blockSize, Tf_MallocPathNode* node)
-{
+inline void Tf_MallocGlobalData::_RegisterBlock(const void* block, size_t blockSize, Tf_MallocPathNode* node) {
     // Disable tagging for this thread so any allocations caused
     // here do not get intercepted and cause recursion.
     _TemporaryDisabler disable;
@@ -615,29 +528,23 @@ Tf_MallocGlobalData::_RegisterBlock(
     TF_DEV_AXIOM(!_blockInfo.count(block));
 
     _MaybeCaptureStackOrDebug(node, block, blockSize);
-    
+
     _blockInfo.emplace(block, Tf_MallocBlockInfo(blockSize, node));
-    
+
     node->_totalBytes.fetch_add(blockSize, std::memory_order_relaxed);
-    node->_callSite->_totalBytes.fetch_add(
-        blockSize, std::memory_order_relaxed);
-    
-    int64_t newTotal = _totalBytes.fetch_add(
-        blockSize, std::memory_order_relaxed) + blockSize;
-    _maxTotalBytes.store(
-        std::max(newTotal, _maxTotalBytes.load(std::memory_order_relaxed)),
-        std::memory_order_relaxed);
-    
+    node->_callSite->_totalBytes.fetch_add(blockSize, std::memory_order_relaxed);
+
+    int64_t newTotal = _totalBytes.fetch_add(blockSize, std::memory_order_relaxed) + blockSize;
+    _maxTotalBytes.store(std::max(newTotal, _maxTotalBytes.load(std::memory_order_relaxed)), std::memory_order_relaxed);
+
     node->_numAllocations++;
 }
 
-inline void
-Tf_MallocGlobalData::_UnregisterBlock(const void* block)
-{
+inline void Tf_MallocGlobalData::_UnregisterBlock(const void* block) {
     // Disable tagging for this thread so any allocations caused
     // here do not get intercepted and cause recursion.
     _TemporaryDisabler disable;
-    
+
     _BlockInfoTable::const_accessor acc;
     if (_blockInfo.find(acc, block)) {
         Tf_MallocBlockInfo bInfo = acc->second;
@@ -646,36 +553,26 @@ Tf_MallocGlobalData::_UnregisterBlock(const void* block)
 
         _MaybeReleaseStackOrDebug(bInfo.pathNode, block, bInfo.blockSize);
 
-        bInfo.pathNode->_totalBytes.fetch_sub(
-            bInfo.blockSize, std::memory_order_relaxed);
+        bInfo.pathNode->_totalBytes.fetch_sub(bInfo.blockSize, std::memory_order_relaxed);
         if (_DECREMENT_ALLOCATION_COUNTS) {
-            bInfo.pathNode->_numAllocations.fetch_sub(
-                1, std::memory_order_relaxed);
+            bInfo.pathNode->_numAllocations.fetch_sub(1, std::memory_order_relaxed);
         }
-        bInfo.pathNode->_callSite->_totalBytes.fetch_sub(
-            bInfo.blockSize, std::memory_order_relaxed);
+        bInfo.pathNode->_callSite->_totalBytes.fetch_sub(bInfo.blockSize, std::memory_order_relaxed);
         _totalBytes.fetch_sub(bInfo.blockSize, std::memory_order_relaxed);
     }
 }
 
-void
-Tf_MallocGlobalData::_GetStackTrace(
-    size_t skipFrames,
-    std::vector<uintptr_t>* stack)
-{
+void Tf_MallocGlobalData::_GetStackTrace(size_t skipFrames, std::vector<uintptr_t>* stack) {
     uintptr_t buf[_MaxMallocStackDepth];
-    
+
     // Get the stack trace.
-    size_t numFrames =
-        ArchGetStackFrames(_MaxMallocStackDepth, skipFrames, buf);
+    size_t numFrames = ArchGetStackFrames(_MaxMallocStackDepth, skipFrames, buf);
 
     // Copy into stack, reserving exactly enough space.
     stack->assign(buf, buf + numFrames);
 }
 
-void
-Tf_MallocGlobalData::_SetTraceNames(const std::string& matchList)
-{
+void Tf_MallocGlobalData::_SetTraceNames(const std::string& matchList) {
     _TemporaryDisabler disable;
 
     _traceMatchTable.SetMatchList(matchList);
@@ -684,32 +581,25 @@ Tf_MallocGlobalData::_SetTraceNames(const std::string& matchList)
     TF_FOR_ALL(i, _callSiteTable) {
         if (_traceMatchTable.Match(i->second->_name.get())) {
             i->second->_flags |= Tf_MallocCallSite::_TraceFlag;
-        }
-        else {
+        } else {
             i->second->_flags &= ~Tf_MallocCallSite::_TraceFlag;
         }
     }
 }
 
-bool
-Tf_MallocGlobalData::_MatchesTraceName(const std::string& name)
-{
+bool Tf_MallocGlobalData::_MatchesTraceName(const std::string& name) {
     return _traceMatchTable.Match(name.c_str());
 }
 
-static bool Tf_MatchesMallocTagTraceName(const string& name)
-{
+static bool Tf_MatchesMallocTagTraceName(const string& name) {
     return _mallocGlobalData->_MatchesTraceName(name);
 }
 
-void
-Tf_MallocGlobalData::_CaptureStackOrDebug(
-    const Tf_MallocPathNode* node, const void *ptr, size_t size)
-{
+void Tf_MallocGlobalData::_CaptureStackOrDebug(const Tf_MallocPathNode* node, const void* ptr, size_t size) {
     if (node->_callSite->_flags & Tf_MallocCallSite::_TraceFlag) {
         _CallStackTableType::accessor acc;
         _callStackTable.insert(acc, ptr);
-        TfMallocTag::CallStackInfo &stackInfo = acc->second;
+        TfMallocTag::CallStackInfo& stackInfo = acc->second;
         _GetStackTrace(_IgnoreStackFramesCount, &stackInfo.stack);
         stackInfo.size = size;
         stackInfo.numAllocations = 1;
@@ -719,19 +609,15 @@ Tf_MallocGlobalData::_CaptureStackOrDebug(
     }
 }
 
-inline void
-Tf_MallocGlobalData::_MaybeCaptureStackOrDebug(
-    const Tf_MallocPathNode* node, const void *ptr, size_t size)
-{
+inline void Tf_MallocGlobalData::_MaybeCaptureStackOrDebug(const Tf_MallocPathNode* node,
+                                                           const void* ptr,
+                                                           size_t size) {
     if (ARCH_UNLIKELY(node->_callSite->_flags)) {
         _CaptureStackOrDebug(node, ptr, size);
     }
 }
 
-void
-Tf_MallocGlobalData::_ReleaseStackOrDebug(
-    const Tf_MallocPathNode* node, const void *ptr, size_t size)
-{
+void Tf_MallocGlobalData::_ReleaseStackOrDebug(const Tf_MallocPathNode* node, const void* ptr, size_t size) {
     if (node->_callSite->_flags & Tf_MallocCallSite::_TraceFlag) {
         _callStackTable.erase(ptr);
     }
@@ -740,18 +626,15 @@ Tf_MallocGlobalData::_ReleaseStackOrDebug(
     }
 }
 
-inline void
-Tf_MallocGlobalData::_MaybeReleaseStackOrDebug(
-    const Tf_MallocPathNode* node, const void *ptr, size_t size)
-{
+inline void Tf_MallocGlobalData::_MaybeReleaseStackOrDebug(const Tf_MallocPathNode* node,
+                                                           const void* ptr,
+                                                           size_t size) {
     if (ARCH_UNLIKELY(node->_callSite->_flags)) {
         _ReleaseStackOrDebug(node, ptr, size);
     }
 }
 
-void
-Tf_MallocGlobalData::_SetDebugNames(const std::string& matchList)
-{
+void Tf_MallocGlobalData::_SetDebugNames(const std::string& matchList) {
     _TemporaryDisabler disable;
 
     _debugMatchTable.SetMatchList(matchList);
@@ -760,54 +643,43 @@ Tf_MallocGlobalData::_SetDebugNames(const std::string& matchList)
     TF_FOR_ALL(i, _callSiteTable) {
         if (_debugMatchTable.Match(i->second->_name.get())) {
             i->second->_flags |= Tf_MallocCallSite::_DebugFlag;
-        }
-        else {
+        } else {
             i->second->_flags &= ~Tf_MallocCallSite::_DebugFlag;
         }
     }
 }
 
-bool
-Tf_MallocGlobalData::_MatchesDebugName(const std::string& name)
-{
+bool Tf_MallocGlobalData::_MatchesDebugName(const std::string& name) {
     return _debugMatchTable.Match(name.c_str());
 }
 
-static bool Tf_MatchesMallocTagDebugName(const string& name)
-{
+static bool Tf_MatchesMallocTagDebugName(const string& name) {
     return _mallocGlobalData->_MatchesDebugName(name);
 }
 
 namespace {
 // Hash functor for a malloc stack.
 //
-struct _HashMallocStack
-{
-    size_t operator()(const vector<uintptr_t> &stack) const {
-        return ArchHash(
-            (const char *)&stack[0], sizeof(uintptr_t) * stack.size());
+struct _HashMallocStack {
+    size_t operator()(const vector<uintptr_t>& stack) const {
+        return ArchHash((const char*)&stack[0], sizeof(uintptr_t) * stack.size());
     }
 };
 
 // The data associated with a malloc stack (a pointer to the malloc stack
 // itself, and the allocation size and number of allocations).
 //
-struct _MallocStackData
-{
-    const vector<uintptr_t> *stack;
+struct _MallocStackData {
+    const vector<uintptr_t>* stack;
     size_t size;
     size_t numAllocations;
 };
-}
+}  // namespace
 
 // Comparison for sorting TfMallocTag::CallStackInfo based on their
 // allocation size.
 //
-static bool
-_MallocStackDataLessThan(
-    const _MallocStackData *lhs,
-    const _MallocStackData *rhs)
-{
+static bool _MallocStackDataLessThan(const _MallocStackData* lhs, const _MallocStackData* rhs) {
     return lhs->size < rhs->size;
 }
 
@@ -815,48 +687,40 @@ _MallocStackDataLessThan(
 // in tree->capturedCallStacks.  The malloc stacks are sorted with the
 // stacks that allocated the most memory at the front of the vector.
 //
-void
-Tf_MallocGlobalData::_BuildUniqueMallocStacks(TfMallocTag::CallTree* tree)
-{
+void Tf_MallocGlobalData::_BuildUniqueMallocStacks(TfMallocTag::CallTree* tree) {
     if (!_callStackTable.empty()) {
         // Create a map from malloc stacks to the malloc stack data.
-        typedef TfHashMap<
-            vector<uintptr_t>, _MallocStackData, _HashMallocStack> _Map;
+        typedef TfHashMap<vector<uintptr_t>, _MallocStackData, _HashMallocStack> _Map;
         _Map map;
 
         TF_FOR_ALL(it, _callStackTable) {
             // Since _callStackTable does not change at this point it is
             // ok to store the address of the malloc stack in the data.
-            const TfMallocTag::CallStackInfo &stackInfo = it->second;
-            _MallocStackData data = { &stackInfo.stack, 0, 0 };
+            const TfMallocTag::CallStackInfo& stackInfo = it->second;
+            _MallocStackData data = {&stackInfo.stack, 0, 0};
 
-            pair<_Map::iterator, bool> insertResult = map.insert(
-                make_pair(stackInfo.stack, data));
+            pair<_Map::iterator, bool> insertResult = map.insert(make_pair(stackInfo.stack, data));
 
-            _MallocStackData &updateData = insertResult.first->second;
+            _MallocStackData& updateData = insertResult.first->second;
             updateData.size += stackInfo.size;
             updateData.numAllocations += stackInfo.numAllocations;
         }
 
         // Sort the malloc stack data by allocation size.
-        std::vector<const _MallocStackData *> sortedStackData;
+        std::vector<const _MallocStackData*> sortedStackData;
         sortedStackData.reserve(map.size());
         TF_FOR_ALL(it, map) {
             sortedStackData.push_back(&it->second);
         }
 
-        std::sort(
-            sortedStackData.begin(),
-            sortedStackData.end(),
-            _MallocStackDataLessThan);
+        std::sort(sortedStackData.begin(), sortedStackData.end(), _MallocStackDataLessThan);
 
         tree->capturedCallStacks.reserve(sortedStackData.size());
         TF_REVERSE_FOR_ALL(it, sortedStackData) {
-            const _MallocStackData &data = **it;
+            const _MallocStackData& data = **it;
 
             tree->capturedCallStacks.push_back(TfMallocTag::CallStackInfo());
-            TfMallocTag::CallStackInfo &stackInfo =
-                tree->capturedCallStacks.back();
+            TfMallocTag::CallStackInfo& stackInfo = tree->capturedCallStacks.back();
 
             // Take a copy of the malloc stack.
             stackInfo.stack = *data.stack;
@@ -866,35 +730,29 @@ Tf_MallocGlobalData::_BuildUniqueMallocStacks(TfMallocTag::CallTree* tree)
     }
 }
 
-Tf_PathNodeChildrenTable
-Tf_MallocGlobalData::_BuildPathNodeChildrenTable() const
-{
+Tf_PathNodeChildrenTable Tf_MallocGlobalData::_BuildPathNodeChildrenTable() const {
     Tf_PathNodeChildrenTable result;
     // Walk all of _pathNodeTable and populate result.
-    for (auto const &item: _pathNodeTable) {
+    for (auto const& item : _pathNodeTable) {
         result[item.first.first].push_back(item.second);
     }
     return result;
 }
 
-void
-Tf_MallocPathNode::_BuildTree(Tf_PathNodeChildrenTable const &nodeChildren,
-                              TfMallocTag::CallTree::PathNode* node,
-                              bool skipRepeated) const
-{
-    std::vector<Tf_MallocPathNode const *> const &children =
-        nodeChildren.count(this)
-        ? nodeChildren.find(this).value()
-        : std::vector<Tf_MallocPathNode const *>();
+void Tf_MallocPathNode::_BuildTree(Tf_PathNodeChildrenTable const& nodeChildren,
+                                   TfMallocTag::CallTree::PathNode* node,
+                                   bool skipRepeated) const {
+    std::vector<Tf_MallocPathNode const*> const& children =
+            nodeChildren.count(this) ? nodeChildren.find(this).value() : std::vector<Tf_MallocPathNode const*>();
     node->children.reserve(children.size());
     node->nBytes = node->nBytesDirect = _totalBytes;
     node->nAllocations = _numAllocations;
     node->siteName = _callSite->_name.get();
 
-    for (Tf_MallocPathNode const *child: children) {
+    for (Tf_MallocPathNode const* child : children) {
         // The tree is built in a special way, if the repeated allocations
-        // should be skipped. First, the full tree is built using temporary 
-        // nodes for all allocations that should be skipped. Then tree is 
+        // should be skipped. First, the full tree is built using temporary
+        // nodes for all allocations that should be skipped. Then tree is
         // collapsed by copying the children of temporary nodes to their parents
         // in bottom-up fasion.
         if (skipRepeated && child->_repeated) {
@@ -905,9 +763,7 @@ Tf_MallocPathNode::_BuildTree(Tf_PathNodeChildrenTable const &nodeChildren,
             node->nBytesDirect += childNode.nBytesDirect;
             // Copy the children, if there are any
             if (!childNode.children.empty()) {
-                node->children.insert(node->children.end(), 
-                                      childNode.children.begin(),
-                                      childNode.children.end());
+                node->children.insert(node->children.end(), childNode.children.begin(), childNode.children.end());
             }
             node->nBytes += childNode.nBytes;
         } else {
@@ -919,31 +775,24 @@ Tf_MallocPathNode::_BuildTree(Tf_PathNodeChildrenTable const &nodeChildren,
     }
 }
 
-void
-TfMallocTag::SetDebugMatchList(const std::string& matchList)
-{
+void TfMallocTag::SetDebugMatchList(const std::string& matchList) {
     if (TfMallocTag::IsInitialized()) {
         TfBigRWMutex::ScopedLock lock(_mallocGlobalData->_mutex);
         _mallocGlobalData->_SetDebugNames(matchList);
     }
 }
 
-void
-TfMallocTag::SetCapturedMallocStacksMatchList(const std::string& matchList)
-{
+void TfMallocTag::SetCapturedMallocStacksMatchList(const std::string& matchList) {
     if (TfMallocTag::IsInitialized()) {
         TfBigRWMutex::ScopedLock lock(_mallocGlobalData->_mutex);
         _mallocGlobalData->_SetTraceNames(matchList);
     }
 }
 
-vector<vector<uintptr_t> >
-TfMallocTag::GetCapturedMallocStacks()
-{
-    vector<vector<uintptr_t> > result;
-    
-    if (!TfMallocTag::IsInitialized())
-        return result;
+vector<vector<uintptr_t>> TfMallocTag::GetCapturedMallocStacks() {
+    vector<vector<uintptr_t>> result;
+
+    if (!TfMallocTag::IsInitialized()) return result;
 
     // Push some malloc tags, so what we do here doesn't pollute the root
     // stacks.
@@ -951,7 +800,7 @@ TfMallocTag::GetCapturedMallocStacks()
 
     // Copy off the stack traces, make sure to malloc outside.
     Tf_MallocGlobalData::_CallStackTableType traces;
-    
+
     // Swap them out while holding the lock.
     {
         TfBigRWMutex::ScopedLock lock(_mallocGlobalData->_mutex);
@@ -965,31 +814,26 @@ TfMallocTag::GetCapturedMallocStacks()
     return result;
 }
 
-void*
-TfMallocTag::_MallocWrapper(size_t nBytes, const void*)
-{
+void* TfMallocTag::_MallocWrapper(size_t nBytes, const void*) {
     void* ptr = _mallocHook.Malloc(nBytes);
 
-    _ThreadData &td = Tls::Find();
-    
+    _ThreadData& td = Tls::Find();
+
     if (!td.TaggingEnabled() || ARCH_UNLIKELY(!ptr)) {
         return ptr;
     }
 
-    Tf_MallocPathNode *node = td.GetCurrentPathNode();
+    Tf_MallocPathNode* node = td.GetCurrentPathNode();
     size_t blockSize = Tf_GetMallocBlockSize(ptr, nBytes);
-    
+
     // Take a shared/read lock on the global data mutex.
-    TfBigRWMutex::ScopedLock
-        lock(_mallocGlobalData->_mutex, /*write=*/false);
+    TfBigRWMutex::ScopedLock lock(_mallocGlobalData->_mutex, /*write=*/false);
     // Update malloc global data with bookkeeping information.
     _mallocGlobalData->_RegisterBlock(ptr, blockSize, node);
     return ptr;
 }
 
-void*
-TfMallocTag::_ReallocWrapper(void* oldPtr, size_t nBytes, const void*)
-{
+void* TfMallocTag::_ReallocWrapper(void* oldPtr, size_t nBytes, const void*) {
     /*
      * If ptr is NULL, we want to make sure we don't double count,
      * because a call to _mallocHook.Realloc(ptr, nBytes) could call
@@ -1000,9 +844,9 @@ TfMallocTag::_ReallocWrapper(void* oldPtr, size_t nBytes, const void*)
         return _MallocWrapper(nBytes, nullptr);
     }
 
-    _ThreadData &td = Tls::Find();
+    _ThreadData& td = Tls::Find();
 
-    // If tagging is explicitly disabled, just do the realloc and skip 
+    // If tagging is explicitly disabled, just do the realloc and skip
     // everything else. This avoids a deadlock if we get here while updating
     // Tf_MallocGlobalData::_pathNodeTable.
     if (!td.TaggingEnabled()) {
@@ -1011,34 +855,32 @@ TfMallocTag::_ReallocWrapper(void* oldPtr, size_t nBytes, const void*)
 
     // Take a shared/read lock on the global data mutex.
     TfBigRWMutex::ScopedLock lock(_mallocGlobalData->_mutex, /*write=*/false);
-    
+
     _mallocGlobalData->_UnregisterBlock(oldPtr);
 
-    void *newPtr = _mallocHook.Realloc(oldPtr, nBytes);
-        
+    void* newPtr = _mallocHook.Realloc(oldPtr, nBytes);
+
     if (ARCH_UNLIKELY(!newPtr)) {
         return newPtr;
     }
 
     Tf_MallocPathNode* newNode = td.GetCurrentPathNode();
     size_t blockSize = Tf_GetMallocBlockSize(newPtr, nBytes);
-    
+
     // Update malloc global data with bookkeeping information.
     _mallocGlobalData->_RegisterBlock(newPtr, blockSize, newNode);
     return newPtr;
 }
 
-void*
-TfMallocTag::_MemalignWrapper(size_t alignment, size_t nBytes, const void*)
-{
+void* TfMallocTag::_MemalignWrapper(size_t alignment, size_t nBytes, const void*) {
     void* ptr = _mallocHook.Memalign(alignment, nBytes);
 
-    _ThreadData &td = Tls::Find();
+    _ThreadData& td = Tls::Find();
     if (!td.TaggingEnabled() || ARCH_UNLIKELY(!ptr)) {
         return ptr;
     }
-    
-    Tf_MallocPathNode *node = td.GetCurrentPathNode();
+
+    Tf_MallocPathNode* node = td.GetCurrentPathNode();
     size_t blockSize = Tf_GetMallocBlockSize(ptr, nBytes);
 
     // Update malloc global data with bookkeeping information.
@@ -1048,14 +890,12 @@ TfMallocTag::_MemalignWrapper(size_t alignment, size_t nBytes, const void*)
     return ptr;
 }
 
-void
-TfMallocTag::_FreeWrapper(void* ptr, const void*)
-{
+void TfMallocTag::_FreeWrapper(void* ptr, const void*) {
     if (!ptr) {
         return;
     }
 
-    _ThreadData &td = Tls::Find();
+    _ThreadData& td = Tls::Find();
 
     // If tagging is explicitly disabled, just do the free and skip everything
     // else.
@@ -1071,21 +911,16 @@ TfMallocTag::_FreeWrapper(void* ptr, const void*)
     _mallocHook.Free(ptr);
 }
 
-bool
-TfMallocTag::Initialize(string* errMsg)
-{
+bool TfMallocTag::Initialize(string* errMsg) {
     static bool status = _Initialize(errMsg);
     return status;
 }
 
-static void
-_GetCallSites(TfMallocTag::CallTree::PathNode* node,
-              Tf_MallocCallSiteTable* table) {
+static void _GetCallSites(TfMallocTag::CallTree::PathNode* node, Tf_MallocCallSiteTable* table) {
     TF_AXIOM(node);
     TF_AXIOM(table);
 
-    Tf_MallocCallSite* site =
-        Tf_GetOrCreateCallSite(table, node->siteName.c_str());
+    Tf_MallocCallSite* site = Tf_GetOrCreateCallSite(table, node->siteName.c_str());
     site->_totalBytes += node->nBytesDirect;
 
     TF_FOR_ALL(pi, node->children) {
@@ -1093,9 +928,7 @@ _GetCallSites(TfMallocTag::CallTree::PathNode* node,
     }
 }
 
-bool
-TfMallocTag::GetCallTree(CallTree* tree, bool skipRepeated)
-{
+bool TfMallocTag::GetCallTree(CallTree* tree, bool skipRepeated) {
     tree->callSites.clear();
     tree->root.nBytes = tree->root.nBytesDirect = 0;
     tree->root.nAllocations = 0;
@@ -1103,15 +936,13 @@ TfMallocTag::GetCallTree(CallTree* tree, bool skipRepeated)
     tree->root.children.clear();
 
     if (Tf_MallocGlobalData* gd = _mallocGlobalData) {
-
         _TemporaryDisabler disable;
 
         TfBigRWMutex::ScopedLock lock(gd->_mutex);
 
         // Build the snapshot call tree
-        gd->_rootNode->_BuildTree(
-            gd->_BuildPathNodeChildrenTable(), &tree->root, skipRepeated);
-        
+        gd->_rootNode->_BuildTree(gd->_BuildPathNodeChildrenTable(), &tree->root, skipRepeated);
+
         // Build the snapshot callsites map based on the tree
         Tf_MallocCallSiteTable callSiteTable;
         _GetCallSites(&tree->root, &callSiteTable);
@@ -1119,10 +950,7 @@ TfMallocTag::GetCallTree(CallTree* tree, bool skipRepeated)
         // Copy the callsites into the calltree
         tree->callSites.reserve(callSiteTable.size());
         TF_FOR_ALL(csi, callSiteTable) {
-            CallTree::CallSite cs = {
-                csi->second->_name.get(),
-                static_cast<size_t>(csi->second->_totalBytes)
-            };
+            CallTree::CallSite cs = {csi->second->_name.get(), static_cast<size_t>(csi->second->_totalBytes)};
             tree->callSites.push_back(cs);
             delete csi->second;
         }
@@ -1130,14 +958,11 @@ TfMallocTag::GetCallTree(CallTree* tree, bool skipRepeated)
         gd->_BuildUniqueMallocStacks(tree);
 
         return true;
-    }
-    else
+    } else
         return false;
 }
 
-size_t
-TfMallocTag::GetTotalBytes()
-{
+size_t TfMallocTag::GetTotalBytes() {
     if (!_mallocGlobalData) {
         return 0;
     }
@@ -1145,9 +970,7 @@ TfMallocTag::GetTotalBytes()
     return _mallocGlobalData->_totalBytes;
 }
 
-size_t
-TfMallocTag::GetMaxTotalBytes()
-{
+size_t TfMallocTag::GetMaxTotalBytes() {
     if (!_mallocGlobalData) {
         return 0;
     }
@@ -1155,9 +978,7 @@ TfMallocTag::GetMaxTotalBytes()
     return _mallocGlobalData->_maxTotalBytes;
 }
 
-bool
-TfMallocTag::_Initialize(std::string* errMsg)
-{
+bool TfMallocTag::_Initialize(std::string* errMsg) {
     /*
      * This is called from an EXECUTE_ONCE block, so no
      * need to lock anything.
@@ -1172,31 +993,23 @@ TfMallocTag::_Initialize(std::string* errMsg)
     TfMallocTag::_isInitialized = true;
 
     _TemporaryDisabler disable;
-    
-    return _mallocHook.Initialize(_MallocWrapper, 
-                                  _ReallocWrapper,
-                                  _MemalignWrapper, 
-                                  _FreeWrapper, 
-                                  errMsg);
+
+    return _mallocHook.Initialize(_MallocWrapper, _ReallocWrapper, _MemalignWrapper, _FreeWrapper, errMsg);
 }
 
-TfMallocTag::_ThreadData *
-TfMallocTag::_Begin(const char* name, _ThreadData *threadData)
-{
+TfMallocTag::_ThreadData* TfMallocTag::_Begin(const char* name, _ThreadData* threadData) {
     if (!name || !name[0]) {
         return nullptr;
     }
 
-    _ThreadData &tls = threadData ? *threadData : TfMallocTag::Tls::Find();
+    _ThreadData& tls = threadData ? *threadData : TfMallocTag::Tls::Find();
 
     _TemporaryDisabler disable(&tls);
-    
-    TfBigRWMutex::ScopedLock
-        lock(_mallocGlobalData->_mutex, /*write=*/false);
-    
-    Tf_MallocCallSite *site = _mallocGlobalData->_GetOrCreateCallSite(name);
-    Tf_MallocPathNode *thisNode = _mallocGlobalData->
-        _GetOrCreateChild({ tls.GetCurrentPathNode(), site });
+
+    TfBigRWMutex::ScopedLock lock(_mallocGlobalData->_mutex, /*write=*/false);
+
+    Tf_MallocCallSite* site = _mallocGlobalData->_GetOrCreateCallSite(name);
+    Tf_MallocPathNode* thisNode = _mallocGlobalData->_GetOrCreateChild({tls.GetCurrentPathNode(), site});
 
     lock.Release();
 
@@ -1205,9 +1018,7 @@ TfMallocTag::_Begin(const char* name, _ThreadData *threadData)
     return &tls;
 }
 
-void
-TfMallocTag::_End(int nTags, TfMallocTag::_ThreadData *tls)
-{
+void TfMallocTag::_End(int nTags, TfMallocTag::_ThreadData* tls) {
     if (!tls) {
         tls = &TfMallocTag::Tls::Find();
     }
@@ -1220,16 +1031,14 @@ TfMallocTag::_End(int nTags, TfMallocTag::_ThreadData *tls)
 // Returns the given number as a string with commas used as thousands
 // separators.
 //
-static string
-_GetAsCommaSeparatedString(size_t number)
-{
+static string _GetAsCommaSeparatedString(size_t number) {
     string result;
 
     string str = TfStringPrintf("%ld", number);
     size_t n = str.size();
 
     TF_FOR_ALL(it, str) {
-        if (n < str.size() && n%3 == 0) {
+        if (n < str.size() && n % 3 == 0) {
             result.push_back(',');
         }
         result.push_back(*it);
@@ -1238,35 +1047,26 @@ _GetAsCommaSeparatedString(size_t number)
     return result;
 }
 
-static void
-_PrintHeader(string *rpt)
-{
+static void _PrintHeader(string* rpt) {
     *rpt += "\n" + string(80, '-') + "\n";
     *rpt += TfStringPrintf("\nMalloc Tag Report\n\n\n");
-    *rpt += TfStringPrintf("Total bytes = %s\n\n\n",
-        _GetAsCommaSeparatedString(TfMallocTag::GetTotalBytes()).c_str());
+    *rpt += TfStringPrintf("Total bytes = %s\n\n\n", _GetAsCommaSeparatedString(TfMallocTag::GetTotalBytes()).c_str());
 }
 
-static size_t
-_PrintMallocNode(
-    string* rpt,
-    const TfMallocTag::CallTree::PathNode &node,
-    size_t rootTotal,
-    size_t parentTotal,
-    size_t level,
-    size_t &printedNodes,
-    size_t maxPrintedNodes)
-{
+static size_t _PrintMallocNode(string* rpt,
+                               const TfMallocTag::CallTree::PathNode& node,
+                               size_t rootTotal,
+                               size_t parentTotal,
+                               size_t level,
+                               size_t& printedNodes,
+                               size_t maxPrintedNodes) {
     if (!level) {
         // XXX:cleanup  We should pass in maxNameWidth and generate format
         //              strings like in _PrintMallocCallSites().
-        *rpt += TfStringPrintf("%-72s %15s%15s %5s %5s %5s\n", "TAGNAME",
-                               "BytesIncl", "BytesExcl", "%Prnt", "% Exc",
+        *rpt += TfStringPrintf("%-72s %15s%15s %5s %5s %5s\n", "TAGNAME", "BytesIncl", "BytesExcl", "%Prnt", "% Exc",
                                "%Totl");
-        *rpt += TfStringPrintf("%-72s %12s%12s %5s %5s %5s\n\n",
-                               string(72, '-').c_str(),
-                               " --------------", " --------------",
-                               "-----", "-----", "-----");
+        *rpt += TfStringPrintf("%-72s %12s%12s %5s %5s %5s\n\n", string(72, '-').c_str(), " --------------",
+                               " --------------", "-----", "-----", "-----");
 
         rootTotal = node.nBytes;
     }
@@ -1279,35 +1079,30 @@ _PrintMallocNode(
     }
     printedNodes++;
 
-    string name = string(indent, ' ') +
-        node.siteName.substr(0, maxNameWidth-indent);
+    string name = string(indent, ' ') + node.siteName.substr(0, maxNameWidth - indent);
     int postLen = static_cast<int>(maxNameWidth - name.length());
     if (postLen > 0) {
         name += string(postLen, ' ');
     }
 
-    *rpt += TfStringPrintf(
-        "%s %15s%15s ",
-        name.c_str(),
-        _GetAsCommaSeparatedString(node.nBytes).c_str(),
-        _GetAsCommaSeparatedString(node.nBytesDirect).c_str());
+    *rpt += TfStringPrintf("%s %15s%15s ", name.c_str(), _GetAsCommaSeparatedString(node.nBytes).c_str(),
+                           _GetAsCommaSeparatedString(node.nBytesDirect).c_str());
 
     string curPercent;
     string curPercentDirect;
     string percentDirectOfRoot;
 
     if (parentTotal) {
-
-        float percent = node.nBytes/(float)parentTotal*100;
+        float percent = node.nBytes / (float)parentTotal * 100;
         if (percent > 0.5) {
             curPercent = TfStringPrintf(" %.0f%%", percent);
         }
-        percent = node.nBytesDirect/(float)node.nBytes*100;
+        percent = node.nBytesDirect / (float)node.nBytes * 100;
         if (percent > 0.5) {
             curPercentDirect = TfStringPrintf(" %.0f%%", percent);
         }
 
-        percent = node.nBytesDirect/(float)rootTotal*100;
+        percent = node.nBytesDirect / (float)rootTotal * 100;
         if (percent > 0.5) {
             percentDirectOfRoot = TfStringPrintf(" %.0f%%", percent);
         }
@@ -1316,35 +1111,28 @@ _PrintMallocNode(
     if (!level) {
         // For Root, take the bytesDirect as the rootPercentage
 
-        float percent = 100*node.nBytesDirect/(float)rootTotal;
+        float percent = 100 * node.nBytesDirect / (float)rootTotal;
         if (percent > 0.5) {
             percentDirectOfRoot = TfStringPrintf(" %.0f%%", percent);
         }
     }
-    *rpt += TfStringPrintf("%5s %5s %5s\n", curPercent.c_str(),
-                           curPercentDirect.c_str(),
-                           percentDirectOfRoot.c_str());
+    *rpt += TfStringPrintf("%5s %5s %5s\n", curPercent.c_str(), curPercentDirect.c_str(), percentDirectOfRoot.c_str());
 
     vector<TfMallocTag::CallTree::PathNode>::const_iterator it;
     for (it = node.children.begin(); it != node.children.end(); ++it) {
-        _PrintMallocNode(rpt, *it, rootTotal, node.nBytes, level+1,
-                         printedNodes,
-                         maxPrintedNodes);
+        _PrintMallocNode(rpt, *it, rootTotal, node.nBytes, level + 1, printedNodes, maxPrintedNodes);
     }
 
     return rootTotal;
 }
 
-static void
-_PrintMallocCallSites(
-   string* rpt,
-   const vector<TfMallocTag::CallTree::CallSite>& callSites,
-   size_t rootTotal)
-{
+static void _PrintMallocCallSites(string* rpt,
+                                  const vector<TfMallocTag::CallTree::CallSite>& callSites,
+                                  size_t rootTotal) {
     *rpt += TfStringPrintf("\n\nCall Sites\n\n");
 
     // Use a map to sort by allocation size.
-    map<size_t, const string *> map;
+    map<size_t, const string*> map;
     TF_FOR_ALL(csi, callSites) {
         map.insert(make_pair(csi->nBytes, &csi->name));
     }
@@ -1354,22 +1142,19 @@ _PrintMallocCallSites(
     const size_t maxBytesWidth = 15;
     const size_t maxPercentageWidth = 15;
 
-    string fmt = TfStringPrintf(
-        "%%-%lds %%%lds %%%lds\n",
-        maxNameWidth, maxBytesWidth, maxPercentageWidth);
+    string fmt = TfStringPrintf("%%-%lds %%%lds %%%lds\n", maxNameWidth, maxBytesWidth, maxPercentageWidth);
 
     *rpt += TfStringPrintf(fmt.c_str(), "NAME", "BYTES", "%ROOT");
-    *rpt += string(maxNameWidth, '-') + ' ' + 
-            string(maxBytesWidth, '-') + ' ' + 
-            string(maxPercentageWidth, '-') + "\n\n";
+    *rpt += string(maxNameWidth, '-') + ' ' + string(maxBytesWidth, '-') + ' ' + string(maxPercentageWidth, '-') +
+            "\n\n";
 
     TF_REVERSE_FOR_ALL(it, map) {
         size_t nBytes = it->first;
-        const string &name = *it->second;
+        const string& name = *it->second;
 
         string curPercent;
         if (rootTotal) {
-            double percent = 100.0*nBytes/rootTotal;
+            double percent = 100.0 * nBytes / rootTotal;
             // Don't print anything less than 0.1%.
             if (percent < 0.1) {
                 break;
@@ -1377,31 +1162,22 @@ _PrintMallocCallSites(
             curPercent = TfStringPrintf("%.1f%%", percent);
         }
 
-        *rpt += TfStringPrintf(
-            fmt.c_str(),
-            name.substr(0, maxNameWidth).c_str(),
-            _GetAsCommaSeparatedString(nBytes).c_str(),
-            curPercent.c_str());
+        *rpt += TfStringPrintf(fmt.c_str(), name.substr(0, maxNameWidth).c_str(),
+                               _GetAsCommaSeparatedString(nBytes).c_str(), curPercent.c_str());
     }
 }
 
 // Comparison for sorting CallTree::PathNodes.
 //
-static bool
-_MallocPathNodeLessThan(
-    const TfMallocTag::CallTree::PathNode *lhs,
-    const TfMallocTag::CallTree::PathNode *rhs)
-{
+static bool _MallocPathNodeLessThan(const TfMallocTag::CallTree::PathNode* lhs,
+                                    const TfMallocTag::CallTree::PathNode* rhs) {
     return lhs->siteName < rhs->siteName;
 }
 
 #if !(_DECREMENT_ALLOCATION_COUNTS)
 // Returns the total number of allocations in the given sub-tree.
 //
-static int64_t
-_GetNumAllocationInSubTree(
-    const TfMallocTag::CallTree::PathNode &node)
-{
+static int64_t _GetNumAllocationInSubTree(const TfMallocTag::CallTree::PathNode& node) {
     int64_t nAllocations = node.nAllocations;
     TF_FOR_ALL(it, node.children) {
         nAllocations += _GetNumAllocationInSubTree(*it);
@@ -1410,74 +1186,60 @@ _GetNumAllocationInSubTree(
 }
 #endif
 
-static void
-_ReportMallocNode(
-    std::ostream &out,
-    const TfMallocTag::CallTree::PathNode &node,
-    size_t level,
-    const std::string *rootName = nullptr)
-{
+static void _ReportMallocNode(std::ostream& out,
+                              const TfMallocTag::CallTree::PathNode& node,
+                              size_t level,
+                              const std::string* rootName = nullptr) {
     // Prune empty branches.
     if (node.nBytes == 0) {
-        #if _DECREMENT_ALLOCATION_COUNTS
+#if _DECREMENT_ALLOCATION_COUNTS
+        return;
+#else
+        if (_GetNumAllocationInSubTree(node) == 0) {
             return;
-        #else
-            if (_GetNumAllocationInSubTree(node) == 0) {
-                return;
-            }
-        #endif
+        }
+#endif
     }
 
-    string indent(2*level, ' ');
+    string indent(2 * level, ' ');
 
     // Insert '|' characters every 4 spaces.
-    for (size_t i=0; i<(level + 1)/2; i++) {
-        indent[4*i] = '|';
+    for (size_t i = 0; i < (level + 1) / 2; i++) {
+        indent[4 * i] = '|';
     }
 
-    out << TfStringPrintf(
-        "%13s B %13s B %7ld samples    ",
-        _GetAsCommaSeparatedString(node.nBytes).c_str(),
-        _GetAsCommaSeparatedString(node.nBytesDirect).c_str(),
-        node.nAllocations);
+    out << TfStringPrintf("%13s B %13s B %7ld samples    ", _GetAsCommaSeparatedString(node.nBytes).c_str(),
+                          _GetAsCommaSeparatedString(node.nBytesDirect).c_str(), node.nAllocations);
 
-    out << indent
-        << (rootName && !rootName->empty() ? *rootName : node.siteName)
-        << std::endl;
+    out << indent << (rootName && !rootName->empty() ? *rootName : node.siteName) << std::endl;
 
     // Sort the children by name.  The reason for doing this is that it is
     // the easiest way to provide stable results for diffing.  You could
     // argue that letting the diff program do the sorting is more correct
     // (i.e. that sorting is a view into the unaltered source data).
-    std::vector<const TfMallocTag::CallTree::PathNode *> sortedChildren;
+    std::vector<const TfMallocTag::CallTree::PathNode*> sortedChildren;
     sortedChildren.reserve(node.children.size());
     TF_FOR_ALL(it, node.children) {
         sortedChildren.push_back(&(*it));
     }
 
-    std::sort(
-        sortedChildren.begin(), sortedChildren.end(), _MallocPathNodeLessThan);
+    std::sort(sortedChildren.begin(), sortedChildren.end(), _MallocPathNodeLessThan);
 
     TF_FOR_ALL(it, sortedChildren) {
-        _ReportMallocNode(out, **it, level+1);
+        _ReportMallocNode(out, **it, level + 1);
     }
 }
 
-static void
-_ReportCapturedMallocStacks(
-    std::ostream &out,
-    const std::vector<TfMallocTag::CallStackInfo> &stackInfos)
-{
-    size_t numReportedStacks =
-        TfMin(stackInfos.size(), _MaxReportedMallocStacks);
+static void _ReportCapturedMallocStacks(std::ostream& out, const std::vector<TfMallocTag::CallStackInfo>& stackInfos) {
+    size_t numReportedStacks = TfMin(stackInfos.size(), _MaxReportedMallocStacks);
 
     size_t totalSize = 0;
     size_t totalNumAllocations = 0;
     size_t reportSize = 0;
     size_t reportNumAllocations = 0;
 
-    for(size_t n=0; n<stackInfos.size(); n++) {
-        const TfMallocTag::CallStackInfo &stackInfo = stackInfos[n];
+    for (size_t n = 0; n < stackInfos.size(); n++) {
+        const TfMallocTag::CallStackInfo& stackInfo = stackInfos[n];
         totalSize += stackInfo.size;
         totalNumAllocations += stackInfo.numAllocations;
         if (n < numReportedStacks) {
@@ -1489,60 +1251,45 @@ _ReportCapturedMallocStacks(
     out << "\n\n\n"
         << "Captured Malloc Stacks\n"
         << "\n"
-        << "Number of unique captured malloc stacks:          "
-            << _GetAsCommaSeparatedString(stackInfos.size()) << "\n"
-        << "Total allocated memory by captured mallocs:       "
-            << _GetAsCommaSeparatedString(totalSize) << "\n"
-        << "Total number of allocations by captured mallocs:  "
-            << _GetAsCommaSeparatedString(totalNumAllocations) << "\n"
+        << "Number of unique captured malloc stacks:          " << _GetAsCommaSeparatedString(stackInfos.size()) << "\n"
+        << "Total allocated memory by captured mallocs:       " << _GetAsCommaSeparatedString(totalSize) << "\n"
+        << "Total number of allocations by captured mallocs:  " << _GetAsCommaSeparatedString(totalNumAllocations)
         << "\n"
-        << "Number of captured malloc stacks in report:       "
-            << _GetAsCommaSeparatedString(numReportedStacks) << "\n"
-        << "Allocated memory by mallocs in report:            "
-            << _GetAsCommaSeparatedString(reportSize) << "\n"
-        << "Number of allocations by mallocs in report:       "
-            << _GetAsCommaSeparatedString(reportNumAllocations) << "\n"
+        << "\n"
+        << "Number of captured malloc stacks in report:       " << _GetAsCommaSeparatedString(numReportedStacks) << "\n"
+        << "Allocated memory by mallocs in report:            " << _GetAsCommaSeparatedString(reportSize) << "\n"
+        << "Number of allocations by mallocs in report:       " << _GetAsCommaSeparatedString(reportNumAllocations)
+        << "\n"
         << "Percentage of allocated memory covered by report: "
-            << TfStringPrintf("%.1f%%", 100.0*reportSize/totalSize) << "\n\n";
+        << TfStringPrintf("%.1f%%", 100.0 * reportSize / totalSize) << "\n\n";
 
-    for(size_t n=0; n<numReportedStacks; n++) {
-        const TfMallocTag::CallStackInfo &stackInfo = stackInfos[n];
+    for (size_t n = 0; n < numReportedStacks; n++) {
+        const TfMallocTag::CallStackInfo& stackInfo = stackInfos[n];
 
         out << string(100, '-') << "\n"
             << "Captured malloc stack #" << n << "\n"
-            << "Size:            " <<
-                _GetAsCommaSeparatedString(stackInfo.size) << "\n"
-            << "Num allocations: " <<
-                _GetAsCommaSeparatedString(stackInfo.numAllocations) << "\n";
+            << "Size:            " << _GetAsCommaSeparatedString(stackInfo.size) << "\n"
+            << "Num allocations: " << _GetAsCommaSeparatedString(stackInfo.numAllocations) << "\n";
 
         ArchPrintStackFrames(out, stackInfo.stack);
     }
 }
 
-
-string
-TfMallocTag::CallTree::GetPrettyPrintString(PrintSetting setting,
-                                            size_t maxPrintedNodes) const
-{
+string TfMallocTag::CallTree::GetPrettyPrintString(PrintSetting setting, size_t maxPrintedNodes) const {
     string rpt;
 
     _PrintHeader(&rpt);
 
     if (setting == TREE || setting == BOTH) {
         size_t printedNodes = 0;
-        size_t reportedMem = 
-            _PrintMallocNode(&rpt, this->root, 0, 0, 0, printedNodes,
-                             maxPrintedNodes);
-        if (printedNodes >= maxPrintedNodes
-            && reportedMem != GetTotalBytes()) {
-            rpt += TfStringPrintf("\nWARNING: limit of %zu nodes visted, but "
-                                  "only %zu bytes of %zu accounted for.  "
-                                  "Running with a larger maxPrintedNodes will "
-                                  "produce more accurate results.\n",
-                                  maxPrintedNodes, 
-                                  reportedMem, 
-                                  GetTotalBytes());
-
+        size_t reportedMem = _PrintMallocNode(&rpt, this->root, 0, 0, 0, printedNodes, maxPrintedNodes);
+        if (printedNodes >= maxPrintedNodes && reportedMem != GetTotalBytes()) {
+            rpt += TfStringPrintf(
+                    "\nWARNING: limit of %zu nodes visted, but "
+                    "only %zu bytes of %zu accounted for.  "
+                    "Running with a larger maxPrintedNodes will "
+                    "produce more accurate results.\n",
+                    maxPrintedNodes, reportedMem, GetTotalBytes());
         }
     }
 
@@ -1553,26 +1300,17 @@ TfMallocTag::CallTree::GetPrettyPrintString(PrintSetting setting,
     return rpt;
 }
 
-void
-TfMallocTag::CallTree::Report(
-    std::ostream &out) const
-{
+void TfMallocTag::CallTree::Report(std::ostream& out) const {
     const std::string emptyRootName;
     Report(out, emptyRootName);
 }
 
-static const std::string &
-_GetTreeHeader()
-{
+static const std::string& _GetTreeHeader() {
     static const std::string treeHeader("Tree view  ==============");
     return treeHeader;
 }
 
-void
-TfMallocTag::CallTree::Report(
-    std::ostream &out,
-    const std::string &rootName) const
-{
+void TfMallocTag::CallTree::Report(std::ostream& out, const std::string& rootName) const {
     out << "\n" << _GetTreeHeader() << "\n";
     out << "      inclusive       exclusive\n";
 
@@ -1587,10 +1325,7 @@ TfMallocTag::CallTree::Report(
     }
 }
 
-bool
-TfMallocTag::CallTree::LoadReport(
-    std::istream &in)
-{
+bool TfMallocTag::CallTree::LoadReport(std::istream& in) {
     // The matches here are:
     // 1. Exclusive memory (in bytes)
     // 2. Inclusive memory (in bytes)
@@ -1598,10 +1333,9 @@ TfMallocTag::CallTree::LoadReport(
     // 4. The indentation string, which we match exactly (excluding leading
     //    whitespace) so that we can use the length to compute the depth, below.
     // 5. The name of the callsite.
-    static const std::regex re(
-        R"( *([\d].*) B *([\d].*) B *([\d].*) samples    ([ |]*)(.*))");
+    static const std::regex re(R"( *([\d].*) B *([\d].*) B *([\d].*) samples    ([ |]*)(.*))");
 
-    // State of the parser. 
+    // State of the parser.
     enum class State {
         // Tree header not yet found
         FindingTree,
@@ -1613,7 +1347,7 @@ TfMallocTag::CallTree::LoadReport(
     // loading multiple report trees. (This root node will be elided later if we
     // end up loading a single tree.)
     root = {0, 0, 0, "root", {}};
-    std::stack<PathNode *> nodes;
+    std::stack<PathNode*> nodes;
     nodes.push(&root);
 
     // Parse the file contents
@@ -1643,10 +1377,8 @@ TfMallocTag::CallTree::LoadReport(
             continue;
         }
 
-        const size_t nBytes =
-            TfStringToULong(TfStringReplace(match[1].str(), ",", ""));
-        const size_t nBytesDirect =
-            TfStringToULong(TfStringReplace(match[2].str(), ",", ""));
+        const size_t nBytes = TfStringToULong(TfStringReplace(match[1].str(), ",", ""));
+        const size_t nBytesDirect = TfStringToULong(TfStringReplace(match[2].str(), ",", ""));
         const size_t nAllocations = TfStringToULong(match[3].str());
         const size_t depth = match[4].length() / 2;
         const std::string& siteName = match[5].str();
@@ -1658,14 +1390,13 @@ TfMallocTag::CallTree::LoadReport(
             nodes.pop();
         }
 
-        PathNode *const parent = nodes.top();
+        PathNode* const parent = nodes.top();
 
         // Add the current node as a child.
-        parent->children.push_back(
-            {nBytes, nBytesDirect, nAllocations, siteName, {}});
+        parent->children.push_back({nBytes, nBytesDirect, nAllocations, siteName, {}});
 
         // Push the child onto the stack.
-        PathNode *const child = &(parent->children.back());
+        PathNode* const child = &(parent->children.back());
         nodes.push(child);
     }
 

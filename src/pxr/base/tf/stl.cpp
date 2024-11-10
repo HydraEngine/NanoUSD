@@ -11,16 +11,12 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-size_t
-Tf_GetEmptyHashMapBucketCount()
-{
+size_t Tf_GetEmptyHashMapBucketCount() {
     static const TfHashMap<int, int> empty(0);
     return empty.bucket_count();
 }
 
-size_t
-Tf_GetEmptyHashSetBucketCount()
-{
+size_t Tf_GetEmptyHashSetBucketCount() {
     static const TfHashSet<int> empty(0);
     return empty.bucket_count();
 }

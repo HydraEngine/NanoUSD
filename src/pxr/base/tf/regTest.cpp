@@ -24,64 +24,46 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_INSTANTIATE_SINGLETON(TfRegTest);
 
-TfRegTest&
-TfRegTest::GetInstance()
-{
+TfRegTest& TfRegTest::GetInstance() {
     return TfSingleton<TfRegTest>::GetInstance();
 }
 
-bool
-TfRegTest::Register(const char* name, RegFunc func)
-{
+bool TfRegTest::Register(const char* name, RegFunc func) {
     _functionTable[name] = func;
     return true;
 }
 
-bool
-TfRegTest::Register(const char* name, RegFuncWithArgs func)
-{
+bool TfRegTest::Register(const char* name, RegFuncWithArgs func) {
     _functionTableWithArgs[name] = func;
     return true;
 }
 
-static int
-_HandleErrors(const TfErrorMark &m, bool success)
-{
-    if (!success)
-        return 1;
+static int _HandleErrors(const TfErrorMark& m, bool success) {
+    if (!success) return 1;
 
-    if (m.IsClean())
-        return 0;
+    if (m.IsClean()) return 0;
 
     int rc(100);
-    for (TfErrorMark::Iterator i = m.GetBegin(); i != m.GetEnd(); ++i)
-    {
+    for (TfErrorMark::Iterator i = m.GetBegin(); i != m.GetEnd(); ++i) {
         ++rc;
-        cerr << "*** Error in " << i->GetSourceFileName()
-             << "@line " << i->GetSourceLineNumber()
-             << "\n    " << i->GetCommentary() << "\n";
+        cerr << "*** Error in " << i->GetSourceFileName() << "@line " << i->GetSourceLineNumber() << "\n    "
+             << i->GetCommentary() << "\n";
     }
 
-    return(rc);
+    return (rc);
 }
 
-void
-TfRegTest::_PrintTestNames()
-{
+void TfRegTest::_PrintTestNames() {
     cerr << "Valid tests are:";
 
     vector<string> names;
     names.reserve(_functionTable.size() + _functionTableWithArgs.size());
-    
-    for (_Hash::const_iterator hi = _functionTable.begin();
-                               hi != _functionTable.end(); ++hi)
+
+    for (_Hash::const_iterator hi = _functionTable.begin(); hi != _functionTable.end(); ++hi)
         names.push_back(hi->first);
 
-    for (_HashWithArgs::const_iterator hi = _functionTableWithArgs.begin();
-                                       hi != _functionTableWithArgs.end();
-                                       ++hi)
+    for (_HashWithArgs::const_iterator hi = _functionTableWithArgs.begin(); hi != _functionTableWithArgs.end(); ++hi)
         names.push_back(hi->first);
-
 
     sort(names.begin(), names.end());
     for (const auto& name : names) {
@@ -91,15 +73,11 @@ TfRegTest::_PrintTestNames()
     cerr << endl;
 }
 
-static void
-_Usage(const string &progName)
-{
+static void _Usage(const string& progName) {
     cerr << "Usage: " << progName << " testName [args]\n";
 }
 
-int
-TfRegTest::_Main(int argc, char *argv[])
-{
+int TfRegTest::_Main(int argc, char* argv[]) {
     string progName(argv[0]);
 
     if (argc < 2) {
@@ -112,20 +90,15 @@ TfRegTest::_Main(int argc, char *argv[])
 
     if (_functionTable.find(testName) != _functionTable.end()) {
         if (argc > 2) {
-            cerr << progName << ": test function '" << testName
-                 << "' takes no arguments." << endl;
+            cerr << progName << ": test function '" << testName << "' takes no arguments." << endl;
             return 2;
         }
         TfErrorMark m;
         return _HandleErrors(m, (*_functionTable[testName])());
-    }
-    else if (_functionTableWithArgs.find(testName) !=
-             _functionTableWithArgs.end()) {
+    } else if (_functionTableWithArgs.find(testName) != _functionTableWithArgs.end()) {
         TfErrorMark m;
-        return _HandleErrors(m,
-                (*_functionTableWithArgs[testName])(argc-1, argv+1));
-    }
-    else {
+        return _HandleErrors(m, (*_functionTableWithArgs[testName])(argc - 1, argv + 1));
+    } else {
         cerr << progName << ": unknown test function " << testName << ".\n";
         _PrintTestNames();
         return 3;

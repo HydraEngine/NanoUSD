@@ -23,29 +23,24 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \ingroup group_tf_String
 ///
 /// Class for matching regular expressions.
-/// 
+///
 /// A matcher is good to use when you have many strings to match against one
 /// pattern. This is because the matcher will only compile the regular
 /// expression once.
 ///
-class TfPatternMatcher
-{
-
-  public:
-
+class TfPatternMatcher {
+public:
     /// Construct an empty (invalid) TfPatternMatcher.
     TF_API TfPatternMatcher();
 
-    TF_API TfPatternMatcher(TfPatternMatcher &&) noexcept = default;
-    TF_API TfPatternMatcher& operator=(TfPatternMatcher &&) = default;
+    TF_API TfPatternMatcher(TfPatternMatcher&&) noexcept = default;
+    TF_API TfPatternMatcher& operator=(TfPatternMatcher&&) = default;
 
     /// Construct a TfPatternMatcher with a default configuration.  Note that
     /// pattern compilation will not occur until the first call to \a Match()
     /// or \a IsValid().
     TF_API
-    TfPatternMatcher( const std::string &pattern,
-                      bool caseSensitive = false,
-                      bool isGlob = false );
+    TfPatternMatcher(const std::string& pattern, bool caseSensitive = false, bool isGlob = false);
 
     /// Destructor.
     TF_API ~TfPatternMatcher();
@@ -55,20 +50,14 @@ class TfPatternMatcher
 
     /// Returns true if the matcher has been set to be case sensitive, false
     /// otherwise.
-    bool IsCaseSensitive() const {
-        return _caseSensitive;
-    }
+    bool IsCaseSensitive() const { return _caseSensitive; }
 
     /// Returns true if the matcher has been set to treat patterns as glob
     /// patterns, false otherwise.
-    bool IsGlobPattern() const {
-        return _isGlob;
-    }
+    bool IsGlobPattern() const { return _isGlob; }
 
     /// Returns the matcher's pattern string.
-    TF_API const std::string& GetPattern() const {
-        return _pattern;
-    }
+    TF_API const std::string& GetPattern() const { return _pattern; }
 
     /// Returns true if the matcher has a valid pattern.  Note that empty
     /// patterns are considered invalid.  This will cause a compile of
@@ -85,23 +74,22 @@ class TfPatternMatcher
     /// libraries, this method does not implicitly anchor the pattern. If a
     /// partial match is not acceptable, it is necessary to anchor the pattern
     /// passed to the constructor, e.g. "^mypattern$".
-    /// 
-    TF_API bool Match( const std::string &query,
-                       std::string *errorMsg = NULL ) const;
+    ///
+    TF_API bool Match(const std::string& query, std::string* errorMsg = NULL) const;
 
     /// Set this matcher to match case-sensitively or not.
-    TF_API void SetIsCaseSensitive( bool sensitive );
+    TF_API void SetIsCaseSensitive(bool sensitive);
 
     /// Set this matcher to treat its pattern as a glob pattern. Currently,
     /// this means that the pattern will be transformed by replacing all
     /// instances of '.' with '\.', '*' with '.*', and '?' with '.', in that
     /// order before being compiled as a normal regular expression.
-    TF_API void SetIsGlobPattern( bool isGlob );
+    TF_API void SetIsGlobPattern(bool isGlob);
 
     /// Set the pattern that this matcher will use to match against.
-    TF_API void SetPattern( const std::string &pattern );
-    
-  private:
+    TF_API void SetPattern(const std::string& pattern);
+
+private:
     void _Compile() const;
 
     bool _caseSensitive;
@@ -109,9 +97,8 @@ class TfPatternMatcher
     std::string _pattern;
     mutable bool _recompile;
     mutable ArchRegex _regex;
-        
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_PATTERN_MATCHER_H
+#endif  // PXR_BASE_TF_PATTERN_MATCHER_H

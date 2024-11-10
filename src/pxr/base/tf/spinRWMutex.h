@@ -46,21 +46,18 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// This class provides a nested TfSpinRWMutex::ScopedLock that makes it easy to
 /// acquire locks, upgrade reader to writer, downgrade writer to reader, and
 /// have those locks automatically release when the ScopedLock is destroyed.
-/// 
-class TfSpinRWMutex
-{
+///
+class TfSpinRWMutex {
     static constexpr int OneReader = 2;
     static constexpr int WriterFlag = 1;
-    
-public:
 
+public:
     /// Construct a mutex, initially unlocked.
     TfSpinRWMutex() : _lockState(0) {}
 
     /// Scoped lock utility class.  API modeled roughly after
     /// tbb::spin_rw_mutex::scoped_lock.
     struct ScopedLock {
-
         // Acquisition states.
         static constexpr int NotAcquired = 0;
         static constexpr int ReadAcquired = 1;
@@ -68,9 +65,7 @@ public:
 
         /// Construct a scoped lock for mutex \p m and acquire either a read or
         /// a write lock depending on \p write.
-        explicit ScopedLock(TfSpinRWMutex &m, bool write=true)
-            : _mutex(&m)
-            , _acqState(NotAcquired) {
+        explicit ScopedLock(TfSpinRWMutex& m, bool write = true) : _mutex(&m), _acqState(NotAcquired) {
             Acquire(write);
         }
 
@@ -79,29 +74,26 @@ public:
 
         /// If this scoped lock is acquired for either read or write, Release()
         /// it.
-        ~ScopedLock() {
-            Release();
-        }
+        ~ScopedLock() { Release(); }
 
         /// If the current scoped lock is acquired, Release() it, then associate
         /// this lock with \p m and acquire either a read or a write lock,
         /// depending on \p write.
-        void Acquire(TfSpinRWMutex &m, bool write=true) {
+        void Acquire(TfSpinRWMutex& m, bool write = true) {
             Release();
             _mutex = &m;
             Acquire(write);
-        }            
+        }
 
         /// Acquire either a read or write lock on this lock's associated mutex
         /// depending on \p write.  This lock must be associated with a mutex
         /// (typically by construction or by a call to Acquire() that takes a
         /// mutex).  This lock must not already be acquired when calling
         /// Acquire().
-        void Acquire(bool write=true) {
+        void Acquire(bool write = true) {
             if (write) {
                 AcquireWrite();
-            }
-            else {
+            } else {
                 AcquireRead();
             }
         }
@@ -110,15 +102,15 @@ public:
         /// this lock is not currently acquired, silently do nothing.
         void Release() {
             switch (_acqState) {
-            default:
-            case NotAcquired:
-                break;
-            case ReadAcquired:
-                _ReleaseRead();
-                break;
-            case WriteAcquired:
-                _ReleaseWrite();
-                break;
+                default:
+                case NotAcquired:
+                    break;
+                case ReadAcquired:
+                    _ReleaseRead();
+                    break;
+                case WriteAcquired:
+                    _ReleaseWrite();
+                    break;
             };
         }
 
@@ -158,9 +150,8 @@ public:
             _acqState = ReadAcquired;
             return _mutex->DowngradeToReader();
         }
-        
-    private:
 
+    private:
         void _ReleaseRead() {
             TF_DEV_AXIOM(_acqState == ReadAcquired);
             _mutex->ReleaseRead();
@@ -173,8 +164,8 @@ public:
             _acqState = NotAcquired;
         }
 
-        TfSpinRWMutex *_mutex;
-        int _acqState; // NotAcquired (0), ReadAcquired (1), WriteAcquired (2)
+        TfSpinRWMutex* _mutex;
+        int _acqState;  // NotAcquired (0), ReadAcquired (1), WriteAcquired (2)
     };
 
     /// Attempt to acquire a read lock on this mutex without waiting for
@@ -193,7 +184,7 @@ public:
         _lockState -= OneReader;
         return false;
     }
-    
+
     /// Acquire a read lock on this mutex.  This thread must not already hold a
     /// lock on this mutex (either read or write).  Consider calling
     /// DowngradeToReader() if this thread holds a write lock.
@@ -245,9 +236,7 @@ public:
     }
 
     /// Release this thread's write lock on this mutex.
-    inline void ReleaseWrite() {
-        _lockState &= ~WriterFlag;
-    }
+    inline void ReleaseWrite() { _lockState &= ~WriterFlag; }
 
     /// Upgrade this thread's lock on this mutex (which must be a read lock) to
     /// a write lock.  Return true if the upgrade is done "atomically" meaning
@@ -265,8 +254,7 @@ public:
             if (!(state & WriterFlag)) {
                 // We set the flag, release our reader count and wait for any
                 // other pending readers.
-                if (_lockState.fetch_sub(
-                        OneReader) != (OneReader | WriterFlag)) {
+                if (_lockState.fetch_sub(OneReader) != (OneReader | WriterFlag)) {
                     _WaitForReaders();
                 }
                 return atomic;
@@ -286,19 +274,15 @@ public:
     bool DowngradeToReader() {
         // Simultaneously add a reader count and clear the writer bit by adding
         // (OneReader-1).
-        _lockState += (OneReader-1);
+        _lockState += (OneReader - 1);
         return true;
     }
 
 private:
     friend class TfBigRWMutex;
-    
+
     // Helpers for staged-acquire-write that BigRWMutex uses.
-    enum _StagedAcquireWriteState {
-        _StageNotAcquired,
-        _StageAcquiring,
-        _StageAcquired
-    };
+    enum _StagedAcquireWriteState { _StageNotAcquired, _StageAcquiring, _StageAcquired };
 
     // This API lets TfBigRWMutex acquire a write lock step-by-step so that it
     // can begin acquiring write locks on several mutexes without waiting
@@ -307,35 +291,34 @@ private:
     // repeatedly calling _StagedAcquireWriteStep, passing the previously
     // returned value until this function returns _StageAcquired.  At this
     // point the write lock is acquired.
-    _StagedAcquireWriteState
-    _StagedAcquireWriteStep(_StagedAcquireWriteState curState) {
+    _StagedAcquireWriteState _StagedAcquireWriteStep(_StagedAcquireWriteState curState) {
         int state;
         switch (curState) {
-        case _StageNotAcquired:
-            state = _lockState.fetch_or(WriterFlag);
-            if (!(state & WriterFlag)) {
-                // We set the flag. If there were no readers we're done,
-                // otherwise we'll have to wait for them, next step.
-                return state == 0 ? _StageAcquired : _StageAcquiring;
-            }
-            // Other writer activity, must retry next step.
-            return _StageNotAcquired;
-        case _StageAcquiring:
-            // We have set the writer flag but must wait to see no readers.
-            _WaitForReaders();
-            return _StageAcquired;
-        case _StageAcquired:
-        default:
-            return _StageAcquired;
+            case _StageNotAcquired:
+                state = _lockState.fetch_or(WriterFlag);
+                if (!(state & WriterFlag)) {
+                    // We set the flag. If there were no readers we're done,
+                    // otherwise we'll have to wait for them, next step.
+                    return state == 0 ? _StageAcquired : _StageAcquiring;
+                }
+                // Other writer activity, must retry next step.
+                return _StageNotAcquired;
+            case _StageAcquiring:
+                // We have set the writer flag but must wait to see no readers.
+                _WaitForReaders();
+                return _StageAcquired;
+            case _StageAcquired:
+            default:
+                return _StageAcquired;
         };
     }
-    
+
     TF_API void _WaitForReaders() const;
     TF_API void _WaitForWriter() const;
-    
+
     std::atomic<int> _lockState;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_SPIN_RW_MUTEX_H
+#endif  // PXR_BASE_TF_SPIN_RW_MUTEX_H

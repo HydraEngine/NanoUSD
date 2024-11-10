@@ -18,16 +18,12 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Helper function for reporting.
-static
-std::string
-_GetDemangled(const TfRefBase* watched)
-{
-    return watched ? ArchGetDemangled(typeid(*watched)) :
-                     std::string("<unknown>");
+static std::string _GetDemangled(const TfRefBase* watched) {
+    return watched ? ArchGetDemangled(typeid(*watched)) : std::string("<unknown>");
 }
 
 // Trace type to string table.
-static const char* _type[] = { "Add", "Assign" };
+static const char* _type[] = {"Add", "Assign"};
 
 // The number of levels in stack traces that are for TfRefPtrTracker itself.
 // Currently these are:
@@ -37,19 +33,15 @@ static const size_t _NumInternalStackLevels = 2;
 
 TF_INSTANTIATE_SINGLETON(TfRefPtrTracker);
 
-TfRefPtrTracker::TfRefPtrTracker() : _maxDepth(20)
-{
+TfRefPtrTracker::TfRefPtrTracker() : _maxDepth(20) {
     // Do nothing
 }
 
-TfRefPtrTracker::~TfRefPtrTracker()
-{
+TfRefPtrTracker::~TfRefPtrTracker() {
     // Do nothing
 }
 
-void
-TfRefPtrTracker::_Watch(const TfRefBase* obj)
-{
+void TfRefPtrTracker::_Watch(const TfRefBase* obj) {
     _Lock lock(_mutex);
 
     // We're now watching the TfRefBase at obj but there are no TfRefPtr
@@ -57,21 +49,14 @@ TfRefPtrTracker::_Watch(const TfRefBase* obj)
     _watched.insert(std::make_pair(obj, (size_t)0));
 }
 
-void
-TfRefPtrTracker::_Unwatch(const TfRefBase* obj)
-{
+void TfRefPtrTracker::_Unwatch(const TfRefBase* obj) {
     _Lock lock(_mutex);
 
     // Stop watching the TfRefBase at obj.
     _watched.erase(obj);
 }
 
-void
-TfRefPtrTracker::_AddTrace(
-    const void* owner,
-    const TfRefBase* obj,
-    TraceType type)
-{
+void TfRefPtrTracker::_AddTrace(const void* owner, const TfRefBase* obj, TraceType type) {
     _Lock lock(_mutex);
 
     // The owner (TfRefPtr) is no longer pointing to the TfRefBase it
@@ -102,7 +87,7 @@ TfRefPtrTracker::_AddTrace(
         // existing owner.
         Trace& trace = _traces[owner];
         ArchGetStackFrames(_maxDepth, _NumInternalStackLevels, &trace.trace);
-        trace.obj  = obj;
+        trace.obj = obj;
         trace.type = type;
     }
 
@@ -113,9 +98,7 @@ TfRefPtrTracker::_AddTrace(
     }
 }
 
-void
-TfRefPtrTracker::_RemoveTraces(const void* owner)
-{
+void TfRefPtrTracker::_RemoveTraces(const void* owner) {
     _Lock lock(_mutex);
 
     // See if we have this owner.
@@ -134,82 +117,59 @@ TfRefPtrTracker::_RemoveTraces(const void* owner)
     }
 }
 
-TfRefPtrTracker::WatchedCounts
-TfRefPtrTracker::GetWatchedCounts() const
-{
+TfRefPtrTracker::WatchedCounts TfRefPtrTracker::GetWatchedCounts() const {
     _Lock lock(_mutex);
     return _watched;
 }
 
-TfRefPtrTracker::OwnerTraces
-TfRefPtrTracker::GetAllTraces() const
-{
+TfRefPtrTracker::OwnerTraces TfRefPtrTracker::GetAllTraces() const {
     _Lock lock(_mutex);
     return _traces;
 }
 
-void
-TfRefPtrTracker::ReportAllWatchedCounts(std::ostream& stream) const
-{
+void TfRefPtrTracker::ReportAllWatchedCounts(std::ostream& stream) const {
     stream << "TfRefPtrTracker watched counts:" << std::endl;
     TF_FOR_ALL(i, _watched) {
-        stream << "  " << i->first << ": " << i->second
-               << " (type " << _GetDemangled(i->first) << ")"
-               << std::endl;
+        stream << "  " << i->first << ": " << i->second << " (type " << _GetDemangled(i->first) << ")" << std::endl;
     }
 }
 
-void
-TfRefPtrTracker::ReportAllTraces(std::ostream& stream) const
-{
+void TfRefPtrTracker::ReportAllTraces(std::ostream& stream) const {
     stream << "TfRefPtrTracker traces:" << std::endl;
     _Lock lock(_mutex);
     TF_FOR_ALL(i, _traces) {
         const Trace& trace = i->second;
-        stream << "  Owner: " << i->first
-               << " " << _type[trace.type] << " " << trace.obj << ":"
-               << std::endl;
-        stream << "=============================================================="
-               << std::endl;
+        stream << "  Owner: " << i->first << " " << _type[trace.type] << " " << trace.obj << ":" << std::endl;
+        stream << "==============================================================" << std::endl;
         ArchPrintStackFrames(stream, trace.trace);
         stream << std::endl;
     }
 }
 
-void
-TfRefPtrTracker::ReportTracesForWatched(
-    std::ostream& stream,
-    const TfRefBase* watched) const
-{
+void TfRefPtrTracker::ReportTracesForWatched(std::ostream& stream, const TfRefBase* watched) const {
     _Lock lock(_mutex);
 
     // Report if not watched.
     if (_watched.find(watched) == _watched.end()) {
-        stream << "TfRefPtrTracker traces for " << watched
-               << ":  not watched" << std::endl;
+        stream << "TfRefPtrTracker traces for " << watched << ":  not watched" << std::endl;
         return;
     }
 
     // Report what watched really is.
-    stream << "TfRefPtrTracker traces for " << watched
-           << " (type " << _GetDemangled(watched) << ")" << std::endl;
+    stream << "TfRefPtrTracker traces for " << watched << " (type " << _GetDemangled(watched) << ")" << std::endl;
 
     // Loop over all traces and report the ones that are watching watched.
     TF_FOR_ALL(i, _traces) {
         const Trace& trace = i->second;
         if (trace.obj == watched) {
-            stream << "  Owner: " << i->first
-                   << " " << _type[trace.type] << ":"
-                   << std::endl;
-            stream << "=============================================================="
-                   << std::endl;
+            stream << "  Owner: " << i->first << " " << _type[trace.type] << ":" << std::endl;
+            stream << "==============================================================" << std::endl;
             ArchPrintStackFrames(stream, trace.trace);
             stream << std::endl;
         }
     }
 
-    stream << "=============================================================="
-           << std::endl;
+    stream << "==============================================================" << std::endl;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

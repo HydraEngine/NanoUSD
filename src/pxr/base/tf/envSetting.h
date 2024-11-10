@@ -112,34 +112,31 @@ PXR_NAMESPACE_OPEN_SCOPE
 // cannot use aggregate-initialization on a struct holding an atomic, but we
 // can value-initialize a single std::atomic.
 template <class T>
-struct TfEnvSetting
-{
-    std::atomic<T*> *_value;
+struct TfEnvSetting {
+    std::atomic<T*>* _value;
     T _default;
-    char const * _name;
-    char const * _description;
+    char const* _name;
+    char const* _description;
 };
 
 // Specialize for string, default is stored as char const * (pointing to a
 // literal).
 template <>
-struct TfEnvSetting<std::string>
-{
-    std::atomic<std::string*> *_value;
-    char const * _default;
-    char const * _name;
-    char const * _description;
+struct TfEnvSetting<std::string> {
+    std::atomic<std::string*>* _value;
+    char const* _default;
+    char const* _name;
+    char const* _description;
 };
 
 template <class T>
-void Tf_InitializeEnvSetting(TfEnvSetting<T> *);
+void Tf_InitializeEnvSetting(TfEnvSetting<T>*);
 
 /// Returns the value of the specified env setting, registered using
 /// \c TF_DEFINE_ENV_SETTING.
 template <class T>
-inline T const &
-TfGetEnvSetting(TfEnvSetting<T>& setting) {
-    T *val = setting._value->load();
+inline T const& TfGetEnvSetting(TfEnvSetting<T>& setting) {
+    T* val = setting._value->load();
     if (ARCH_UNLIKELY(!val)) {
         Tf_InitializeEnvSetting(&setting);
         val = setting._value->load();
@@ -152,22 +149,21 @@ TfGetEnvSetting(TfEnvSetting<T>& setting) {
 
 bool Tf_ChooseEnvSettingType(bool);
 int Tf_ChooseEnvSettingType(int);
-std::string Tf_ChooseEnvSettingType(char const *);
+std::string Tf_ChooseEnvSettingType(char const*);
 
 class Tf_EnvSettingRegistry;
 
 /// Define an env setting named \p envVar with default value \p defValue and a
 /// descriptive string \p description.
 /// \hideinitializer
-#define TF_DEFINE_ENV_SETTING(envVar, defValue, description)                  \
-    std::atomic< decltype(Tf_ChooseEnvSettingType(defValue))*>                \
-        envVar##_value;                                                       \
-    TfEnvSetting<decltype(Tf_ChooseEnvSettingType(defValue))> envVar = {      \
-        &envVar##_value, defValue, #envVar, description };                    \
-    TF_REGISTRY_FUNCTION_WITH_TAG(Tf_EnvSettingRegistry, envVar) {            \
-        (void)TfGetEnvSetting(envVar);                                        \
+#define TF_DEFINE_ENV_SETTING(envVar, defValue, description)                                                \
+    std::atomic<decltype(Tf_ChooseEnvSettingType(defValue))*> envVar##_value;                               \
+    TfEnvSetting<decltype(Tf_ChooseEnvSettingType(defValue))> envVar = {&envVar##_value, defValue, #envVar, \
+                                                                        description};                       \
+    TF_REGISTRY_FUNCTION_WITH_TAG(Tf_EnvSettingRegistry, envVar) {                                          \
+        (void)TfGetEnvSetting(envVar);                                                                      \
     }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_ENV_SETTING_H
+#endif  // PXR_BASE_TF_ENV_SETTING_H

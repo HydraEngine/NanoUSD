@@ -15,9 +15,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TfCompressedBits::TfCompressedBits(const TfBits &bits) :
-    _num(bits.GetSize())
-{
+TfCompressedBits::TfCompressedBits(const TfBits& bits) : _num(bits.GetSize()) {
     if (bits.GetSize() == 0) {
         _runningBit = 0;
         _platforms.PushBack(0);
@@ -29,9 +27,7 @@ TfCompressedBits::TfCompressedBits(const TfBits &bits) :
 
     size_t i = 0;
     while (i < bits.GetSize()) {
-        size_t next = set ? 
-            bits.FindNextUnset(i + 1) : 
-            bits.FindNextSet(i + 1);
+        size_t next = set ? bits.FindNextUnset(i + 1) : bits.FindNextSet(i + 1);
 
         _platforms.PushBack(next - i);
 
@@ -40,28 +36,19 @@ TfCompressedBits::TfCompressedBits(const TfBits &bits) :
     }
 }
 
-size_t
-TfCompressedBits::GetHash() const
-{
+size_t TfCompressedBits::GetHash() const {
     if (_num == 0) {
         return 0;
     }
 
     // Hash the running bit and number of platforms.
-    uint64_t seed = TfHash::Combine(
-        _runningBit,
-        _platforms.GetNum());
+    uint64_t seed = TfHash::Combine(_runningBit, _platforms.GetNum());
 
     // Hash all the platform data.
-    return ArchHash64(
-        (const char*)&(_platforms[0]), 
-        _platforms.GetNum() * sizeof(_WordType), 
-        seed);
+    return ArchHash64((const char*)&(_platforms[0]), _platforms.GetNum() * sizeof(_WordType), seed);
 }
 
-std::string
-TfCompressedBits::GetAsStringLeftToRight() const
-{
+std::string TfCompressedBits::GetAsStringLeftToRight() const {
     std::string res;
 
     uint8_t bit = _runningBit;
@@ -75,9 +62,7 @@ TfCompressedBits::GetAsStringLeftToRight() const
     return res;
 }
 
-std::string
-TfCompressedBits::GetAsStringRightToLeft() const
-{
+std::string TfCompressedBits::GetAsStringRightToLeft() const {
     std::string res;
 
     uint8_t bit = _runningBit;
@@ -95,20 +80,18 @@ TfCompressedBits::GetAsStringRightToLeft() const
     return res;
 }
 
-std::string
-TfCompressedBits::GetAsRLEString() const
-{
+std::string TfCompressedBits::GetAsRLEString() const {
     std::string res;
 
     // If the length of the mask is <= 4 bits we just print them left to
-    // right.  This makes a lot of the simple unit tests much easier to 
+    // right.  This makes a lot of the simple unit tests much easier to
     // read.
     if (_num == 0) {
         return res;
     } else if (_num <= 4) {
         return GetAsStringLeftToRight();
     }
-    
+
     uint8_t bit = _runningBit;
     res = TfIntToString(bit) + "x" + TfIntToString(_platforms[0]);
     bit = 1 - bit;
@@ -124,21 +107,17 @@ TfCompressedBits::GetAsRLEString() const
     return res;
 }
 
-static bool
-_IsWhiteSpace(const char c)
-{
+static bool _IsWhiteSpace(const char c) {
     // These characters are considered whitespace in the string representation
     // of a compressed bitset.
     return c == ' ' || c == '\n' || c == '\r' || c == '\t';
 }
 
-static std::vector<uint32_t>
-_TokenizeRLEString(const std::string &source)
-{
+static std::vector<uint32_t> _TokenizeRLEString(const std::string& source) {
     // There are two types of token delimiters, and we toggle between the two.
     // We first expect a 'x' delimiter, followed by a '-' delimiter, followed
     // by another 'x', and so forth.
-    const std::array<char, 2> delimiters = { 'x', '-' };
+    const std::array<char, 2> delimiters = {'x', '-'};
     uint32_t nextDelimiterIdx = 0;
 
     // The resulting tokens. A platform is comprised of two tokens, a bit value
@@ -148,7 +127,6 @@ _TokenizeRLEString(const std::string &source)
     // Iterate over the source string and build a vector of tokens for the
     // platforms representing the bitset.
     for (const char c : source) {
-
         // Digits encode the integer value of the current token.
         if (c >= '0' && c <= '9') {
             const uint32_t digit = c - '0';
@@ -179,9 +157,7 @@ _TokenizeRLEString(const std::string &source)
     return tokens;
 }
 
-static TfCompressedBits
-_FromRLETokens(const std::vector<uint32_t> &tokens)
-{
+static TfCompressedBits _FromRLETokens(const std::vector<uint32_t>& tokens) {
     // The number of tokens must be even, because each platform is comprised of
     // two tokens: A bit value (zero or one), and a platform length.
     if (tokens.size() & 1) {
@@ -207,15 +183,12 @@ _FromRLETokens(const std::vector<uint32_t> &tokens)
     return result;
 }
 
-static TfCompressedBits
-_FromBinaryRepresentation(const std::string &source)
-{
+static TfCompressedBits _FromBinaryRepresentation(const std::string& source) {
     TfCompressedBits result;
 
     // Iterate over the string and treat it as a binary representation, i.e. a
     // string of zeros and ones.
     for (const char c : source) {
-
         // Zeros and ones will be appended to the bitset.
         if (c == '0' || c == '1') {
             const bool bit = c - '0';
@@ -237,9 +210,7 @@ _FromBinaryRepresentation(const std::string &source)
     return result;
 }
 
-TfCompressedBits
-TfCompressedBits::FromString(const std::string &source)
-{
+TfCompressedBits TfCompressedBits::FromString(const std::string& source) {
     TfCompressedBits result;
 
     // Assume the string is a RLE representation of the bits. Let's tokenize it
@@ -254,7 +225,7 @@ TfCompressedBits::FromString(const std::string &source)
 
     // Build a compressed bitset from the RLE tokens.
     result = _FromRLETokens(tokens);
-    
+
     // If this returns an empty bitset, maybe the string is encoded as a binary
     // representation, i.e. a string of zeros and ones.
     if (result.GetSize() == 0) {
@@ -266,9 +237,7 @@ TfCompressedBits::FromString(const std::string &source)
     return result;
 }
 
-void
-TfCompressedBits::Decompress(TfBits *bits) const
-{
+void TfCompressedBits::Decompress(TfBits* bits) const {
     bits->Resize(_num);
     bits->ClearAll();
 

@@ -6,4 +6,3 @@
 //
 
 #include "pxr/base/tf/denseHashSet.h"
-

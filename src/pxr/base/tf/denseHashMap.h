@@ -29,41 +29,29 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \warning This differs from a TfHashMap in so far that inserting and
 /// removing elements invalidate all iterators of the container.
 ///
-template <
-    class    Key,
-    class    Data,
-    class    HashFn,
-    class    EqualKey  = std::equal_to<Key>,
-    unsigned Threshold = 128
->
+template <class Key, class Data, class HashFn, class EqualKey = std::equal_to<Key>, unsigned Threshold = 128>
 
-class TfDenseHashMap
-{
+class TfDenseHashMap {
 public:
-
     typedef std::pair<const Key, Data> value_type;
-    typedef Key                        key_type;
-    typedef Data                       mapped_type;
+    typedef Key key_type;
+    typedef Data mapped_type;
 
-////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
 
 private:
-
     // This helper implements a std::pair with an assignment operator that
-    // uses placement new instead of assignment.  The benefit here is that 
+    // uses placement new instead of assignment.  The benefit here is that
     // the two elements of the pair may be const.
     //
-    struct _InternalValueType 
-    {
+    struct _InternalValueType {
         _InternalValueType() {}
 
-        _InternalValueType(const Key &k, const Data &d)
-        :   _value(k, d) {}
+        _InternalValueType(const Key& k, const Data& d) : _value(k, d) {}
 
-        _InternalValueType &operator=(const _InternalValueType &rhs) {
-
+        _InternalValueType& operator=(const _InternalValueType& rhs) {
             if (this != &rhs) {
-                // Since value_type's first member is const we need to 
+                // Since value_type's first member is const we need to
                 // use placement new to put the new element in place.  Just
                 // make sure we destruct the element we are about to overwrite.
                 _value.value_type::~value_type();
@@ -73,15 +61,11 @@ private:
             return *this;
         }
 
-        value_type &GetValue() {
-            return _value;
-        }
+        value_type& GetValue() { return _value; }
 
-        const value_type &GetValue() const {
-            return _value;
-        }
+        const value_type& GetValue() const { return _value; }
 
-        void swap(_InternalValueType &rhs) {
+        void swap(_InternalValueType& rhs) {
             using std::swap;
 
             // We do this in order to take advantage of a potentially fast
@@ -89,16 +73,15 @@ private:
             Key tmp = _value.first;
 
             _value.first.Key::~Key();
-            new (const_cast<Key *>(&_value.first)) Key(rhs._value.first);
+            new (const_cast<Key*>(&_value.first)) Key(rhs._value.first);
 
             rhs._value.first.Key::~Key();
-            new (const_cast<Key *>(&rhs._value.first)) Key(tmp);
+            new (const_cast<Key*>(&rhs._value.first)) Key(tmp);
 
             swap(_value.second, rhs._value.second);
         }
 
     private:
-
         // Data hold by _InternalValueType.  Note that the key portion of
         // value_type maybe const.
         value_type _value;
@@ -121,8 +104,7 @@ private:
     // externally visible type.
     //
     template <class ElementType, class UnderlyingIterator>
-    class _IteratorBase
-    {
+    class _IteratorBase {
     public:
         using iterator_category = std::bidirectional_iterator_tag;
         using value_type = ElementType;
@@ -134,9 +116,8 @@ private:
         _IteratorBase() = default;
 
         // Allow conversion of an iterator to a const_iterator.
-        template<class OtherIteratorType>
-        _IteratorBase(const OtherIteratorType &rhs)
-        :   _iter(rhs._GetUnderlyingIterator()) {}
+        template <class OtherIteratorType>
+        _IteratorBase(const OtherIteratorType& rhs) : _iter(rhs._GetUnderlyingIterator()) {}
 
         reference operator*() const { return dereference(); }
         pointer operator->() const { return &(dereference()); }
@@ -174,71 +155,53 @@ private:
         }
 
     private:
-
         friend class TfDenseHashMap;
 
         // Ctor from an underlying iterator.
-        _IteratorBase(const UnderlyingIterator &iter)
-        :   _iter(iter) {}
+        _IteratorBase(const UnderlyingIterator& iter) : _iter(iter) {}
 
-        template<class OtherIteratorType>
-        bool equal(const OtherIteratorType &rhs) const {
+        template <class OtherIteratorType>
+        bool equal(const OtherIteratorType& rhs) const {
             return _iter == rhs._iter;
         }
-        
-        void increment() {
-            ++_iter;
-        }
 
-        void decrement() {
-            --_iter;
-        }
-        
-        ElementType &dereference() const {
+        void increment() { ++_iter; }
+
+        void decrement() { --_iter; }
+
+        ElementType& dereference() const {
             // The dereference() method accesses the correct value_type (ie.
             // the one with potentially const key_type.  This way, clients don't
             // see the assignment operator of _InternalValueType.
             return _iter->GetValue();
         }
 
-        UnderlyingIterator _GetUnderlyingIterator() const {
-            return _iter;
-        }
+        UnderlyingIterator _GetUnderlyingIterator() const { return _iter; }
 
     private:
-        
         UnderlyingIterator _iter;
     };
 
-////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
 
 public:
+    /// An iterator type for this map.  Note that it provides access to the
+    /// This::value_type only.
+    typedef _IteratorBase<value_type, typename _Vector::iterator> iterator;
 
     /// An iterator type for this map.  Note that it provides access to the
     /// This::value_type only.
-    typedef
-        _IteratorBase<value_type, typename _Vector::iterator>
-        iterator; 
-
-    /// An iterator type for this map.  Note that it provides access to the
-    /// This::value_type only.
-    typedef
-        _IteratorBase<const value_type, typename _Vector::const_iterator>
-        const_iterator; 
+    typedef _IteratorBase<const value_type, typename _Vector::const_iterator> const_iterator;
 
     /// Return type for insert() method.
     typedef std::pair<iterator, bool> insert_result;
 
 public:
-
     /// Ctor.
     ///
-    explicit TfDenseHashMap(
-        const HashFn   &hashFn   = HashFn(),
-        const EqualKey &equalKey = EqualKey())
-    {
+    explicit TfDenseHashMap(const HashFn& hashFn = HashFn(), const EqualKey& equalKey = EqualKey()) {
         _hash() = hashFn;
-        _equ()  = equalKey;
+        _equ() = equalKey;
     }
 
     /// Construct with range.
@@ -250,25 +213,22 @@ public:
 
     /// Construct from an initializer_list.
     ///
-    TfDenseHashMap(std::initializer_list<value_type> l) {
-        insert(l.begin(), l.end());
-    }
+    TfDenseHashMap(std::initializer_list<value_type> l) { insert(l.begin(), l.end()); }
 
     /// Copy Ctor.
     ///
-    TfDenseHashMap(const TfDenseHashMap &rhs)
-    :   _storage(rhs._storage) {
+    TfDenseHashMap(const TfDenseHashMap& rhs) : _storage(rhs._storage) {
         if (rhs._h) {
             _h = std::make_unique<_HashMap>(*rhs._h);
         }
     }
     /// Move Ctor.
     ///
-    TfDenseHashMap(TfDenseHashMap &&rhs) = default;
+    TfDenseHashMap(TfDenseHashMap&& rhs) = default;
 
     /// Copy assignment operator.
     ///
-    TfDenseHashMap &operator=(const TfDenseHashMap &rhs) {
+    TfDenseHashMap& operator=(const TfDenseHashMap& rhs) {
         if (this != &rhs) {
             TfDenseHashMap temp(rhs);
             temp.swap(*this);
@@ -278,11 +238,11 @@ public:
 
     /// Move assignment operator.
     ///
-    TfDenseHashMap &operator=(TfDenseHashMap &&rhs) = default;
+    TfDenseHashMap& operator=(TfDenseHashMap&& rhs) = default;
 
     /// Assignment from an initializer_list.
     ///
-    TfDenseHashMap &operator=(std::initializer_list<value_type> l) {
+    TfDenseHashMap& operator=(std::initializer_list<value_type> l) {
         clear();
         insert(l.begin(), l.end());
         return *this;
@@ -290,28 +250,22 @@ public:
 
     /// Equality operator.
     ///
-    bool operator==(const TfDenseHashMap &rhs) const {
+    bool operator==(const TfDenseHashMap& rhs) const {
+        if (size() != rhs.size()) return false;
 
-        if (size() != rhs.size())
-            return false;
-
-        //XXX: Should we compare the HashFn and EqualKey too?
+        // XXX: Should we compare the HashFn and EqualKey too?
         const_iterator tend = end(), rend = rhs.end();
 
-        for(const_iterator iter = begin(); iter != tend; ++iter) {
+        for (const_iterator iter = begin(); iter != tend; ++iter) {
             const_iterator riter = rhs.find(iter->first);
-            if (riter == rend)
-                return false;
-            if (iter->second != riter->second)
-                return false;
+            if (riter == rend) return false;
+            if (iter->second != riter->second) return false;
         }
 
         return true;
     }
 
-    bool operator!=(const TfDenseHashMap &rhs) const {
-        return !(*this == rhs);
-    }
+    bool operator!=(const TfDenseHashMap& rhs) const { return !(*this == rhs); }
 
     /// Erases all of the elements
     ///
@@ -322,54 +276,41 @@ public:
 
     /// Swaps the contents of two maps.
     ///
-    void swap(TfDenseHashMap &rhs) {
+    void swap(TfDenseHashMap& rhs) {
         _storage.swap(rhs._storage);
         _h.swap(rhs._h);
     }
 
     /// \c true if the \c map's size is 0.
     ///
-    bool empty() const {
-        return _vec().empty();
-    }
+    bool empty() const { return _vec().empty(); }
 
     /// Returns the size of the map.
     ///
-    size_t size() const {
-        return _vec().size();
-    }
+    size_t size() const { return _vec().size(); }
 
     /// Returns an const_iterator pointing to the beginning of the map.
     ///
-    iterator begin() {
-        return _vec().begin();
-    }
+    iterator begin() { return _vec().begin(); }
 
     /// Returns an const_iterator pointing to the end of the map.
     ///
-    iterator end() {
-        return _vec().end();
-    }
+    iterator end() { return _vec().end(); }
 
     /// Returns an const_iterator pointing to the beginning of the map.
     ///
-    const_iterator begin() const {
-        return _vec().begin();
-    }
-    
+    const_iterator begin() const { return _vec().begin(); }
+
     /// Returns an const_iterator pointing to the end of the map.
     ///
-    const_iterator end() const {
-        return _vec().end();
-    }
+    const_iterator end() const { return _vec().end(); }
 
     /// Finds the element with key \p k.
     ///
-    iterator find(const key_type &k) {
+    iterator find(const key_type& k) {
         if (_h) {
             typename _HashMap::const_iterator iter = _h->find(k);
-            if (iter == _h->end())
-                return end();
+            if (iter == _h->end()) return end();
 
             return _vec().begin() + iter->second;
         } else {
@@ -379,11 +320,10 @@ public:
 
     /// Finds the element with key \p k.
     ///
-    const_iterator find(const key_type &k) const {
+    const_iterator find(const key_type& k) const {
         if (_h) {
             typename _HashMap::const_iterator iter = _h->find(k);
-            if (iter == _h->end())
-                return end();
+            if (iter == _h->end()) return end();
 
             return _vec().begin() + iter->second;
         } else {
@@ -393,27 +333,22 @@ public:
 
     /// Returns the number of elements with key \p k.  Which is either 0 or 1.
     ///
-    size_t count(const key_type &k) const {
-        return find(k) != end();
-    }
+    size_t count(const key_type& k) const { return find(k) != end(); }
 
     /// Returns a pair of <iterator, bool> where iterator points to the element
     /// in the list and bool is true if a new element was inserted.
     ///
-    insert_result insert(const value_type &v) {
+    insert_result insert(const value_type& v) {
         if (_h) {
             // Attempt to insert the new index.  If this fails, we can't insert
             // v.
-            std::pair<typename _HashMap::iterator, bool> res =
-                _h->insert(std::make_pair(v.first, size()));
+            std::pair<typename _HashMap::iterator, bool> res = _h->insert(std::make_pair(v.first, size()));
 
-            if (!res.second)
-                return insert_result(_vec().begin() + res.first->second, false);
+            if (!res.second) return insert_result(_vec().begin() + res.first->second, false);
         } else {
             // Bail if already inserted.
             iterator iter = _FindInVec(v.first);
-            if (iter != end())
-                return insert_result(iter, false);
+            if (iter != end()) return insert_result(iter, false);
         }
 
         // Insert at end and create table if necessary.
@@ -423,21 +358,19 @@ public:
         return insert_result(std::prev(end()), true);
     }
 
-    /// Insert a range into the hash map.  Note that \p i0 and \p i1 can't 
+    /// Insert a range into the hash map.  Note that \p i0 and \p i1 can't
     /// point into the hash map.
     ///
-    template<class IteratorType>
+    template <class IteratorType>
     void insert(IteratorType i0, IteratorType i1) {
         // Assume elements are more often than not unique, so if the sum of the
         // current size and the size of the range is greater than or equal to
         // the threshold, we create the table immediately so we don't do m*n
         // work before creating the table.
-        if (size() + std::distance(i0, i1) >= Threshold)
-            _CreateTable();
+        if (size() + std::distance(i0, i1) >= Threshold) _CreateTable();
 
         // Insert elements.
-        for(IteratorType iter = i0; iter != i1; ++iter)
-            insert(*iter);
+        for (IteratorType iter = i0; iter != i1; ++iter) insert(*iter);
     }
 
     /// Insert a range of unique elements into the container.  [begin, end)
@@ -460,14 +393,11 @@ public:
     ///
     /// Returns a reference to the value type for \p key.
     ///
-    Data &operator[](const key_type &key) {
-        return insert(value_type(key, Data())).first->second;
-    }
+    Data& operator[](const key_type& key) { return insert(value_type(key, Data())).first->second; }
 
     /// Erase element with key \p k.  Returns the number of elements erased.
     ///
-    size_t erase(const key_type &k) {
-
+    size_t erase(const key_type& k) {
         iterator iter = find(k);
         if (iter != end()) {
             erase(iter);
@@ -478,134 +408,105 @@ public:
 
     /// Erases element pointed to by \p iter.
     ///
-    void erase(const iterator &iter) {
-
+    void erase(const iterator& iter) {
         // Erase key from hash table if applicable.
-        if (_h)
-            _h->erase(iter->first);
-    
+        if (_h) _h->erase(iter->first);
+
         // If we are not removing that last element...
         if (iter != std::prev(end())) {
-    
             // Need to get the underlying vector iterator directly, because
             // we want to operate on the vector.
             typename _Vector::iterator vi = iter._GetUnderlyingIterator();
-    
+
             // ... move the last element into the erased placed.
             vi->swap(_vec().back());
-    
+
             // ... and update the moved element's index.
-            if (_h)
-                (*_h)[vi->GetValue().first] = vi - _vec().begin();
+            if (_h) (*_h)[vi->GetValue().first] = vi - _vec().begin();
         }
-    
+
         _vec().pop_back();
     }
 
     /// Erases a range from the map.
     ///
     void erase(iterator i0, iterator i1) {
-
         if (_h) {
-            for(iterator iter = i0; iter != i1; ++iter)
-                _h->erase(iter->first);
+            for (iterator iter = i0; iter != i1; ++iter) _h->erase(iter->first);
         }
 
-        typename _Vector::const_iterator vremain = _vec().erase(
-            i0._GetUnderlyingIterator(), i1._GetUnderlyingIterator());
+        typename _Vector::const_iterator vremain =
+                _vec().erase(i0._GetUnderlyingIterator(), i1._GetUnderlyingIterator());
 
         if (_h) {
-            for(; vremain != _vec().end(); ++vremain)
-                (*_h)[vremain->GetValue().first] = vremain - _vec().begin();
+            for (; vremain != _vec().end(); ++vremain) (*_h)[vremain->GetValue().first] = vremain - _vec().begin();
         }
     }
 
     /// Optimize storage space.
     ///
     void shrink_to_fit() {
-
         // Shrink the vector to best size.
         _vec().shrink_to_fit();
 
-        if (!_h)
-            return;
+        if (!_h) return;
 
         size_t sz = size();
 
         // If we have a hash map and are underneath the threshold, discard it.
         if (sz < Threshold) {
-
             _h.reset();
 
         } else {
-
             // Otherwise, allocate a new hash map with the optimal size.
             _h.reset(new _HashMap(sz, _hash(), _equ()));
-            for(size_t i=0; i<sz; ++i)
-                _h->insert(std::make_pair(_vec()[i].GetValue().first, i));
+            for (size_t i = 0; i < sz; ++i) _h->insert(std::make_pair(_vec()[i].GetValue().first, i));
         }
     }
 
     /// Reserve space.
     ///
-    void reserve(size_t n) {
-        _vec().reserve(n);
-    }
+    void reserve(size_t n) { _vec().reserve(n); }
 
-////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
 
 private:
-
     // Helper to access the storage vector.
-    _Vector &_vec() {
-        return _storage.vector;
-    }
+    _Vector& _vec() { return _storage.vector; }
 
     // Helper to access the hash functor.
-    HashFn &_hash() {
-        return _storage;
-    }
+    HashFn& _hash() { return _storage; }
 
     // Helper to access the equality functor.
-    EqualKey &_equ() {
-        return _storage;
-    }
+    EqualKey& _equ() { return _storage; }
 
     // Helper to access the storage vector.
-    const _Vector &_vec() const {
-        return _storage.vector;
-    }
+    const _Vector& _vec() const { return _storage.vector; }
 
     // Helper to access the hash functor.
-    const HashFn &_hash() const {
-        return _storage;
-    }
+    const HashFn& _hash() const { return _storage; }
 
     // Helper to access the equality functor.
-    const EqualKey &_equ() const {
-        return _storage;
-    }
+    const EqualKey& _equ() const { return _storage; }
 
     // Helper to linear-search the vector for a key.
-    inline iterator _FindInVec(const key_type &k) {
-        _Vector &vec = _vec();
-        EqualKey &equ = _equ();
+    inline iterator _FindInVec(const key_type& k) {
+        _Vector& vec = _vec();
+        EqualKey& equ = _equ();
         typename _Vector::iterator iter = vec.begin(), end = vec.end();
         for (; iter != end; ++iter) {
-            if (equ(iter->GetValue().first, k))
-                break;
+            if (equ(iter->GetValue().first, k)) break;
         }
         return iter;
     }
 
     // Helper to linear-search the vector for a key.
-    inline const_iterator _FindInVec(const key_type &k) const {
-        _Vector const &vec = _vec();
-        EqualKey const &equ = _equ();
+    inline const_iterator _FindInVec(const key_type& k) const {
+        _Vector const& vec = _vec();
+        EqualKey const& equ = _equ();
         typename _Vector::const_iterator iter = vec.begin(), end = vec.end();
         for (; iter != end; ++iter) {
-            if (equ(iter->GetValue().first, k))
-                break;
+            if (equ(iter->GetValue().first, k)) break;
         }
         return iter;
     }
@@ -622,8 +523,7 @@ private:
     inline void _CreateTable() {
         if (!_h) {
             _h.reset(new _HashMap(Threshold, _hash(), _equ()));
-            for(size_t i=0; i < size(); ++i)
-                _h->insert(std::make_pair(_vec()[i].GetValue().first, i));
+            for (size_t i = 0; i < size(); ++i) _h->insert(std::make_pair(_vec()[i].GetValue().first, i));
         }
     }
 
@@ -631,13 +531,10 @@ private:
     // we use the empty base optimization to not pay a size penalty.
     // In C++20, explore using [[no_unique_address]] as an alternative
     // way to get this optimization.
-    struct ARCH_EMPTY_BASES _CompressedStorage :
-        private EqualKey, private HashFn {
-        static_assert(!std::is_same<EqualKey, HashFn>::value,
-                      "EqualKey and HashFn must be distinct types.");
+    struct ARCH_EMPTY_BASES _CompressedStorage : private EqualKey, private HashFn {
+        static_assert(!std::is_same<EqualKey, HashFn>::value, "EqualKey and HashFn must be distinct types.");
         _CompressedStorage() = default;
-        _CompressedStorage(const EqualKey& equalKey, const HashFn& hashFn)
-            : EqualKey(equalKey), HashFn(hashFn) {}
+        _CompressedStorage(const EqualKey& equalKey, const HashFn& hashFn) : EqualKey(equalKey), HashFn(hashFn) {}
 
         void swap(_CompressedStorage& other) {
             using std::swap;
@@ -656,4 +553,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_DENSE_HASH_MAP_H
+#endif  // PXR_BASE_TF_DENSE_HASH_MAP_H

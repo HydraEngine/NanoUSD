@@ -55,12 +55,12 @@ double StrtodTrimmed(Vector<const char> trimmed, int exponent);
 float StrtofTrimmed(Vector<const char> trimmed, int exponent);
 
 inline Vector<const char> TrimTrailingZeros(Vector<const char> buffer) {
-  for (int i = buffer.length() - 1; i >= 0; --i) {
-    if (buffer[i] != '0') {
-      return buffer.SubVector(0, i + 1);
+    for (int i = buffer.length() - 1; i >= 0; --i) {
+        if (buffer[i] != '0') {
+            return buffer.SubVector(0, i + 1);
+        }
     }
-  }
-  return Vector<const char>(buffer.start(), 0);
+    return Vector<const char>(buffer.start(), 0);
 }
 
 }  // namespace pxr_double_conversion

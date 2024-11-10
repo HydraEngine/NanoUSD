@@ -1,5 +1,5 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
-// 
+//
 // Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
@@ -7,9 +7,9 @@
 //
 // http://opensource.org/licenses/MIT
 //
-// Unless required by applicable law or agreed to in writing, software distributed 
-// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
-// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// Unless required by applicable law or agreed to in writing, software distributed
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
 #ifndef RAPIDJSON_STRTOD_
@@ -39,8 +39,7 @@ inline double StrtodNormalPrecision(double d, int p) {
         // Prevent expSum < -308, making Pow10(p) = 0
         d = FastPath(d, -308);
         d = FastPath(d, p + 308);
-    }
-    else
+    } else
         d = FastPath(d, p);
     return d;
 }
@@ -65,8 +64,7 @@ inline int CheckWithinHalfULP(double b, const BigInteger& d, int dExp) {
     if (dExp >= 0) {
         dS_Exp2 += dExp;
         dS_Exp5 += dExp;
-    }
-    else {
+    } else {
         bS_Exp2 -= dExp;
         bS_Exp5 -= dExp;
         hS_Exp2 -= dExp;
@@ -113,33 +111,32 @@ inline int CheckWithinHalfULP(double b, const BigInteger& d, int dExp) {
 inline bool StrtodFast(double d, int p, double* result) {
     // Use fast path for string-to-double conversion if possible
     // see http://www.exploringbinary.com/fast-path-decimal-to-floating-point-conversion/
-    if (p > 22  && p < 22 + 16) {
+    if (p > 22 && p < 22 + 16) {
         // Fast Path Cases In Disguise
         d *= internal::Pow10(p - 22);
         p = 22;
     }
 
-    if (p >= -22 && p <= 22 && d <= 9007199254740991.0) { // 2^53 - 1
+    if (p >= -22 && p <= 22 && d <= 9007199254740991.0) {  // 2^53 - 1
         *result = FastPath(d, p);
         return true;
-    }
-    else
+    } else
         return false;
 }
 
 // Compute an approximation and see if it is within 1/2 ULP
-template<typename Ch>
+template <typename Ch>
 inline bool StrtodDiyFp(const Ch* decimals, int dLen, int dExp, double* result) {
     uint64_t significand = 0;
-    int i = 0;   // 2^64 - 1 = 18446744073709551615, 1844674407370955161 = 0x1999999999999999    
+    int i = 0;  // 2^64 - 1 = 18446744073709551615, 1844674407370955161 = 0x1999999999999999
     for (; i < dLen; i++) {
-        if (significand  >  RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) ||
+        if (significand > RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) ||
             (significand == RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) && decimals[i] > Ch('5')))
             break;
         significand = significand * 10u + static_cast<unsigned>(decimals[i] - Ch('0'));
     }
-    
-    if (i < dLen && decimals[i] >= Ch('5')) // Rounding
+
+    if (i < dLen && decimals[i] >= Ch('5'))  // Rounding
         significand++;
 
     int remaining = dLen - i;
@@ -157,18 +154,18 @@ inline bool StrtodDiyFp(const Ch* decimals, int dLen, int dExp, double* result) 
     DiyFp cachedPower = GetCachedPower10(dExp, &actualExp);
     if (actualExp != dExp) {
         static const DiyFp kPow10[] = {
-            DiyFp(RAPIDJSON_UINT64_C2(0xa0000000, 0x00000000), -60),  // 10^1
-            DiyFp(RAPIDJSON_UINT64_C2(0xc8000000, 0x00000000), -57),  // 10^2
-            DiyFp(RAPIDJSON_UINT64_C2(0xfa000000, 0x00000000), -54),  // 10^3
-            DiyFp(RAPIDJSON_UINT64_C2(0x9c400000, 0x00000000), -50),  // 10^4
-            DiyFp(RAPIDJSON_UINT64_C2(0xc3500000, 0x00000000), -47),  // 10^5
-            DiyFp(RAPIDJSON_UINT64_C2(0xf4240000, 0x00000000), -44),  // 10^6
-            DiyFp(RAPIDJSON_UINT64_C2(0x98968000, 0x00000000), -40)   // 10^7
+                DiyFp(RAPIDJSON_UINT64_C2(0xa0000000, 0x00000000), -60),  // 10^1
+                DiyFp(RAPIDJSON_UINT64_C2(0xc8000000, 0x00000000), -57),  // 10^2
+                DiyFp(RAPIDJSON_UINT64_C2(0xfa000000, 0x00000000), -54),  // 10^3
+                DiyFp(RAPIDJSON_UINT64_C2(0x9c400000, 0x00000000), -50),  // 10^4
+                DiyFp(RAPIDJSON_UINT64_C2(0xc3500000, 0x00000000), -47),  // 10^5
+                DiyFp(RAPIDJSON_UINT64_C2(0xf4240000, 0x00000000), -44),  // 10^6
+                DiyFp(RAPIDJSON_UINT64_C2(0x98968000, 0x00000000), -40)   // 10^7
         };
         int adjustment = dExp - actualExp;
         RAPIDJSON_ASSERT(adjustment >= 1 && adjustment < 8);
         v = v * kPow10[adjustment - 1];
-        if (dLen + adjustment > 19) // has more digits than decimal digits in 64-bit
+        if (dLen + adjustment > 19)  // has more digits than decimal digits in 64-bit
             error += kUlp / 2;
     }
 
@@ -185,7 +182,7 @@ inline bool StrtodDiyFp(const Ch* decimals, int dLen, int dExp, double* result) 
     if (precisionSize + kUlpShift >= 64) {
         int scaleExp = (precisionSize + kUlpShift) - 63;
         v.f >>= scaleExp;
-        v.e += scaleExp; 
+        v.e += scaleExp;
         error = (error >> scaleExp) + 1 + kUlp;
         precisionSize -= scaleExp;
     }
@@ -195,7 +192,7 @@ inline bool StrtodDiyFp(const Ch* decimals, int dLen, int dExp, double* result) 
     const uint64_t halfWay = (uint64_t(1) << (precisionSize - 1)) * kUlp;
     if (precisionBits >= halfWay + static_cast<unsigned>(error)) {
         rounded.f++;
-        if (rounded.f & (DiyFp::kDpHiddenBit << 1)) { // rounding overflows mantissa (issue #340)
+        if (rounded.f & (DiyFp::kDpHiddenBit << 1)) {  // rounding overflows mantissa (issue #340)
             rounded.f >>= 1;
             rounded.e++;
         }
@@ -203,10 +200,11 @@ inline bool StrtodDiyFp(const Ch* decimals, int dLen, int dExp, double* result) 
 
     *result = rounded.ToDouble();
 
-    return halfWay - static_cast<unsigned>(error) >= precisionBits || precisionBits >= halfWay + static_cast<unsigned>(error);
+    return halfWay - static_cast<unsigned>(error) >= precisionBits ||
+           precisionBits >= halfWay + static_cast<unsigned>(error);
 }
 
-template<typename Ch>
+template <typename Ch>
 inline double StrtodBigInteger(double approx, const Ch* decimals, int dLen, int dExp) {
     RAPIDJSON_ASSERT(dLen >= 0);
     const BigInteger dInt(decimals, static_cast<unsigned>(dLen));
@@ -220,19 +218,17 @@ inline double StrtodBigInteger(double approx, const Ch* decimals, int dLen, int 
             return a.NextPositiveDouble();
         else
             return a.Value();
-    }
-    else // adjustment
+    } else  // adjustment
         return a.NextPositiveDouble();
 }
 
-template<typename Ch>
+template <typename Ch>
 inline double StrtodFullPrecision(double d, int p, const Ch* decimals, size_t length, size_t decimalPosition, int exp) {
     RAPIDJSON_ASSERT(d >= 0.0);
     RAPIDJSON_ASSERT(length >= 1);
 
     double result = 0.0;
-    if (StrtodFast(d, p, &result))
-        return result;
+    if (StrtodFast(d, p, &result)) return result;
 
     RAPIDJSON_ASSERT(length <= INT_MAX);
     int dLen = static_cast<int>(length);
@@ -259,7 +255,7 @@ inline double StrtodFullPrecision(double d, int p, const Ch* decimals, size_t le
         dExp++;
     }
 
-    if (dLen == 0) { // Buffer only contains zeros.
+    if (dLen == 0) {  // Buffer only contains zeros.
         return 0.0;
     }
 
@@ -272,22 +268,19 @@ inline double StrtodFullPrecision(double d, int p, const Ch* decimals, size_t le
 
     // If too small, underflow to zero.
     // Any x <= 10^-324 is interpreted as zero.
-    if (dLen + dExp <= -324)
-        return 0.0;
+    if (dLen + dExp <= -324) return 0.0;
 
     // If too large, overflow to infinity.
     // Any x >= 10^309 is interpreted as +infinity.
-    if (dLen + dExp > 309)
-        return std::numeric_limits<double>::infinity();
+    if (dLen + dExp > 309) return std::numeric_limits<double>::infinity();
 
-    if (StrtodDiyFp(decimals, dLen, dExp, &result))
-        return result;
+    if (StrtodDiyFp(decimals, dLen, dExp, &result)) return result;
 
     // Use approximation from StrtodDiyFp and make adjustment with BigInteger comparison
     return StrtodBigInteger(result, decimals, dLen, dExp);
 }
 
-} // namespace internal
+}  // namespace internal
 RAPIDJSON_NAMESPACE_END
 
-#endif // RAPIDJSON_STRTOD_
+#endif  // RAPIDJSON_STRTOD_

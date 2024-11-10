@@ -5,4 +5,3 @@
 // https://openusd.org/license.
 //
 #include "pxr/base/tf/status.h"
-

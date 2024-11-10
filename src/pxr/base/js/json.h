@@ -25,7 +25,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// A struct containing information about a JSON parsing error.
 ///
 struct JsParseError {
-    JsParseError() : line(0), column(0) { }
+    JsParseError() : line(0), column(0) {}
     unsigned int line;
     unsigned int column;
     std::string reason;
@@ -58,10 +58,7 @@ std::string JsWriteToString(const JsValue& value);
 ///
 class JsWriter {
 public:
-    enum class Style {
-        Compact,
-        Pretty
-    };
+    enum class Style { Compact, Pretty };
 
     /// Constructor. The lifetime of the /p ostr parameter is assumed to be
     /// longer than the JsWriter instance.
@@ -102,8 +99,10 @@ public:
     JS_API bool WriteValue(const char* s);
 
     /// Write a string value.
-    template< size_t N>
-    bool WriteValue(const char(&s)[N]) { return _String(s, N-1); }
+    template <size_t N>
+    bool WriteValue(const char (&s)[N]) {
+        return _String(s, N - 1);
+    }
 
     /// Write the start of an object.
     JS_API bool BeginObject();
@@ -115,15 +114,17 @@ public:
     JS_API bool WriteKey(const char*);
 
     /// Write a string literal object key.
-    template< size_t N>
-    bool WriteKey(const char(&s)[N]) { return _Key(s, N-1); }
+    template <size_t N>
+    bool WriteKey(const char (&s)[N]) {
+        return _Key(s, N - 1);
+    }
 
     /// Convenience function to write an object key and value.
-    template<class K, class V>
+    template <class K, class V>
     void WriteKeyValue(K&& k, V&& v) {
         _WriteObjectFields(std::forward<K>(k), std::forward<V>(v));
     }
-    
+
     /// Write the end of an object.
     JS_API bool EndObject();
 
@@ -143,7 +144,7 @@ public:
         EndArray();
     }
 
-    /// Convenience function to write an array of values by calling the given 
+    /// Convenience function to write an array of values by calling the given
     /// functor for each item in the container.
     template <class Container, class ItemWriteFn>
     void WriteArray(const Container& c, const ItemWriteFn& f) {
@@ -154,11 +155,10 @@ public:
         EndArray();
     }
 
-    /// Convenience function to write an array of values given two iterators by 
+    /// Convenience function to write an array of values given two iterators by
     /// calling the given functor for each item in the container.
     template <class Iterator, class ItemWriteFn>
-    void WriteArray(
-        const Iterator& begin, const Iterator& end, const ItemWriteFn& f) {
+    void WriteArray(const Iterator& begin, const Iterator& end, const ItemWriteFn& f) {
         BeginArray();
         for (Iterator i = begin; i != end; ++i) {
             f(*this, i);
@@ -167,12 +167,11 @@ public:
     }
 
     /// Convenience function to write an object given key value pair arguments.
-    /// key arguments must be convertable to strings, value argruments must be 
+    /// key arguments must be convertable to strings, value argruments must be
     /// either a writable type, or a callablable type taking a JsWriter&.
-    template< class ...T>
+    template <class... T>
     void WriteObject(T&&... f) {
-        static_assert(sizeof...(T) %2 == 0,
-            "Arguments must come in key value pairs");
+        static_assert(sizeof...(T) % 2 == 0, "Arguments must come in key value pairs");
         BeginObject();
         _WriteObjectFields(std::forward<T>(f)...);
         EndObject();
@@ -187,21 +186,19 @@ private:
     JS_API bool _Key(const char* s, size_t len);
 
     template <class KeyType, class T>
-    auto _WriteObjectFields(KeyType&& key, T&& v)
-        -> decltype(WriteValue(std::forward<T>(v)), void()) {
+    auto _WriteObjectFields(KeyType&& key, T&& v) -> decltype(WriteValue(std::forward<T>(v)), void()) {
         WriteKey(std::forward<KeyType>(key));
         WriteValue(std::forward<T>(v));
     }
 
     template <class KeyType, class T>
-    auto _WriteObjectFields(KeyType&& key, T&& v)
-        -> decltype(v(std::declval<JsWriter&>()), void()) {
+    auto _WriteObjectFields(KeyType&& key, T&& v) -> decltype(v(std::declval<JsWriter&>()), void()) {
         WriteKey(std::forward<KeyType>(key));
         v(*this);
     }
 
-    template< class Key0, class T0, class ...T>
-    void _WriteObjectFields(Key0&& key0, T0&& f0, T&&...f){
+    template <class Key0, class T0, class... T>
+    void _WriteObjectFields(Key0&& key0, T0&& f0, T&&... f) {
         _WriteObjectFields(std::forward<Key0>(key0), std::forward<T0>(f0));
         _WriteObjectFields(std::forward<T>(f)...);
     }
@@ -215,4 +212,4 @@ JS_API void JsWriteValue(JsWriter* writer, const JsValue& value);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_JS_JSON_H
+#endif  // PXR_BASE_JS_JSON_H

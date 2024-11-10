@@ -29,8 +29,7 @@ struct Tf_TypeFactoryType {
     };
 };
 template <class T>
-struct TfTest_RefPtrFactory {
-};
+struct TfTest_RefPtrFactory {};
 
 template <typename T>
 struct Tf_TypeFactoryType<T, false> {
@@ -51,20 +50,19 @@ struct Tf_MakeTypeManufacturable {
 // Don't make it manufacturable.
 template <typename T>
 struct Tf_MakeTypeManufacturable<T, false> {
-    static void Doit(TfType) {
-    }
+    static void Doit(TfType) {}
 };
-    
+
 #define _TF_REMOVE_PARENS_HELPER(...) __VA_ARGS__
 #define _TF_REMOVE_PARENS(parens) _TF_REMOVE_PARENS_HELPER parens
 
-#define TF_NO_PARENT()            (TfType::Bases<>)
-#define TF_1_PARENT(p1)            (TfType::Bases<p1 >)
-#define TF_2_PARENT(p1,p2)  (TfType::Bases<p1, p2 >)
-#define TF_INSTANTIATE_TYPE(Type, flags, Bases) \
-    TF_REGISTRY_DEFINE_WITH_TYPE(TfType, Type) { \
-        TfType t1 = TfType::Define<Type, _TF_REMOVE_PARENS(Bases) >(); \
-        Tf_MakeTypeManufacturable<Type, (flags&TfType::MANUFACTURABLE)!=0 >::Doit(t1); \
+#define TF_NO_PARENT() (TfType::Bases<>)
+#define TF_1_PARENT(p1) (TfType::Bases<p1>)
+#define TF_2_PARENT(p1, p2) (TfType::Bases<p1, p2>)
+#define TF_INSTANTIATE_TYPE(Type, flags, Bases)                                           \
+    TF_REGISTRY_DEFINE_WITH_TYPE(TfType, Type) {                                          \
+        TfType t1 = TfType::Define<Type, _TF_REMOVE_PARENS(Bases)>();                     \
+        Tf_MakeTypeManufacturable<Type, (flags & TfType::MANUFACTURABLE) != 0>::Doit(t1); \
     }
 
 PXR_NAMESPACE_CLOSE_SCOPE

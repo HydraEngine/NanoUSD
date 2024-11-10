@@ -41,19 +41,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \li double
 /// \li null
 ///
-class JsValue
-{
+class JsValue {
 public:
     /// Type held by this JSON value.
-    enum Type {
-        ObjectType,
-        ArrayType,
-        StringType,
-        BoolType,
-        IntType,
-        RealType,
-        NullType
-    };
+    enum Type { ObjectType, ArrayType, StringType, BoolType, IntType, RealType, NullType };
 
     /// Constructs a null value.
     JS_API JsValue();
@@ -142,20 +133,20 @@ public:
     /// method raises a coding error. See Get functions above for default
     /// value returned in this case.
     template <typename T,
-              typename ReturnType = typename std::conditional<
-                  std::is_same<T, JsObject>::value || 
-                  std::is_same<T, JsArray>::value || 
-                  std::is_same<T, std::string>::value,
-                  const T&, T>::type>
+              typename ReturnType =
+                      typename std::conditional<std::is_same<T, JsObject>::value || std::is_same<T, JsArray>::value ||
+                                                        std::is_same<T, std::string>::value,
+                                                const T&,
+                                                T>::type>
     ReturnType Get() const {
         return _Get(static_cast<T*>(nullptr));
     }
 
     /// Returns a vector holding the elements of this value's array that
-    /// correspond to the C++ type specified as the template parameter. 
-    /// If this value is not holding an array, an empty vector is returned. 
-    /// If any of the array's elements does not correspond to the C++ type, 
-    /// it is replaced with the default value used by the Get functions above. 
+    /// correspond to the C++ type specified as the template parameter.
+    /// If this value is not holding an array, an empty vector is returned.
+    /// If any of the array's elements does not correspond to the C++ type,
+    /// it is replaced with the default value used by the Get functions above.
     /// In both cases, a coding error will be raised.
     template <typename T>
     std::vector<T> GetArrayOf() const;
@@ -214,13 +205,12 @@ public:
     JS_API bool operator!=(const JsValue& other) const;
 
 private:
-    template <typename T> 
-    struct _InvalidTypeHelper : public std::false_type { };
+    template <typename T>
+    struct _InvalidTypeHelper : public std::false_type {};
 
     template <class T>
     T _Get(T*) const {
-        static_assert(_InvalidTypeHelper<T>::value, 
-                      "Invalid type for JsValue");
+        static_assert(_InvalidTypeHelper<T>::value, "Invalid type for JsValue");
         return T();
     }
 
@@ -235,8 +225,7 @@ private:
 
     template <class T>
     bool _Is(T*) const {
-        static_assert(_InvalidTypeHelper<T>::value, 
-                      "Invalid type for JsValue");
+        static_assert(_InvalidTypeHelper<T>::value, "Invalid type for JsValue");
         return false;
     }
 
@@ -254,26 +243,26 @@ private:
 };
 
 template <typename T>
-inline std::vector<T> JsValue::GetArrayOf() const
-{
+inline std::vector<T> JsValue::GetArrayOf() const {
     const JsArray& array = GetJsArray();
     std::vector<T> result(array.size());
-    std::transform(array.begin(), array.end(), result.begin(),
-                   [](const JsValue& v) { return v.Get<T>(); });
+    std::transform(array.begin(), array.end(), result.begin(), [](const JsValue& v) {
+        return v.Get<T>();
+    });
     return result;
 }
 
 template <typename T>
-inline bool JsValue::IsArrayOf() const 
-{
+inline bool JsValue::IsArrayOf() const {
     if (!IsArray()) {
         return false;
     }
     const JsArray& array = GetJsArray();
-    return std::all_of(array.begin(), array.end(),
-                       [](const JsValue& v) { return v.Is<T>(); });
+    return std::all_of(array.begin(), array.end(), [](const JsValue& v) {
+        return v.Is<T>();
+    });
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_JS_VALUE_H
+#endif  // PXR_BASE_JS_VALUE_H

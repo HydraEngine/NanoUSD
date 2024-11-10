@@ -17,7 +17,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 static constexpr int SpinsBeforeBackoff = 32;
 
 template <class Fn>
-static void WaitWithBackoff(Fn &&fn) {
+static void WaitWithBackoff(Fn&& fn) {
     // Hope for the best...
     if (ARCH_LIKELY(fn())) {
         return;
@@ -35,9 +35,7 @@ static void WaitWithBackoff(Fn &&fn) {
     } while (!fn());
 }
 
-void
-TfSpinMutex::_AcquireContended()
-{
+void TfSpinMutex::_AcquireContended() {
     WaitWithBackoff([this]() {
         return _lockState.exchange(true, std::memory_order_acquire) == false;
     });

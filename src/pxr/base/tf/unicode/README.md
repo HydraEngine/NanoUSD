@@ -1,7 +1,7 @@
 # Generating Character Classes from the Unicode Database
 
 To properly process UTF-8 encoded strings, the system needs to know what code
-points fall into what Unicode character class.  This is useful for e.g.,
+points fall into what Unicode character class. This is useful for e.g.,
 processing identifiers to determine whether the first character is represented
 by a Unicode code point that falls into the `XidStart` Unicode character class.
 Unicode defines a maximum of 17 * 2^16 code points, and we need an efficient
@@ -14,11 +14,11 @@ version of the Unicode database.
 This directory contains a script `tfGenCharacterClasses.py` that will read in
 character class information from a source version of the Unicode database and
 generate the `pxr/base/tf/unicodeCharacterClasses.cpp` file from the provided
-`pxr/base/tf/unicode/unicodeCharacterClasses.template.cpp` file.  The Unicode
+`pxr/base/tf/unicode/unicodeCharacterClasses.template.cpp` file. The Unicode
 database provides a post-processed file called `DerivedCoreProperties.txt` in
-its core collateral.  For the script to function, this file must be present
+its core collateral. For the script to function, this file must be present
 locally on disk (see below for information about where to obtain the source
-Unicode character class data).  Once the script is present locally, the
+Unicode character class data). Once the script is present locally, the
 character classes can be generated via the following command:
 
 ```
@@ -27,7 +27,7 @@ python tfGenCharacterClasses.py --srcDir <path/to/DerivedCoreProperties.txt>
     --destDir .. --srcTemplate unicodeCharacterClasses.template.cpp
 ```
 
-This command will overwrite the current 
+This command will overwrite the current
 `pxr/base/tf/unicodeCharacterClasses.cpp` file with the newly generated
 version.
 

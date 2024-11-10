@@ -48,9 +48,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// tbb::spin_rw_mutex, and >100x better throughput compared to
 /// tbb::queuing_rw_mutex on reader-contention-heavy loads.  The tradeoff being
 /// the relatively large size required compared to these other classes.
-/// 
-class TfBigRWMutex
-{
+///
+class TfBigRWMutex {
 public:
     // Number of different cache-line-sized lock states.
     static constexpr unsigned NumStates = 16;
@@ -67,7 +66,6 @@ public:
     /// Scoped lock utility class.  API modeled after
     /// tbb::spin_rw_mutex::scoped_lock.
     struct ScopedLock {
-
         // Acquisition states: -1 means not acquired, -2 means acquired for
         // write (exclusive lock), >= 0 indicates locked for read, and the value
         // indicates which lock state index the reader has incremented.
@@ -76,40 +74,33 @@ public:
 
         /// Construct a scoped lock for mutex \p m and acquire either a read or
         /// a write lock depending on \p write.
-        explicit ScopedLock(TfBigRWMutex &m, bool write=true)
-            : _mutex(&m)
-            , _acqState(NotAcquired) {
-            Acquire(write);
-        }
+        explicit ScopedLock(TfBigRWMutex& m, bool write = true) : _mutex(&m), _acqState(NotAcquired) { Acquire(write); }
 
         /// Construct a scoped lock not associated with a \p mutex.
         ScopedLock() : _mutex(nullptr), _acqState(NotAcquired) {}
 
         /// If this scoped lock is acquired for either read or write, Release()
         /// it.
-        ~ScopedLock() {
-            Release();
-        }
+        ~ScopedLock() { Release(); }
 
         /// If the current scoped lock is acquired, Release() it, then associate
         /// this lock with \p m and acquire either a read or a write lock,
         /// depending on \p write.
-        void Acquire(TfBigRWMutex &m, bool write=true) {
+        void Acquire(TfBigRWMutex& m, bool write = true) {
             Release();
             _mutex = &m;
             Acquire(write);
-        }            
+        }
 
         /// Acquire either a read or write lock on this lock's associated mutex
         /// depending on \p write.  This lock must be associated with a mutex
         /// (typically by construction or by a call to Acquire() that takes a
         /// mutex).  This lock must not already be acquired when calling
         /// Acquire().
-        void Acquire(bool write=true) {
+        void Acquire(bool write = true) {
             if (write) {
                 AcquireWrite();
-            }
-            else {
+            } else {
                 AcquireRead();
             }
         }
@@ -118,14 +109,14 @@ public:
         /// this lock is not currently acquired, silently do nothing.
         void Release() {
             switch (_acqState) {
-            case NotAcquired:
-                break;
-            case WriteAcquired:
-                _ReleaseWrite();
-                break;
-            default:
-                _ReleaseRead();
-                break;
+                case NotAcquired:
+                    break;
+                case WriteAcquired:
+                    _ReleaseWrite();
+                    break;
+                default:
+                    _ReleaseRead();
+                    break;
             };
         }
 
@@ -156,9 +147,8 @@ public:
             AcquireWrite();
             return false;
         }
-        
-    private:
 
+    private:
         void _ReleaseRead() {
             TF_AXIOM(_acqState >= 0);
             _mutex->_ReleaseRead(_acqState);
@@ -173,25 +163,20 @@ public:
 
         // Helper for returning a seed value associated with this lock object.
         // This helps determine which lock state a read-lock should use.
-        inline int _GetSeed() const {
-            return static_cast<int>(
-                static_cast<unsigned>(TfHash()(this)) >> 8);
-        }
+        inline int _GetSeed() const { return static_cast<int>(static_cast<unsigned>(TfHash()(this)) >> 8); }
 
-        TfBigRWMutex *_mutex;
-        int _acqState; // NotAcquired (-1), WriteAcquired (-2), otherwise
-                       // acquired for read, and index indicates which lock
-                       // state we are associated with.
+        TfBigRWMutex* _mutex;
+        int _acqState;  // NotAcquired (-1), WriteAcquired (-2), otherwise
+                        // acquired for read, and index indicates which lock
+                        // state we are associated with.
     };
 
 private:
-
     // Optimistic read-lock case inlined.
     inline int _AcquireRead(int seed) {
         // Determine a lock state index to use.
         int stateIndex = seed % NumStates;
-        if (ARCH_UNLIKELY(_writerActive) ||
-            !_states[stateIndex].mutex.TryAcquireRead()) {
+        if (ARCH_UNLIKELY(_writerActive) || !_states[stateIndex].mutex.TryAcquireRead()) {
             _AcquireReadContended(stateIndex);
         }
         return stateIndex;
@@ -200,26 +185,22 @@ private:
     // Contended read-lock helper.
     TF_API void _AcquireReadContended(int stateIndex);
 
-    void _ReleaseRead(int stateIndex) {
-        _states[stateIndex].mutex.ReleaseRead();
-    }
+    void _ReleaseRead(int stateIndex) { _states[stateIndex].mutex.ReleaseRead(); }
 
     TF_API void _AcquireWrite();
     TF_API void _ReleaseWrite();
-    
+
     struct _LockState {
         TfSpinRWMutex mutex;
         // This padding ensures that \p state instances sit on different cache
         // lines.
-        char _unused_padding[
-            ARCH_CACHE_LINE_SIZE-(sizeof(mutex) % ARCH_CACHE_LINE_SIZE)];
+        char _unused_padding[ARCH_CACHE_LINE_SIZE - (sizeof(mutex) % ARCH_CACHE_LINE_SIZE)];
     };
 
-    std::unique_ptr<_LockState []> _states;
+    std::unique_ptr<_LockState[]> _states;
     std::atomic<bool> _writerActive;
-    
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_BASE_TF_BIG_RW_MUTEX_H
+#endif  // PXR_BASE_TF_BIG_RW_MUTEX_H

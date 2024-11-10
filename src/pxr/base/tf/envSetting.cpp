@@ -21,7 +21,7 @@
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
 #include "pxr/base/tf/pyUtils.h"
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
 #include <mutex>
 #include <variant>
@@ -35,9 +35,7 @@ public:
     Tf_EnvSettingRegistry(const Tf_EnvSettingRegistry&) = delete;
     Tf_EnvSettingRegistry& operator=(const Tf_EnvSettingRegistry&) = delete;
 
-    static Tf_EnvSettingRegistry& GetInstance() {
-        return TfSingleton<Tf_EnvSettingRegistry>::GetInstance();
-    }
+    static Tf_EnvSettingRegistry& GetInstance() { return TfSingleton<Tf_EnvSettingRegistry>::GetInstance(); }
 
     Tf_EnvSettingRegistry() {
         string fileName = TfGetenv("PIXAR_TF_ENV_SETTING_FILE", "");
@@ -46,16 +44,17 @@ public:
 
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
             bool syncPython = TfPyIsInitialized();
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
 
             int lineNo = 0;
-            auto emitError = [&fileName, &lineNo](char const *fmt, ...)
-                /*ARCH_PRINTF_FUNCTION(1, 2)*/ {
+            auto emitError = [&fileName, &lineNo](char const* fmt, ...)
+            /*ARCH_PRINTF_FUNCTION(1, 2)*/ {
                 va_list ap;
                 va_start(ap, fmt);
-                fprintf(stderr, "File '%s' (From PIXAR_TF_ENV_SETTING_FILE) "
-                        "line %d: %s.\n", fileName.c_str(), lineNo,
-                        TfVStringPrintf(fmt, ap).c_str());
+                fprintf(stderr,
+                        "File '%s' (From PIXAR_TF_ENV_SETTING_FILE) "
+                        "line %d: %s.\n",
+                        fileName.c_str(), lineNo, TfVStringPrintf(fmt, ap).c_str());
                 va_end(ap);
             };
 
@@ -77,25 +76,25 @@ public:
                     emitError("no '=' found");
                     continue;
                 }
-                    
+
                 string key = TfStringTrim(trimmed.substr(0, eqPos));
-                string value = TfStringTrim(trimmed.substr(eqPos+1));
+                string value = TfStringTrim(trimmed.substr(eqPos + 1));
                 if (key.empty()) {
                     emitError("empty key");
                     continue;
                 }
-                    
+
                 ArchSetEnv(key, value, /*overwrite=*/false);
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
                 if (syncPython && ArchGetEnv(key) == value) {
                     TfPySetenv(key, value);
                 }
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED
             }
 
             fclose(fp);
         }
-                    
+
         _printAlerts = TfGetenvBool("TF_ENV_SETTING_ALERTS_ENABLED", true);
         TfSingleton<Tf_EnvSettingRegistry>::SetInstanceConstructed(*this);
         TfRegistryManager::GetInstance().SubscribeTo<Tf_EnvSettingRegistry>();
@@ -104,10 +103,7 @@ public:
     using VariantType = std::variant<int, bool, std::string>;
 
     template <typename U>
-    bool Define(string const& varName,
-                U const& value,
-                std::atomic<U*>* cachedValue) {
-
+    bool Define(string const& varName, U const& value, std::atomic<U*>* cachedValue) {
         bool inserted = false;
         {
             std::lock_guard<std::mutex> lock(_lock);
@@ -128,19 +124,19 @@ public:
         }
 
         if (!inserted) {
-            TF_CODING_ERROR("Multiple definitions of TfEnvSetting variable "
-                            "detected.  This is usually due to software "
-                            "misconfiguration.  Contact the build team for "
-                            "assistance.  (duplicate '%s')",
-                            varName.c_str());
+            TF_CODING_ERROR(
+                    "Multiple definitions of TfEnvSetting variable "
+                    "detected.  This is usually due to software "
+                    "misconfiguration.  Contact the build team for "
+                    "assistance.  (duplicate '%s')",
+                    varName.c_str());
             return false;
-        }
-        else {
+        } else {
             return _printAlerts;
         }
     }
 
-    VariantType const *LookupByName(string const& name) const {
+    VariantType const* LookupByName(string const& name) const {
         std::lock_guard<std::mutex> lock(_lock);
         return TfMapLookupPtr(_valuesByName, name);
     }
@@ -159,7 +155,7 @@ static bool _Getenv(std::string const& name, bool def) {
 static int _Getenv(std::string const& name, int def) {
     return TfGetenvInt(name, def);
 }
-static string _Getenv(std::string const& name, const char *def) {
+static string _Getenv(std::string const& name, const char* def) {
     return TfGetenv(name, def);
 }
 
@@ -169,16 +165,15 @@ static string _Str(bool value) {
 static string _Str(int value) {
     return TfStringPrintf("%d", value);
 }
-static string _Str(const char *value) {
+static string _Str(const char* value) {
     return string(value);
 }
-static string _Str(const std::string &value) {
+static string _Str(const std::string& value) {
     return value;
 }
 
 template <class T>
-void Tf_InitializeEnvSetting(TfEnvSetting<T> *setting)
-{
+void Tf_InitializeEnvSetting(TfEnvSetting<T>* setting) {
     const std::string settingName = setting->_name;
 
     // Create an object to install as the cached value.
@@ -186,33 +181,27 @@ void Tf_InitializeEnvSetting(TfEnvSetting<T> *setting)
 
     // Define the setting in the registry and install the cached setting
     // value.
-    Tf_EnvSettingRegistry &reg = Tf_EnvSettingRegistry::GetInstance();
-    if (reg.Define(settingName,
-                   value,
-                   setting->_value)) {
+    Tf_EnvSettingRegistry& reg = Tf_EnvSettingRegistry::GetInstance();
+    if (reg.Define(settingName, value, setting->_value)) {
         // Setting was defined successfully and we should print alerts.
         if (setting->_default != value) {
-            string text = TfStringPrintf("#  %s is overridden to '%s'.  "
-                                         "Default is '%s'.  #",
-                                         setting->_name,
-                                         _Str(value).c_str(),
-                                         _Str(setting->_default).c_str());
+            string text = TfStringPrintf(
+                    "#  %s is overridden to '%s'.  "
+                    "Default is '%s'.  #",
+                    setting->_name, _Str(value).c_str(), _Str(setting->_default).c_str());
             string line(text.length(), '#');
-            fprintf(stderr, "%s\n%s\n%s\n",
-                    line.c_str(), text.c_str(), line.c_str());
+            fprintf(stderr, "%s\n%s\n%s\n", line.c_str(), text.c_str(), line.c_str());
         }
     }
 }
 
 // Explicitly instantiate for the supported types: bool, int, and string.
-template void TF_API Tf_InitializeEnvSetting(TfEnvSetting<bool> *);
-template void TF_API Tf_InitializeEnvSetting(TfEnvSetting<int> *);
-template void TF_API Tf_InitializeEnvSetting(TfEnvSetting<string> *);
+template void TF_API Tf_InitializeEnvSetting(TfEnvSetting<bool>*);
+template void TF_API Tf_InitializeEnvSetting(TfEnvSetting<int>*);
+template void TF_API Tf_InitializeEnvSetting(TfEnvSetting<string>*);
 
 TF_API
-std::variant<int, bool, std::string> const *
-Tf_GetEnvSettingByName(std::string const& name)
-{
+std::variant<int, bool, std::string> const* Tf_GetEnvSettingByName(std::string const& name) {
     return Tf_EnvSettingRegistry::GetInstance().LookupByName(name);
 }
 
