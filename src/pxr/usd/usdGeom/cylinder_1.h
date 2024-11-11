@@ -38,7 +38,7 @@ class SdfAssetPath;
 /// Defines a primitive cylinder with closed ends, centered at the
 /// origin, whose spine is along the specified \em axis, with a pair of radii
 /// describing the size of the end points.
-/// 
+///
 /// The fallback values for Cube, Sphere, Cone, and Cylinder are set so that
 /// they all pack into the same volume/bounds.
 ///
@@ -47,8 +47,7 @@ class SdfAssetPath;
 /// So to set an attribute to the value "rightHanded", use UsdGeomTokens->rightHanded
 /// as the value.
 ///
-class UsdGeomCylinder_1 : public UsdGeomGprim
-{
+class UsdGeomCylinder_1 : public UsdGeomGprim {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -59,18 +58,12 @@ public:
     /// Equivalent to UsdGeomCylinder_1::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdGeomCylinder_1(const UsdPrim& prim=UsdPrim())
-        : UsdGeomGprim(prim)
-    {
-    }
+    explicit UsdGeomCylinder_1(const UsdPrim& prim = UsdPrim()) : UsdGeomGprim(prim) {}
 
     /// Construct a UsdGeomCylinder_1 on the prim held by \p schemaObj .
     /// Should be preferred over UsdGeomCylinder_1(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdGeomCylinder_1(const UsdSchemaBase& schemaObj)
-        : UsdGeomGprim(schemaObj)
-    {
-    }
+    explicit UsdGeomCylinder_1(const UsdSchemaBase& schemaObj) : UsdGeomGprim(schemaObj) {}
 
     /// Destructor.
     USDGEOM_API
@@ -80,8 +73,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDGEOM_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdGeomCylinder_1 holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -93,8 +85,7 @@ public:
     /// \endcode
     ///
     USDGEOM_API
-    static UsdGeomCylinder_1
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdGeomCylinder_1 Get(const UsdStagePtr& stage, const SdfPath& path);
 
     /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
     /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -119,8 +110,7 @@ public:
     /// the opinion at the current EditTarget.
     ///
     USDGEOM_API
-    static UsdGeomCylinder_1
-    Define(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdGeomCylinder_1 Define(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -133,21 +123,21 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDGEOM_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDGEOM_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // HEIGHT 
+    // HEIGHT
     // --------------------------------------------------------------------- //
     /// The length of the cylinder's spine along the specified
     /// \em axis.  If you author \em height you must also author \em extent.
-    /// 
+    ///
     /// \sa GetExtentAttr()
     ///
     /// | ||
@@ -158,22 +148,22 @@ public:
     USDGEOM_API
     UsdAttribute GetHeightAttr() const;
 
-    /// See GetHeightAttr(), and also 
+    /// See GetHeightAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateHeightAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateHeightAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // RADIUSTOP 
+    // RADIUSTOP
     // --------------------------------------------------------------------- //
     /// The radius of the top of the cylinder - i.e. the face located
     /// along the positive \em axis. If you author \em radiusTop you must also
     /// author \em extent.
-    /// 
+    ///
     /// \sa GetExtentAttr()
     ///
     /// | ||
@@ -184,22 +174,22 @@ public:
     USDGEOM_API
     UsdAttribute GetRadiusTopAttr() const;
 
-    /// See GetRadiusTopAttr(), and also 
+    /// See GetRadiusTopAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateRadiusTopAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateRadiusTopAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // RADIUSBOTTOM 
+    // RADIUSBOTTOM
     // --------------------------------------------------------------------- //
     /// The radius of the bottom of the cylinder - i.e. the face
     /// point located along the negative \em axis. If you author
     /// \em radiusBottom you must also author \em extent.
-    /// 
+    ///
     /// \sa GetExtentAttr()
     ///
     /// | ||
@@ -210,17 +200,17 @@ public:
     USDGEOM_API
     UsdAttribute GetRadiusBottomAttr() const;
 
-    /// See GetRadiusBottomAttr(), and also 
+    /// See GetRadiusBottomAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateRadiusBottomAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateRadiusBottomAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // AXIS 
+    // AXIS
     // --------------------------------------------------------------------- //
     /// The axis along which the spine of the cylinder is aligned
     ///
@@ -234,17 +224,17 @@ public:
     USDGEOM_API
     UsdAttribute GetAxisAttr() const;
 
-    /// See GetAxisAttr(), and also 
+    /// See GetAxisAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateAxisAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateAxisAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // EXTENT 
+    // EXTENT
     // --------------------------------------------------------------------- //
     /// Extent is re-defined on Cylinder only to provide a fallback
     /// value. \sa UsdGeomGprim::GetExtentAttr().
@@ -257,21 +247,21 @@ public:
     USDGEOM_API
     UsdAttribute GetExtentAttr() const;
 
-    /// See GetExtentAttr(), and also 
+    /// See GetExtentAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateExtentAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateExtentAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
@@ -282,23 +272,26 @@ public:
     ///
     /// \return true upon success, false if unable to calculate extent.
     ///
-    /// On success, extent will contain an approximate axis-aligned bounding 
-    /// box of the cylinder defined by the height, radiusTop and radiusBottom, 
+    /// On success, extent will contain an approximate axis-aligned bounding
+    /// box of the cylinder defined by the height, radiusTop and radiusBottom,
     /// and axis.
     ///
-    /// This function is to provide easy authoring of extent for usd authoring 
-    /// tools, hence it is static and acts outside a specific prim (as in 
+    /// This function is to provide easy authoring of extent for usd authoring
+    /// tools, hence it is static and acts outside a specific prim (as in
     /// attribute based methods).
     USDGEOM_API
-    static bool ComputeExtent(double height, double radiusTop, 
-            double radiusBottom, const TfToken& axis, VtVec3fArray* extent);
+    static bool ComputeExtent(
+            double height, double radiusTop, double radiusBottom, const TfToken& axis, VtVec3fArray* extent);
 
     /// \overload
     /// Computes the extent as if the matrix \p transform was first applied.
     USDGEOM_API
-    static bool ComputeExtent(double height, double radiusTop, 
-            double radiusBottom, const TfToken& axis, 
-            const GfMatrix4d& transform, VtVec3fArray* extent);
+    static bool ComputeExtent(double height,
+                              double radiusTop,
+                              double radiusBottom,
+                              const TfToken& axis,
+                              const GfMatrix4d& transform,
+                              VtVec3fArray* extent);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

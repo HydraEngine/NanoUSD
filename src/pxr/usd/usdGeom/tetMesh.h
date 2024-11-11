@@ -16,7 +16,7 @@
 #include "pxr/usd/usd/stage.h"
 #include "pxr/usd/usdGeom/tokens.h"
 
-#include "pxr/usd/usd/timeCode.h" 
+#include "pxr/usd/usd/timeCode.h"
 
 #include "pxr/base/vt/value.h"
 
@@ -37,18 +37,17 @@ class SdfAssetPath;
 
 /// \class UsdGeomTetMesh
 ///
-/// Encodes a tetrahedral mesh. A tetrahedral mesh is defined as a set of 
-/// tetrahedra. Each tetrahedron is defined by a set of 4 points, with the 
-/// triangles of the tetrahedron determined from these 4 points as described in 
-/// the <b>tetVertexIndices</b> attribute description. The mesh surface faces 
-/// are encoded as triangles. Surface faces must be provided for consumers 
-/// that need to do surface calculations, such as renderers or consumers using 
-/// physics attachments. Both tetrahedra and surface face definitions use 
-/// indices into the TetMesh's <b>points</b> attribute, inherited from 
+/// Encodes a tetrahedral mesh. A tetrahedral mesh is defined as a set of
+/// tetrahedra. Each tetrahedron is defined by a set of 4 points, with the
+/// triangles of the tetrahedron determined from these 4 points as described in
+/// the <b>tetVertexIndices</b> attribute description. The mesh surface faces
+/// are encoded as triangles. Surface faces must be provided for consumers
+/// that need to do surface calculations, such as renderers or consumers using
+/// physics attachments. Both tetrahedra and surface face definitions use
+/// indices into the TetMesh's <b>points</b> attribute, inherited from
 /// UsdGeomPointBased.
 ///
-class UsdGeomTetMesh : public UsdGeomPointBased
-{
+class UsdGeomTetMesh : public UsdGeomPointBased {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -59,18 +58,12 @@ public:
     /// Equivalent to UsdGeomTetMesh::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdGeomTetMesh(const UsdPrim& prim=UsdPrim())
-        : UsdGeomPointBased(prim)
-    {
-    }
+    explicit UsdGeomTetMesh(const UsdPrim& prim = UsdPrim()) : UsdGeomPointBased(prim) {}
 
     /// Construct a UsdGeomTetMesh on the prim held by \p schemaObj .
     /// Should be preferred over UsdGeomTetMesh(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdGeomTetMesh(const UsdSchemaBase& schemaObj)
-        : UsdGeomPointBased(schemaObj)
-    {
-    }
+    explicit UsdGeomTetMesh(const UsdSchemaBase& schemaObj) : UsdGeomPointBased(schemaObj) {}
 
     /// Destructor.
     USDGEOM_API
@@ -80,8 +73,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDGEOM_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdGeomTetMesh holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -93,8 +85,7 @@ public:
     /// \endcode
     ///
     USDGEOM_API
-    static UsdGeomTetMesh
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdGeomTetMesh Get(const UsdStagePtr& stage, const SdfPath& path);
 
     /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
     /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -119,8 +110,7 @@ public:
     /// the opinion at the current EditTarget.
     ///
     USDGEOM_API
-    static UsdGeomTetMesh
-    Define(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdGeomTetMesh Define(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -133,40 +123,40 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDGEOM_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDGEOM_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // TETVERTEXINDICES 
+    // TETVERTEXINDICES
     // --------------------------------------------------------------------- //
-    /// Flat list of the index (into the <b>points</b> attribute) of 
+    /// Flat list of the index (into the <b>points</b> attribute) of
     /// each vertex of each tetrahedron in the mesh. Each int4 corresponds to the
     /// indices of a single tetrahedron. Users should set the <b>orientation</b>
-    /// attribute of UsdGeomPrim accordingly. That is if the <b>orientation</b> 
+    /// attribute of UsdGeomPrim accordingly. That is if the <b>orientation</b>
     /// is "rightHanded", the CCW face ordering of a tetrahedron is
     /// [123],[032],[013],[021] with respect to the int4. This results in the
     /// normals facing outward from the center of the tetrahedron. The following
-    /// diagram shows the face ordering of an unwrapped tetrahedron with 
+    /// diagram shows the face ordering of an unwrapped tetrahedron with
     /// "rightHanded" orientation.
-    /// 
+    ///
     /// \image html USDTetMeshRightHanded.svg
-    /// 
-    /// If the <b>orientation</b> attribute is set to "leftHanded" the face 
-    /// ordering of the tetrahedron is [321],[230],[310],[120] and the 
-    /// leftHanded CW face normals point outward from the center of the 
-    /// tetrahedron. The following diagram shows the face ordering of an 
+    ///
+    /// If the <b>orientation</b> attribute is set to "leftHanded" the face
+    /// ordering of the tetrahedron is [321],[230],[310],[120] and the
+    /// leftHanded CW face normals point outward from the center of the
+    /// tetrahedron. The following diagram shows the face ordering of an
     /// unwrapped tetrahedron with "leftHanded" orientation.
-    /// 
+    ///
     /// \image html USDTetMeshLeftHanded.svg
-    /// 
-    /// Setting the <b>orientation</b> attribute to align with the 
-    /// ordering of the int4 for the tetrahedrons is the responsibility of the 
+    ///
+    /// Setting the <b>orientation</b> attribute to align with the
+    /// ordering of the int4 for the tetrahedrons is the responsibility of the
     /// user.
     ///
     /// | ||
@@ -177,22 +167,22 @@ public:
     USDGEOM_API
     UsdAttribute GetTetVertexIndicesAttr() const;
 
-    /// See GetTetVertexIndicesAttr(), and also 
+    /// See GetTetVertexIndicesAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateTetVertexIndicesAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateTetVertexIndicesAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // SURFACEFACEVERTEXINDICES 
+    // SURFACEFACEVERTEXINDICES
     // --------------------------------------------------------------------- //
     /// <b>surfaceFaceVertexIndices</b> defines the triangle
-    /// surface faces indices wrt. <b>points</b> of the tetmesh surface. Again 
-    /// the <b>orientation</b> attribute inherited from UsdGeomPrim should be 
-    /// set accordingly. The <b>orientation</b> for faces of tetrahedra and  
+    /// surface faces indices wrt. <b>points</b> of the tetmesh surface. Again
+    /// the <b>orientation</b> attribute inherited from UsdGeomPrim should be
+    /// set accordingly. The <b>orientation</b> for faces of tetrahedra and
     /// surface faces must match.
     ///
     /// | ||
@@ -203,46 +193,47 @@ public:
     USDGEOM_API
     UsdAttribute GetSurfaceFaceVertexIndicesAttr() const;
 
-    /// See GetSurfaceFaceVertexIndicesAttr(), and also 
+    /// See GetSurfaceFaceVertexIndicesAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateSurfaceFaceVertexIndicesAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateSurfaceFaceVertexIndicesAttr(VtValue const& defaultValue = VtValue(),
+                                                    bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
     // --(BEGIN CUSTOM CODE)--
 
-    /// ComputeSurfaceFaces determines the vertex indices of the surface faces 
-    /// from tetVertexIndices. The surface faces are the set of faces that occur 
-    /// only once when traversing the faces of all the tetrahedra. The algorithm 
-    /// is O(nlogn) in the number of tetrahedra. Method returns false if 
+    /// ComputeSurfaceFaces determines the vertex indices of the surface faces
+    /// from tetVertexIndices. The surface faces are the set of faces that occur
+    /// only once when traversing the faces of all the tetrahedra. The algorithm
+    /// is O(nlogn) in the number of tetrahedra. Method returns false if
     /// surfaceFaceIndices argument is nullptr and returns true otherwise.
     /// The algorithm can't be O(n) because we need to sort the resulting
-    /// surface faces for deterministic behavior across different compilers 
-    /// and OS. 
-    USDGEOM_API    
+    /// surface faces for deterministic behavior across different compilers
+    /// and OS.
+    USDGEOM_API
     static bool ComputeSurfaceFaces(const UsdGeomTetMesh& tetMesh,
                                     VtVec3iArray* surfaceFaceIndices,
-                                    const UsdTimeCode timeCode = UsdTimeCode::Default()); 
+                                    const UsdTimeCode timeCode = UsdTimeCode::Default());
 
-    /// FindInvertedElements is used to determine if the tetMesh has inverted 
-    /// tetrahedral elements at the given time code. Inverted elements are 
+    /// FindInvertedElements is used to determine if the tetMesh has inverted
+    /// tetrahedral elements at the given time code. Inverted elements are
     /// determined wrt. the "orientation" attribute of the UsdGeomTetMesh and
-    /// are stored in the invertedElements arg. Method returns true if it 
-    /// succeeds and if invertedElements is empty then all the tetrahedra have  
+    /// are stored in the invertedElements arg. Method returns true if it
+    /// succeeds and if invertedElements is empty then all the tetrahedra have
     /// the correct orientation.
-    USDGEOM_API    
+    USDGEOM_API
     static bool FindInvertedElements(const UsdGeomTetMesh& tetMesh,
                                      VtIntArray* invertedElements,
                                      const UsdTimeCode timeCode = UsdTimeCode::Default());

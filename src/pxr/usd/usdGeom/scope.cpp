@@ -14,11 +14,9 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType)
-{
-    TfType::Define<UsdGeomScope,
-        TfType::Bases< UsdGeomImageable > >();
-    
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<UsdGeomScope, TfType::Bases<UsdGeomImageable>>();
+
     // Register the usd prim typename as an alias under UsdSchemaBase. This
     // enables one to call
     // TfType::Find<UsdSchemaBase>().FindDerivedByName("Scope")
@@ -28,14 +26,10 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdGeomScope::~UsdGeomScope()
-{
-}
+UsdGeomScope::~UsdGeomScope() {}
 
 /* static */
-UsdGeomScope
-UsdGeomScope::Get(const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdGeomScope UsdGeomScope::Get(const UsdStagePtr& stage, const SdfPath& path) {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdGeomScope();
@@ -44,55 +38,41 @@ UsdGeomScope::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdGeomScope
-UsdGeomScope::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdGeomScope UsdGeomScope::Define(const UsdStagePtr& stage, const SdfPath& path) {
     static TfToken usdPrimTypeName("Scope");
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdGeomScope();
     }
-    return UsdGeomScope(
-        stage->DefinePrim(path, usdPrimTypeName));
+    return UsdGeomScope(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
-UsdSchemaKind UsdGeomScope::_GetSchemaKind() const
-{
+UsdSchemaKind UsdGeomScope::_GetSchemaKind() const {
     return UsdGeomScope::schemaKind;
 }
 
 /* static */
-const TfType &
-UsdGeomScope::_GetStaticTfType()
-{
+const TfType& UsdGeomScope::_GetStaticTfType() {
     static TfType tfType = TfType::Find<UsdGeomScope>();
     return tfType;
 }
 
 /* static */
-bool 
-UsdGeomScope::_IsTypedSchema()
-{
+bool UsdGeomScope::_IsTypedSchema() {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdGeomScope::_GetTfType() const
-{
+const TfType& UsdGeomScope::_GetTfType() const {
     return _GetStaticTfType();
 }
 
 /*static*/
-const TfTokenVector&
-UsdGeomScope::GetSchemaAttributeNames(bool includeInherited)
-{
+const TfTokenVector& UsdGeomScope::GetSchemaAttributeNames(bool includeInherited) {
     static TfTokenVector localNames;
-    static TfTokenVector allNames =
-        UsdGeomImageable::GetSchemaAttributeNames(true);
+    static TfTokenVector allNames = UsdGeomImageable::GetSchemaAttributeNames(true);
 
     if (includeInherited)
         return allNames;

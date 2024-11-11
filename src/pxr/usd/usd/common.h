@@ -39,29 +39,27 @@ typedef UsdStagePtr UsdStageWeakPtr;
 
 /// Return a human-readable description.
 USD_API
-std::string UsdDescribe(const UsdObject &);
+std::string UsdDescribe(const UsdObject&);
 /// \overload
 USD_API
-std::string UsdDescribe(const UsdStageRefPtr &);
+std::string UsdDescribe(const UsdStageRefPtr&);
 /// \overload
 USD_API
-std::string UsdDescribe(const UsdStageWeakPtr &);
+std::string UsdDescribe(const UsdStageWeakPtr&);
 /// \overload
 USD_API
-std::string UsdDescribe(const UsdStage *);
+std::string UsdDescribe(const UsdStage*);
 /// \overload
 USD_API
-std::string UsdDescribe(const UsdStage &);
+std::string UsdDescribe(const UsdStage&);
 /// \overload
 USD_API
-std::string UsdDescribe(const UsdStageCache &);
+std::string UsdDescribe(const UsdStageCache&);
 
 // XXX:
 // Currently used for querying composed values from text layers, so VtValue is
 // the optimal value-store, but this may not always be the case.
-typedef std::map<class TfToken, VtValue,
-                 TfDictionaryLessThan
-                 > UsdMetadataValueMap;
+typedef std::map<class TfToken, VtValue, TfDictionaryLessThan> UsdMetadataValueMap;
 
 /// \enum UsdListPosition
 ///
@@ -106,7 +104,7 @@ enum UsdLoadPolicy {
 /// \enum UsdSchemaKind
 ///
 /// An enum representing which kind of schema a given schema class belongs to.
-/// For more details on the different kinds of schemas, see 
+/// For more details on the different kinds of schemas, see
 /// \ref Usd_Page_GeneratingSchemas.
 ///
 enum class UsdSchemaKind {

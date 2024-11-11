@@ -1,22 +1,23 @@
 # Usd : Universal Scene Description (Core) {#usd_page_front}
+
 \if ( PIXAR_MFB_BUILD )
 \mainpage Usd : Universal Scene Description
 \endif
 
-<b>Usd</b> is the core client-facing module for authoring, composing, 
-and reading Universal Scene Description. USD is designed to encode scalable, 
-hierarchically organized, static and time-sampled data, for the primary 
-purpose of interchanging and augmenting the data between cooperating Digital 
-Content Creation applications. 
+<b>Usd</b> is the core client-facing module for authoring, composing,
+and reading Universal Scene Description. USD is designed to encode scalable,
+hierarchically organized, static and time-sampled data, for the primary
+purpose of interchanging and augmenting the data between cooperating Digital
+Content Creation applications.
 
 ## Core API Manual {#Usd_ManualDesc}
 
 This manual contains the API documentation for the core Usd module, prefaced
 with an introduction to the key concepts behind the API, and including a
-guide to making effective use of the API.  In this manual we do not deeply
+guide to making effective use of the API. In this manual we do not deeply
 explore the composition semantics that underly Usd scenegraphs - that is the
 domain of the (forthcoming) <em>Universal Scene Description Composition
-Compendium</em>.  We will discuss some aspects of the composition operators,
+Compendium</em>. We will discuss some aspects of the composition operators,
 primarily as they affect authoring workflows and/or scalability and/or
 import/export.
 

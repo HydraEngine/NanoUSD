@@ -25,7 +25,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 class UsdAttribute;
 class TsSpline;
 
@@ -48,25 +47,25 @@ typedef std::vector<UsdAttribute> UsdAttributeVector;
 /// \li <b>Variability</b> Expresses whether an attribute is intended to
 /// have time samples (GetVariability() == \c SdfVariabilityVarying), or only
 /// a default (GetVariability() == \c SdfVariabilityUniform).  For more on
-/// reasoning about time samples, 
+/// reasoning about time samples,
 /// see \ref Usd_AttributeValueMethods "Value & Time-Sample Accessors".
 ///
 /// \li <b>Custom</b> Determines whether an attribute belongs to a
 /// schema (IsCustom() == \c false), or is a user-defined, custom attribute.
 /// schema attributes will always be defined on a prim of the schema type,
-/// ans may possess fallback values from the schema, whereas custom 
+/// ans may possess fallback values from the schema, whereas custom
 /// attributes must always first be authored in order to be defined.  Note
 /// that \em custom is actually an aspect of UsdProperty, as UsdRelationship
 /// can also be custom or provided by a schema.
 ///
 /// \section Usd_AttributeExistence Attribute Creation and Existence
 ///
-/// One can always create an attribute generically via 
+/// One can always create an attribute generically via
 /// UsdPrim::CreateAttribute(), which ensures that an attribute "is defined"
 /// in the current \ref UsdEditTarget .  In order to author any metadata or
 /// a default or timesample for an attribute, <em>it must first be defined</em>.
 /// It is sufficient that the attribute be defined in any one of the layers
-/// participating in the stage's current composition; for \em builtin 
+/// participating in the stage's current composition; for \em builtin
 /// attributes (those belonging to the owning prim's defining schema, i.e.
 /// the most specific subclass of UsdTypedSchema for which prim.IsA<schema>()
 /// will evaluate to true) there need be no authored scene description, because
@@ -80,7 +79,7 @@ typedef std::vector<UsdAttribute> UsdAttributeVector;
 /// }
 /// \endcode
 ///
-/// The UsdAttribute passes the bool test, because it is defined; however, 
+/// The UsdAttribute passes the bool test, because it is defined; however,
 /// inside the clause, we have no guarantee that attr has a value.
 ///
 /// \section Usd_AttributeInterpolation Attribute Value Interpolation
@@ -94,18 +93,18 @@ typedef std::vector<UsdAttribute> UsdAttributeVector;
 ///
 /// \li <b>Held</b> Attribute values are held constant between authored
 /// values.  An attribute's value will be equal to the nearest preceding
-/// authored value.  If there is no preceding authored value, the value 
+/// authored value.  If there is no preceding authored value, the value
 /// will be equal to the nearest subsequent value.
 ///
 /// \li <b>Linear</b> Attribute values are linearly interpolated between
 /// authored values.
 ///
-/// Linear interpolation is only supported for certain data types.  See 
-/// \ref USD_LINEAR_INTERPOLATION_TYPES for the list of these types.  Types 
-/// that do not support linear interpolation will use held interpolation 
+/// Linear interpolation is only supported for certain data types.  See
+/// \ref USD_LINEAR_INTERPOLATION_TYPES for the list of these types.  Types
+/// that do not support linear interpolation will use held interpolation
 /// instead.
 ///
-/// Linear interpolation is done element-by-element for array, vector, 
+/// Linear interpolation is done element-by-element for array, vector,
 /// and matrix data types.  If linear interpolation is requested for
 /// two array values with different sizes, held interpolation will
 /// be used instead.
@@ -116,8 +115,8 @@ typedef std::vector<UsdAttribute> UsdAttributeVector;
 /// \ref Usd_ActiveInactive "deactivating them," properties cannot.  However,
 /// it is possible to **block an attribute's value**, thus making the attribute
 /// behave as if it has a definition (and possibly metadata), but no authored
-/// value.  
-/// 
+/// value.
+///
 ///
 /// One blocks an attribute using UsdAttribute::Block(), which will block the
 /// attribute in the stage's current UsdEditTarget, by authoring an
@@ -139,7 +138,7 @@ typedef std::vector<UsdAttribute> UsdAttributeVector;
 /// "partially blocked", UsdAttribute::Get() will succeed only for those time
 /// intervals whose left/earlier bracketing timeSample is **not** SdfValueBlock.
 ///
-/// Due to this time-varying potential of value blocking, it may be the case 
+/// Due to this time-varying potential of value blocking, it may be the case
 /// that an attribute's  HasAuthoredValue() and HasValue() methods both return
 /// *true* (because they do not and cannot consider time-varying blocks), but
 /// Get() may yet return *false* over some intervals.
@@ -169,7 +168,7 @@ public:
     /// @{
 
     /// An attribute's variability expresses whether it is intended to have
-    /// time-samples (\c SdfVariabilityVarying), or only a single default 
+    /// time-samples (\c SdfVariabilityVarying), or only a single default
     /// value (\c SdfVariabilityUniform).
     ///
     /// Variability is required meta-data of all attributes, and its fallback
@@ -219,82 +218,79 @@ public:
     /// default value is authored over weaker time samples, the default value
     /// will hide the underlying timesamples.
     ///
-    /// \note This function will query all value clips that may contribute 
+    /// \note This function will query all value clips that may contribute
     /// time samples for this attribute, opening them if needed. This may be
-    /// expensive, especially if many clips are involved.     
-    /// 
+    /// expensive, especially if many clips are involved.
+    ///
     /// \param times - on return, will contain the \em sorted, ascending
     /// timeSample ordinates.  Any data in \p times will be lost, as this
-    /// method clears \p times. 
+    /// method clears \p times.
     ///
     /// \sa UsdAttribute::GetTimeSamplesInInterval
     USD_API
     bool GetTimeSamples(std::vector<double>* times) const;
 
-    /// Populates a vector with authored sample times in \p interval. 
+    /// Populates a vector with authored sample times in \p interval.
     /// Returns false only on an error.
     ///
-    /// \note This function will only query the value clips that may 
-    /// contribute time samples for this attribute in the given interval, 
+    /// \note This function will only query the value clips that may
+    /// contribute time samples for this attribute in the given interval,
     /// opening them if necessary.
-    /// 
-    /// \param interval - the \ref GfInterval on which to gather time samples.     
+    ///
+    /// \param interval - the \ref GfInterval on which to gather time samples.
     ///
     /// \param times - on return, will contain the \em sorted, ascending
     /// timeSample ordinates.  Any data in \p times will be lost, as this
-    /// method clears \p times. 
+    /// method clears \p times.
     ///
     /// \sa UsdAttribute::GetTimeSamples
     USD_API
-    bool GetTimeSamplesInInterval(const GfInterval& interval,
-                                  std::vector<double>* times) const;
+    bool GetTimeSamplesInInterval(const GfInterval& interval, std::vector<double>* times) const;
 
-    /// Populates the given vector, \p times with the union of all the 
+    /// Populates the given vector, \p times with the union of all the
     /// authored sample times on all of the given attributes, \p attrs.
-    /// 
-    /// \note This function will query all value clips that may contribute 
-    /// time samples for the attributes in \p attrs, opening them if needed. 
+    ///
+    /// \note This function will query all value clips that may contribute
+    /// time samples for the attributes in \p attrs, opening them if needed.
     /// This may be expensive, especially if many clips are involved.
-    /// 
-    /// The accumulated sample times will be in sorted (increasing) order and 
+    ///
+    /// The accumulated sample times will be in sorted (increasing) order and
     /// will not contain any duplicates.
-    /// 
-    /// This clears any existing values in the \p times vector before 
+    ///
+    /// This clears any existing values in the \p times vector before
     /// accumulating sample times of the given attributes.
-    /// 
-    /// \return false if any of the attributes in \p attr are invalid or  if 
+    ///
+    /// \return false if any of the attributes in \p attr are invalid or  if
     /// there's an error when fetching time-samples for any of the attributes.
-    /// 
+    ///
     /// \sa UsdAttribute::GetTimeSamples
     /// \sa UsdAttribute::GetUnionedTimeSamplesInInterval
     USD_API
-    static bool GetUnionedTimeSamples(const std::vector<UsdAttribute> &attrs, 
-                                      std::vector<double> *times);
+    static bool GetUnionedTimeSamples(const std::vector<UsdAttribute>& attrs, std::vector<double>* times);
 
-    /// Populates the given vector, \p times with the union of all the 
-    /// authored sample times in the GfInterval, \p interval on all of the 
+    /// Populates the given vector, \p times with the union of all the
+    /// authored sample times in the GfInterval, \p interval on all of the
     /// given attributes, \p attrs.
-    /// 
-    /// \note This function will only query the value clips that may 
-    /// contribute time samples for the attributes in \p attrs, in the 
+    ///
+    /// \note This function will only query the value clips that may
+    /// contribute time samples for the attributes in \p attrs, in the
     /// given \p interval, opening them if necessary.
     ///
-    /// The accumulated sample times will be in sorted (increasing) order and 
+    /// The accumulated sample times will be in sorted (increasing) order and
     /// will not contain any duplicates.
-    /// 
-    /// This clears any existing values in the \p times vector before 
+    ///
+    /// This clears any existing values in the \p times vector before
     /// accumulating sample times of the given attributes.
-    /// 
-    /// \return false if any of the attributes in \p attr are invalid or if 
+    ///
+    /// \return false if any of the attributes in \p attr are invalid or if
     /// there's an error fetching time-samples for any of the attributes.
     ///
     /// \sa UsdAttribute::GetTimeSamplesInInterval
     /// \sa UsdAttribute::GetUnionedTimeSamples
     USD_API
-    static bool GetUnionedTimeSamplesInInterval(
-        const std::vector<UsdAttribute> &attrs, 
-        const GfInterval &interval,
-        std::vector<double> *times);
+    static bool GetUnionedTimeSamplesInInterval(const std::vector<UsdAttribute>& attrs,
+                                                const GfInterval& interval,
+                                                std::vector<double>* times);
 
     /// Returns the number of time samples that have been authored.
     ///
@@ -302,7 +298,7 @@ public:
     /// default value is authored over weaker time samples, the default value
     /// will hide the underlying timesamples.
     ///
-    /// \note This function will query all value clips that may contribute 
+    /// \note This function will query all value clips that may contribute
     /// time samples for this attribute, opening them if needed. This may be
     /// expensive, especially if many clips are involved.
     USD_API
@@ -321,9 +317,9 @@ public:
     ///
     /// 2) If samples exist surrounding, but not equal to the \a desiredTime,
     /// set lower and upper to the bracketing samples nearest to the
-    /// \a desiredTime. 
+    /// \a desiredTime.
     ///
-    /// 3) If the \a desiredTime is outside of the range of authored samples, 
+    /// 3) If the \a desiredTime is outside of the range of authored samples,
     /// clamp upper and lower to the nearest time sample.
     ///
     /// 4) If no samples exist, do not modify upper and lower and set
@@ -334,10 +330,7 @@ public:
     /// All four cases above are considered to be successful, thus the return
     /// value will be true and no error message will be emitted.
     USD_API
-    bool GetBracketingTimeSamples(double desiredTime, 
-                                  double* lower, 
-                                  double* upper, 
-                                  bool* hasTimeSamples) const;
+    bool GetBracketingTimeSamples(double desiredTime, double* lower, double* upper, bool* hasTimeSamples) const;
 
     /// Return true if this attribute has an authored default value, authored
     /// time samples or a fallback value provided by a registered schema. If
@@ -347,7 +340,7 @@ public:
     bool HasValue() const;
 
     /// \deprecated This method is deprecated because it returns `true` even when
-    /// an attribute is blocked.  Please use HasAuthoredValue() instead.  If 
+    /// an attribute is blocked.  Please use HasAuthoredValue() instead.  If
     /// you truly need to know whether the attribute has **any** authored
     /// value opinions, *including blocks*, you can make the following query:
     /// `attr.GetResolveInfo().HasAuthoredValueOpinion()`
@@ -358,18 +351,18 @@ public:
     bool HasAuthoredValueOpinion() const;
 
     /// Return true if this attribute has either an authored default value or
-    /// authored time samples.  If the attribute has been 
+    /// authored time samples.  If the attribute has been
     /// \ref Usd_AttributeBlocking "blocked", then return `false`
     USD_API
     bool HasAuthoredValue() const;
 
-    /// Return true if this attribute has a fallback value provided by 
+    /// Return true if this attribute has a fallback value provided by
     /// a registered schema.
     USD_API
     bool HasFallbackValue() const;
 
     /// Return true if it is possible, but not certain, that this attribute's
-    /// value changes over time, false otherwise. 
+    /// value changes over time, false otherwise.
     ///
     /// If this function returns false, it is certain that this attribute's
     /// value remains constant over time.
@@ -384,12 +377,12 @@ public:
     /// requested UsdTimeCode \p time, which defaults to \em default.
     ///
     /// If no value is authored at \p time but values are authored at other
-    /// times, this function will return an interpolated value based on the 
+    /// times, this function will return an interpolated value based on the
     /// stage's interpolation type.
     /// See \ref Usd_AttributeInterpolation.
     ///
-    /// If no value is authored and no fallback value is provided by the 
-    /// schema for this attribute, this function will return false. If the 
+    /// If no value is authored and no fallback value is provided by the
+    /// schema for this attribute, this function will return false. If the
     /// consumer's use-case requires a default value, the consumer will need
     /// to provide one, possibly using GetTypeName().GetDefaultValue().
     ///
@@ -404,10 +397,10 @@ public:
     /// \ref Usd_Page_Datatypes for the complete list of types.
     ///
     /// Values are retrieved without regard to this attribute's variability.
-    /// For example, a uniform attribute may retrieve time sample values 
-    /// if any are authored. However, the USD_VALIDATE_VARIABILITY TF_DEBUG 
-    /// code will cause debug information to be output if values that are 
-    /// inconsistent with this attribute's variability are retrieved. 
+    /// For example, a uniform attribute may retrieve time sample values
+    /// if any are authored. However, the USD_VALIDATE_VARIABILITY TF_DEBUG
+    /// code will cause debug information to be output if values that are
+    /// inconsistent with this attribute's variability are retrieved.
     /// See UsdAttribute::GetVariability for more details.
     ///
     /// \return true if there was a value to be read, it was of the type T
@@ -422,7 +415,7 @@ public:
         static_assert(SdfValueTypeTraits<T>::IsValueType, "");
         return _Get(value, time);
     }
-    /// \overload 
+    /// \overload
     /// Type-erased access, often not as efficient as typed access.
     USD_API
     bool Get(VtValue* value, UsdTimeCode time = UsdTimeCode::Default()) const;
@@ -430,28 +423,26 @@ public:
     /// Perform value resolution to determine the source of the resolved
     /// value of this attribute at the requested UsdTimeCode \p time.
     USD_API
-    UsdResolveInfo
-    GetResolveInfo(UsdTimeCode time) const;
+    UsdResolveInfo GetResolveInfo(UsdTimeCode time) const;
 
     /// Perform value resolution to determine the source of the resolved
-    /// value of this attribute at any non-default time. 
+    /// value of this attribute at any non-default time.
     ///
-    /// Often (i.e. unless the attribute is affected by 
+    /// Often (i.e. unless the attribute is affected by
     /// \ref Usd_Page_ValueClips "Value Clips") the source of the resolved value
     /// does not vary over time. See UsdAttributeQuery as an example that takes
     /// advantage of this quality of value resolution.
     USD_API
-    UsdResolveInfo
-    GetResolveInfo() const;
+    UsdResolveInfo GetResolveInfo() const;
 
     /// Set the value of this attribute in the current UsdEditTarget to
     /// \p value at UsdTimeCode \p time, which defaults to \em default.
     ///
-    /// Values are authored without regard to this attribute's variability. 
+    /// Values are authored without regard to this attribute's variability.
     /// For example, time sample values may be authored on a uniform
     /// attribute. However, the USD_VALIDATE_VARIABILITY TF_DEBUG code
     /// will cause debug information to be output if values that are
-    /// inconsistent with this attribute's variability are authored. 
+    /// inconsistent with this attribute's variability are authored.
     /// See UsdAttribute::GetVariability for more details.
     ///
     /// \return false and generate an error if type \c T does not match
@@ -460,8 +451,7 @@ public:
     template <typename T>
     bool Set(const T& value, UsdTimeCode time = UsdTimeCode::Default()) const {
         static_assert(!std::is_pointer<T>::value, "");
-        static_assert(SdfValueTypeTraits<T>::IsValueType ||
-                      std::is_same<T, SdfValueBlock>::value, "");
+        static_assert(SdfValueTypeTraits<T>::IsValueType || std::is_same<T, SdfValueBlock>::value, "");
         return _Set(value, time);
     }
 
@@ -471,7 +461,7 @@ public:
     USD_API
     bool Set(const char* value, UsdTimeCode time = UsdTimeCode::Default()) const;
 
-    /// \overload 
+    /// \overload
     USD_API
     bool Set(const VtValue& value, UsdTimeCode time = UsdTimeCode::Default()) const;
 
@@ -485,24 +475,24 @@ public:
 
     /// IN DEVELOPMENT.
     USD_API
-    bool SetSpline(const TsSpline &spline);
+    bool SetSpline(const TsSpline& spline);
 
     /// Clears the authored default value and all time samples for this
     /// attribute at the current EditTarget and returns true on success.
     ///
     /// Calling clear when either no value is authored or no spec is present,
-    /// is a silent no-op returning true.    
+    /// is a silent no-op returning true.
     ///
     /// This method does not affect any other data authored on this attribute.
     USD_API
     bool Clear() const;
 
-    /// Clear the authored value for this attribute at the given 
-    /// \a time, at the current EditTarget and return true on success. 
+    /// Clear the authored value for this attribute at the given
+    /// \a time, at the current EditTarget and return true on success.
     /// UsdTimeCode::Default() can be used to clear the default value.
     ///
     /// Calling clear when either no value is authored or no spec is present,
-    /// is a silent no-op returning true. 
+    /// is a silent no-op returning true.
     USD_API
     bool ClearAtTime(UsdTimeCode time) const;
 
@@ -511,7 +501,7 @@ public:
     bool ClearDefault() const;
 
     /// Remove all time samples on an attribute and author a *block*
-    /// \c default value. This causes the attribute to resolve as 
+    /// \c default value. This causes the attribute to resolve as
     /// if there were no authored value opinions in weaker layers.
     ///
     /// See \ref Usd_AttributeBlocking for more information, including
@@ -529,14 +519,13 @@ public:
     ///
     /// Issue an error if \p source identifies a prototype prim or an object
     /// descendant to a prototype prim.  It is not valid to author connections
-    /// to these objects. 
+    /// to these objects.
     ///
     /// What data this actually authors depends on what data is currently
     /// authored in the authoring layer, with respect to list-editing
-    /// semantics, which we will document soon 
+    /// semantics, which we will document soon
     USD_API
-    bool AddConnection(const SdfPath& source,
-           UsdListPosition position=UsdListPositionBackOfPrependList) const;
+    bool AddConnection(const SdfPath& source, UsdListPosition position = UsdListPositionBackOfPrependList) const;
 
     /// Removes \p target from the list of targets.
     ///
@@ -566,12 +555,12 @@ public:
     /// result.  All preexisting elements in \p sources are lost.
     ///
     /// Returns true if any connection path opinions have been authored and no
-    /// composition errors were encountered, returns false otherwise. 
-    /// Note that authored opinions may include opinions that clear the 
-    /// connections and a return value of true does not necessarily indicate 
+    /// composition errors were encountered, returns false otherwise.
+    /// Note that authored opinions may include opinions that clear the
+    /// connections and a return value of true does not necessarily indicate
     /// that \p sources will contain any connection paths.
-    /// 
-    /// See \ref Usd_ScenegraphInstancing_TargetsAndConnections for details on 
+    ///
+    /// See \ref Usd_ScenegraphInstancing_TargetsAndConnections for details on
     /// behavior when targets point to objects beneath instance prims.
     ///
     /// The result is not cached, and thus recomputed on each query.
@@ -586,17 +575,17 @@ public:
     bool HasAuthoredConnections() const;
 
     /// @}
-    
+
     // ---------------------------------------------------------------------- //
     /// \anchor Usd_AttributeColorSpaceAPI
     /// \name ColorSpace API
-    /// 
-    /// The color space in which a given color or texture valued attribute is 
-    /// authored is set as token-valued metadata 'colorSpace' on the attribute. 
+    ///
+    /// The color space in which a given color or texture valued attribute is
+    /// authored is set as token-valued metadata 'colorSpace' on the attribute.
     /// For color or texture attributes that don't have an authored 'colorSpace'
-    /// value, the fallback color-space is gleaned from whatever color 
+    /// value, the fallback color-space is gleaned from whatever color
     /// management system is specified by UsdStage::GetColorManagementSystem().
-    /// 
+    ///
     /// @{
     // ---------------------------------------------------------------------- //
 
@@ -610,7 +599,7 @@ public:
     /// \sa GetColorSpace()
     /// \ref Usd_ColorConfigurationAPI "UsdStage Color Configuration API"
     USD_API
-    void SetColorSpace(const TfToken &colorSpace) const;
+    void SetColorSpace(const TfToken& colorSpace) const;
 
     /// Returns whether color-space is authored on the attribute.
     /// \sa GetColorSpace()
@@ -625,7 +614,7 @@ public:
     /// @}
 
     // ---------------------------------------------------------------------- //
-    // Private Methods and Members 
+    // Private Methods and Members
     // ---------------------------------------------------------------------- //
 private:
     friend class UsdAttributeQuery;
@@ -634,29 +623,26 @@ private:
     friend class UsdSchemaBase;
     friend class Usd_PrimData;
     friend struct UsdPrim_AttrConnectionFinder;
-    
-    UsdAttribute(const Usd_PrimDataHandle &prim,
-                 const SdfPath &proxyPrimPath,
-                 const TfToken &attrName)
+
+    UsdAttribute(const Usd_PrimDataHandle& prim, const SdfPath& proxyPrimPath, const TfToken& attrName)
         : UsdProperty(UsdTypeAttribute, prim, proxyPrimPath, attrName) {}
 
     UsdAttribute(UsdObjType objType,
-                 const Usd_PrimDataHandle &prim,
-                 const SdfPath &proxyPrimPath,
-                 const TfToken &propName)
+                 const Usd_PrimDataHandle& prim,
+                 const SdfPath& proxyPrimPath,
+                 const TfToken& propName)
         : UsdProperty(objType, prim, proxyPrimPath, propName) {}
 
-    SdfAttributeSpecHandle
-    _CreateSpec(const SdfValueTypeName &typeName, bool custom,
-                const SdfVariability &variability) const;
+    SdfAttributeSpecHandle _CreateSpec(const SdfValueTypeName& typeName,
+                                       bool custom,
+                                       const SdfVariability& variability) const;
 
     // Like _CreateSpec(), but fail if this attribute is not built-in and there
     // isn't already existing scene description to go on rather than stamping
     // new information.
     SdfAttributeSpecHandle _CreateSpec() const;
 
-    bool _Create(const SdfValueTypeName &typeName, bool custom,
-                 const SdfVariability &variability) const;
+    bool _Create(const SdfValueTypeName& typeName, bool custom, const SdfVariability& variability) const;
 
     template <typename T>
     bool _Get(T* value, UsdTimeCode time) const;
@@ -664,10 +650,9 @@ private:
     template <typename T>
     bool _Set(const T& value, UsdTimeCode time) const;
 
-    SdfPath
-    _GetPathForAuthoring(const SdfPath &path, std::string* whyNot) const;
+    SdfPath _GetPathForAuthoring(const SdfPath& path, std::string* whyNot) const;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_ATTRIBUTE_H
+#endif  // PXR_USD_USD_ATTRIBUTE_H

@@ -18,25 +18,19 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-const NdrStringVec& 
-UsdLux_DiscoveryPlugin::GetSearchURIs() const
-{
+const NdrStringVec& UsdLux_DiscoveryPlugin::GetSearchURIs() const {
     static const NdrStringVec empty;
     return empty;
 }
 
-NdrNodeDiscoveryResultVec
-UsdLux_DiscoveryPlugin::DiscoverNodes(const Context &context)
-{
+NdrNodeDiscoveryResultVec UsdLux_DiscoveryPlugin::DiscoverNodes(const Context& context) {
     NdrNodeDiscoveryResultVec result;
 
-    // We want to discover nodes for all concrete schema types that derive from 
+    // We want to discover nodes for all concrete schema types that derive from
     // UsdLuxBoundableLightBase and UsdLuxNonboundableLightBase. We'll filter
     // out types that aren't defined in UsdLux as we process them.
-    static const TfType boundableLightType = 
-        TfType::Find<UsdLuxBoundableLightBase>();
-    static const TfType nonboundableLightType = 
-        TfType::Find<UsdLuxNonboundableLightBase>();
+    static const TfType boundableLightType = TfType::Find<UsdLuxBoundableLightBase>();
+    static const TfType nonboundableLightType = TfType::Find<UsdLuxNonboundableLightBase>();
 
     std::set<TfType> types;
     PlugRegistry::GetAllDerivedTypes(boundableLightType, &types);
@@ -45,17 +39,16 @@ UsdLux_DiscoveryPlugin::DiscoverNodes(const Context &context)
     // We include certain API schema types in the discovery results.
     // - MeshLightAPI
     // - VolumeLightAPI
-    // Current UsdLux OM specified MeshLightAPI and VolumeLightAPI as basically 
+    // Current UsdLux OM specified MeshLightAPI and VolumeLightAPI as basically
     // the types for MeshLight and VolumeLight, also notice shaderId defined for
     // these API types is MeshLight and VolumeLight respectively.
-    const UsdLux_LightDefParserPlugin::ShaderIdToAPITypeNameMap 
-        &shaderIdToAPITypeNameMap = 
+    const UsdLux_LightDefParserPlugin::ShaderIdToAPITypeNameMap& shaderIdToAPITypeNameMap =
             UsdLux_LightDefParserPlugin::_GetShaderIdToAPITypeNameMap();
 
     // Collect all typenames for which we need to associate discovered nodes.
     TfTokenVector typeNames;
     typeNames.reserve(types.size() + shaderIdToAPITypeNameMap.size());
-    for (const TfType &type : types) {
+    for (const TfType& type : types) {
         // Filter out types that weren't declared in the UsdLux library itself.
         static PlugPluginPtr thisPlugin = PLUG_THIS_PLUGIN;
         if (!thisPlugin->DeclaresType(type)) {
@@ -64,10 +57,10 @@ UsdLux_DiscoveryPlugin::DiscoverNodes(const Context &context)
 
         const TfToken name = UsdSchemaRegistry::GetConcreteSchemaTypeName(type);
 
-        // The type name from the schema registry will be empty if the type is 
+        // The type name from the schema registry will be empty if the type is
         // not concrete (i.e. abstract); we skip abstract types.
         if (!name.IsEmpty()) {
-            // The schema type name is the name and identifier.  
+            // The schema type name is the name and identifier.
             typeNames.push_back(name);
         }
     }
@@ -77,18 +70,14 @@ UsdLux_DiscoveryPlugin::DiscoverNodes(const Context &context)
     }
 
     result.reserve(typeNames.size());
-    for(const TfToken &typeName : typeNames) {
-        // The URIs are left empty as these nodes can be populated from the 
+    for (const TfToken& typeName : typeNames) {
+        // The URIs are left empty as these nodes can be populated from the
         // schema registry prim definitions.
-        result.emplace_back(
-                typeName,
-                NdrVersion().GetAsDefault(),
-                typeName,
-                /*family*/ TfToken(),
-                UsdLux_LightDefParserPlugin::_GetDiscoveryType(),
-                UsdLux_LightDefParserPlugin::_GetSourceType(),
-                /*uri=*/ "",
-                /*resolvedUri=*/ "");
+        result.emplace_back(typeName, NdrVersion().GetAsDefault(), typeName,
+                            /*family*/ TfToken(), UsdLux_LightDefParserPlugin::_GetDiscoveryType(),
+                            UsdLux_LightDefParserPlugin::_GetSourceType(),
+                            /*uri=*/"",
+                            /*resolvedUri=*/"");
     }
 
     return result;

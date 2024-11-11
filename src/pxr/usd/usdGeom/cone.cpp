@@ -14,11 +14,9 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType)
-{
-    TfType::Define<UsdGeomCone,
-        TfType::Bases< UsdGeomGprim > >();
-    
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<UsdGeomCone, TfType::Bases<UsdGeomGprim>>();
+
     // Register the usd prim typename as an alias under UsdSchemaBase. This
     // enables one to call
     // TfType::Find<UsdSchemaBase>().FindDerivedByName("Cone")
@@ -28,14 +26,10 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdGeomCone::~UsdGeomCone()
-{
-}
+UsdGeomCone::~UsdGeomCone() {}
 
 /* static */
-UsdGeomCone
-UsdGeomCone::Get(const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdGeomCone UsdGeomCone::Get(const UsdStagePtr& stage, const SdfPath& path) {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdGeomCone();
@@ -44,142 +38,92 @@ UsdGeomCone::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdGeomCone
-UsdGeomCone::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdGeomCone UsdGeomCone::Define(const UsdStagePtr& stage, const SdfPath& path) {
     static TfToken usdPrimTypeName("Cone");
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdGeomCone();
     }
-    return UsdGeomCone(
-        stage->DefinePrim(path, usdPrimTypeName));
+    return UsdGeomCone(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
-UsdSchemaKind UsdGeomCone::_GetSchemaKind() const
-{
+UsdSchemaKind UsdGeomCone::_GetSchemaKind() const {
     return UsdGeomCone::schemaKind;
 }
 
 /* static */
-const TfType &
-UsdGeomCone::_GetStaticTfType()
-{
+const TfType& UsdGeomCone::_GetStaticTfType() {
     static TfType tfType = TfType::Find<UsdGeomCone>();
     return tfType;
 }
 
 /* static */
-bool 
-UsdGeomCone::_IsTypedSchema()
-{
+bool UsdGeomCone::_IsTypedSchema() {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdGeomCone::_GetTfType() const
-{
+const TfType& UsdGeomCone::_GetTfType() const {
     return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdGeomCone::GetHeightAttr() const
-{
+UsdAttribute UsdGeomCone::GetHeightAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->height);
 }
 
-UsdAttribute
-UsdGeomCone::CreateHeightAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->height,
-                       SdfValueTypeNames->Double,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomCone::CreateHeightAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->height, SdfValueTypeNames->Double,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomCone::GetRadiusAttr() const
-{
+UsdAttribute UsdGeomCone::GetRadiusAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->radius);
 }
 
-UsdAttribute
-UsdGeomCone::CreateRadiusAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->radius,
-                       SdfValueTypeNames->Double,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomCone::CreateRadiusAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->radius, SdfValueTypeNames->Double,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomCone::GetAxisAttr() const
-{
+UsdAttribute UsdGeomCone::GetAxisAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->axis);
 }
 
-UsdAttribute
-UsdGeomCone::CreateAxisAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->axis,
-                       SdfValueTypeNames->Token,
-                       /* custom = */ false,
-                       SdfVariabilityUniform,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomCone::CreateAxisAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->axis, SdfValueTypeNames->Token,
+                                      /* custom = */ false, SdfVariabilityUniform, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomCone::GetExtentAttr() const
-{
+UsdAttribute UsdGeomCone::GetExtentAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->extent);
 }
 
-UsdAttribute
-UsdGeomCone::CreateExtentAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->extent,
-                       SdfValueTypeNames->Float3Array,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomCone::CreateExtentAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->extent, SdfValueTypeNames->Float3Array,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
 namespace {
-static inline TfTokenVector
-_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
-{
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector& left, const TfTokenVector& right) {
     TfTokenVector result;
     result.reserve(left.size() + right.size());
     result.insert(result.end(), left.begin(), left.end());
     result.insert(result.end(), right.begin(), right.end());
     return result;
 }
-}
+}  // namespace
 
 /*static*/
-const TfTokenVector&
-UsdGeomCone::GetSchemaAttributeNames(bool includeInherited)
-{
+const TfTokenVector& UsdGeomCone::GetSchemaAttributeNames(bool includeInherited) {
     static TfTokenVector localNames = {
-        UsdGeomTokens->height,
-        UsdGeomTokens->radius,
-        UsdGeomTokens->axis,
-        UsdGeomTokens->extent,
+            UsdGeomTokens->height,
+            UsdGeomTokens->radius,
+            UsdGeomTokens->axis,
+            UsdGeomTokens->extent,
     };
-    static TfTokenVector allNames =
-        _ConcatenateAttributeNames(
-            UsdGeomGprim::GetSchemaAttributeNames(true),
-            localNames);
+    static TfTokenVector allNames = _ConcatenateAttributeNames(UsdGeomGprim::GetSchemaAttributeNames(true), localNames);
 
     if (includeInherited)
         return allNames;
@@ -203,10 +147,7 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-static bool
-_ComputeExtentMax(double height, double radius, const TfToken& axis,
-    GfVec3f* max)
-{
+static bool _ComputeExtentMax(double height, double radius, const TfToken& axis, GfVec3f* max) {
     if (axis == UsdGeomTokens->x) {
         *max = GfVec3f(height * 0.5, radius, radius);
     } else if (axis == UsdGeomTokens->y) {
@@ -214,16 +155,13 @@ _ComputeExtentMax(double height, double radius, const TfToken& axis,
     } else if (axis == UsdGeomTokens->z) {
         *max = GfVec3f(radius, radius, height * 0.5);
     } else {
-      return false; // invalid axis
+        return false;  // invalid axis
     }
 
     return true;
 }
 
-bool
-UsdGeomCone::ComputeExtent(double height, double radius, const TfToken& axis,
-    VtVec3fArray* extent)
-{
+bool UsdGeomCone::ComputeExtent(double height, double radius, const TfToken& axis, VtVec3fArray* extent) {
     // Create Sized Extent
     extent->resize(2);
 
@@ -238,10 +176,8 @@ UsdGeomCone::ComputeExtent(double height, double radius, const TfToken& axis,
     return true;
 }
 
-bool
-UsdGeomCone::ComputeExtent(double height, double radius, const TfToken& axis,
-    const GfMatrix4d& transform, VtVec3fArray* extent)
-{
+bool UsdGeomCone::ComputeExtent(
+        double height, double radius, const TfToken& axis, const GfMatrix4d& transform, VtVec3fArray* extent) {
     // Create Sized Extent
     extent->resize(2);
 
@@ -258,13 +194,10 @@ UsdGeomCone::ComputeExtent(double height, double radius, const TfToken& axis,
     return true;
 }
 
-static bool
-_ComputeExtentForCone(
-    const UsdGeomBoundable& boundable,
-    const UsdTimeCode& time,
-    const GfMatrix4d* transform,
-    VtVec3fArray* extent)
-{
+static bool _ComputeExtentForCone(const UsdGeomBoundable& boundable,
+                                  const UsdTimeCode& time,
+                                  const GfMatrix4d* transform,
+                                  VtVec3fArray* extent) {
     const UsdGeomCone coneSchema(boundable);
     if (!TF_VERIFY(coneSchema)) {
         return false;
@@ -286,17 +219,14 @@ _ComputeExtentForCone(
     }
 
     if (transform) {
-        return UsdGeomCone::ComputeExtent(
-          height, radius, axis, *transform, extent);
+        return UsdGeomCone::ComputeExtent(height, radius, axis, *transform, extent);
     } else {
         return UsdGeomCone::ComputeExtent(height, radius, axis, extent);
     }
 }
 
-TF_REGISTRY_FUNCTION(UsdGeomBoundable)
-{
-    UsdGeomRegisterComputeExtentFunction<UsdGeomCone>(
-        _ComputeExtentForCone);
+TF_REGISTRY_FUNCTION(UsdGeomBoundable) {
+    UsdGeomRegisterComputeExtentFunction<UsdGeomCone>(_ComputeExtentForCone);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

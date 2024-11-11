@@ -23,21 +23,13 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-namespace
-{
+namespace {
 
-class _FunctionRegistry
-    : public TfWeakBase
-{
+class _FunctionRegistry : public TfWeakBase {
 public:
-    static _FunctionRegistry& GetInstance() 
-    {
-        return TfSingleton<_FunctionRegistry>::GetInstance();
-    }
+    static _FunctionRegistry& GetInstance() { return TfSingleton<_FunctionRegistry>::GetInstance(); }
 
-    _FunctionRegistry()
-        : _initialized(false)
-    {
+    _FunctionRegistry() : _initialized(false) {
         // Calling SubscribeTo may cause functions to be registered
         // while we're still in the c'tor, so make sure to call
         // SetInstanceConstructed to allow reentrancy.
@@ -49,40 +41,32 @@ public:
 
         // Register for new plugins being registered so we can invalidate
         // this registry.
-        TfNotice::Register(
-            TfCreateWeakPtr(this), 
-            &_FunctionRegistry::_DidRegisterPlugins);
+        TfNotice::Register(TfCreateWeakPtr(this), &_FunctionRegistry::_DidRegisterPlugins);
     }
 
-    void 
-    RegisterComputeFunction(
-        const TfType& schemaType, 
-        const UsdGeomComputeExtentFunction& fn)
-    {
+    void RegisterComputeFunction(const TfType& schemaType, const UsdGeomComputeExtentFunction& fn) {
         bool didInsert = false;
         {
             _RWMutex::scoped_lock lock(_mutex, /* write = */ true);
             didInsert = _registry.emplace(schemaType, fn).second;
         }
-        
+
         if (!didInsert) {
             TF_CODING_ERROR(
-                "UsdGeomComputeExtentFunction already registered for "
-                "prim type '%s'", schemaType.GetTypeName().c_str());
+                    "UsdGeomComputeExtentFunction already registered for "
+                    "prim type '%s'",
+                    schemaType.GetTypeName().c_str());
         }
     }
 
-    UsdGeomComputeExtentFunction
-    GetComputeFunction(const UsdPrim& prim)
-    {
+    UsdGeomComputeExtentFunction GetComputeFunction(const UsdPrim& prim) {
         _WaitUntilInitialized();
 
         // Get the actual schema type from the prim definition.
-        const TfType &primSchemaType = prim.GetPrimTypeInfo().GetSchemaType();
+        const TfType& primSchemaType = prim.GetPrimTypeInfo().GetSchemaType();
         if (!primSchemaType) {
-            TF_CODING_ERROR(
-                "Could not find prim type '%s' for prim %s",
-                prim.GetTypeName().GetText(), UsdDescribe(prim).c_str());
+            TF_CODING_ERROR("Could not find prim type '%s' for prim %s", prim.GetTypeName().GetText(),
+                            UsdDescribe(prim).c_str());
             return nullptr;
         }
 
@@ -91,8 +75,7 @@ public:
             return fn;
         }
 
-        const std::vector<TfType> primSchemaTypeAndBases = 
-            _GetTypesThatMayHaveRegisteredFunctions(primSchemaType);
+        const std::vector<TfType> primSchemaTypeAndBases = _GetTypesThatMayHaveRegisteredFunctions(primSchemaType);
 
         auto i = primSchemaTypeAndBases.cbegin();
         for (auto e = primSchemaTypeAndBases.cend(); i != e; ++i) {
@@ -123,19 +106,16 @@ public:
     }
 
 private:
-    // Wait until initialization of the singleton is completed. 
-    void _WaitUntilInitialized()
-    {
+    // Wait until initialization of the singleton is completed.
+    void _WaitUntilInitialized() {
         while (ARCH_UNLIKELY(!_initialized.load(std::memory_order_acquire))) {
-            std::this_thread::yield(); 
+            std::this_thread::yield();
         }
     }
 
     // Return a list of TfTypes that should be examined to find a compute
     // function for the given type.
-    std::vector<TfType> 
-    _GetTypesThatMayHaveRegisteredFunctions(const TfType& type) const
-    {
+    std::vector<TfType> _GetTypesThatMayHaveRegisteredFunctions(const TfType& type) const {
         std::vector<TfType> result;
         type.GetAllAncestorTypes(&result);
 
@@ -143,47 +123,41 @@ private:
         // classes, so remove all other types, taking care not to alter
         // the relative order of the remaining results.
         static const TfType boundableType = TfType::Find<UsdGeomBoundable>();
-        result.erase(
-            std::remove_if(
-                result.begin(), result.end(),
-                [](const TfType& t) { return !t.IsA(boundableType); }),
-            result.end());
+        result.erase(std::remove_if(result.begin(), result.end(),
+                                    [](const TfType& t) {
+                                        return !t.IsA(boundableType);
+                                    }),
+                     result.end());
         return result;
     }
 
     // Load the plugin for the given type if it supplies a compute function.
-    bool _LoadPluginForType(const TfType& type) const
-    {
+    bool _LoadPluginForType(const TfType& type) const {
         PlugRegistry& plugReg = PlugRegistry::GetInstance();
 
-        const JsValue implementsComputeExtent = 
-            plugReg.GetDataFromPluginMetaData(type, "implementsComputeExtent");
-        if (!implementsComputeExtent.Is<bool>() ||
-            !implementsComputeExtent.Get<bool>()) {
+        const JsValue implementsComputeExtent = plugReg.GetDataFromPluginMetaData(type, "implementsComputeExtent");
+        if (!implementsComputeExtent.Is<bool>() || !implementsComputeExtent.Get<bool>()) {
             return false;
         }
 
         const PlugPluginPtr pluginForType = plugReg.GetPluginForType(type);
         if (!pluginForType) {
-            TF_CODING_ERROR(
-                "Could not find plugin for '%s'", type.GetTypeName().c_str());
+            TF_CODING_ERROR("Could not find plugin for '%s'", type.GetTypeName().c_str());
             return false;
         }
 
         return pluginForType->Load();
     }
 
-    void _DidRegisterPlugins(const PlugNotice::DidRegisterPlugins& n)
-    {
+    void _DidRegisterPlugins(const PlugNotice::DidRegisterPlugins& n) {
         // Erase the entries in _registry which have a null
-        // ComputeExtentFunction registered, since newly-registered plugins may 
+        // ComputeExtentFunction registered, since newly-registered plugins may
         // provide a valid computeExtentFunction for these type entries.
         // Note that we retain entries which have valid ComputeExtentFunction
         // defined.
         //
         _RWMutex::scoped_lock lock(_mutex, /* write = */ true);
-        _Registry::iterator itr = _registry.begin(),
-            end = _registry.end();
+        _Registry::iterator itr = _registry.begin(), end = _registry.end();
         while (itr != end) {
             if (!itr->second) {
                 itr = _registry.erase(itr);
@@ -194,95 +168,71 @@ private:
         }
     }
 
-    bool _FindFunctionForType(
-        const TfType& type, UsdGeomComputeExtentFunction* fn) const
-    {
+    bool _FindFunctionForType(const TfType& type, UsdGeomComputeExtentFunction* fn) const {
         _RWMutex::scoped_lock lock(_mutex, /* write = */ false);
         return TfMapLookup(_registry, type, fn);
     }
-    
+
 private:
     using _RWMutex = tbb::queuing_rw_mutex;
     mutable _RWMutex _mutex;
 
-    using _Registry = 
-        std::unordered_map<TfType, UsdGeomComputeExtentFunction, TfHash>;
+    using _Registry = std::unordered_map<TfType, UsdGeomComputeExtentFunction, TfHash>;
     _Registry _registry;
 
     std::atomic<bool> _initialized;
 };
 
-}
+}  // namespace
 
 TF_INSTANTIATE_SINGLETON(_FunctionRegistry);
 
-static bool
-_ComputeExtentFromPlugins(
-    const UsdGeomBoundable& boundable,
-    const UsdTimeCode& time,
-    const GfMatrix4d* transform,
-    VtVec3fArray* extent)
-{
+static bool _ComputeExtentFromPlugins(const UsdGeomBoundable& boundable,
+                                      const UsdTimeCode& time,
+                                      const GfMatrix4d* transform,
+                                      VtVec3fArray* extent) {
     if (!boundable) {
-        TF_CODING_ERROR(
-            "Invalid UsdGeomBoundable %s", 
-            UsdDescribe(boundable.GetPrim()).c_str());
+        TF_CODING_ERROR("Invalid UsdGeomBoundable %s", UsdDescribe(boundable.GetPrim()).c_str());
         return false;
     }
 
-    const UsdGeomComputeExtentFunction fn = _FunctionRegistry::GetInstance()
-        .GetComputeFunction(boundable.GetPrim());
+    const UsdGeomComputeExtentFunction fn = _FunctionRegistry::GetInstance().GetComputeFunction(boundable.GetPrim());
     VtVec3fArray tmpExt;
     if (fn && (*fn)(boundable, time, transform, &tmpExt)) {
         if (tmpExt.size() == 2) {
             *extent = std::move(tmpExt);
             return true;
-        }
-        else {
-            TF_CODING_ERROR("Plugin compute extent function produced an extent "
-                            "with %zu elements instead of 2 for %s",
-                            tmpExt.size(),
-                            UsdDescribe(boundable.GetPrim()).c_str());
+        } else {
+            TF_CODING_ERROR(
+                    "Plugin compute extent function produced an extent "
+                    "with %zu elements instead of 2 for %s",
+                    tmpExt.size(), UsdDescribe(boundable.GetPrim()).c_str());
         }
     }
     return false;
 }
 
-bool
-UsdGeomBoundable::ComputeExtentFromPlugins(
-    const UsdGeomBoundable& boundable,
-    const UsdTimeCode& time,
-    const GfMatrix4d& transform,
-    VtVec3fArray* extent)
-{
+bool UsdGeomBoundable::ComputeExtentFromPlugins(const UsdGeomBoundable& boundable,
+                                                const UsdTimeCode& time,
+                                                const GfMatrix4d& transform,
+                                                VtVec3fArray* extent) {
     return _ComputeExtentFromPlugins(boundable, time, &transform, extent);
 }
 
-bool
-UsdGeomBoundable::ComputeExtentFromPlugins(
-    const UsdGeomBoundable& boundable,
-    const UsdTimeCode& time,
-    VtVec3fArray* extent)
-{
+bool UsdGeomBoundable::ComputeExtentFromPlugins(const UsdGeomBoundable& boundable,
+                                                const UsdTimeCode& time,
+                                                VtVec3fArray* extent) {
     return _ComputeExtentFromPlugins(boundable, time, nullptr, extent);
 }
 
-void
-UsdGeomRegisterComputeExtentFunction(
-    const TfType& primType,
-    const UsdGeomComputeExtentFunction& fn)
-{
+void UsdGeomRegisterComputeExtentFunction(const TfType& primType, const UsdGeomComputeExtentFunction& fn) {
     if (!primType.IsA<UsdGeomBoundable>()) {
-        TF_CODING_ERROR(
-            "Prim type '%s' must derive from UsdGeomBoundable",
-            primType.GetTypeName().c_str());
+        TF_CODING_ERROR("Prim type '%s' must derive from UsdGeomBoundable", primType.GetTypeName().c_str());
         return;
     }
 
     if (!fn) {
-        TF_CODING_ERROR(
-            "Invalid function registered for prim type '%s'",
-            primType.GetTypeName().c_str());
+        TF_CODING_ERROR("Invalid function registered for prim type '%s'", primType.GetTypeName().c_str());
         return;
     }
 

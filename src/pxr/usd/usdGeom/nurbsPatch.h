@@ -37,16 +37,17 @@ class SdfAssetPath;
 ///
 /// Encodes a rational or polynomial non-uniform B-spline
 /// surface, with optional trim curves.
-/// 
-/// The encoding mostly follows that of RiNuPatch and RiTrimCurve: 
-/// https://renderman.pixar.com/resources/RenderMan_20/geometricPrimitives.html#rinupatch , with some minor renaming and coalescing for clarity.
-/// 
+///
+/// The encoding mostly follows that of RiNuPatch and RiTrimCurve:
+/// https://renderman.pixar.com/resources/RenderMan_20/geometricPrimitives.html#rinupatch , with some minor renaming and
+/// coalescing for clarity.
+///
 /// The layout of control vertices in the \em points attribute inherited
 /// from UsdGeomPointBased is row-major with U considered rows, and V columns.
-/// 
+///
 /// \anchor UsdGeom_NurbsPatch_Form
 /// <b>NurbsPatch Form</b>
-/// 
+///
 /// The authored points, orders, knots, weights, and ranges are all that is
 /// required to render the nurbs patch.  However, the only way to model closed
 /// surfaces with nurbs is to ensure that the first and last control points
@@ -55,42 +56,41 @@ class SdfAssetPath;
 /// points must be (correspondingly) coincident with the first \em order - 1
 /// control points, and also the spacing of the last corresponding knots
 /// must be the same as the first corresponding knots.
-/// 
+///
 /// <b>Form</b> is provided as an aid to interchange between modeling and
 /// animation applications so that they can robustly identify the intent with
 /// which the surface was modelled, and take measures (if they are able) to
 /// preserve the continuity/concidence constraints as the surface may be rigged
-/// or deformed.  
+/// or deformed.
 /// \li An \em open-form NurbsPatch has no continuity constraints.
 /// \li A \em closed-form NurbsPatch expects the first and last control points
 /// to overlap
 /// \li A \em periodic-form NurbsPatch expects the first and last
 /// \em order - 1 control points to overlap.
-/// 
+///
 /// <b>Nurbs vs Subdivision Surfaces</b>
-/// 
+///
 /// Nurbs are an important modeling primitive in CAD/CAM tools and early
 /// computer graphics DCC's.  Because they have a natural UV parameterization
 /// they easily support "trim curves", which allow smooth shapes to be
 /// carved out of the surface.
-/// 
-/// However, the topology of the patch is always rectangular, and joining two 
+///
+/// However, the topology of the patch is always rectangular, and joining two
 /// nurbs patches together (especially when they have differing numbers of
 /// spans) is difficult to do smoothly.  Also, nurbs are not supported by
 /// the Ptex texturing technology (http://ptex.us).
-/// 
+///
 /// Neither of these limitations are shared by subdivision surfaces; therefore,
 /// although they do not subscribe to trim-curve-based shaping, subdivs are
 /// often considered a more flexible modeling primitive.
-/// 
+///
 ///
 /// For any described attribute \em Fallback \em Value or \em Allowed \em Values below
 /// that are text/tokens, the actual token is published and defined in \ref UsdGeomTokens.
 /// So to set an attribute to the value "rightHanded", use UsdGeomTokens->rightHanded
 /// as the value.
 ///
-class UsdGeomNurbsPatch : public UsdGeomPointBased
-{
+class UsdGeomNurbsPatch : public UsdGeomPointBased {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -101,18 +101,12 @@ public:
     /// Equivalent to UsdGeomNurbsPatch::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdGeomNurbsPatch(const UsdPrim& prim=UsdPrim())
-        : UsdGeomPointBased(prim)
-    {
-    }
+    explicit UsdGeomNurbsPatch(const UsdPrim& prim = UsdPrim()) : UsdGeomPointBased(prim) {}
 
     /// Construct a UsdGeomNurbsPatch on the prim held by \p schemaObj .
     /// Should be preferred over UsdGeomNurbsPatch(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdGeomNurbsPatch(const UsdSchemaBase& schemaObj)
-        : UsdGeomPointBased(schemaObj)
-    {
-    }
+    explicit UsdGeomNurbsPatch(const UsdSchemaBase& schemaObj) : UsdGeomPointBased(schemaObj) {}
 
     /// Destructor.
     USDGEOM_API
@@ -122,8 +116,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDGEOM_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdGeomNurbsPatch holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -135,8 +128,7 @@ public:
     /// \endcode
     ///
     USDGEOM_API
-    static UsdGeomNurbsPatch
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdGeomNurbsPatch Get(const UsdStagePtr& stage, const SdfPath& path);
 
     /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
     /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -161,8 +153,7 @@ public:
     /// the opinion at the current EditTarget.
     ///
     USDGEOM_API
-    static UsdGeomNurbsPatch
-    Define(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdGeomNurbsPatch Define(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -175,17 +166,17 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDGEOM_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDGEOM_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // UVERTEXCOUNT 
+    // UVERTEXCOUNT
     // --------------------------------------------------------------------- //
     /// Number of vertices in the U direction.  Should be at least as
     /// large as uOrder.
@@ -198,17 +189,17 @@ public:
     USDGEOM_API
     UsdAttribute GetUVertexCountAttr() const;
 
-    /// See GetUVertexCountAttr(), and also 
+    /// See GetUVertexCountAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateUVertexCountAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateUVertexCountAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // VVERTEXCOUNT 
+    // VVERTEXCOUNT
     // --------------------------------------------------------------------- //
     /// Number of vertices in the V direction.  Should be at least as
     /// large as vOrder.
@@ -221,17 +212,17 @@ public:
     USDGEOM_API
     UsdAttribute GetVVertexCountAttr() const;
 
-    /// See GetVVertexCountAttr(), and also 
+    /// See GetVVertexCountAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateVVertexCountAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateVVertexCountAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // UORDER 
+    // UORDER
     // --------------------------------------------------------------------- //
     /// Order in the U direction.  Order must be positive and is
     /// equal to the degree of the polynomial basis to be evaluated, plus 1.
@@ -244,17 +235,17 @@ public:
     USDGEOM_API
     UsdAttribute GetUOrderAttr() const;
 
-    /// See GetUOrderAttr(), and also 
+    /// See GetUOrderAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateUOrderAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateUOrderAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // VORDER 
+    // VORDER
     // --------------------------------------------------------------------- //
     /// Order in the V direction.  Order must be positive and is
     /// equal to the degree of the polynomial basis to be evaluated, plus 1.
@@ -267,17 +258,17 @@ public:
     USDGEOM_API
     UsdAttribute GetVOrderAttr() const;
 
-    /// See GetVOrderAttr(), and also 
+    /// See GetVOrderAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateVOrderAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateVOrderAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // UKNOTS 
+    // UKNOTS
     // --------------------------------------------------------------------- //
     /// Knot vector for U direction providing U parameterization.
     /// The length of this array must be ( uVertexCount + uOrder ), and its
@@ -291,17 +282,17 @@ public:
     USDGEOM_API
     UsdAttribute GetUKnotsAttr() const;
 
-    /// See GetUKnotsAttr(), and also 
+    /// See GetUKnotsAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateUKnotsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateUKnotsAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // VKNOTS 
+    // VKNOTS
     // --------------------------------------------------------------------- //
     /// Knot vector for V direction providing U parameterization.
     /// The length of this array must be ( vVertexCount + vOrder ), and its
@@ -315,22 +306,22 @@ public:
     USDGEOM_API
     UsdAttribute GetVKnotsAttr() const;
 
-    /// See GetVKnotsAttr(), and also 
+    /// See GetVKnotsAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateVKnotsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateVKnotsAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // UFORM 
+    // UFORM
     // --------------------------------------------------------------------- //
     /// Interpret the control grid and knot vectors as representing
     /// an open, geometrically closed, or geometrically closed and C2 continuous
     /// surface along the U dimension.
-    /// \sa \ref UsdGeom_NurbsPatch_Form "NurbsPatch Form" 
+    /// \sa \ref UsdGeom_NurbsPatch_Form "NurbsPatch Form"
     ///
     /// | ||
     /// | -- | -- |
@@ -342,22 +333,22 @@ public:
     USDGEOM_API
     UsdAttribute GetUFormAttr() const;
 
-    /// See GetUFormAttr(), and also 
+    /// See GetUFormAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateUFormAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateUFormAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // VFORM 
+    // VFORM
     // --------------------------------------------------------------------- //
     /// Interpret the control grid and knot vectors as representing
     /// an open, geometrically closed, or geometrically closed and C2 continuous
     /// surface along the V dimension.
-    /// \sa \ref UsdGeom_NurbsPatch_Form "NurbsPatch Form" 
+    /// \sa \ref UsdGeom_NurbsPatch_Form "NurbsPatch Form"
     ///
     /// | ||
     /// | -- | -- |
@@ -369,17 +360,17 @@ public:
     USDGEOM_API
     UsdAttribute GetVFormAttr() const;
 
-    /// See GetVFormAttr(), and also 
+    /// See GetVFormAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateVFormAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateVFormAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // URANGE 
+    // URANGE
     // --------------------------------------------------------------------- //
     /// Provides the minimum and maximum parametric values (as defined
     /// by uKnots) over which the surface is actually defined.  The minimum
@@ -395,17 +386,17 @@ public:
     USDGEOM_API
     UsdAttribute GetURangeAttr() const;
 
-    /// See GetURangeAttr(), and also 
+    /// See GetURangeAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateURangeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateURangeAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // VRANGE 
+    // VRANGE
     // --------------------------------------------------------------------- //
     /// Provides the minimum and maximum parametric values (as defined
     /// by vKnots) over which the surface is actually defined.  The minimum
@@ -421,23 +412,23 @@ public:
     USDGEOM_API
     UsdAttribute GetVRangeAttr() const;
 
-    /// See GetVRangeAttr(), and also 
+    /// See GetVRangeAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateVRangeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateVRangeAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // POINTWEIGHTS 
+    // POINTWEIGHTS
     // --------------------------------------------------------------------- //
     /// Optionally provides "w" components for each control point,
     /// thus must be the same length as the points attribute.  If authored,
     /// the patch will be rational.  If unauthored, the patch will be
     /// polynomial, i.e. weight for all points is 1.0.
-    /// \note Some DCC's pre-weight the \em points, but in this schema, 
+    /// \note Some DCC's pre-weight the \em points, but in this schema,
     /// \em points are not pre-weighted.
     ///
     /// | ||
@@ -448,22 +439,22 @@ public:
     USDGEOM_API
     UsdAttribute GetPointWeightsAttr() const;
 
-    /// See GetPointWeightsAttr(), and also 
+    /// See GetPointWeightsAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreatePointWeightsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreatePointWeightsAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // TRIMCURVECOUNTS 
+    // TRIMCURVECOUNTS
     // --------------------------------------------------------------------- //
     /// Each element specifies how many curves are present in each
     /// "loop" of the trimCurve, and the length of the array determines how
     /// many loops the trimCurve contains.  The sum of all elements is the
-    /// total nuber of curves in the trim, to which we will refer as 
+    /// total nuber of curves in the trim, to which we will refer as
     /// \em nCurves in describing the other trim attributes.
     ///
     /// | ||
@@ -474,17 +465,17 @@ public:
     USDGEOM_API
     UsdAttribute GetTrimCurveCountsAttr() const;
 
-    /// See GetTrimCurveCountsAttr(), and also 
+    /// See GetTrimCurveCountsAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateTrimCurveCountsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateTrimCurveCountsAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // TRIMCURVEORDERS 
+    // TRIMCURVEORDERS
     // --------------------------------------------------------------------- //
     /// Flat list of orders for each of the \em nCurves curves.
     ///
@@ -496,17 +487,17 @@ public:
     USDGEOM_API
     UsdAttribute GetTrimCurveOrdersAttr() const;
 
-    /// See GetTrimCurveOrdersAttr(), and also 
+    /// See GetTrimCurveOrdersAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateTrimCurveOrdersAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateTrimCurveOrdersAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // TRIMCURVEVERTEXCOUNTS 
+    // TRIMCURVEVERTEXCOUNTS
     // --------------------------------------------------------------------- //
     /// Flat list of number of vertices for each of the
     /// \em nCurves curves.
@@ -519,17 +510,18 @@ public:
     USDGEOM_API
     UsdAttribute GetTrimCurveVertexCountsAttr() const;
 
-    /// See GetTrimCurveVertexCountsAttr(), and also 
+    /// See GetTrimCurveVertexCountsAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateTrimCurveVertexCountsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateTrimCurveVertexCountsAttr(VtValue const& defaultValue = VtValue(),
+                                                 bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // TRIMCURVEKNOTS 
+    // TRIMCURVEKNOTS
     // --------------------------------------------------------------------- //
     /// Flat list of parametric values for each of the
     /// \em nCurves curves.  There will be as many knots as the sum over
@@ -544,19 +536,19 @@ public:
     USDGEOM_API
     UsdAttribute GetTrimCurveKnotsAttr() const;
 
-    /// See GetTrimCurveKnotsAttr(), and also 
+    /// See GetTrimCurveKnotsAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateTrimCurveKnotsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateTrimCurveKnotsAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // TRIMCURVERANGES 
+    // TRIMCURVERANGES
     // --------------------------------------------------------------------- //
-    /// Flat list of minimum and maximum parametric values 
+    /// Flat list of minimum and maximum parametric values
     /// (as defined by \em knots) for each of the \em nCurves curves.
     ///
     /// | ||
@@ -567,17 +559,17 @@ public:
     USDGEOM_API
     UsdAttribute GetTrimCurveRangesAttr() const;
 
-    /// See GetTrimCurveRangesAttr(), and also 
+    /// See GetTrimCurveRangesAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateTrimCurveRangesAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateTrimCurveRangesAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // TRIMCURVEPOINTS 
+    // TRIMCURVEPOINTS
     // --------------------------------------------------------------------- //
     /// Flat list of homogeneous 2D points (u, v, w) that comprise
     /// the \em nCurves curves.  The number of points should be equal to the
@@ -591,21 +583,21 @@ public:
     USDGEOM_API
     UsdAttribute GetTrimCurvePointsAttr() const;
 
-    /// See GetTrimCurvePointsAttr(), and also 
+    /// See GetTrimCurvePointsAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateTrimCurvePointsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateTrimCurvePointsAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //

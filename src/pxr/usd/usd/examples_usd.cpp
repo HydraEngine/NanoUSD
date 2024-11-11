@@ -11,10 +11,9 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 //! [ApplyCollections]
-bool ApplyCollections(UsdPrim const &prim)
-{       
+bool ApplyCollections(UsdPrim const& prim) {
     /* Assuming the folling prim hierarchy:
-    |- Vehicles 
+    |- Vehicles
     |    |- FourWheelers
     |    |    |- CarA
     |    |    |- CarB
@@ -34,22 +33,22 @@ bool ApplyCollections(UsdPrim const &prim)
     |    |        |- BackWheels
     */
 
-    // Create a collection that includes only the cars, by adding all 
+    // Create a collection that includes only the cars, by adding all
     // of "FourWheelers" and excluding the trucks.
     UsdCollectionAPI cars = UsdCollectionAPI::Apply(prim, "cars");
     cars.CreateIncludesRel().AddTarget(SdfPath("/Vehicles/FourWheelers"));
     cars.CreateExcludesRel().AddTarget(SdfPath("/Vehicles/FourWheelers/TruckA"));
     cars.CreateExcludesRel().AddTarget(SdfPath("/Vehicles/FourWheelers/TruckB"));
 
-    // Create a collection that includes only the bikes by explicitly inluding 
+    // Create a collection that includes only the bikes by explicitly inluding
     // just the two bikes in the collection.
     UsdCollectionAPI bikes = UsdCollectionAPI::Apply(prim, "bikes");
     bikes.CreateExpansionRuleAttr(VtValue(UsdTokens->explicitOnly));
     bikes.CreateIncludesRel().AddTarget(SdfPath("/Vehicles/TwoWheelers/BikeA"));
     bikes.CreateIncludesRel().AddTarget(SdfPath("/Vehicles/TwoWheelers/BikeB"));
 
-    // Create an explicit collection of slow-moving vehicles. 
-    // An explicit collection implies that descendants (i.e. the front and back 
+    // Create an explicit collection of slow-moving vehicles.
+    // An explicit collection implies that descendants (i.e. the front and back
     // wheels) are not considered to be included in the collection.
     UsdCollectionAPI slowVehicles = UsdCollectionAPI::Apply(prim, "slowVehicles");
     slowVehicles.CreateExpansionRuleAttr(VtValue(UsdTokens->explicitOnly));
@@ -63,7 +62,6 @@ bool ApplyCollections(UsdPrim const &prim)
     vehicles.CreateIncludesRel().AddTarget(SdfPath("/Vehicles/FourWheelers/TruckA"));
     vehicles.CreateIncludesRel().AddTarget(SdfPath("/Vehicles/FourWheelers/TruckB"));
 
-
     UsdCollectionAPI::MembershipQuery query = vehicles.ComputeMembershipQuery();
 
     // CarA is included in the 'vehicles' collection through the 'cars' collection.
@@ -72,28 +70,25 @@ bool ApplyCollections(UsdPrim const &prim)
     // BikeB is included in the 'vehicles' collection through the 'cars' collection.
     TF_AXIOM(query.IsPathIncluded("/Vehicles/TwoWheelers/BikeB"))
 
-    // BikeB is included directly in the 'vehicles' collection 
+    // BikeB is included directly in the 'vehicles' collection
     TF_AXIOM(query.IsPathIncluded("/Vehicles/FourWheelers/TruckA"))
 
-    // BicycleA is included, but it's descendants are not, since it is part of 
+    // BicycleA is included, but it's descendants are not, since it is part of
     // an "explicitOnly" collection.
     TF_AXIOM(query.IsPathIncluded("/Vehicles/TwoWheelers/BicycleA"))
     TF_AXIOM(!query.IsPathIncluded("/Vehicles/TwoWheelers/BicycleA/FrontWheel"))
 
-    // TricycleA is included, but it's descendants are not, since it is part of 
+    // TricycleA is included, but it's descendants are not, since it is part of
     // an "explicitOnly" collection.
     TF_AXIOM(query.IsPathIncluded("/Vehicles/Other/TricycleA"))
     TF_AXIOM(!query.IsPathIncluded("/Vehicles/Other/TricycleA/BackWheels"))
 
     SdfPathSet includedPaths;
-    UsdCollectionAPI::ComputeIncludedPaths(query, prim.GetStage(), 
-                                           &includedPaths);
+    UsdCollectionAPI::ComputeIncludedPaths(query, prim.GetStage(), &includedPaths);
     std::set<UsdObject> includedObjects;
-    UsdCollectionAPI::ComputeIncludedObjects(query, prim.GetStage(), 
-                                             &includedObjects);
+    UsdCollectionAPI::ComputeIncludedObjects(query, prim.GetStage(), &includedObjects);
 }
 
 //! [ApplyCollections]
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

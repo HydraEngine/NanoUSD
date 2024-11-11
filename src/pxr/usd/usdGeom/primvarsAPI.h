@@ -15,7 +15,7 @@
 #include "pxr/usd/usd/prim.h"
 #include "pxr/usd/usd/stage.h"
 
-#include "pxr/usd/usdGeom/primvar.h" 
+#include "pxr/usd/usdGeom/primvar.h"
 
 #include "pxr/base/vt/value.h"
 
@@ -39,14 +39,14 @@ class SdfAssetPath;
 /// UsdGeomPrimvarsAPI encodes geometric "primitive variables",
 /// as UsdGeomPrimvar, which interpolate across a primitive's topology,
 /// can override shader inputs, and inherit down namespace.
-/// 
+///
 /// \section usdGeom_PrimvarFetchingAPI Which Method to Use to Retrieve Primvars
-/// 
+///
 /// While creating primvars is unambiguous (CreatePrimvar()), there are quite
 /// a few methods available for retrieving primvars, making it potentially
 /// confusing knowing which one to use.  Here are some guidelines:
-/// 
-/// \li If you are populating a GUI with the primvars already available for 
+///
+/// \li If you are populating a GUI with the primvars already available for
 /// authoring values on a prim, use GetPrimvars().
 /// \li If you want all of the "useful" (e.g. to a renderer) primvars
 /// available at a prim, including those inherited from ancestor prims, use
@@ -55,15 +55,14 @@ class SdfAssetPath;
 /// \li To find a particular primvar defined directly on a prim, which may
 /// or may not provide a value, use GetPrimvar().
 /// \li To find a particular primvar defined on a prim or inherited from
-/// ancestors, which may or may not provide a value, use 
+/// ancestors, which may or may not provide a value, use
 /// FindPrimvarWithInheritance().
 /// \li To *efficiently* query for primvars using the overloads of
 /// FindPrimvarWithInheritance() and FindPrimvarsWithInheritance(), one
 /// must first cache the results of FindIncrementallyInheritablePrimvars() for
-/// each non-leaf prim on the stage. 
+/// each non-leaf prim on the stage.
 ///
-class UsdGeomPrimvarsAPI : public UsdAPISchemaBase
-{
+class UsdGeomPrimvarsAPI : public UsdAPISchemaBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -74,18 +73,12 @@ public:
     /// Equivalent to UsdGeomPrimvarsAPI::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdGeomPrimvarsAPI(const UsdPrim& prim=UsdPrim())
-        : UsdAPISchemaBase(prim)
-    {
-    }
+    explicit UsdGeomPrimvarsAPI(const UsdPrim& prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
     /// Construct a UsdGeomPrimvarsAPI on the prim held by \p schemaObj .
     /// Should be preferred over UsdGeomPrimvarsAPI(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdGeomPrimvarsAPI(const UsdSchemaBase& schemaObj)
-        : UsdAPISchemaBase(schemaObj)
-    {
-    }
+    explicit UsdGeomPrimvarsAPI(const UsdSchemaBase& schemaObj) : UsdAPISchemaBase(schemaObj) {}
 
     /// Destructor.
     USDGEOM_API
@@ -95,8 +88,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDGEOM_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdGeomPrimvarsAPI holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -108,9 +100,7 @@ public:
     /// \endcode
     ///
     USDGEOM_API
-    static UsdGeomPrimvarsAPI
-    Get(const UsdStagePtr &stage, const SdfPath &path);
-
+    static UsdGeomPrimvarsAPI Get(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -123,21 +113,21 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDGEOM_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDGEOM_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
@@ -151,7 +141,7 @@ public:
     /// \p name, due to the possible need to apply property namespacing
     /// for primvars.  See \ref Usd_Creating_and_Accessing_Primvars
     /// for more information.  Creation may fail and return an invalid
-    /// Primvar if \p name contains a reserved keyword, such as the 
+    /// Primvar if \p name contains a reserved keyword, such as the
     /// "indices" suffix we use for indexed primvars.
     ///
     /// The behavior with respect to the provided \p typeName
@@ -172,34 +162,31 @@ public:
     /// \sa UsdPrim::CreateAttribute(), UsdGeomPrimvar::IsPrimvar()
     USDGEOM_API
     UsdGeomPrimvar CreatePrimvar(const TfToken& name,
-                                 const SdfValueTypeName &typeName,
+                                 const SdfValueTypeName& typeName,
                                  const TfToken& interpolation = TfToken(),
                                  int elementSize = -1) const;
 
     /// Author scene description to create an attribute and authoring a \p value
-    /// on this prim that will be recognized as a Primvar (i.e. will present as 
-    /// a valid UsdGeomPrimvar). Note that unlike CreatePrimvar using this API 
+    /// on this prim that will be recognized as a Primvar (i.e. will present as
+    /// a valid UsdGeomPrimvar). Note that unlike CreatePrimvar using this API
     /// explicitly authors a block for the indices attr associated with the
     /// primvar, thereby blocking any indices set in any weaker layers.
     ///
-    /// \return an invalid UsdGeomPrimvar on error, a valid UsdGeomPrimvar 
+    /// \return an invalid UsdGeomPrimvar on error, a valid UsdGeomPrimvar
     /// otherwise. It is fine to call this method multiple times, and in
     /// different UsdEditTargets, even if there is an existing primvar of the
     /// same name, indexed or not.
     ///
-    /// \sa CreatePrimvar(), CreateIndexedPrimvar(), UsdPrim::CreateAttribute(), 
+    /// \sa CreatePrimvar(), CreateIndexedPrimvar(), UsdPrim::CreateAttribute(),
     /// UsdGeomPrimvar::IsPrimvar()
     template <typename T>
-    UsdGeomPrimvar CreateNonIndexedPrimvar(
-            const TfToken& name,
-            const SdfValueTypeName &typeName,
-            const T &value,
-            const TfToken &interpolation = TfToken(),
-            int elementSize = -1,
-            UsdTimeCode time = UsdTimeCode::Default()) const
-    {
-        UsdGeomPrimvar primvar = 
-            CreatePrimvar(name, typeName, interpolation, elementSize);
+    UsdGeomPrimvar CreateNonIndexedPrimvar(const TfToken& name,
+                                           const SdfValueTypeName& typeName,
+                                           const T& value,
+                                           const TfToken& interpolation = TfToken(),
+                                           int elementSize = -1,
+                                           UsdTimeCode time = UsdTimeCode::Default()) const {
+        UsdGeomPrimvar primvar = CreatePrimvar(name, typeName, interpolation, elementSize);
 
         primvar.GetAttr().Set(value, time);
         primvar.BlockIndices();
@@ -210,25 +197,22 @@ public:
     /// on this prim that will be recognized as an indexed Primvar with \p
     /// indices appropriately set (i.e. will present as a valid UsdGeomPrimvar).
     ///
-    /// \return an invalid UsdGeomPrimvar on error, a valid UsdGeomPrimvar 
+    /// \return an invalid UsdGeomPrimvar on error, a valid UsdGeomPrimvar
     /// otherwise. It is fine to call this method multiple times, and in
     /// different UsdEditTargets, even if there is an existing primvar of the
     /// same name, indexed or not.
     ///
-    /// \sa CreatePrimvar(), CreateNonIndexedPrimvar(), 
+    /// \sa CreatePrimvar(), CreateNonIndexedPrimvar(),
     /// UsdPrim::CreateAttribute(), UsdGeomPrimvar::IsPrimvar()
     template <typename T>
-    UsdGeomPrimvar CreateIndexedPrimvar(
-            const TfToken& name,
-            const SdfValueTypeName &typeName,
-            const T &value,
-            const VtIntArray &indices,
-            const TfToken &interpolation = TfToken(),
-            int elementSize = -1,
-            UsdTimeCode time = UsdTimeCode::Default()) const
-    {
-        UsdGeomPrimvar primvar = 
-            CreatePrimvar(name, typeName, interpolation, elementSize);
+    UsdGeomPrimvar CreateIndexedPrimvar(const TfToken& name,
+                                        const SdfValueTypeName& typeName,
+                                        const T& value,
+                                        const VtIntArray& indices,
+                                        const TfToken& interpolation = TfToken(),
+                                        int elementSize = -1,
+                                        UsdTimeCode time = UsdTimeCode::Default()) const {
+        UsdGeomPrimvar primvar = CreatePrimvar(name, typeName, interpolation, elementSize);
 
         primvar.GetAttr().Set(value, time);
         primvar.SetIndices(indices, time);
@@ -239,25 +223,25 @@ public:
     /// was recognized as Primvar (i.e. will present as a valid UsdGeomPrimvar),
     /// <em>in the current UsdEditTarget</em>.
     ///
-    /// Because this method can only remove opinions about the primvar 
-    /// from the current EditTarget, you may generally find it more useful to 
-    /// use BlockPrimvar() which will ensure that all values from the EditTarget 
+    /// Because this method can only remove opinions about the primvar
+    /// from the current EditTarget, you may generally find it more useful to
+    /// use BlockPrimvar() which will ensure that all values from the EditTarget
     /// and weaker layers for the primvar and its indices will be ignored.
     ///
-    /// Removal may fail and return false if \p name contains a reserved 
+    /// Removal may fail and return false if \p name contains a reserved
     /// keyword, such as the "indices" suffix we use for indexed primvars.
     ///
     /// Note this will also remove the indices attribute associated with an
-    /// indiced primvar. 
+    /// indiced primvar.
     ///
-    /// \return true if UsdGeomPrimvar and indices attribute was successfully 
+    /// \return true if UsdGeomPrimvar and indices attribute was successfully
     /// removed, false otherwise.
     ///
     /// \sa UsdPrim::RemoveProperty())
     USDGEOM_API
     bool RemovePrimvar(const TfToken& name);
 
-    /// Remove all time samples on the primvar and its associated indices attr, 
+    /// Remove all time samples on the primvar and its associated indices attr,
     /// and author a *block* \c default value. This will cause authored opinions
     /// in weaker layers to be ignored.
     ///
@@ -282,8 +266,8 @@ public:
     ///
     /// \sa HasPrimvar(), \ref usdGeom_PrimvarFetchingAPI
     USDGEOM_API
-    UsdGeomPrimvar GetPrimvar(const TfToken &name) const;
-    
+    UsdGeomPrimvar GetPrimvar(const TfToken& name) const;
+
     /// Return valid UsdGeomPrimvar objects for all defined Primvars on
     /// this prim, similarly to UsdPrim::GetAttributes().
     ///
@@ -361,13 +345,13 @@ public:
     /// \sa \ref usdGeom_PrimvarFetchingAPI
     USDGEOM_API
     std::vector<UsdGeomPrimvar> FindIncrementallyInheritablePrimvars(
-        const std::vector<UsdGeomPrimvar> &inheritedFromAncestors) const;
+            const std::vector<UsdGeomPrimvar>& inheritedFromAncestors) const;
 
     /// Like GetPrimvar(), but if the named primvar does not exist or has no
     /// authored value on this prim, search for the named, value-producing
     /// primvar on ancestor prims.
-    /// 
-    /// The returned primvar will be bound to the attribute on the 
+    ///
+    /// The returned primvar will be bound to the attribute on the
     /// corresponding ancestor prim on which it was found (if any).  If neither
     /// this prim nor any ancestor contains a value-producing primvar, then
     /// the returned primvar will be the same as that returned by GetPrimvar().
@@ -377,10 +361,10 @@ public:
     ///
     /// \sa \ref usdGeom_PrimvarFetchingAPI
     USDGEOM_API
-    UsdGeomPrimvar FindPrimvarWithInheritance(const TfToken &name) const;
+    UsdGeomPrimvar FindPrimvarWithInheritance(const TfToken& name) const;
 
     /// \overload
-    /// 
+    ///
     /// This version of FindPrimvarWithInheritance() takes the pre-computed
     /// set of primvars inherited from this prim's ancestors, as computed
     /// by FindInheritablePrimvars() or FindIncrementallyInheritablePrimvars()
@@ -388,8 +372,8 @@ public:
     ///
     /// \sa \ref usdGeom_PrimvarFetchingAPI
     USDGEOM_API
-    UsdGeomPrimvar FindPrimvarWithInheritance(const TfToken &name,
-        const std::vector<UsdGeomPrimvar> &inheritedFromAncestors) const;
+    UsdGeomPrimvar FindPrimvarWithInheritance(const TfToken& name,
+                                              const std::vector<UsdGeomPrimvar>& inheritedFromAncestors) const;
 
     /// Find all of the value-producing primvars either defined on this prim,
     /// or inherited from ancestor prims.
@@ -399,7 +383,7 @@ public:
     std::vector<UsdGeomPrimvar> FindPrimvarsWithInheritance() const;
 
     /// \overload
-    /// 
+    ///
     /// This version of FindPrimvarsWithInheritance() takes the pre-computed
     /// set of primvars inherited from this prim's ancestors, as computed
     /// by FindInheritablePrimvars() or FindIncrementallyInheritablePrimvars()
@@ -408,7 +392,7 @@ public:
     /// \sa \ref usdGeom_PrimvarFetchingAPI
     USDGEOM_API
     std::vector<UsdGeomPrimvar> FindPrimvarsWithInheritance(
-        const std::vector<UsdGeomPrimvar> &inheritedFromAncestors) const;
+            const std::vector<UsdGeomPrimvar>& inheritedFromAncestors) const;
 
     /// Is there a defined Primvar \p name on this prim?
     ///
@@ -417,7 +401,7 @@ public:
     /// Like GetPrimvar(), a return value of `true` for HasPrimvar() does not
     /// guarantee the primvar will produce a value.
     USDGEOM_API
-    bool HasPrimvar(const TfToken &name) const;
+    bool HasPrimvar(const TfToken& name) const;
 
     /// Is there a Primvar named \p name with an authored value on this
     /// prim or any of its ancestors?
@@ -427,7 +411,7 @@ public:
     ///
     /// \sa FindPrimvarWithInheritance()
     USDGEOM_API
-    bool HasPossiblyInheritedPrimvar(const TfToken &name) const;
+    bool HasPossiblyInheritedPrimvar(const TfToken& name) const;
 
     /// Test whether a given \p name contains the "primvars:" prefix
     ///

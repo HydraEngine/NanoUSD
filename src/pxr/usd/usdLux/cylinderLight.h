@@ -38,10 +38,9 @@ class SdfAssetPath;
 /// Light emitted outward from a cylinder.
 /// The cylinder is centered at the origin and has its major axis on the X axis.
 /// The cylinder does not emit light from the flat end-caps.
-/// 
 ///
-class UsdLuxCylinderLight : public UsdLuxBoundableLightBase
-{
+///
+class UsdLuxCylinderLight : public UsdLuxBoundableLightBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -52,18 +51,12 @@ public:
     /// Equivalent to UsdLuxCylinderLight::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdLuxCylinderLight(const UsdPrim& prim=UsdPrim())
-        : UsdLuxBoundableLightBase(prim)
-    {
-    }
+    explicit UsdLuxCylinderLight(const UsdPrim& prim = UsdPrim()) : UsdLuxBoundableLightBase(prim) {}
 
     /// Construct a UsdLuxCylinderLight on the prim held by \p schemaObj .
     /// Should be preferred over UsdLuxCylinderLight(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdLuxCylinderLight(const UsdSchemaBase& schemaObj)
-        : UsdLuxBoundableLightBase(schemaObj)
-    {
-    }
+    explicit UsdLuxCylinderLight(const UsdSchemaBase& schemaObj) : UsdLuxBoundableLightBase(schemaObj) {}
 
     /// Destructor.
     USDLUX_API
@@ -73,8 +66,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDLUX_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdLuxCylinderLight holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -86,8 +78,7 @@ public:
     /// \endcode
     ///
     USDLUX_API
-    static UsdLuxCylinderLight
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdLuxCylinderLight Get(const UsdStagePtr& stage, const SdfPath& path);
 
     /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
     /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -112,8 +103,7 @@ public:
     /// the opinion at the current EditTarget.
     ///
     USDLUX_API
-    static UsdLuxCylinderLight
-    Define(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdLuxCylinderLight Define(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -126,17 +116,17 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDLUX_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDLUX_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // LENGTH 
+    // LENGTH
     // --------------------------------------------------------------------- //
     /// Length of the cylinder, in the local X axis.
     ///
@@ -148,17 +138,17 @@ public:
     USDLUX_API
     UsdAttribute GetLengthAttr() const;
 
-    /// See GetLengthAttr(), and also 
+    /// See GetLengthAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDLUX_API
-    UsdAttribute CreateLengthAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateLengthAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // RADIUS 
+    // RADIUS
     // --------------------------------------------------------------------- //
     /// Radius of the cylinder.
     ///
@@ -170,17 +160,17 @@ public:
     USDLUX_API
     UsdAttribute GetRadiusAttr() const;
 
-    /// See GetRadiusAttr(), and also 
+    /// See GetRadiusAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDLUX_API
-    UsdAttribute CreateRadiusAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateRadiusAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // TREATASLINE 
+    // TREATASLINE
     // --------------------------------------------------------------------- //
     /// A hint that this light can be treated as a 'line'
     /// light (effectively, a zero-radius cylinder) by renderers that
@@ -195,21 +185,21 @@ public:
     USDLUX_API
     UsdAttribute GetTreatAsLineAttr() const;
 
-    /// See GetTreatAsLineAttr(), and also 
+    /// See GetTreatAsLineAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDLUX_API
-    UsdAttribute CreateTreatAsLineAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateTreatAsLineAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //

@@ -17,37 +17,32 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PUBLIC_TOKENS(UsdCollectionMembershipQueryTokens,
-                        USD_COLLECTION_MEMBERSHIP_QUERY_TOKENS);
+TF_DEFINE_PUBLIC_TOKENS(UsdCollectionMembershipQueryTokens, USD_COLLECTION_MEMBERSHIP_QUERY_TOKENS);
 
 namespace {
 
 /* static */
-void
-_ComputeIncludedImpl(
-    const UsdCollectionMembershipQuery &query,
-    const UsdStageWeakPtr &stage,
-    const Usd_PrimFlagsPredicate &pred,
-    std::set<UsdObject> *includedObjects,
-    SdfPathSet *includedPaths)
-{
-    using ExpressionEvaluator =
-        UsdCollectionMembershipQuery::ExpressionEvaluator;
-    
+void _ComputeIncludedImpl(const UsdCollectionMembershipQuery& query,
+                          const UsdStageWeakPtr& stage,
+                          const Usd_PrimFlagsPredicate& pred,
+                          std::set<UsdObject>* includedObjects,
+                          SdfPathSet* includedPaths) {
+    using ExpressionEvaluator = UsdCollectionMembershipQuery::ExpressionEvaluator;
+
     if (!((bool)includedObjects ^ (bool)includedPaths)) {
-        TF_CODING_ERROR("Either includedObjects or includedPaths must be"
-                        " valid, but not both");
+        TF_CODING_ERROR(
+                "Either includedObjects or includedPaths must be"
+                " valid, but not both");
     }
 
     std::set<UsdObject> result;
 
-    const UsdCollectionMembershipQuery::PathExpansionRuleMap& pathExpRuleMap =
-        query.GetAsPathExpansionRuleMap();
+    const UsdCollectionMembershipQuery::PathExpansionRuleMap& pathExpRuleMap = query.GetAsPathExpansionRuleMap();
     const bool hasExcludes = query.HasExcludes();
 
     // Helper function to get the UsdProperty object associated with a given
     // property path.
-    auto GetPropertyAtPath = [stage](const SdfPath &path) {
+    auto GetPropertyAtPath = [stage](const SdfPath& path) {
         if (const UsdPrim p = stage->GetPrimAtPath(path.GetPrimPath())) {
             return p.GetProperty(path.GetNameToken());
         }
@@ -55,8 +50,7 @@ _ComputeIncludedImpl(
     };
 
     // Returns true if a property is excluded in the PathExpansionRuleMap.
-    auto IsPropertyExplicitlyExcluded = [hasExcludes,pathExpRuleMap](
-            const SdfPath &propPath) {
+    auto IsPropertyExplicitlyExcluded = [hasExcludes, pathExpRuleMap](const SdfPath& propPath) {
         if (!hasExcludes) {
             return false;
         }
@@ -67,8 +61,7 @@ _ComputeIncludedImpl(
         return false;
     };
 
-    auto AppendIncludedObject = [includedObjects, includedPaths](
-            const UsdObject &obj) {
+    auto AppendIncludedObject = [includedObjects, includedPaths](const UsdObject& obj) {
         if (includedObjects) {
             includedObjects->insert(obj);
         } else if (includedPaths) {
@@ -77,15 +70,15 @@ _ComputeIncludedImpl(
     };
 
     // Iterate through all the entries in the PathExpansionRuleMap.
-    for (const auto &pathAndExpansionRule : pathExpRuleMap) {
-        const TfToken &expansionRule = pathAndExpansionRule.second;
+    for (const auto& pathAndExpansionRule : pathExpRuleMap) {
+        const TfToken& expansionRule = pathAndExpansionRule.second;
 
         // Skip excluded paths.
         if (expansionRule == UsdTokens->exclude) {
             continue;
         }
 
-        const SdfPath &path = pathAndExpansionRule.first;
+        const SdfPath& path = pathAndExpansionRule.first;
 
         if (expansionRule == UsdTokens->explicitOnly) {
             if (path.IsPrimPath()) {
@@ -102,15 +95,12 @@ _ComputeIncludedImpl(
             }
         }
 
-        else if (expansionRule == UsdTokens->expandPrims ||
-                 expansionRule == UsdTokens->expandPrimsAndProperties)
-        {
+        else if (expansionRule == UsdTokens->expandPrims || expansionRule == UsdTokens->expandPrimsAndProperties) {
             if (path.IsPropertyPath()) {
                 if (UsdProperty property = GetPropertyAtPath(path)) {
                     AppendIncludedObject(property.As<UsdObject>());
                 }
             } else if (UsdPrim prim = stage->GetPrimAtPath(path)) {
-
                 UsdPrimRange range(prim, pred);
                 // If this prim is the stage's pseudo-root, increment the
                 // range's begin iterator to skip it.  This happens when the
@@ -122,18 +112,17 @@ _ComputeIncludedImpl(
                 if (prim == stage->GetPseudoRoot()) {
                     range.increment_begin();
                 }
-                
+
                 auto iter = range.begin();
-                for (; iter != range.end() ; ++iter) {
-                    const UsdPrim &descendantPrim = *iter;
+                for (; iter != range.end(); ++iter) {
+                    const UsdPrim& descendantPrim = *iter;
 
                     // Skip the descendant prim and its subtree
                     // if it's excluded.
                     // If an object below the excluded object is included,
                     // it will have a separate entry in the
                     // path<->expansionRule map.
-                    if (hasExcludes && !query.IsPathIncluded(
-                            descendantPrim.GetPath())) {
+                    if (hasExcludes && !query.IsPathIncluded(descendantPrim.GetPath())) {
                         iter.PruneChildren();
                         continue;
                     }
@@ -150,22 +139,17 @@ _ComputeIncludedImpl(
                     //
                     // Call GetPropertyNames() otherwise.
                     if (includedObjects) {
-                        std::vector<UsdProperty> properties =
-                            descendantPrim.GetProperties();
-                        for (const auto &property : properties) {
+                        std::vector<UsdProperty> properties = descendantPrim.GetProperties();
+                        for (const auto& property : properties) {
                             // Add the property to the result only if it's
                             // not explicitly excluded.
-                            if (!IsPropertyExplicitlyExcluded(
-                                    property.GetPath())) {
+                            if (!IsPropertyExplicitlyExcluded(property.GetPath())) {
                                 AppendIncludedObject(property.As<UsdObject>());
                             }
                         }
                     } else {
-                        for (const auto &propertyName :
-                                descendantPrim.GetPropertyNames()) {
-                            SdfPath propertyPath =
-                                descendantPrim.GetPath().AppendProperty(
-                                    propertyName);
+                        for (const auto& propertyName : descendantPrim.GetPropertyNames()) {
+                            SdfPath propertyPath = descendantPrim.GetPath().AppendProperty(propertyName);
                             if (!IsPropertyExplicitlyExcluded(propertyPath)) {
                                 // Can't call IncludeObject here since we're
                                 // avoiding creation of the object.
@@ -181,20 +165,14 @@ _ComputeIncludedImpl(
     // Walk everything according to \p pred, and do incremental search.
     TfToken expansionRule = query.GetTopExpansionRule();
     if (query.HasExpression() &&
-        (expansionRule == UsdTokens->expandPrims ||
-         expansionRule == UsdTokens->expandPrimsAndProperties)) {
+        (expansionRule == UsdTokens->expandPrims || expansionRule == UsdTokens->expandPrimsAndProperties)) {
+        bool searchProperties = (expansionRule == UsdTokens->expandPrimsAndProperties);
 
-        bool searchProperties =
-            (expansionRule == UsdTokens->expandPrimsAndProperties);
+        ExpressionEvaluator::IncrementalSearcher searcher = query.GetExpressionEvaluator().MakeIncrementalSearcher();
 
-        ExpressionEvaluator::IncrementalSearcher
-            searcher = query.GetExpressionEvaluator().MakeIncrementalSearcher();
-        
         UsdPrimRange range = stage->Traverse(pred);
-        
-        for (auto iter = range.begin(),
-                 end = range.end(); iter != end; ++iter) {
 
+        for (auto iter = range.begin(), end = range.end(); iter != end; ++iter) {
             SdfPredicateFunctionResult r = searcher.Next(iter->GetPath());
             bool didProps = false;
             if (r) {
@@ -209,8 +187,7 @@ _ComputeIncludedImpl(
                         AppendIncludedObject(*subtreeIter);
                         if (searchProperties) {
                             didProps = true;
-                            for (UsdProperty const &prop:
-                                     subtreeIter->GetProperties()) {
+                            for (UsdProperty const& prop : subtreeIter->GetProperties()) {
                                 AppendIncludedObject(prop);
                             }
                         }
@@ -227,7 +204,7 @@ _ComputeIncludedImpl(
             // above, do them here.  Constancy doesn't matter here since we
             // don't search descendants of properties.
             if (searchProperties && !didProps && !(r && !r.IsConstant())) {
-                for (UsdProperty const &prop: iter->GetProperties()) {
+                for (UsdProperty const& prop : iter->GetProperties()) {
                     if (searcher.Next(prop.GetPath())) {
                         AppendIncludedObject(prop);
                     }
@@ -243,109 +220,74 @@ _ComputeIncludedImpl(
     }
 }
 
-} // anonymous
+}  // namespace
 
-UsdObjectCollectionExpressionEvaluator
-::UsdObjectCollectionExpressionEvaluator(UsdStageWeakPtr const &stage,
-                                         SdfPathExpression const &expr)
-    : _stage(stage)
-    , _evaluator(SdfMakePathExpressionEval(
-                     expr, UsdGetCollectionPredicateLibrary()))
-{
-}
+UsdObjectCollectionExpressionEvaluator ::UsdObjectCollectionExpressionEvaluator(UsdStageWeakPtr const& stage,
+                                                                                SdfPathExpression const& expr)
+    : _stage(stage), _evaluator(SdfMakePathExpressionEval(expr, UsdGetCollectionPredicateLibrary())) {}
 
-SdfPredicateFunctionResult
-UsdObjectCollectionExpressionEvaluator
-::Match(SdfPath const &path) const
-{
+SdfPredicateFunctionResult UsdObjectCollectionExpressionEvaluator ::Match(SdfPath const& path) const {
     if (_stage) {
         if (UsdObject obj = _stage->GetObjectAtPath(path)) {
-            return _evaluator.Match(path, PathToObj { _stage });
+            return _evaluator.Match(path, PathToObj{_stage});
         }
     }
     return SdfPredicateFunctionResult::MakeConstant(false);
 }
 
-SdfPredicateFunctionResult
-UsdObjectCollectionExpressionEvaluator
-::Match(UsdObject const &obj) const
-{
+SdfPredicateFunctionResult UsdObjectCollectionExpressionEvaluator ::Match(UsdObject const& obj) const {
     if (_stage) {
-        return _evaluator.Match(obj.GetPath(), PathToObj { _stage });
+        return _evaluator.Match(obj.GetPath(), PathToObj{_stage});
     }
     return SdfPredicateFunctionResult::MakeConstant(false);
 }
 
 UsdObjectCollectionExpressionEvaluator::IncrementalSearcher
-UsdObjectCollectionExpressionEvaluator
-::MakeIncrementalSearcher() const
-{
+UsdObjectCollectionExpressionEvaluator ::MakeIncrementalSearcher() const {
     if (_stage) {
-        return _evaluator.MakeIncrementalSearcher(PathToObj { _stage });
+        return _evaluator.MakeIncrementalSearcher(PathToObj{_stage});
     }
     return {};
 }
 
-std::set<UsdObject>
-UsdComputeIncludedObjectsFromCollection(
-    const UsdCollectionMembershipQuery &query,
-    const UsdStageWeakPtr &stage,
-    const Usd_PrimFlagsPredicate &pred)
-{
+std::set<UsdObject> UsdComputeIncludedObjectsFromCollection(const UsdCollectionMembershipQuery& query,
+                                                            const UsdStageWeakPtr& stage,
+                                                            const Usd_PrimFlagsPredicate& pred) {
     std::set<UsdObject> result;
     _ComputeIncludedImpl(query, stage, pred, &result, nullptr);
     return result;
 }
 
-SdfPathSet
-UsdComputeIncludedPathsFromCollection(
-    const UsdCollectionMembershipQuery &query,
-    const UsdStageWeakPtr &stage,
-    const Usd_PrimFlagsPredicate &pred)
-{
+SdfPathSet UsdComputeIncludedPathsFromCollection(const UsdCollectionMembershipQuery& query,
+                                                 const UsdStageWeakPtr& stage,
+                                                 const Usd_PrimFlagsPredicate& pred) {
     SdfPathSet result;
     _ComputeIncludedImpl(query, stage, pred, nullptr, &result);
     return result;
 }
 
-Usd_CollectionMembershipQueryBase::Usd_CollectionMembershipQueryBase(
-    const PathExpansionRuleMap& pathExpansionRuleMap,
-    const SdfPathSet& includedCollections)
+Usd_CollectionMembershipQueryBase::Usd_CollectionMembershipQueryBase(const PathExpansionRuleMap& pathExpansionRuleMap,
+                                                                     const SdfPathSet& includedCollections)
     : Usd_CollectionMembershipQueryBase(
-        PathExpansionRuleMap {pathExpansionRuleMap},
-        SdfPathSet {includedCollections}, {})
-{
-}
+              PathExpansionRuleMap{pathExpansionRuleMap}, SdfPathSet{includedCollections}, {}) {}
 
-Usd_CollectionMembershipQueryBase::Usd_CollectionMembershipQueryBase(
-    PathExpansionRuleMap&& pathExpansionRuleMap,
-    SdfPathSet&& includedCollections)
+Usd_CollectionMembershipQueryBase::Usd_CollectionMembershipQueryBase(PathExpansionRuleMap&& pathExpansionRuleMap,
+                                                                     SdfPathSet&& includedCollections)
+    : Usd_CollectionMembershipQueryBase(std::move(pathExpansionRuleMap), std::move(includedCollections), {}) {}
+
+Usd_CollectionMembershipQueryBase::Usd_CollectionMembershipQueryBase(const PathExpansionRuleMap& pathExpansionRuleMap,
+                                                                     const SdfPathSet& includedCollections,
+                                                                     const TfToken& topExpansionRule)
     : Usd_CollectionMembershipQueryBase(
-        std::move(pathExpansionRuleMap),
-        std::move(includedCollections), {})
-{
-}
+              PathExpansionRuleMap{pathExpansionRuleMap}, SdfPathSet{includedCollections}, topExpansionRule) {}
 
-Usd_CollectionMembershipQueryBase::Usd_CollectionMembershipQueryBase(
-    const PathExpansionRuleMap& pathExpansionRuleMap,
-    const SdfPathSet& includedCollections,
-    const TfToken &topExpansionRule)
-    : Usd_CollectionMembershipQueryBase(
-        PathExpansionRuleMap {pathExpansionRuleMap},
-        SdfPathSet {includedCollections},
-        topExpansionRule)
-{
-}
-
-Usd_CollectionMembershipQueryBase::Usd_CollectionMembershipQueryBase(
-    PathExpansionRuleMap&& pathExpansionRuleMap,
-    SdfPathSet&& includedCollections,
-    TfToken const &topExpansionRule)
-    : _topExpansionRule(topExpansionRule)
-    , _pathExpansionRuleMap(std::move(pathExpansionRuleMap))
-    , _includedCollections(std::move(includedCollections))
-{
-    for (const auto &pathAndExpansionRule : _pathExpansionRuleMap) {
+Usd_CollectionMembershipQueryBase::Usd_CollectionMembershipQueryBase(PathExpansionRuleMap&& pathExpansionRuleMap,
+                                                                     SdfPathSet&& includedCollections,
+                                                                     TfToken const& topExpansionRule)
+    : _topExpansionRule(topExpansionRule),
+      _pathExpansionRuleMap(std::move(pathExpansionRuleMap)),
+      _includedCollections(std::move(includedCollections)) {
+    for (const auto& pathAndExpansionRule : _pathExpansionRuleMap) {
         if (pathAndExpansionRule.second == UsdTokens->exclude) {
             _hasExcludes = true;
             break;
@@ -353,11 +295,7 @@ Usd_CollectionMembershipQueryBase::Usd_CollectionMembershipQueryBase(
     }
 }
 
-bool
-Usd_CollectionMembershipQueryBase::_IsPathIncludedByRuleMap(
-    const SdfPath &path,
-    TfToken *expansionRule) const
-{
+bool Usd_CollectionMembershipQueryBase::_IsPathIncludedByRuleMap(const SdfPath& path, TfToken* expansionRule) const {
     // Coding Error if one passes in a relative path to _IsPathIncludedByRuleMap
     // Passing one causes a infinite loop because of how `GetParentPath` works.
     if (!path.IsAbsolutePath()) {
@@ -366,14 +304,12 @@ Usd_CollectionMembershipQueryBase::_IsPathIncludedByRuleMap(
     }
 
     // Only prims and properties can belong to a collection.
-    if (!path.IsPrimPath() && !path.IsPropertyPath())
-        return false;
+    if (!path.IsPrimPath() && !path.IsPropertyPath()) return false;
 
-    // Have separate code paths for prim and property paths as we'd like this 
+    // Have separate code paths for prim and property paths as we'd like this
     // method to be as fast as possible.
     if (path.IsPrimPath()) {
-        for (SdfPath p = path; p != SdfPath::EmptyPath();  p = p.GetParentPath())     
-        {
+        for (SdfPath p = path; p != SdfPath::EmptyPath(); p = p.GetParentPath()) {
             const auto i = _pathExpansionRuleMap.find(p);
             if (i != _pathExpansionRuleMap.end()) {
                 if (i->second == UsdTokens->exclude) {
@@ -381,8 +317,7 @@ Usd_CollectionMembershipQueryBase::_IsPathIncludedByRuleMap(
                         *expansionRule = UsdTokens->exclude;
                     }
                     return false;
-                } else if (i->second != UsdTokens->explicitOnly || 
-                           p == path) {
+                } else if (i->second != UsdTokens->explicitOnly || p == path) {
                     if (expansionRule) {
                         *expansionRule = i->second;
                     }
@@ -391,8 +326,7 @@ Usd_CollectionMembershipQueryBase::_IsPathIncludedByRuleMap(
             }
         }
     } else {
-        for (SdfPath p = path; p != SdfPath::EmptyPath();  p = p.GetParentPath()) 
-        {
+        for (SdfPath p = path; p != SdfPath::EmptyPath(); p = p.GetParentPath()) {
             const auto i = _pathExpansionRuleMap.find(p);
             if (i != _pathExpansionRuleMap.end()) {
                 if (i->second == UsdTokens->exclude) {
@@ -403,8 +337,7 @@ Usd_CollectionMembershipQueryBase::_IsPathIncludedByRuleMap(
                 }
                 // If there is a property path directly in the map, then it is
                 // considered included even if the rule is expandPrims.
-                else if (p.IsPropertyPath() ||
-                         (i->second == UsdTokens->expandPrimsAndProperties) ||
+                else if (p.IsPropertyPath() || (i->second == UsdTokens->expandPrimsAndProperties) ||
                          (i->second == UsdTokens->explicitOnly && p == path)) {
                     if (expansionRule) {
                         *expansionRule = i->second;
@@ -417,12 +350,9 @@ Usd_CollectionMembershipQueryBase::_IsPathIncludedByRuleMap(
     return false;
 }
 
-bool 
-Usd_CollectionMembershipQueryBase::_IsPathIncludedByRuleMap(
-    const SdfPath &path,
-    const TfToken &parentExpansionRule,
-    TfToken *expansionRule) const
-{
+bool Usd_CollectionMembershipQueryBase::_IsPathIncludedByRuleMap(const SdfPath& path,
+                                                                 const TfToken& parentExpansionRule,
+                                                                 TfToken* expansionRule) const {
     // Coding Error if one passes in a relative path to _IsPathIncludedByRuleMap
     if (!path.IsAbsolutePath()) {
         TF_CODING_ERROR("Relative paths are not allowed");
@@ -430,8 +360,7 @@ Usd_CollectionMembershipQueryBase::_IsPathIncludedByRuleMap(
     }
 
     // Only prims and properties can belong to a collection.
-    if (!path.IsPrimPath() && !path.IsPropertyPath())
-        return false;
+    if (!path.IsPrimPath() && !path.IsPropertyPath()) return false;
 
     // Check if there's a direct entry in the path-expansionRule map.
     const auto i = _pathExpansionRuleMap.find(path);
@@ -442,27 +371,25 @@ Usd_CollectionMembershipQueryBase::_IsPathIncludedByRuleMap(
         return i->second != UsdTokens->exclude;
     }
 
-    // There's no direct-entry, so decide based on the parent path's 
+    // There's no direct-entry, so decide based on the parent path's
     // expansion-rule.
     if (path.IsPrimPath()) {
-        bool parentIsExcludedOrExplicitlyIncluded = 
-            (parentExpansionRule == UsdTokens->exclude ||
-             parentExpansionRule == UsdTokens->explicitOnly);
+        bool parentIsExcludedOrExplicitlyIncluded =
+                (parentExpansionRule == UsdTokens->exclude || parentExpansionRule == UsdTokens->explicitOnly);
 
         if (expansionRule) {
-            *expansionRule = parentIsExcludedOrExplicitlyIncluded ? 
-                UsdTokens->exclude : parentExpansionRule;
+            *expansionRule = parentIsExcludedOrExplicitlyIncluded ? UsdTokens->exclude : parentExpansionRule;
         }
 
         return !parentIsExcludedOrExplicitlyIncluded;
 
     } else {
-        // If it's a property path, then the path is excluded unless its 
+        // If it's a property path, then the path is excluded unless its
         // parent-path's expansionRule is "expandPrimsAndProperties".
         if (expansionRule) {
-            *expansionRule = 
-                (parentExpansionRule == UsdTokens->expandPrimsAndProperties) ?
-                UsdTokens->expandPrimsAndProperties : UsdTokens->exclude;
+            *expansionRule = (parentExpansionRule == UsdTokens->expandPrimsAndProperties)
+                                     ? UsdTokens->expandPrimsAndProperties
+                                     : UsdTokens->exclude;
         }
         if (parentExpansionRule == UsdTokens->expandPrimsAndProperties) {
             return true;
@@ -471,16 +398,11 @@ Usd_CollectionMembershipQueryBase::_IsPathIncludedByRuleMap(
     return false;
 }
 
-bool
-Usd_CollectionMembershipQueryBase::_HasEmptyRuleMap() const
-{
+bool Usd_CollectionMembershipQueryBase::_HasEmptyRuleMap() const {
     return _pathExpansionRuleMap.empty();
 }
 
-size_t
-Usd_CollectionMembershipQueryBase::_Hash::operator()(
-    Usd_CollectionMembershipQueryBase const& q) const
-{
+size_t Usd_CollectionMembershipQueryBase::_Hash::operator()(Usd_CollectionMembershipQueryBase const& q) const {
     TRACE_FUNCTION();
 
     // Hashing unordered maps is costly because two maps holding the
@@ -492,8 +414,7 @@ Usd_CollectionMembershipQueryBase::_Hash::operator()(
     // computing the hash once and storing it in the MembershipQuery,
     // as a finalization step in _ComputeMembershipQueryImpl().
     typedef std::pair<SdfPath, TfToken> _Entry;
-    std::vector<_Entry> entries(q._pathExpansionRuleMap.begin(),
-                                q._pathExpansionRuleMap.end());
+    std::vector<_Entry> entries(q._pathExpansionRuleMap.begin(), q._pathExpansionRuleMap.end());
     std::sort(entries.begin(), entries.end());
 
     // Don't hash _hasExcludes because it is derived from
@@ -501,11 +422,8 @@ Usd_CollectionMembershipQueryBase::_Hash::operator()(
     return TfHash::Combine(entries, q._topExpansionRule);
 }
 
-
-SdfPathExpression
-UsdComputePathExpressionFromCollectionMembershipQueryRuleMap(
-    Usd_CollectionMembershipQueryBase::PathExpansionRuleMap const &ruleMap)
-{
+SdfPathExpression UsdComputePathExpressionFromCollectionMembershipQueryRuleMap(
+        Usd_CollectionMembershipQueryBase::PathExpansionRuleMap const& ruleMap) {
     // Shorthand to increase readability.
     using Expr = SdfPathExpression;
 
@@ -516,11 +434,16 @@ UsdComputePathExpressionFromCollectionMembershipQueryRuleMap(
 
     // Use an enum instead of tokens to avoid TfToken refcounting locally.
     enum Rule { ExpandPrims, ExpandPrimsAndProps, Exclude, ExplicitOnly };
-    auto tokenToRule = [](TfToken const &token) {
-        if (token == UsdTokens->expandPrims) { return ExpandPrims; }
-        if (token == UsdTokens->
-            expandPrimsAndProperties) { return ExpandPrimsAndProps; }
-        if (token == UsdTokens->exclude) { return Exclude; }
+    auto tokenToRule = [](TfToken const& token) {
+        if (token == UsdTokens->expandPrims) {
+            return ExpandPrims;
+        }
+        if (token == UsdTokens->expandPrimsAndProperties) {
+            return ExpandPrimsAndProps;
+        }
+        if (token == UsdTokens->exclude) {
+            return Exclude;
+        }
         return ExplicitOnly;
     };
 
@@ -539,12 +462,11 @@ UsdComputePathExpressionFromCollectionMembershipQueryRuleMap(
     // These subexpressions track explicitly included or excluded single-path
     // rules.  They are both just union chains, like '/foo /bar /baz' etc.
     Expr explicitIncludes, explicitExcludes;
-    auto addUnion = [](Expr &expr, SdfPath const &path) {
-        expr = Expr::MakeOp(Expr::ImpliedUnion,
-                            std::move(expr), Expr::MakeAtom(path));
+    auto addUnion = [](Expr& expr, SdfPath const& path) {
+        expr = Expr::MakeOp(Expr::ImpliedUnion, std::move(expr), Expr::MakeAtom(path));
     };
 
-    for (auto const &[path, ruleToken]: ruleMap) {
+    for (auto const& [path, ruleToken] : ruleMap) {
         Rule rule = tokenToRule(ruleToken);
         // Collect explicit-only rules separately.
         if (rule == ExplicitOnly) {
@@ -553,8 +475,7 @@ UsdComputePathExpressionFromCollectionMembershipQueryRuleMap(
         // Property paths can always be treated as explicit since they don't
         // have descendant prims/properties.
         else if (!path.IsAbsoluteRootOrPrimPath()) {
-            addUnion(
-                rule == Exclude ? explicitExcludes : explicitIncludes, path);
+            addUnion(rule == Exclude ? explicitExcludes : explicitIncludes, path);
         }
         // Other rules for prim-like paths are handled by the shift/reduce
         // builder.
@@ -567,15 +488,13 @@ UsdComputePathExpressionFromCollectionMembershipQueryRuleMap(
 
     // Build the expression shift-reduce style, merging the most descendant
     // expressions into ancestral expressions.
-    
+
     // Each stack entry contains the path for this rule as 'self', its
     // accumulated subexpression thus far (incorporating descendant rules), and
     // finally the rule for this path.
     struct StackEntry {
-        StackEntry(SdfPath const &self_, Rule rule_)
-            : StackEntry(SdfPath(self_), rule_) {}
-        StackEntry(SdfPath &&self_, Rule rule_)
-            : self(std::move(self_)), rule(rule_) {
+        StackEntry(SdfPath const& self_, Rule rule_) : StackEntry(SdfPath(self_), rule_) {}
+        StackEntry(SdfPath&& self_, Rule rule_) : self(std::move(self_)), rule(rule_) {
             // Note that this cannot be a property path.  Those are handled in
             // explicitIncludes/Excludes.
             TF_AXIOM(self.IsAbsoluteRootOrPrimPath());
@@ -588,13 +507,12 @@ UsdComputePathExpressionFromCollectionMembershipQueryRuleMap(
             // Otherwise build the initial expression for this path's rule,
             // starting with the path itself.
             Expr::PathPattern pattern(self);
-            pattern.AppendChild({}); // tack on '//'
+            pattern.AppendChild({});  // tack on '//'
             expr = Expr::MakeAtom(std::move(pattern));
             // If the rule is ExpandPrims (not properties) subtract properties.
             if (rule == ExpandPrims) {
-                static Expr const &allPropsExpr = *(new Expr("//*.*"));
-                expr = Expr::MakeOp(Expr::Difference,
-                                    std::move(expr), Expr{allPropsExpr});
+                static Expr const& allPropsExpr = *(new Expr("//*.*"));
+                expr = Expr::MakeOp(Expr::Difference, std::move(expr), Expr{allPropsExpr});
             }
             // Finally, to get correct precedence, we insert a weaker reference
             // '%_' on the left hand side joined with the operator for our rule.
@@ -604,9 +522,8 @@ UsdComputePathExpressionFromCollectionMembershipQueryRuleMap(
             // spot.  But if this rule is for the absolute root, we do not
             // include a weaker reference since it's the final rule.
             if (!self.IsAbsoluteRootPath()) {
-                expr = Expr::MakeOp(
-                    rule == Exclude ? Expr::Difference : Expr::Union,
-                    Expr::WeakerRef(), std::move(expr));
+                expr = Expr::MakeOp(rule == Exclude ? Expr::Difference : Expr::Union, Expr::WeakerRef(),
+                                    std::move(expr));
             }
         }
         SdfPath self;
@@ -620,7 +537,7 @@ UsdComputePathExpressionFromCollectionMembershipQueryRuleMap(
     // ancestor, reducing the stack size by one. If the stack is not empty,
     // return the empty expression.  If the stack has only one element, return
     // the final expression and leave the stack empty.
-    auto reduce = [](std::vector<StackEntry> &stack) {
+    auto reduce = [](std::vector<StackEntry>& stack) {
         Expr topExpr = std::move(stack.back().expr);
         stack.pop_back();
         // If the stack is empty, return the final expression.
@@ -630,13 +547,13 @@ UsdComputePathExpressionFromCollectionMembershipQueryRuleMap(
         // Otherwise combine into the next entry by composing the oldTop's
         // expression over the newTop's -- replacing the oldTop's weaker
         // reference '%_' with the newTop's expression.
-        StackEntry &newTop = stack.back();
+        StackEntry& newTop = stack.back();
         newTop.expr = topExpr.ComposeOver(newTop.expr);
         // Return empty since the expression is not yet complete.
         topExpr = {};
         return topExpr;
     };
-    
+
     // For uniformity we want the stack top to always be '/'.  If the first
     // entry in 'entries' is not '/', it means that '/' is implicitly excluded,
     // so in that case we push an exclude of '/' manually.  Otherwise the loop
@@ -649,7 +566,7 @@ UsdComputePathExpressionFromCollectionMembershipQueryRuleMap(
 
     // Process each entry in lexicographical order, which ensures we process
     // ancestors prior to descendants.
-    for (Entry &curEntry: entries) {
+    for (Entry& curEntry : entries) {
         // Reduce the stack until we find an ancestor of 'curEntry'.  Note that
         // this loop will never reduce stack to empty() -- it is only possibly
         // empty the first time through.
@@ -664,8 +581,7 @@ UsdComputePathExpressionFromCollectionMembershipQueryRuleMap(
         // top=expandPrimsAndProps and cur!=exclude.
         if (!stack.empty()) {
             Rule topRule = stack.back().rule, curRule = curEntry.second;
-            if ((topRule == Exclude && curRule == Exclude) ||
-                (topRule == ExpandPrims && curRule == ExpandPrims) ||
+            if ((topRule == Exclude && curRule == Exclude) || (topRule == ExpandPrims && curRule == ExpandPrims) ||
                 (topRule == ExpandPrimsAndProps && curRule != Exclude)) {
                 // This entry is redundant with the stack top, so skip it.  Any
                 // descendant entries of this curEntry will still be processed.
@@ -675,7 +591,7 @@ UsdComputePathExpressionFromCollectionMembershipQueryRuleMap(
         // Push new descendant.
         stack.emplace_back(std::move(curEntry.first), curEntry.second);
     }
-    
+
     // Reduce the remainder of the stack to complete building the expression.
     Expr result;
     while (!stack.empty()) {
@@ -692,12 +608,9 @@ UsdComputePathExpressionFromCollectionMembershipQueryRuleMap(
     // with hierarchical include/exclude rules, and 'incl/excl_1..N' are the
     // explicit includes & excludes.
 
-    return Expr::MakeOp(Expr::ImpliedUnion,
-                        std::move(explicitIncludes),
-                        Expr::MakeOp(Expr::Intersection,
-                                     Expr::MakeComplement(
-                                         std::move(explicitExcludes)),
-                                     std::move(result)));
+    return Expr::MakeOp(
+            Expr::ImpliedUnion, std::move(explicitIncludes),
+            Expr::MakeOp(Expr::Intersection, Expr::MakeComplement(std::move(explicitExcludes)), std::move(result)));
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

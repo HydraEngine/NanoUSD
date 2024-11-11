@@ -14,11 +14,9 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType)
-{
-    TfType::Define<UsdLuxRectLight,
-        TfType::Bases< UsdLuxBoundableLightBase > >();
-    
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<UsdLuxRectLight, TfType::Bases<UsdLuxBoundableLightBase>>();
+
     // Register the usd prim typename as an alias under UsdSchemaBase. This
     // enables one to call
     // TfType::Find<UsdSchemaBase>().FindDerivedByName("RectLight")
@@ -28,14 +26,10 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdLuxRectLight::~UsdLuxRectLight()
-{
-}
+UsdLuxRectLight::~UsdLuxRectLight() {}
 
 /* static */
-UsdLuxRectLight
-UsdLuxRectLight::Get(const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdLuxRectLight UsdLuxRectLight::Get(const UsdStagePtr& stage, const SdfPath& path) {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdLuxRectLight();
@@ -44,124 +38,83 @@ UsdLuxRectLight::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdLuxRectLight
-UsdLuxRectLight::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdLuxRectLight UsdLuxRectLight::Define(const UsdStagePtr& stage, const SdfPath& path) {
     static TfToken usdPrimTypeName("RectLight");
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdLuxRectLight();
     }
-    return UsdLuxRectLight(
-        stage->DefinePrim(path, usdPrimTypeName));
+    return UsdLuxRectLight(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
-UsdSchemaKind UsdLuxRectLight::_GetSchemaKind() const
-{
+UsdSchemaKind UsdLuxRectLight::_GetSchemaKind() const {
     return UsdLuxRectLight::schemaKind;
 }
 
 /* static */
-const TfType &
-UsdLuxRectLight::_GetStaticTfType()
-{
+const TfType& UsdLuxRectLight::_GetStaticTfType() {
     static TfType tfType = TfType::Find<UsdLuxRectLight>();
     return tfType;
 }
 
 /* static */
-bool 
-UsdLuxRectLight::_IsTypedSchema()
-{
+bool UsdLuxRectLight::_IsTypedSchema() {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdLuxRectLight::_GetTfType() const
-{
+const TfType& UsdLuxRectLight::_GetTfType() const {
     return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdLuxRectLight::GetWidthAttr() const
-{
+UsdAttribute UsdLuxRectLight::GetWidthAttr() const {
     return GetPrim().GetAttribute(UsdLuxTokens->inputsWidth);
 }
 
-UsdAttribute
-UsdLuxRectLight::CreateWidthAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsWidth,
-                       SdfValueTypeNames->Float,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdLuxRectLight::CreateWidthAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsWidth, SdfValueTypeNames->Float,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdLuxRectLight::GetHeightAttr() const
-{
+UsdAttribute UsdLuxRectLight::GetHeightAttr() const {
     return GetPrim().GetAttribute(UsdLuxTokens->inputsHeight);
 }
 
-UsdAttribute
-UsdLuxRectLight::CreateHeightAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsHeight,
-                       SdfValueTypeNames->Float,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdLuxRectLight::CreateHeightAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsHeight, SdfValueTypeNames->Float,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdLuxRectLight::GetTextureFileAttr() const
-{
+UsdAttribute UsdLuxRectLight::GetTextureFileAttr() const {
     return GetPrim().GetAttribute(UsdLuxTokens->inputsTextureFile);
 }
 
-UsdAttribute
-UsdLuxRectLight::CreateTextureFileAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsTextureFile,
-                       SdfValueTypeNames->Asset,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdLuxRectLight::CreateTextureFileAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdLuxTokens->inputsTextureFile, SdfValueTypeNames->Asset,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
 namespace {
-static inline TfTokenVector
-_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
-{
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector& left, const TfTokenVector& right) {
     TfTokenVector result;
     result.reserve(left.size() + right.size());
     result.insert(result.end(), left.begin(), left.end());
     result.insert(result.end(), right.begin(), right.end());
     return result;
 }
-}
+}  // namespace
 
 /*static*/
-const TfTokenVector&
-UsdLuxRectLight::GetSchemaAttributeNames(bool includeInherited)
-{
+const TfTokenVector& UsdLuxRectLight::GetSchemaAttributeNames(bool includeInherited) {
     static TfTokenVector localNames = {
-        UsdLuxTokens->inputsWidth,
-        UsdLuxTokens->inputsHeight,
-        UsdLuxTokens->inputsTextureFile,
+            UsdLuxTokens->inputsWidth,
+            UsdLuxTokens->inputsHeight,
+            UsdLuxTokens->inputsTextureFile,
     };
     static TfTokenVector allNames =
-        _ConcatenateAttributeNames(
-            UsdLuxBoundableLightBase::GetSchemaAttributeNames(true),
-            localNames);
+            _ConcatenateAttributeNames(UsdLuxBoundableLightBase::GetSchemaAttributeNames(true), localNames);
 
     if (includeInherited)
         return allNames;
@@ -184,24 +137,17 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-static bool
-_ComputeLocalExtent(const float width, 
-                    const float height, 
-                    VtVec3fArray *extent)
-{
+static bool _ComputeLocalExtent(const float width, const float height, VtVec3fArray* extent) {
     extent->resize(2);
     (*extent)[1] = GfVec3f(width * 0.5f, height * 0.5f, 0.0f);
     (*extent)[0] = -(*extent)[1];
     return true;
 }
 
-static bool 
-_ComputeExtent(
-    const UsdGeomBoundable &boundable,
-    const UsdTimeCode &time,
-    const GfMatrix4d *transform,
-    VtVec3fArray *extent)
-{
+static bool _ComputeExtent(const UsdGeomBoundable& boundable,
+                           const UsdTimeCode& time,
+                           const GfMatrix4d* transform,
+                           VtVec3fArray* extent) {
     const UsdLuxRectLight light(boundable);
     if (!TF_VERIFY(light)) {
         return false;
@@ -231,8 +177,7 @@ _ComputeExtent(
     return true;
 }
 
-TF_REGISTRY_FUNCTION(UsdGeomBoundable)
-{
+TF_REGISTRY_FUNCTION(UsdGeomBoundable) {
     UsdGeomRegisterComputeExtentFunction<UsdLuxRectLight>(_ComputeExtent);
 }
 

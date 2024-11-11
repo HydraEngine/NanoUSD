@@ -44,7 +44,7 @@ class SdfAssetPath;
 /// retaining their consistency with the RenderMan specification for
 /// NURBS Patches. HermiteCurves are useful for the
 /// interchange of animation guides and paths.
-/// 
+///
 /// It is safe to use the length of the curve vertex count to derive
 /// the number of curves and the number and layout of curve vertices,
 /// but this schema should NOT be used to derive the number of curve
@@ -53,10 +53,9 @@ class SdfAssetPath;
 /// internal or future shipped schemas will follow this pattern. Be
 /// sure to key any indexing behavior off the concrete type, not this
 /// abstract type.
-/// 
 ///
-class UsdGeomCurves : public UsdGeomPointBased
-{
+///
+class UsdGeomCurves : public UsdGeomPointBased {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -67,18 +66,12 @@ public:
     /// Equivalent to UsdGeomCurves::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdGeomCurves(const UsdPrim& prim=UsdPrim())
-        : UsdGeomPointBased(prim)
-    {
-    }
+    explicit UsdGeomCurves(const UsdPrim& prim = UsdPrim()) : UsdGeomPointBased(prim) {}
 
     /// Construct a UsdGeomCurves on the prim held by \p schemaObj .
     /// Should be preferred over UsdGeomCurves(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdGeomCurves(const UsdSchemaBase& schemaObj)
-        : UsdGeomPointBased(schemaObj)
-    {
-    }
+    explicit UsdGeomCurves(const UsdSchemaBase& schemaObj) : UsdGeomPointBased(schemaObj) {}
 
     /// Destructor.
     USDGEOM_API
@@ -88,8 +81,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDGEOM_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdGeomCurves holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -101,9 +93,7 @@ public:
     /// \endcode
     ///
     USDGEOM_API
-    static UsdGeomCurves
-    Get(const UsdStagePtr &stage, const SdfPath &path);
-
+    static UsdGeomCurves Get(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -116,17 +106,17 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDGEOM_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDGEOM_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // CURVEVERTEXCOUNTS 
+    // CURVEVERTEXCOUNTS
     // --------------------------------------------------------------------- //
     /// Curves-derived primitives can represent multiple distinct,
     /// potentially disconnected curves.  The length of 'curveVertexCounts'
@@ -141,17 +131,17 @@ public:
     USDGEOM_API
     UsdAttribute GetCurveVertexCountsAttr() const;
 
-    /// See GetCurveVertexCountsAttr(), and also 
+    /// See GetCurveVertexCountsAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateCurveVertexCountsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateCurveVertexCountsAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // WIDTHS 
+    // WIDTHS
     // --------------------------------------------------------------------- //
     /// Provides width specification for the curves, whose application
     /// will depend on whether the curve is oriented (normals are defined for
@@ -169,21 +159,21 @@ public:
     USDGEOM_API
     UsdAttribute GetWidthsAttr() const;
 
-    /// See GetWidthsAttr(), and also 
+    /// See GetWidthsAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateWidthsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateWidthsAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
@@ -195,7 +185,7 @@ public:
     /// Although 'widths' is not classified as a generic UsdGeomPrimvar (and
     /// will not be included in the results of UsdGeomPrimvarsAPI::GetPrimvars() )
     /// it does require an interpolation specification.  The fallback
-    /// interpolation, if left unspecified, is UsdGeomTokens->vertex , 
+    /// interpolation, if left unspecified, is UsdGeomTokens->vertex ,
     /// which means a width value is specified at the end of each curve segment.
     USDGEOM_API
     TfToken GetWidthsInterpolation() const;
@@ -204,35 +194,35 @@ public:
     /// attribute.
     ///
     /// \return true upon success, false if \p interpolation is not a legal
-    /// value as defined by UsdPrimvar::IsValidInterpolation(), or if there 
+    /// value as defined by UsdPrimvar::IsValidInterpolation(), or if there
     /// was a problem setting the value.  No attempt is made to validate
     /// that the widths attr's value contains the right number of elements
     /// to match its interpolation to its prim's topology.
     ///
     /// \sa GetWidthsInterpolation()
     USDGEOM_API
-    bool SetWidthsInterpolation(TfToken const &interpolation);
+    bool SetWidthsInterpolation(TfToken const& interpolation);
 
     /// Compute the extent for the curves defined by points and widths.
     ///
     /// \return true upon success, false if unable to calculate extent.
     ///
-    /// On success, extent will contain an approximate axis-aligned bounding 
+    /// On success, extent will contain an approximate axis-aligned bounding
     /// box of the curve defined by points with the given widths.
     ///
-    /// This function is to provide easy authoring of extent for usd authoring 
-    /// tools, hence it is static and acts outside a specific prim (as in 
+    /// This function is to provide easy authoring of extent for usd authoring
+    /// tools, hence it is static and acts outside a specific prim (as in
     /// attribute based methods).
     USDGEOM_API
-    static bool ComputeExtent(const VtVec3fArray& points,
-        const VtFloatArray& widths, VtVec3fArray* extent);
+    static bool ComputeExtent(const VtVec3fArray& points, const VtFloatArray& widths, VtVec3fArray* extent);
 
     /// \overload
     /// Computes the extent as if the matrix \p transform was first applied.
     USDGEOM_API
     static bool ComputeExtent(const VtVec3fArray& points,
-        const VtFloatArray& widths, const GfMatrix4d& transform,
-        VtVec3fArray* extent);
+                              const VtFloatArray& widths,
+                              const GfMatrix4d& transform,
+                              VtVec3fArray* extent);
 
     /// Returns the number of curves as defined by the size of the
     /// _curveVertexCounts_ array at _timeCode_.

@@ -9,15 +9,14 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-TF_WRAP_MODULE
-{
-    TF_WRAP(UsdGeomBBoxCache); 
+TF_WRAP_MODULE {
+    TF_WRAP(UsdGeomBBoxCache);
     TF_WRAP(UsdGeomConstraintTarget);
     TF_WRAP(UsdGeomPrimvar);
     TF_WRAP(UsdGeomXformOp);
     TF_WRAP(UsdGeomXformCache);
     TF_WRAP(Metrics);
-    
-    // Generated Schema classes.  Do not remove or edit the following line.
-    #include "generatedSchema.module.h"
+
+// Generated Schema classes.  Do not remove or edit the following line.
+#include "generatedSchema.module.h"
 }

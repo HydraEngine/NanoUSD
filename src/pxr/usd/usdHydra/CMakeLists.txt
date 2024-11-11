@@ -1,32 +1,28 @@
-set(PXR_PREFIX pxr/usd)
-set(PXR_PACKAGE usdHydra)
+#  Copyright (c) 2023 Feng Yang
+#
+#  I am making my contributions/submissions to this project solely in my
+#  personal capacity and am not conveying any rights to any intellectual
+#  property of any third parties.
 
-pxr_library(usdHydra
+# create sample app project
+project(usdHydra LANGUAGES C CXX)
 
-    INCLUDE_SCHEMA_FILES
-
-    LIBRARIES
-        tf
-        usd
-        usdShade
-
-    PUBLIC_CLASSES
-        discoveryPlugin
-
-    PUBLIC_HEADERS
-        api.h
-
-    PYTHON_CPPFILES
-        moduleDeps.cpp
-
-    PYMODULE_FILES
-        __init__.py
-
-    RESOURCE_FILES
-        shaders/shaderDefs.usda
-        shaders/empty.glslfx
-
-    DOXYGEN_FILES
-        overview.dox
+set(SRC_FILES
+        discoveryPlugin.cpp
+        generativeProceduralAPI.cpp
+        tokens.cpp
 )
 
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+        ${PXR_INCLUDE_PATH}
+)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC
+        fmt::fmt
+        Eigen3::Eigen
+        TBB::tbb
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)

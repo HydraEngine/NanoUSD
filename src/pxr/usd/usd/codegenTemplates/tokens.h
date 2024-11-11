@@ -4,30 +4,42 @@
 // Licensed under the terms set forth in the LICENSE.txt file available at
 // https://openusd.org/license.
 //
-#ifndef {{ Upper(tokensPrefix) }}_TOKENS_H
-#define {{ Upper(tokensPrefix) }}_TOKENS_H
+#ifndef{{Upper(tokensPrefix) } } _TOKENS_H
+#define{{Upper(tokensPrefix) } } _TOKENS_H
 
 /// \file {{ libraryName }}/tokens.h
 
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-// 
+//
 // This is an automatically generated file (by usdGenSchema.py).
 // Do not hand-edit!
-// 
+//
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-{% if useExportAPI %}
+{
+    % if useExportAPI %
+}
 #include "pxr/pxr.h"
 #include "{{ libraryPath }}/api.h"
-{% endif %}
+{
+    % endif %
+}
 #include "pxr/base/tf/staticData.h"
 #include "pxr/base/tf/token.h"
 #include <vector>
 
-{% if useExportAPI %}
-{{ namespaceOpen }}
+{
+    % if useExportAPI %
+}
+{
+    {
+        namespaceOpen
+    }
+}
 
-{% endif %}
+{
+    % endif %
+}
 
 /// \class {{ tokensPrefix }}TokensType
 ///
@@ -42,21 +54,45 @@
 ///
 /// {{ tokensPrefix }}Tokens also contains all of the \em allowedTokens values
 /// declared for schema builtin attributes of 'token' scene description type.
-{% if tokens %}
+{
+    % if tokens %
+}
 /// Use {{ tokensPrefix }}Tokens like so:
 ///
 /// \code
 ///     gprim.GetMyTokenValuedAttr().Set({{ tokensPrefix }}Tokens->{{ tokens[0].id }});
 /// \endcode
-{% endif %}
-struct {{ tokensPrefix }}TokensType {
-    {% if useExportAPI %}{{ Upper(libraryName) }}_API {% endif %}{{ tokensPrefix }}TokensType();
-{% for token in tokens %}
+{
+    % endif %
+}
+struct {
+    {
+        tokensPrefix
+    }
+} TokensType {
+    {
+        % if useExportAPI %
+    }
+    {
+        {
+            Upper(libraryName)
+        }
+    }
+    _API{ % endif % } {
+        {
+            tokensPrefix
+        }
+    }
+    TokensType();
+    {% for token in tokens %
+    }
     /// \brief "{{ token.value }}"
-    /// 
+    ///
     /// {{ token.desc }}
-    const TfToken {{ token.id }};
-{% endfor %}
+    const TfToken{{token.id}};
+    {
+        % endfor %
+    }
     /// A vector of all of the tokens listed above.
     const std::vector<TfToken> allTokens;
 };
@@ -65,10 +101,36 @@ struct {{ tokensPrefix }}TokensType {
 ///
 /// A global variable with static, efficient \link TfToken TfTokens\endlink
 /// for use in all public USD API.  \sa {{ tokensPrefix }}TokensType
-extern{% if useExportAPI %} {{ Upper(libraryName) }}_API{% endif %} TfStaticData<{{ tokensPrefix }}TokensType> {{ tokensPrefix }}Tokens;
-{% if useExportAPI %}
+extern {
+    % if useExportAPI %
+}
+{
+    {
+        Upper(libraryName)
+    }
+}
+_API{ % endif % } TfStaticData < {
+    {
+        tokensPrefix
+    }
+}
+TokensType > {
+    {
+        tokensPrefix
+    }
+}
+Tokens;
+{
+    % if useExportAPI %
+}
 
-{{ namespaceClose }}
-{% endif %}
+{
+    {
+        namespaceClose
+    }
+}
+{
+    % endif %
+}
 
 #endif

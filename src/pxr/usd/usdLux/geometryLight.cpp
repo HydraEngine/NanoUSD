@@ -14,11 +14,9 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType)
-{
-    TfType::Define<UsdLuxGeometryLight,
-        TfType::Bases< UsdLuxNonboundableLightBase > >();
-    
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<UsdLuxGeometryLight, TfType::Bases<UsdLuxNonboundableLightBase>>();
+
     // Register the usd prim typename as an alias under UsdSchemaBase. This
     // enables one to call
     // TfType::Find<UsdSchemaBase>().FindDerivedByName("GeometryLight")
@@ -28,14 +26,10 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdLuxGeometryLight::~UsdLuxGeometryLight()
-{
-}
+UsdLuxGeometryLight::~UsdLuxGeometryLight() {}
 
 /* static */
-UsdLuxGeometryLight
-UsdLuxGeometryLight::Get(const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdLuxGeometryLight UsdLuxGeometryLight::Get(const UsdStagePtr& stage, const SdfPath& path) {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdLuxGeometryLight();
@@ -44,83 +38,61 @@ UsdLuxGeometryLight::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdLuxGeometryLight
-UsdLuxGeometryLight::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdLuxGeometryLight UsdLuxGeometryLight::Define(const UsdStagePtr& stage, const SdfPath& path) {
     static TfToken usdPrimTypeName("GeometryLight");
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdLuxGeometryLight();
     }
-    return UsdLuxGeometryLight(
-        stage->DefinePrim(path, usdPrimTypeName));
+    return UsdLuxGeometryLight(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
-UsdSchemaKind UsdLuxGeometryLight::_GetSchemaKind() const
-{
+UsdSchemaKind UsdLuxGeometryLight::_GetSchemaKind() const {
     return UsdLuxGeometryLight::schemaKind;
 }
 
 /* static */
-const TfType &
-UsdLuxGeometryLight::_GetStaticTfType()
-{
+const TfType& UsdLuxGeometryLight::_GetStaticTfType() {
     static TfType tfType = TfType::Find<UsdLuxGeometryLight>();
     return tfType;
 }
 
 /* static */
-bool 
-UsdLuxGeometryLight::_IsTypedSchema()
-{
+bool UsdLuxGeometryLight::_IsTypedSchema() {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdLuxGeometryLight::_GetTfType() const
-{
+const TfType& UsdLuxGeometryLight::_GetTfType() const {
     return _GetStaticTfType();
 }
 
-UsdRelationship
-UsdLuxGeometryLight::GetGeometryRel() const
-{
+UsdRelationship UsdLuxGeometryLight::GetGeometryRel() const {
     return GetPrim().GetRelationship(UsdLuxTokens->geometry);
 }
 
-UsdRelationship
-UsdLuxGeometryLight::CreateGeometryRel() const
-{
+UsdRelationship UsdLuxGeometryLight::CreateGeometryRel() const {
     return GetPrim().CreateRelationship(UsdLuxTokens->geometry,
-                       /* custom = */ false);
+                                        /* custom = */ false);
 }
 
 namespace {
-static inline TfTokenVector
-_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
-{
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector& left, const TfTokenVector& right) {
     TfTokenVector result;
     result.reserve(left.size() + right.size());
     result.insert(result.end(), left.begin(), left.end());
     result.insert(result.end(), right.begin(), right.end());
     return result;
 }
-}
+}  // namespace
 
 /*static*/
-const TfTokenVector&
-UsdLuxGeometryLight::GetSchemaAttributeNames(bool includeInherited)
-{
-    static TfTokenVector localNames = {
-    };
+const TfTokenVector& UsdLuxGeometryLight::GetSchemaAttributeNames(bool includeInherited) {
+    static TfTokenVector localNames = {};
     static TfTokenVector allNames =
-        _ConcatenateAttributeNames(
-            UsdLuxNonboundableLightBase::GetSchemaAttributeNames(true),
-            localNames);
+            _ConcatenateAttributeNames(UsdLuxNonboundableLightBase::GetSchemaAttributeNames(true), localNames);
 
     if (includeInherited)
         return allNames;

@@ -29,27 +29,23 @@ class PcpPrimIndex;
 /// instance key are guaranteed to have the same opinions for name children
 /// and properties and thus can share the same prototype.
 ///
-class Usd_InstanceKey
-{
+class Usd_InstanceKey {
 public:
     Usd_InstanceKey();
 
     /// Create an instance key for the given instanceable prim index.
     explicit Usd_InstanceKey(const PcpPrimIndex& instance,
-                             const UsdStagePopulationMask *popMask,
-                             const UsdStageLoadRules &loadRules);
+                             const UsdStagePopulationMask* popMask,
+                             const UsdStageLoadRules& loadRules);
 
     /// Comparison operators.
     bool operator==(const Usd_InstanceKey& rhs) const;
-    inline bool operator!=(const Usd_InstanceKey& rhs) const {
-        return !(*this == rhs);
-    }
+    inline bool operator!=(const Usd_InstanceKey& rhs) const { return !(*this == rhs); }
 
 private:
     friend size_t hash_value(const Usd_InstanceKey& key);
 
-    friend std::ostream &
-    operator<<(std::ostream &os, const Usd_InstanceKey &key);
+    friend std::ostream& operator<<(std::ostream& os, const Usd_InstanceKey& key);
 
     size_t _ComputeHash() const;
 
@@ -61,11 +57,10 @@ private:
 };
 
 /// Return the hash code for \p key.
-inline size_t
-hash_value(const Usd_InstanceKey &key) {
+inline size_t hash_value(const Usd_InstanceKey& key) {
     return key._hash;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_INSTANCE_KEY_H
+#endif  // PXR_USD_USD_INSTANCE_KEY_H

@@ -12,12 +12,10 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
-TF_REGISTRY_FUNCTION(TfDebug)
-{
-    TF_DEBUG_ENVIRONMENT_SYMBOL(SDR_TYPE_CONFORMANCE, "Diagnostcs from parsing "
-            "and conforming default values for Sdr and Sdf type conformance");
+TF_REGISTRY_FUNCTION(TfDebug) {
+    TF_DEBUG_ENVIRONMENT_SYMBOL(SDR_TYPE_CONFORMANCE,
+                                "Diagnostcs from parsing "
+                                "and conforming default values for Sdr and Sdf type conformance");
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

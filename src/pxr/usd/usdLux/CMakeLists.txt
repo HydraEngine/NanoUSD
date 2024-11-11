@@ -1,70 +1,50 @@
-set(PXR_PREFIX pxr/usd)
-set(PXR_PACKAGE usdLux)
+#  Copyright (c) 2023 Feng Yang
+#
+#  I am making my contributions/submissions to this project solely in my
+#  personal capacity and am not conveying any rights to any intellectual
+#  property of any third parties.
 
-pxr_library(usdLux
-    INCLUDE_SCHEMA_FILES
+# create sample app project
+project(usdLux LANGUAGES C CXX)
 
-    LIBRARIES
-        tf
-        vt
-        ndr
-        sdf
-        usd
-        usdGeom
-        usdShade
-
-    PUBLIC_CLASSES
-        blackbody
-
-    PUBLIC_HEADERS
-        api.h
-
-    PRIVATE_CLASSES
-        discoveryPlugin
-        lightDefParser
-
-    PYTHON_CPPFILES
-        moduleDeps.cpp
-
-    PYMODULE_FILES 
-        __init__.py
-
-    DOXYGEN_FILES
-        overview.dox
+set(SRC_FILES
+        blackbody.cpp
+        boundableLightBase.cpp
+        cylinderLight.cpp
+        discoveryPlugin.cpp
+        diskLight.cpp
+        distantLight.cpp
+        domeLight.cpp
+        domeLight_1.cpp
+        geometryLight.cpp
+        lightAPI.cpp
+        lightDefParser.cpp
+        lightFilter.cpp
+        lightListAPI.cpp
+        listAPI.cpp
+        meshLightAPI.cpp
+        nonboundableLightBase.cpp
+        pluginLight.cpp
+        pluginLightFilter.cpp
+        portalLight.cpp
+        rectLight.cpp
+        shadowAPI.cpp
+        shapingAPI.cpp
+        sphereLight.cpp
+        tokens.cpp
+        volumeLightAPI.cpp
 )
 
-pxr_test_scripts(
-    testenv/testUsdLuxLight.py
-    testenv/testUsdLuxLinkingAPI.py
-    testenv/testUsdLuxLightListAPI.py
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+        ${PXR_INCLUDE_PATH}
 )
 
-pxr_register_test(testUsdLuxLight
-    PYTHON
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdLuxLight"
-    EXPECTED_RETURN_CODE 0
+target_link_libraries(${PROJECT_NAME} PUBLIC
+        fmt::fmt
+        Eigen3::Eigen
+        TBB::tbb
 )
 
-pxr_install_test_dir(
-    DEST testUsdLuxLinkingAPI
-    SRC testenv/testUsdLuxLinkingAPI
-)
-
-pxr_register_test(testUsdLuxLinkingAPI
-    PYTHON
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdLuxLinkingAPI"
-    EXPECTED_RETURN_CODE 0
-)
-
-pxr_install_test_dir(
-    DEST testUsdLuxLightListAPI
-    SRC testenv/testUsdLuxLightListAPI
-)
-
-pxr_register_test(testUsdLuxLightListAPI
-    PYTHON
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdLuxLightListAPI"
-    EXPECTED_RETURN_CODE 0
-)
-
-
+set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)

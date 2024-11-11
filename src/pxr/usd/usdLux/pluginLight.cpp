@@ -14,11 +14,9 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType)
-{
-    TfType::Define<UsdLuxPluginLight,
-        TfType::Bases< UsdGeomXformable > >();
-    
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<UsdLuxPluginLight, TfType::Bases<UsdGeomXformable>>();
+
     // Register the usd prim typename as an alias under UsdSchemaBase. This
     // enables one to call
     // TfType::Find<UsdSchemaBase>().FindDerivedByName("PluginLight")
@@ -28,14 +26,10 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdLuxPluginLight::~UsdLuxPluginLight()
-{
-}
+UsdLuxPluginLight::~UsdLuxPluginLight() {}
 
 /* static */
-UsdLuxPluginLight
-UsdLuxPluginLight::Get(const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdLuxPluginLight UsdLuxPluginLight::Get(const UsdStagePtr& stage, const SdfPath& path) {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdLuxPluginLight();
@@ -44,55 +38,41 @@ UsdLuxPluginLight::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdLuxPluginLight
-UsdLuxPluginLight::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdLuxPluginLight UsdLuxPluginLight::Define(const UsdStagePtr& stage, const SdfPath& path) {
     static TfToken usdPrimTypeName("PluginLight");
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdLuxPluginLight();
     }
-    return UsdLuxPluginLight(
-        stage->DefinePrim(path, usdPrimTypeName));
+    return UsdLuxPluginLight(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
-UsdSchemaKind UsdLuxPluginLight::_GetSchemaKind() const
-{
+UsdSchemaKind UsdLuxPluginLight::_GetSchemaKind() const {
     return UsdLuxPluginLight::schemaKind;
 }
 
 /* static */
-const TfType &
-UsdLuxPluginLight::_GetStaticTfType()
-{
+const TfType& UsdLuxPluginLight::_GetStaticTfType() {
     static TfType tfType = TfType::Find<UsdLuxPluginLight>();
     return tfType;
 }
 
 /* static */
-bool 
-UsdLuxPluginLight::_IsTypedSchema()
-{
+bool UsdLuxPluginLight::_IsTypedSchema() {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdLuxPluginLight::_GetTfType() const
-{
+const TfType& UsdLuxPluginLight::_GetTfType() const {
     return _GetStaticTfType();
 }
 
 /*static*/
-const TfTokenVector&
-UsdLuxPluginLight::GetSchemaAttributeNames(bool includeInherited)
-{
+const TfTokenVector& UsdLuxPluginLight::GetSchemaAttributeNames(bool includeInherited) {
     static TfTokenVector localNames;
-    static TfTokenVector allNames =
-        UsdGeomXformable::GetSchemaAttributeNames(true);
+    static TfTokenVector allNames = UsdGeomXformable::GetSchemaAttributeNames(true);
 
     if (includeInherited)
         return allNames;
@@ -113,9 +93,7 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-UsdShadeNodeDefAPI 
-UsdLuxPluginLight::GetNodeDefAPI() const
-{
+UsdShadeNodeDefAPI UsdLuxPluginLight::GetNodeDefAPI() const {
     return UsdShadeNodeDefAPI(GetPrim());
 }
 

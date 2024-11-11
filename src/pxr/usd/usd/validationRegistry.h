@@ -46,7 +46,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// provided in the plugInfo.json when registering the validators via plugin
 /// mechanism, or by providing metadata field when registering validators.
 ///
-/// Example of registering a validator named "StageMetadataValidator" with 
+/// Example of registering a validator named "StageMetadataValidator" with
 /// doc metadata using plufInfo.json:
 ///
 /// \code
@@ -81,12 +81,12 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// {
 ///     UsdValidationRegistry& registry = UsdValidationRegistry::GetInstance();
 ///     const TfToken validatorName("usd:StageMetadataValidator");
-///     const UsdValidateStageTaskFn stageTaskFn = 
+///     const UsdValidateStageTaskFn stageTaskFn =
 ///         [](const UsdStagePtr &usdStage) {
 ///             UsdValidationErrorVector errors;
 ///             if (!usdStage->GetDefaultPrim()) {
 ///                 errors.emplace_back(UsdValidationErrorType::Error,
-///                     {UsdValidationErrorSite(usdStage, SdfPath("/"))}, 
+///                     {UsdValidationErrorSite(usdStage, SdfPath("/"))},
 ///                     "Stage has missing or invalid defaultPrim.");
 ///             }
 ///             if (!usdStage->HasAuthoredMetadata(
@@ -143,17 +143,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// \sa UsdValidator
 /// \sa UsdValidatorSuite
-class UsdValidationRegistry
-{
+class UsdValidationRegistry {
     UsdValidationRegistry(const UsdValidationRegistry&) = delete;
     UsdValidationRegistry& operator=(const UsdValidationRegistry&) = delete;
+
 public:
     USD_API
-    static UsdValidationRegistry& GetInstance() {
-        return TfSingleton<UsdValidationRegistry>::GetInstance();
-    }
+    static UsdValidationRegistry& GetInstance() { return TfSingleton<UsdValidationRegistry>::GetInstance(); }
 
-    /// Register UsdValidator defined in a plugin using \p validatorName and 
+    /// Register UsdValidator defined in a plugin using \p validatorName and
     /// \p layerTaskFn with the UsdValidationRegistry.
     ///
     /// Here \p validatorName should include the name of the plugin the
@@ -164,15 +162,14 @@ public:
     /// used to determine if a validator is already registered and associated
     /// with validatorName.
     ///
-    /// Also note any other failure to register a validator results in a coding 
+    /// Also note any other failure to register a validator results in a coding
     /// error.
     ///
     /// \sa HasValidator
     USD_API
-    void RegisterPluginValidator(const TfToken &validatorName,
-                           const UsdValidateLayerTaskFn &layerTaskFn);
+    void RegisterPluginValidator(const TfToken& validatorName, const UsdValidateLayerTaskFn& layerTaskFn);
 
-    /// Register UsdValidator defined in a plugin using \p validatorName and 
+    /// Register UsdValidator defined in a plugin using \p validatorName and
     /// \p stageTaskFn with the UsdValidationRegistry.
     ///
     /// Here \p validatorName should include the name of the plugin the
@@ -183,15 +180,14 @@ public:
     /// used to determine if a validator is already registered and associated
     /// with validatorName.
     ///
-    /// Also note any other failure to register a validator results in a coding 
+    /// Also note any other failure to register a validator results in a coding
     /// error.
     ///
     /// \sa HasValidator
     USD_API
-    void RegisterPluginValidator(const TfToken &validatorName,
-                           const UsdValidateStageTaskFn &stageTaskFn);
+    void RegisterPluginValidator(const TfToken& validatorName, const UsdValidateStageTaskFn& stageTaskFn);
 
-    /// Register UsdValidator defined in a plugin using \p validatorName and 
+    /// Register UsdValidator defined in a plugin using \p validatorName and
     /// \p primTaskFn with the UsdValidationRegistry.
     ///
     /// Here \p validatorName should include the name of the plugin the
@@ -202,18 +198,17 @@ public:
     /// used to determine if a validator is already registered and associated
     /// with validatorName.
     ///
-    /// Also note any other failure to register a validator results in a coding 
+    /// Also note any other failure to register a validator results in a coding
     /// error.
     ///
     /// \sa HasValidator
     USD_API
-    void RegisterPluginValidator(const TfToken &validatorName,
-                           const UsdValidatePrimTaskFn &primTaskFn);
+    void RegisterPluginValidator(const TfToken& validatorName, const UsdValidatePrimTaskFn& primTaskFn);
 
     /// Register UsdValidator using \p metadata and \p layerTaskFn
     /// with the UsdValidationRegistry.
     ///
-    /// Clients can explicitly provide validator metadata, which is then used to 
+    /// Clients can explicitly provide validator metadata, which is then used to
     /// register a validator and associate it with name metadata. The metadata
     /// here is not specified in a plugInfo.
     ///
@@ -222,18 +217,17 @@ public:
     /// determine if a validator is already registered and associated with
     /// validatorName.
     ///
-    /// Also note any other failure to register a validator results in a coding 
+    /// Also note any other failure to register a validator results in a coding
     /// error.
     ///
     /// \sa HasValidator
     USD_API
-    void RegisterValidator(const UsdValidatorMetadata &metadata,
-                           const UsdValidateLayerTaskFn &layerTaskFn);
+    void RegisterValidator(const UsdValidatorMetadata& metadata, const UsdValidateLayerTaskFn& layerTaskFn);
 
     /// Register UsdValidator using \p metadata and \p stageTaskFn
     /// with the UsdValidationRegistry.
     ///
-    /// Clients can explicitly provide validator metadata, which is then used to 
+    /// Clients can explicitly provide validator metadata, which is then used to
     /// register a validator and associate it with name metadata. The metadata
     /// here is not specified in a plugInfo.
     ///
@@ -242,18 +236,17 @@ public:
     /// determine if a validator is already registered and associated with
     /// validatorName.
     ///
-    /// Also note any other failure to register a validator results in a coding 
+    /// Also note any other failure to register a validator results in a coding
     /// error.
     ///
     /// \sa HasValidator
     USD_API
-    void RegisterValidator(const UsdValidatorMetadata &metadata,
-                           const UsdValidateStageTaskFn &stageTaskFn);
+    void RegisterValidator(const UsdValidatorMetadata& metadata, const UsdValidateStageTaskFn& stageTaskFn);
 
     /// Register UsdValidator using \p metadata and \p primTaskFn
     /// with the UsdValidationRegistry.
     ///
-    /// Clients can explicitly provide validator metadata, which is then used to 
+    /// Clients can explicitly provide validator metadata, which is then used to
     /// register a validator and associate it with name metadata. The metadata
     /// here is not specified in a plugInfo.
     ///
@@ -262,13 +255,12 @@ public:
     /// determine if a validator is already registered and associated with
     /// validatorName.
     ///
-    /// Also note any other failure to register a validator results in a coding 
+    /// Also note any other failure to register a validator results in a coding
     /// error.
     ///
     /// \sa HasValidator
     USD_API
-    void RegisterValidator(const UsdValidatorMetadata &metadata,
-                           const UsdValidatePrimTaskFn &primTaskFn);
+    void RegisterValidator(const UsdValidatorMetadata& metadata, const UsdValidatePrimTaskFn& primTaskFn);
 
     /// Register UsdValidatorSuite defined in a plugin using
     /// \p validatorSuiteName and \p containedValidators with the
@@ -285,22 +277,21 @@ public:
     /// HasValidatorSuite can be used to determine if a validator is already
     /// registered and associated with validatorName.
     ///
-    /// Also note any other failure to register a validator results in a coding 
+    /// Also note any other failure to register a validator results in a coding
     /// error.
     ///
     /// \sa HasValidatorSuite
     USD_API
-    void RegisterPluginValidatorSuite(const TfToken &validatorSuiteName, 
-                                      const std::vector<const UsdValidator*>& 
-                                          containedValidators);
+    void RegisterPluginValidatorSuite(const TfToken& validatorSuiteName,
+                                      const std::vector<const UsdValidator*>& containedValidators);
 
     /// Register UsdValidatorSuite using \p metadata and
     /// \p containedValidators with the UsdValidationRegistry.
     ///
-    /// Clients can explicitly provide validator metadata, which is then used to 
+    /// Clients can explicitly provide validator metadata, which is then used to
     /// register a suite and associate it with name metadata. The metadata
     /// here is not specified in a plugInfo.
-    /// 
+    ///
     /// Note UsdValidatorMetadata::isSuite must be set to true in the plugInfo,
     /// else the validatorSuite will not be registered.
     ///
@@ -309,24 +300,23 @@ public:
     /// HasValidatorSuite can be used to determine if a validator is already
     /// registered and associated with validatorName.
     ///
-    /// Also note any other failure to register a validator results in a coding 
+    /// Also note any other failure to register a validator results in a coding
     /// error.
     ///
     /// \sa HasValidatorSuite
     USD_API
-    void RegisterValidatorSuite(const UsdValidatorMetadata &metadata,
-                                const std::vector<const UsdValidator*>&
-                                    containedValidators);
+    void RegisterValidatorSuite(const UsdValidatorMetadata& metadata,
+                                const std::vector<const UsdValidator*>& containedValidators);
 
     /// Return true if a UsdValidator is registered with the name \p
     /// validatorName; false otherwise.
     USD_API
-    bool HasValidator(const TfToken &validatorName) const;
+    bool HasValidator(const TfToken& validatorName) const;
 
     /// Return true if a UsdValidatorSuite is registered with the name \p
     /// validatorSuiteName; false otherwise.
     USD_API
-    bool HasValidatorSuite(const TfToken &suiteName) const;
+    bool HasValidatorSuite(const TfToken& suiteName) const;
 
     /// Returns a vector of const pointer to UsdValidator corresponding to all
     /// validators registered in the UsdValidationRegistry.
@@ -349,9 +339,9 @@ public:
     ///
     /// Returns a nullptr if no validator is found.
     USD_API
-    const UsdValidator* GetOrLoadValidatorByName(const TfToken &validatorName);
+    const UsdValidator* GetOrLoadValidatorByName(const TfToken& validatorName);
 
-    /// Returns a vector of const pointer to UsdValidator corresponding to 
+    /// Returns a vector of const pointer to UsdValidator corresponding to
     /// \p validatorNames found in the registry.
     ///
     /// If a validator is not found in the registry, this method will load
@@ -360,17 +350,16 @@ public:
     /// Size of returned vector might be less than the size of the input
     /// validatorNames, in case of missing validators.
     USD_API
-    std::vector<const UsdValidator*> 
-    GetOrLoadValidatorsByName(const TfTokenVector &validatorNames);
+    std::vector<const UsdValidator*> GetOrLoadValidatorsByName(const TfTokenVector& validatorNames);
 
-    /// Returns a vector of const pointer to UsdValidatorSuite corresponding to 
+    /// Returns a vector of const pointer to UsdValidatorSuite corresponding to
     /// all validator suites registered in the UsdValidationRegistry.
     ///
     /// If a suite is not found in the registry, this method will load
     /// appropriate plugins, if the suite is made available via a plugin.
     ///
     /// Note that this call might load in many plugins which provide a
-    /// UsdValidatorSuite, if not already loaded. Also note that returned suites 
+    /// UsdValidatorSuite, if not already loaded. Also note that returned suites
     /// will only include suites defined in plugins or any explicitly registered
     /// suites before this call.
     USD_API
@@ -384,8 +373,7 @@ public:
     ///
     /// Returns a nullptr if no validator is found.
     USD_API
-    const UsdValidatorSuite* GetOrLoadValidatorSuiteByName(
-        const TfToken &suiteName);
+    const UsdValidatorSuite* GetOrLoadValidatorSuiteByName(const TfToken& suiteName);
 
     /// Returns a vector of const pointer to UsdValidatorSuite corresponding to
     /// \p suiteNames found in the registry.
@@ -396,95 +384,87 @@ public:
     /// Size of returned vector might be less than the size of the input
     /// suiteNames, in case of missing validators.
     USD_API
-    std::vector<const UsdValidatorSuite*> 
-    GetOrLoadValidatorSuitesByName(const TfTokenVector &suiteNames);
+    std::vector<const UsdValidatorSuite*> GetOrLoadValidatorSuitesByName(const TfTokenVector& suiteNames);
 
     /// Returns true if metadata is found in the _validatorNameToMetadata for
     /// a validator/suite name, false otherwise.
     ///
     /// \p metadata parameter is used as an out parameter here.
     USD_API
-    bool GetValidatorMetadata(const TfToken &name, 
-                              UsdValidatorMetadata *metadata) const;
+    bool GetValidatorMetadata(const TfToken& name, UsdValidatorMetadata* metadata) const;
 
-    /// Return vector of all UsdValidatorMetadata known to the registry 
+    /// Return vector of all UsdValidatorMetadata known to the registry
     USD_API
     UsdValidatorMetadataVector GetAllValidatorMetadata() const;
 
     /// Returns vector of UsdValidatorMetadata associated with the Validators
     /// which belong to the \p pluginName.
     ///
-    /// This API can be used to curate a vector of validator metadata, that 
+    /// This API can be used to curate a vector of validator metadata, that
     /// clients may want to load and use in their validation context.
     ///
     /// Note that this method does not result in any plugins to be loaded.
     USD_API
-    UsdValidatorMetadataVector GetValidatorMetadataForPlugin(
-        const TfToken &pluginName) const;
+    UsdValidatorMetadataVector GetValidatorMetadataForPlugin(const TfToken& pluginName) const;
 
-    /// Returns vector of UsdValidatorMetadata associated with the Validators 
+    /// Returns vector of UsdValidatorMetadata associated with the Validators
     /// which has the \p keyword.
     ///
-    /// This API can be used to curate a vector of validator metadata, that 
+    /// This API can be used to curate a vector of validator metadata, that
     /// clients may want to load and use in their validation context.
     ///
     /// Note that this method does not result in any plugins to be loaded.
     USD_API
-    UsdValidatorMetadataVector GetValidatorMetadataForKeyword(
-        const TfToken &keyword) const;
+    UsdValidatorMetadataVector GetValidatorMetadataForKeyword(const TfToken& keyword) const;
 
-    /// Returns vector of UsdValidatorMetadata associated with the Validators 
+    /// Returns vector of UsdValidatorMetadata associated with the Validators
     /// which has the \p schemaType.
     ///
-    /// This API can be used to curate a vector of validator metadata, that 
+    /// This API can be used to curate a vector of validator metadata, that
     /// clients may want to load and use in their validation context.
     ///
     /// Note that this method does not result in any plugins to be loaded.
     USD_API
-    UsdValidatorMetadataVector GetValidatorMetadataForSchemaType(
-        const TfToken &schemaType) const;
+    UsdValidatorMetadataVector GetValidatorMetadataForSchemaType(const TfToken& schemaType) const;
 
-    /// Returns vector of UsdValidatorMetadata associated with the Validators 
+    /// Returns vector of UsdValidatorMetadata associated with the Validators
     /// which belong to the \p pluginNames.
     ///
     /// The returned vector is a union of all UsdValidatorMetadata associated
     /// with the plugins.
     ///
-    /// This API can be used to curate a vector of validator metadata, that 
+    /// This API can be used to curate a vector of validator metadata, that
     /// clients may want to load and use in their validation context.
     ///
     /// Note that this method does not result in any plugins to be loaded.
     USD_API
-    UsdValidatorMetadataVector GetValidatorMetadataForPlugins(
-        const TfTokenVector &pluginNames) const;
+    UsdValidatorMetadataVector GetValidatorMetadataForPlugins(const TfTokenVector& pluginNames) const;
 
-    /// Returns vector of UsdValidatorMetadata associated with the Validators 
+    /// Returns vector of UsdValidatorMetadata associated with the Validators
     /// which has at least one of the \p keywords.
     ///
     /// The returned vector is a union of all UsdValidatorMetadata associated
     /// with the keywords.
     ///
-    /// This API can be used to curate a vector of validator metadata, that 
+    /// This API can be used to curate a vector of validator metadata, that
     /// clients may want to load and use in their validation context.
     ///
     /// Note that this method does not result in any plugins to be loaded.
     USD_API
-    UsdValidatorMetadataVector GetValidatorMetadataForKeywords(
-        const TfTokenVector &keywords) const;
+    UsdValidatorMetadataVector GetValidatorMetadataForKeywords(const TfTokenVector& keywords) const;
 
-    /// Returns vector of UsdValidatorMetadata associated with the Validators 
+    /// Returns vector of UsdValidatorMetadata associated with the Validators
     /// which has at least one of the \p schameTypes.
     ///
     /// The returned vector is a union of all UsdValidatorMetadata associated
     /// with the schemaTypes.
     ///
-    /// This API can be used to curate a vector of validator metadata, that 
+    /// This API can be used to curate a vector of validator metadata, that
     /// clients may want to load and use in their validation context.
     ///
     /// Note that this method does not result in any plugins to be loaded.
     USD_API
-    UsdValidatorMetadataVector GetValidatorMetadataForSchemaTypes(
-        const TfTokenVector &schemaTypes) const;
+    UsdValidatorMetadataVector GetValidatorMetadataForSchemaTypes(const TfTokenVector& schemaTypes) const;
 
 private:
     friend class TfSingleton<UsdValidationRegistry>;
@@ -492,26 +472,26 @@ private:
     UsdValidationRegistry();
 
     // Initialize _validatorNameToMetadata, _keywordToValidatorNames and
-    // _schemaTypeToValidatorNames by parsing all plugInfo.json, find all 
+    // _schemaTypeToValidatorNames by parsing all plugInfo.json, find all
     // Validators.
     void _PopulateMetadataFromPlugInfo();
 
     // Templated method to register validator, called by appropriate
     // RegisterValidator methods, providing UsdValidateLayerTaskFn,
     // UsdValidateStageTaskFn or UsdValidatePrimTaskFn.
-    template<typename ValidateTaskFn>
-    void _RegisterPluginValidator(const TfToken &validatorName, 
-        const ValidateTaskFn &taskFn);
+    template <typename ValidateTaskFn>
+    void _RegisterPluginValidator(const TfToken& validatorName, const ValidateTaskFn& taskFn);
 
     // Overloaded templated _RegisterValidator, where metadata is explicitly
-    // provided. 
-    template<typename ValidateTaskFn>
-    void _RegisterValidator(const UsdValidatorMetadata &metadata, 
-        const ValidateTaskFn &taskFn, bool addMetadata = true);
+    // provided.
+    template <typename ValidateTaskFn>
+    void _RegisterValidator(const UsdValidatorMetadata& metadata,
+                            const ValidateTaskFn& taskFn,
+                            bool addMetadata = true);
 
-    void _RegisterValidatorSuite(const UsdValidatorMetadata &metadata,
-        const std::vector<const UsdValidator*>& containedValidators, 
-        bool addMetadata = true);
+    void _RegisterValidatorSuite(const UsdValidatorMetadata& metadata,
+                                 const std::vector<const UsdValidator*>& containedValidators,
+                                 bool addMetadata = true);
 
     // makes sure metadata provided is legal
     // checkForPrimTask parameter is used to determine if schemaTypes metadata
@@ -519,43 +499,36 @@ private:
     // UsdValidatePrimTaskFn.
     // expectSuite parameter is used to determine if the isSuite metadata is
     // appropriately set (for UsdValidatorSuite) or not (for UsdValidator).
-    static
-    bool _CheckMetadata(const UsdValidatorMetadata &metadata,
-            bool checkForPrimTask, bool expectSuite = false);
+    static bool _CheckMetadata(const UsdValidatorMetadata& metadata, bool checkForPrimTask, bool expectSuite = false);
 
     // Add validator metadata to _validatorNameToMetadata, also updates
     // _schemaTypeToValidatorNames and _keywordToValidatorNames, for easy access
     // to what validators are linked to specific schemaTypes or keywords.
     // _mutex must be acquired before calling this method.
-    bool _AddValidatorMetadata(const UsdValidatorMetadata &metadata);
-    
-    using _ValidatorNameToValidatorMap = 
-        std::unordered_map<TfToken, std::unique_ptr<UsdValidator>, 
-            TfToken::HashFunctor>;
-    using _ValidatorSuiteNameToValidatorSuiteMap = 
-        std::unordered_map<TfToken, std::unique_ptr<UsdValidatorSuite>,
-            TfToken::HashFunctor>;
-    using _ValidatorNameToMetadataMap =
-        std::unordered_map<TfToken, UsdValidatorMetadata, TfToken::HashFunctor>;
-    using _TokenToValidatorNamesMap =
-        std::unordered_map<TfToken, TfTokenVector, TfToken::HashFunctor>;
+    bool _AddValidatorMetadata(const UsdValidatorMetadata& metadata);
 
-    // Helper to query 
-    UsdValidatorMetadataVector _GetValidatorMetadataForToken(
-        const _TokenToValidatorNamesMap &tokenToValidatorNames,
-        const TfTokenVector &tokens) const;
+    using _ValidatorNameToValidatorMap =
+            std::unordered_map<TfToken, std::unique_ptr<UsdValidator>, TfToken::HashFunctor>;
+    using _ValidatorSuiteNameToValidatorSuiteMap =
+            std::unordered_map<TfToken, std::unique_ptr<UsdValidatorSuite>, TfToken::HashFunctor>;
+    using _ValidatorNameToMetadataMap = std::unordered_map<TfToken, UsdValidatorMetadata, TfToken::HashFunctor>;
+    using _TokenToValidatorNamesMap = std::unordered_map<TfToken, TfTokenVector, TfToken::HashFunctor>;
+
+    // Helper to query
+    UsdValidatorMetadataVector _GetValidatorMetadataForToken(const _TokenToValidatorNamesMap& tokenToValidatorNames,
+                                                             const TfTokenVector& tokens) const;
 
     // Helper to populate _keywordToValidatorNames and
     // _schemaTypeToValidatorNames
     // _mutex must be acquired before calling this method.
-    static
-    void _UpdateValidatorNamesMappings(_TokenToValidatorNamesMap &tokenMap, 
-        const TfToken &validatorName, const TfTokenVector &tokens);
+    static void _UpdateValidatorNamesMappings(_TokenToValidatorNamesMap& tokenMap,
+                                              const TfToken& validatorName,
+                                              const TfTokenVector& tokens);
 
-    // Main datastructure which holds validatorName to 
+    // Main datastructure which holds validatorName to
     // std::unique_ptr<UsdValidator>
     _ValidatorNameToValidatorMap _validators;
-    // Main datastructure which holds suiteName to 
+    // Main datastructure which holds suiteName to
     // std::unique_ptr<UsdValidatorSuite>
     _ValidatorSuiteNameToValidatorSuiteMap _validatorSuites;
 
@@ -594,4 +567,4 @@ USD_API_TEMPLATE_CLASS(TfSingleton<UsdValidationRegistry>);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_VALIDATION_REGISTRY_H
+#endif  // PXR_USD_USD_VALIDATION_REGISTRY_H

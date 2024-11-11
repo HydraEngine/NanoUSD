@@ -15,7 +15,7 @@
 #include "pxr/usd/usd/prim.h"
 #include "pxr/usd/usd/stage.h"
 
-#include "pxr/usd/usdShade/nodeDefAPI.h" 
+#include "pxr/usd/usdShade/nodeDefAPI.h"
 
 #include "pxr/base/vt/value.h"
 
@@ -36,16 +36,15 @@ class SdfAssetPath;
 
 /// \class UsdLuxPluginLight
 ///
-/// Light that provides properties that allow it to identify an 
-/// external SdrShadingNode definition, through UsdShadeNodeDefAPI, that can be 
-/// provided to render delegates without the need to provide a schema 
+/// Light that provides properties that allow it to identify an
+/// external SdrShadingNode definition, through UsdShadeNodeDefAPI, that can be
+/// provided to render delegates without the need to provide a schema
 /// definition for the light's type.
-/// 
-/// \see \ref usdLux_PluginSchemas
-/// 
 ///
-class UsdLuxPluginLight : public UsdGeomXformable
-{
+/// \see \ref usdLux_PluginSchemas
+///
+///
+class UsdLuxPluginLight : public UsdGeomXformable {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -56,18 +55,12 @@ public:
     /// Equivalent to UsdLuxPluginLight::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdLuxPluginLight(const UsdPrim& prim=UsdPrim())
-        : UsdGeomXformable(prim)
-    {
-    }
+    explicit UsdLuxPluginLight(const UsdPrim& prim = UsdPrim()) : UsdGeomXformable(prim) {}
 
     /// Construct a UsdLuxPluginLight on the prim held by \p schemaObj .
     /// Should be preferred over UsdLuxPluginLight(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdLuxPluginLight(const UsdSchemaBase& schemaObj)
-        : UsdGeomXformable(schemaObj)
-    {
-    }
+    explicit UsdLuxPluginLight(const UsdSchemaBase& schemaObj) : UsdGeomXformable(schemaObj) {}
 
     /// Destructor.
     USDLUX_API
@@ -77,8 +70,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDLUX_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdLuxPluginLight holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -90,8 +82,7 @@ public:
     /// \endcode
     ///
     USDLUX_API
-    static UsdLuxPluginLight
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdLuxPluginLight Get(const UsdStagePtr& stage, const SdfPath& path);
 
     /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
     /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -116,8 +107,7 @@ public:
     /// the opinion at the current EditTarget.
     ///
     USDLUX_API
-    static UsdLuxPluginLight
-    Define(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdLuxPluginLight Define(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -130,28 +120,28 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDLUX_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDLUX_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
     // --(BEGIN CUSTOM CODE)--
 
-    /// Convenience method for accessing the UsdShadeNodeDefAPI functionality 
-    /// for this prim. 
+    /// Convenience method for accessing the UsdShadeNodeDefAPI functionality
+    /// for this prim.
     /// One can also construct a UsdShadeNodeDefAPI directly from a UsdPrim.
     USDLUX_API
     UsdShadeNodeDefAPI GetNodeDefAPI() const;

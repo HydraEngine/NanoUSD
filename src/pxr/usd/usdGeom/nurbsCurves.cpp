@@ -14,11 +14,9 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType)
-{
-    TfType::Define<UsdGeomNurbsCurves,
-        TfType::Bases< UsdGeomCurves > >();
-    
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<UsdGeomNurbsCurves, TfType::Bases<UsdGeomCurves>>();
+
     // Register the usd prim typename as an alias under UsdSchemaBase. This
     // enables one to call
     // TfType::Find<UsdSchemaBase>().FindDerivedByName("NurbsCurves")
@@ -28,14 +26,10 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdGeomNurbsCurves::~UsdGeomNurbsCurves()
-{
-}
+UsdGeomNurbsCurves::~UsdGeomNurbsCurves() {}
 
 /* static */
-UsdGeomNurbsCurves
-UsdGeomNurbsCurves::Get(const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdGeomNurbsCurves UsdGeomNurbsCurves::Get(const UsdStagePtr& stage, const SdfPath& path) {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdGeomNurbsCurves();
@@ -44,142 +38,93 @@ UsdGeomNurbsCurves::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdGeomNurbsCurves
-UsdGeomNurbsCurves::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdGeomNurbsCurves UsdGeomNurbsCurves::Define(const UsdStagePtr& stage, const SdfPath& path) {
     static TfToken usdPrimTypeName("NurbsCurves");
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdGeomNurbsCurves();
     }
-    return UsdGeomNurbsCurves(
-        stage->DefinePrim(path, usdPrimTypeName));
+    return UsdGeomNurbsCurves(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
-UsdSchemaKind UsdGeomNurbsCurves::_GetSchemaKind() const
-{
+UsdSchemaKind UsdGeomNurbsCurves::_GetSchemaKind() const {
     return UsdGeomNurbsCurves::schemaKind;
 }
 
 /* static */
-const TfType &
-UsdGeomNurbsCurves::_GetStaticTfType()
-{
+const TfType& UsdGeomNurbsCurves::_GetStaticTfType() {
     static TfType tfType = TfType::Find<UsdGeomNurbsCurves>();
     return tfType;
 }
 
 /* static */
-bool 
-UsdGeomNurbsCurves::_IsTypedSchema()
-{
+bool UsdGeomNurbsCurves::_IsTypedSchema() {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdGeomNurbsCurves::_GetTfType() const
-{
+const TfType& UsdGeomNurbsCurves::_GetTfType() const {
     return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdGeomNurbsCurves::GetOrderAttr() const
-{
+UsdAttribute UsdGeomNurbsCurves::GetOrderAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->order);
 }
 
-UsdAttribute
-UsdGeomNurbsCurves::CreateOrderAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->order,
-                       SdfValueTypeNames->IntArray,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomNurbsCurves::CreateOrderAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->order, SdfValueTypeNames->IntArray,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomNurbsCurves::GetKnotsAttr() const
-{
+UsdAttribute UsdGeomNurbsCurves::GetKnotsAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->knots);
 }
 
-UsdAttribute
-UsdGeomNurbsCurves::CreateKnotsAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->knots,
-                       SdfValueTypeNames->DoubleArray,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomNurbsCurves::CreateKnotsAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->knots, SdfValueTypeNames->DoubleArray,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomNurbsCurves::GetRangesAttr() const
-{
+UsdAttribute UsdGeomNurbsCurves::GetRangesAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->ranges);
 }
 
-UsdAttribute
-UsdGeomNurbsCurves::CreateRangesAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->ranges,
-                       SdfValueTypeNames->Double2Array,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomNurbsCurves::CreateRangesAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->ranges, SdfValueTypeNames->Double2Array,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomNurbsCurves::GetPointWeightsAttr() const
-{
+UsdAttribute UsdGeomNurbsCurves::GetPointWeightsAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->pointWeights);
 }
 
-UsdAttribute
-UsdGeomNurbsCurves::CreatePointWeightsAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->pointWeights,
-                       SdfValueTypeNames->DoubleArray,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomNurbsCurves::CreatePointWeightsAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->pointWeights, SdfValueTypeNames->DoubleArray,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
 namespace {
-static inline TfTokenVector
-_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
-{
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector& left, const TfTokenVector& right) {
     TfTokenVector result;
     result.reserve(left.size() + right.size());
     result.insert(result.end(), left.begin(), left.end());
     result.insert(result.end(), right.begin(), right.end());
     return result;
 }
-}
+}  // namespace
 
 /*static*/
-const TfTokenVector&
-UsdGeomNurbsCurves::GetSchemaAttributeNames(bool includeInherited)
-{
+const TfTokenVector& UsdGeomNurbsCurves::GetSchemaAttributeNames(bool includeInherited) {
     static TfTokenVector localNames = {
-        UsdGeomTokens->order,
-        UsdGeomTokens->knots,
-        UsdGeomTokens->ranges,
-        UsdGeomTokens->pointWeights,
+            UsdGeomTokens->order,
+            UsdGeomTokens->knots,
+            UsdGeomTokens->ranges,
+            UsdGeomTokens->pointWeights,
     };
     static TfTokenVector allNames =
-        _ConcatenateAttributeNames(
-            UsdGeomCurves::GetSchemaAttributeNames(true),
-            localNames);
+            _ConcatenateAttributeNames(UsdGeomCurves::GetSchemaAttributeNames(true), localNames);
 
     if (includeInherited)
         return allNames;

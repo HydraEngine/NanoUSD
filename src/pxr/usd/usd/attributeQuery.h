@@ -22,7 +22,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 /// \class UsdAttributeQuery
 ///
 /// Object for efficiently making repeated queries for attribute values.
@@ -37,10 +36,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// just be less.
 ///
 /// \section UsdAttributeQuery_Resolve_targets Resolve targets
-/// An attribute query can also be constructed for an attribute along with a 
+/// An attribute query can also be constructed for an attribute along with a
 /// UsdResolveTarget. A resolve target allows value resolution to consider only
-/// a subrange of the prim stack instead of the entirety of it. All of the methods 
-/// of an attribute query created with a resolve target will perform value 
+/// a subrange of the prim stack instead of the entirety of it. All of the methods
+/// of an attribute query created with a resolve target will perform value
 /// resolution within that resolve target. This can be useful for finding the
 /// value of an attribute resolved up to a particular layer or for determining
 /// if a value authored on layer would be overridden by a stronger opinion.
@@ -52,12 +51,11 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \section UsdAttributeQuery_Invalidation Invalidation
 /// This object does not listen for change notification.  If a consumer is
 /// holding on to a UsdAttributeQuery, it is their responsibility to dispose
-/// of it in response to a resync change to the associated attribute. 
-/// Failing to do so may result in incorrect values or crashes due to 
+/// of it in response to a resync change to the associated attribute.
+/// Failing to do so may result in incorrect values or crashes due to
 /// dereferencing invalid objects.
 ///
-class UsdAttributeQuery
-{
+class UsdAttributeQuery {
 public:
     /// Construct an invalid query object.
     USD_API
@@ -65,11 +63,11 @@ public:
 
     /// Copy constructor.
     USD_API
-    UsdAttributeQuery(const UsdAttributeQuery &other);
+    UsdAttributeQuery(const UsdAttributeQuery& other);
 
     /// Move constructor.
     USD_API
-    UsdAttributeQuery(UsdAttributeQuery &&other) = default;
+    UsdAttributeQuery(UsdAttributeQuery&& other) = default;
 
     /// Construct a new query for the attribute \p attr.
     USD_API
@@ -80,21 +78,19 @@ public:
     USD_API
     UsdAttributeQuery(const UsdPrim& prim, const TfToken& attrName);
 
-    /// Construct a new query for the attribute \p attr with the given 
+    /// Construct a new query for the attribute \p attr with the given
     /// resolve target \p resolveTarget.
     ///
-    /// Note that a UsdResolveTarget is associated with a particular prim so 
+    /// Note that a UsdResolveTarget is associated with a particular prim so
     /// only resolve targets for the attribute's owning prim are allowed.
     USD_API
-    UsdAttributeQuery(const UsdAttribute &attr, 
-        const UsdResolveTarget &resolveTarget);
+    UsdAttributeQuery(const UsdAttribute& attr, const UsdResolveTarget& resolveTarget);
 
     /// Construct new queries for the attributes named in \p attrNames under
     /// the prim \p prim. The objects in the returned vector will line up
     /// 1-to-1 with \p attrNames.
     USD_API
-    static std::vector<UsdAttributeQuery> CreateQueries(
-        const UsdPrim& prim, const TfTokenVector& attrNames);
+    static std::vector<UsdAttributeQuery> CreateQueries(const UsdPrim& prim, const TfTokenVector& attrNames);
 
     // --------------------------------------------------------------------- //
     /// \name Query information
@@ -108,23 +104,19 @@ public:
 
     /// Return true if this query is valid (i.e. it is associated with a
     /// valid attribute), false otherwise.
-    bool IsValid() const {
-        return GetAttribute().IsValid();
-    }
+    bool IsValid() const { return GetAttribute().IsValid(); }
 
 public:
     /// Returns \c true if the query object is valid, \c false otherwise.
-    explicit operator bool() const {
-        return IsValid();
-    }
+    explicit operator bool() const { return IsValid(); }
 
     /// Copy assignment.
     USD_API
-    UsdAttributeQuery &operator=(const UsdAttributeQuery &other);
+    UsdAttributeQuery& operator=(const UsdAttributeQuery& other);
 
     /// Move assignment.
     USD_API
-    UsdAttributeQuery &operator=(UsdAttributeQuery &&other) = default;
+    UsdAttributeQuery& operator=(UsdAttributeQuery&& other) = default;
 
     /// @}
 
@@ -140,17 +132,16 @@ public:
     /// \sa UsdAttribute::Get
     template <typename T>
     bool Get(T* value, UsdTimeCode time = UsdTimeCode::Default()) const {
-        static_assert(SdfValueTypeTraits<T>::IsValueType,
-                      "T must be an SdfValueType.");
+        static_assert(SdfValueTypeTraits<T>::IsValueType, "T must be an SdfValueType.");
         return _Get(value, time);
     }
     /// \overload
     /// Type-erased access, often not as efficient as typed access.
     USD_API
     bool Get(VtValue* value, UsdTimeCode time = UsdTimeCode::Default()) const;
-    
-    /// Populates a vector with authored sample times. 
-    /// Returns false only on error. 
+
+    /// Populates a vector with authored sample times.
+    /// Returns false only on error.
     //
     /// Behaves identically to UsdAttribute::GetTimeSamples()
     ///
@@ -163,45 +154,41 @@ public:
     ///
     /// Behaves identically to UsdAttribute::GetTimeSamplesInInterval()
     USD_API
-    bool GetTimeSamplesInInterval(const GfInterval& interval,
-                                  std::vector<double>* times) const;
+    bool GetTimeSamplesInInterval(const GfInterval& interval, std::vector<double>* times) const;
 
-    /// Populates the given vector, \p times with the union of all the 
-    /// authored sample times on all of the given attribute-query objects, 
+    /// Populates the given vector, \p times with the union of all the
+    /// authored sample times on all of the given attribute-query objects,
     /// \p attrQueries.
-    /// 
+    ///
     /// Behaves identically to UsdAttribute::GetUnionedTimeSamples()
-    /// 
-    /// \return false if one or more attribute-queries in \p attrQueries are 
-    /// invalid or if there's an error fetching time-samples for any of 
+    ///
+    /// \return false if one or more attribute-queries in \p attrQueries are
+    /// invalid or if there's an error fetching time-samples for any of
     /// the attribute-query objects.
     ///
     /// \sa UsdAttribute::GetUnionedTimeSamples
     /// \sa UsdAttributeQuery::GetUnionedTimeSamplesInInterval
     USD_API
-    static bool GetUnionedTimeSamples(
-        const std::vector<UsdAttributeQuery> &attrQueries, 
-        std::vector<double> *times);
+    static bool GetUnionedTimeSamples(const std::vector<UsdAttributeQuery>& attrQueries, std::vector<double>* times);
 
-    /// Populates the given vector, \p times with the union of all the 
-    /// authored sample times in the GfInterval, \p interval on all of the 
+    /// Populates the given vector, \p times with the union of all the
+    /// authored sample times in the GfInterval, \p interval on all of the
     /// given attribute-query objects, \p attrQueries.
-    /// 
+    ///
     /// Behaves identically to UsdAttribute::GetUnionedTimeSamplesInInterval()
-    /// 
-    /// \return false if one or more attribute-queries in \p attrQueries are 
-    /// invalid or if there's an error fetching time-samples for any of 
+    ///
+    /// \return false if one or more attribute-queries in \p attrQueries are
+    /// invalid or if there's an error fetching time-samples for any of
     /// the attribute-query objects.
     ///
     /// \sa UsdAttribute::GetUnionedTimeSamplesInInterval
     USD_API
-    static bool GetUnionedTimeSamplesInInterval(
-        const std::vector<UsdAttributeQuery> &attrQueries, 
-        const GfInterval &interval,
-        std::vector<double> *times);
+    static bool GetUnionedTimeSamplesInInterval(const std::vector<UsdAttributeQuery>& attrQueries,
+                                                const GfInterval& interval,
+                                                std::vector<double>* times);
 
     /// Returns the number of time samples that have been authored.
-    /// 
+    ///
     /// \sa UsdAttribute::GetNumTimeSamples
     USD_API
     size_t GetNumTimeSamples() const;
@@ -211,13 +198,10 @@ public:
     ///
     /// \sa UsdAttribute::GetBracketingTimeSamples
     USD_API
-    bool GetBracketingTimeSamples(double desiredTime, 
-                                  double* lower, 
-                                  double* upper, 
-                                  bool* hasTimeSamples) const;
+    bool GetBracketingTimeSamples(double desiredTime, double* lower, double* upper, bool* hasTimeSamples) const;
 
-    /// Return true if the attribute associated with this query has an 
-    /// authored default value, authored time samples or a fallback value 
+    /// Return true if the attribute associated with this query has an
+    /// authored default value, authored time samples or a fallback value
     /// provided by a registered schema.
     ///
     /// \sa UsdAttribute::HasValue
@@ -225,7 +209,7 @@ public:
     bool HasValue() const;
 
     /// \deprecated This method is deprecated because it returns `true` even when
-    /// an attribute is blocked.  Please use HasAuthoredValue() instead. If 
+    /// an attribute is blocked.  Please use HasAuthoredValue() instead. If
     /// you truly need to know whether the attribute has **any** authored
     /// value opinions, *including blocks*, you can make the following query:
     /// `query.GetAttribute().GetResolveInfo().HasAuthoredValueOpinion()`
@@ -237,13 +221,13 @@ public:
     bool HasAuthoredValueOpinion() const;
 
     /// Return true if this attribute has either an authored default value or
-    /// authored time samples.  If the attribute has been 
+    /// authored time samples.  If the attribute has been
     /// \ref Usd_AttributeBlocking "blocked", then return `false`
     /// \sa UsdAttribute::HasAuthoredValue()
     USD_API
     bool HasAuthoredValue() const;
 
-    /// Return true if the attribute associated with this query has a 
+    /// Return true if the attribute associated with this query has a
     /// fallback value provided by a registered schema.
     ///
     /// \sa UsdAttribute::HasFallbackValue
@@ -251,7 +235,7 @@ public:
     bool HasFallbackValue() const;
 
     /// Return true if it is possible, but not certain, that this attribute's
-    /// value changes over time, false otherwise. 
+    /// value changes over time, false otherwise.
     ///
     /// \sa UsdAttribute::ValueMightBeTimeVarying
     USD_API
@@ -262,11 +246,10 @@ public:
 private:
     void _Initialize();
 
-    void _Initialize(const UsdResolveTarget &resolveTarget);
+    void _Initialize(const UsdResolveTarget& resolveTarget);
 
     template <typename T>
-    USD_API
-    bool _Get(T* value, UsdTimeCode time) const;
+    USD_API bool _Get(T* value, UsdTimeCode time) const;
 
 private:
     UsdAttribute _attr;
@@ -276,4 +259,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_ATTRIBUTE_QUERY_H
+#endif  // PXR_USD_USD_ATTRIBUTE_QUERY_H

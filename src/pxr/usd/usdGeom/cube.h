@@ -36,12 +36,11 @@ class SdfAssetPath;
 /// \class UsdGeomCube
 ///
 /// Defines a primitive rectilinear cube centered at the origin.
-/// 
+///
 /// The fallback values for Cube, Sphere, Cone, and Cylinder are set so that
 /// they all pack into the same volume/bounds.
 ///
-class UsdGeomCube : public UsdGeomGprim
-{
+class UsdGeomCube : public UsdGeomGprim {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -52,18 +51,12 @@ public:
     /// Equivalent to UsdGeomCube::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdGeomCube(const UsdPrim& prim=UsdPrim())
-        : UsdGeomGprim(prim)
-    {
-    }
+    explicit UsdGeomCube(const UsdPrim& prim = UsdPrim()) : UsdGeomGprim(prim) {}
 
     /// Construct a UsdGeomCube on the prim held by \p schemaObj .
     /// Should be preferred over UsdGeomCube(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdGeomCube(const UsdSchemaBase& schemaObj)
-        : UsdGeomGprim(schemaObj)
-    {
-    }
+    explicit UsdGeomCube(const UsdSchemaBase& schemaObj) : UsdGeomGprim(schemaObj) {}
 
     /// Destructor.
     USDGEOM_API
@@ -73,8 +66,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDGEOM_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdGeomCube holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -86,8 +78,7 @@ public:
     /// \endcode
     ///
     USDGEOM_API
-    static UsdGeomCube
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdGeomCube Get(const UsdStagePtr& stage, const SdfPath& path);
 
     /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
     /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -112,8 +103,7 @@ public:
     /// the opinion at the current EditTarget.
     ///
     USDGEOM_API
-    static UsdGeomCube
-    Define(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdGeomCube Define(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -126,21 +116,21 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDGEOM_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDGEOM_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // SIZE 
+    // SIZE
     // --------------------------------------------------------------------- //
     /// Indicates the length of each edge of the cube.  If you
     /// author \em size you must also author \em extent.
-    /// 
+    ///
     /// \sa GetExtentAttr()
     ///
     /// | ||
@@ -151,17 +141,17 @@ public:
     USDGEOM_API
     UsdAttribute GetSizeAttr() const;
 
-    /// See GetSizeAttr(), and also 
+    /// See GetSizeAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateSizeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateSizeAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // EXTENT 
+    // EXTENT
     // --------------------------------------------------------------------- //
     /// Extent is re-defined on Cube only to provide a fallback value.
     /// \sa UsdGeomGprim::GetExtentAttr().
@@ -174,21 +164,21 @@ public:
     USDGEOM_API
     UsdAttribute GetExtentAttr() const;
 
-    /// See GetExtentAttr(), and also 
+    /// See GetExtentAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateExtentAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateExtentAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
@@ -198,11 +188,11 @@ public:
     ///
     /// \return true upon success, false if unable to calculate extent.
     ///
-    /// On success, extent will contain an approximate axis-aligned bounding 
+    /// On success, extent will contain an approximate axis-aligned bounding
     /// box of the cube defined by the size of each dimension.
     ///
-    /// This function is to provide easy authoring of extent for usd authoring 
-    /// tools, hence it is static and acts outside a specific prim (as in 
+    /// This function is to provide easy authoring of extent for usd authoring
+    /// tools, hence it is static and acts outside a specific prim (as in
     /// attribute based methods).
     USDGEOM_API
     static bool ComputeExtent(double size, VtVec3fArray* extent);
@@ -210,8 +200,7 @@ public:
     /// \overload
     /// Computes the extent as if the matrix \p transform was first applied.
     USDGEOM_API
-    static bool ComputeExtent(double size, const GfMatrix4d& transform,
-        VtVec3fArray* extent);
+    static bool ComputeExtent(double size, const GfMatrix4d& transform, VtVec3fArray* extent);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -9,15 +9,14 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-TF_WRAP_MODULE
-{
+TF_WRAP_MODULE {
     TF_WRAP(UsdCommon);
     TF_WRAP(UsdNotice);
     TF_WRAP(UsdTimeCode);
     TF_WRAP(UsdInterpolationType);
 
     // UsdObject and its subclasses.
-    TF_WRAP(UsdObject); 
+    TF_WRAP(UsdObject);
     TF_WRAP(UsdProperty);
     TF_WRAP(UsdAttribute);
     TF_WRAP(UsdRelationship);
@@ -64,6 +63,6 @@ TF_WRAP_MODULE
     TF_WRAP(UsdPrimCompositionQuery);
     TF_WRAP(UsdFlattenUtils);
 
-    // Generated Schema classes.  Do not remove or edit the following line.
-    #include "generatedSchema.module.h"
+// Generated Schema classes.  Do not remove or edit the following line.
+#include "generatedSchema.module.h"
 }

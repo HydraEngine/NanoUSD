@@ -35,19 +35,18 @@ class SdfAssetPath;
 
 /// \class UsdGeomGprim
 ///
-/// Base class for all geometric primitives.  
-/// 
+/// Base class for all geometric primitives.
+///
 /// Gprim encodes basic graphical properties such as \em doubleSided and
 /// \em orientation, and provides primvars for "display color" and "display
-/// opacity" that travel with geometry to be used as shader overrides.  
+/// opacity" that travel with geometry to be used as shader overrides.
 ///
 /// For any described attribute \em Fallback \em Value or \em Allowed \em Values below
 /// that are text/tokens, the actual token is published and defined in \ref UsdGeomTokens.
 /// So to set an attribute to the value "rightHanded", use UsdGeomTokens->rightHanded
 /// as the value.
 ///
-class UsdGeomGprim : public UsdGeomBoundable
-{
+class UsdGeomGprim : public UsdGeomBoundable {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -58,18 +57,12 @@ public:
     /// Equivalent to UsdGeomGprim::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdGeomGprim(const UsdPrim& prim=UsdPrim())
-        : UsdGeomBoundable(prim)
-    {
-    }
+    explicit UsdGeomGprim(const UsdPrim& prim = UsdPrim()) : UsdGeomBoundable(prim) {}
 
     /// Construct a UsdGeomGprim on the prim held by \p schemaObj .
     /// Should be preferred over UsdGeomGprim(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdGeomGprim(const UsdSchemaBase& schemaObj)
-        : UsdGeomBoundable(schemaObj)
-    {
-    }
+    explicit UsdGeomGprim(const UsdSchemaBase& schemaObj) : UsdGeomBoundable(schemaObj) {}
 
     /// Destructor.
     USDGEOM_API
@@ -79,8 +72,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDGEOM_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdGeomGprim holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -92,9 +84,7 @@ public:
     /// \endcode
     ///
     USDGEOM_API
-    static UsdGeomGprim
-    Get(const UsdStagePtr &stage, const SdfPath &path);
-
+    static UsdGeomGprim Get(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -107,17 +97,17 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDGEOM_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDGEOM_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // DISPLAYCOLOR 
+    // DISPLAYCOLOR
     // --------------------------------------------------------------------- //
     /// It is useful to have an "official" colorSet that can be used
     /// as a display or modeling color, even in the absence of any specified
@@ -133,17 +123,17 @@ public:
     USDGEOM_API
     UsdAttribute GetDisplayColorAttr() const;
 
-    /// See GetDisplayColorAttr(), and also 
+    /// See GetDisplayColorAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateDisplayColorAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateDisplayColorAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // DISPLAYOPACITY 
+    // DISPLAYOPACITY
     // --------------------------------------------------------------------- //
     /// Companion to \em displayColor that specifies opacity, broken
     /// out as an independent attribute rather than an rgba color, both so that
@@ -158,30 +148,30 @@ public:
     USDGEOM_API
     UsdAttribute GetDisplayOpacityAttr() const;
 
-    /// See GetDisplayOpacityAttr(), and also 
+    /// See GetDisplayOpacityAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateDisplayOpacityAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateDisplayOpacityAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // DOUBLESIDED 
+    // DOUBLESIDED
     // --------------------------------------------------------------------- //
     /// Although some renderers treat all parametric or polygonal
     /// surfaces as if they were effectively laminae with outward-facing
     /// normals on both sides, some renderers derive significant optimizations
     /// by considering these surfaces to have only a single outward side,
-    /// typically determined by control-point winding order and/or 
+    /// typically determined by control-point winding order and/or
     /// \em orientation.  By doing so they can perform "backface culling" to
     /// avoid drawing the many polygons of most closed surfaces that face away
     /// from the viewer.
-    /// 
+    ///
     /// However, it is often advantageous to model thin objects such as paper
     /// and cloth as single, open surfaces that must be viewable from both
-    /// sides, always.  Setting a gprim's \em doubleSided attribute to 
+    /// sides, always.  Setting a gprim's \em doubleSided attribute to
     /// \c true instructs all renderers to disable optimizations such as
     /// backface culling for the gprim, and attempt (not all renderers are able
     /// to do so, but the USD reference GL renderer always will) to provide
@@ -197,19 +187,19 @@ public:
     USDGEOM_API
     UsdAttribute GetDoubleSidedAttr() const;
 
-    /// See GetDoubleSidedAttr(), and also 
+    /// See GetDoubleSidedAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateDoubleSidedAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateDoubleSidedAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // ORIENTATION 
+    // ORIENTATION
     // --------------------------------------------------------------------- //
-    /// Orientation specifies whether the gprim's surface normal 
+    /// Orientation specifies whether the gprim's surface normal
     /// should be computed using the right hand rule, or the left hand rule.
     /// Please see \ref UsdGeom_WindingOrder for a deeper explanation and
     /// generalization of orientation to composed scenes with transformation
@@ -225,21 +215,21 @@ public:
     USDGEOM_API
     UsdAttribute GetOrientationAttr() const;
 
-    /// See GetOrientationAttr(), and also 
+    /// See GetOrientationAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateOrientationAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateOrientationAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
@@ -256,9 +246,7 @@ public:
     ///
     /// \sa CreateDisplayColorAttr(), GetDisplayColorPrimvar()
     USDGEOM_API
-    UsdGeomPrimvar CreateDisplayColorPrimvar(
-                                const TfToken& interpolation = TfToken(),
-                                int elementSize = -1) const;
+    UsdGeomPrimvar CreateDisplayColorPrimvar(const TfToken& interpolation = TfToken(), int elementSize = -1) const;
 
     /// Convenience function to get the displayOpacity Attribute as a Primvar.
     ///
@@ -271,10 +259,7 @@ public:
     ///
     /// \sa CreateDisplayOpacityAttr(), GetDisplayOpacityPrimvar()
     USDGEOM_API
-    UsdGeomPrimvar CreateDisplayOpacityPrimvar(
-                                const TfToken& interpolation = TfToken(),
-                                int elementSize = -1) const;
-
+    UsdGeomPrimvar CreateDisplayOpacityPrimvar(const TfToken& interpolation = TfToken(), int elementSize = -1) const;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -21,7 +21,6 @@
 #include "pxr/usd/usd/tokens.h"
 #include "pxr/usd/sdf/pathExpression.h"
 
-
 #include "pxr/base/vt/value.h"
 
 #include "pxr/base/gf/vec3d.h"
@@ -45,7 +44,7 @@ class SdfAssetPath;
 /// and properties within a scene. This API schema can be applied to a prim
 /// multiple times with different instance names to define several collections
 /// on a single prim.
-/// 
+///
 /// A collection's membership is specified one of two ways. The first way uses
 /// the built-in relationships `includes` and `excludes`, and the attribute
 /// `includeRoot` to determine membership. The second way is termed a
@@ -54,13 +53,13 @@ class SdfAssetPath;
 /// collections using `includes`, `excludes` and `includeRoot` as being in
 /// *relationship-mode* and those using the `membershipExpression` as being in
 /// *expression-mode*.
-/// 
+///
 /// A collection is determined to be in *relationship-mode* when either or both
 /// of its `includes` and `excludes` relationships have valid targets, or the
 /// `includeRoot` attribute is set `true`.  In this case, the pattern-based
 /// `membershipExpression` attribute is ignored.  Otherwise, the collection is
 /// in *expression-mode* and the `membershipExpression` attribute applies.
-/// 
+///
 /// In *relationship-mode* the `includes` and `excludes` relationships specify
 /// the collection members as a set of paths to include and a set of paths to
 /// exclude.  Whether or not the descendants of an included path belong to a
@@ -69,18 +68,18 @@ class SdfAssetPath;
 /// implicitly includes the root path `</>`.  If such a collection also
 /// includes paths that are not descendent to the excluded paths, it is
 /// considered invalid since the intent is ambiguous.
-/// 
+///
 /// In *expression-mode*, the pattern-based `membershipExpression` attribute is
 /// used with the `expansionRule` attribute to determine collection membership.
 /// See the detailed descriptions of the built-in properties below for more
 /// details.
-/// 
+///
 /// \section usd_collectionapi_properties Collection API Properties
-/// 
+///
 /// The built-in properties for this schema are in the `collection:instanceName`
 /// namespace, where `instanceName` is the user-provided applied API schema
 /// instance name.
-/// 
+///
 /// <ul>
 /// <li>`uniform token collection:instanceName:expansionRule` - in
 /// *relationship-mode*, specifies how to expand the `includes` and `excludes`
@@ -113,7 +112,7 @@ class SdfAssetPath;
 /// </li>
 /// </ul>
 /// </li>
-/// 
+///
 /// <li>`bool collection:instanceName:includeRoot` - boolean attribute
 /// indicating whether the pseudo-root path `</>` should be counted as one
 /// of the included target paths in *relationship-mode*. This separate attribute
@@ -121,7 +120,7 @@ class SdfAssetPath;
 /// `expansionRule` is `explicitOnly`, this attribute is ignored. The fallback
 /// value is false. When set to `true`, this collection is in
 /// *relationship-mode*. This attribute is ignored in *expression-mode*.  </li>
-/// 
+///
 /// <li>`rel collection:instanceName:includes` - in *relationship-mode*,
 /// specifies a list of targets that are included in the collection. This can
 /// target prims or properties directly. A collection can insert the rules of
@@ -136,7 +135,7 @@ class SdfAssetPath;
 /// conflicting opinions about the same path. Targets that are added later are
 /// considered to be stronger than earlier targets for the same path.  This
 /// relationship is ignored in *expression-mode*.</li>
-/// 
+///
 /// <li>`rel collection:instanceName:excludes` - in *relationship-mode*,
 /// specifies a list of targets that are excluded below the <b>included</b>
 /// paths in this collection. This can target prims or properties directly, but
@@ -150,39 +149,38 @@ class SdfAssetPath;
 /// objects belonging to the collection (see
 /// UsdCollectionAPI::ComputeIncludedObjects).  This relationship is ignored in
 /// *expression-mode*.</li>
-/// 
+///
 /// <li>`uniform opaque collection:instanceName` - opaque
 /// attribute (meaning it can never have a value) that represents the collection
 /// for the purpose of allowing another collection to include it in
 /// *relationship-mode*. When this property is targeted by another collection's
 /// `includes` relationship, the rules of this collection will be inserted
 /// into the rules of the collection that includes it.</li>
-/// 
+///
 /// <li>`uniform pathExpression collection:instanceName:membershipExpression` -
 /// in *expression-mode*, defines the SdfPathExpression used to test
 /// objects for collection membership.</li>
-/// 
+///
 /// </ul>
-/// 
+///
 /// \subsection usd_collectionapi_implicit_inclusion Implicit Inclusion
-/// 
+///
 /// In some scenarios it is useful to express a collection that includes
 /// everything except certain paths.  To support this, a *relationship-mode*
 /// collection that has an exclude that is not descendent to any include will
 /// include the root path `</>`.
-/// 
+///
 /// \section usd_collectionapi_creating_cpp Creating Collections in C++
-/// 
+///
 /// \snippet examples_usd.cpp ApplyCollections
-/// 
+///
 ///
 /// For any described attribute \em Fallback \em Value or \em Allowed \em Values below
 /// that are text/tokens, the actual token is published and defined in \ref UsdTokens.
 /// So to set an attribute to the value "rightHanded", use UsdTokens->rightHanded
 /// as the value.
 ///
-class UsdCollectionAPI : public UsdAPISchemaBase
-{
+class UsdCollectionAPI : public UsdAPISchemaBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -198,19 +196,15 @@ public:
     ///
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdCollectionAPI(
-        const UsdPrim& prim=UsdPrim(), const TfToken &name=TfToken())
-        : UsdAPISchemaBase(prim, /*instanceName*/ name)
-    { }
+    explicit UsdCollectionAPI(const UsdPrim& prim = UsdPrim(), const TfToken& name = TfToken())
+        : UsdAPISchemaBase(prim, /*instanceName*/ name) {}
 
     /// Construct a UsdCollectionAPI on the prim held by \p schemaObj with
     /// name \p name.  Should be preferred over
     /// UsdCollectionAPI(schemaObj.GetPrim(), name), as it preserves
     /// SchemaBase state.
-    explicit UsdCollectionAPI(
-        const UsdSchemaBase& schemaObj, const TfToken &name)
-        : UsdAPISchemaBase(schemaObj, /*instanceName*/ name)
-    { }
+    explicit UsdCollectionAPI(const UsdSchemaBase& schemaObj, const TfToken& name)
+        : UsdAPISchemaBase(schemaObj, /*instanceName*/ name) {}
 
     /// Destructor.
     USD_API
@@ -220,8 +214,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USD_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a vector of names of all pre-declared attributes for this schema
     /// class and all its ancestor classes for a given instance name.  Does not
@@ -229,13 +222,10 @@ public:
     /// the schemas involved. The names returned will have the proper namespace
     /// prefix.
     USD_API
-    static TfTokenVector
-    GetSchemaAttributeNames(bool includeInherited, const TfToken &instanceName);
+    static TfTokenVector GetSchemaAttributeNames(bool includeInherited, const TfToken& instanceName);
 
     /// Returns the name of this multiple-apply schema instance
-    TfToken GetName() const {
-        return _GetInstanceName();
-    }
+    TfToken GetName() const { return _GetInstanceName(); }
 
     /// Return a UsdCollectionAPI holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -252,44 +242,39 @@ public:
     /// \endcode
     ///
     USD_API
-    static UsdCollectionAPI
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdCollectionAPI Get(const UsdStagePtr& stage, const SdfPath& path);
 
     /// Return a UsdCollectionAPI with name \p name holding the
     /// prim \p prim. Shorthand for UsdCollectionAPI(prim, name);
     USD_API
-    static UsdCollectionAPI
-    Get(const UsdPrim &prim, const TfToken &name);
+    static UsdCollectionAPI Get(const UsdPrim& prim, const TfToken& name);
 
-    /// Return a vector of all named instances of UsdCollectionAPI on the 
+    /// Return a vector of all named instances of UsdCollectionAPI on the
     /// given \p prim.
     USD_API
-    static std::vector<UsdCollectionAPI>
-    GetAll(const UsdPrim &prim);
+    static std::vector<UsdCollectionAPI> GetAll(const UsdPrim& prim);
 
     /// Checks if the given name \p baseName is the base name of a property
     /// of CollectionAPI.
     USD_API
-    static bool
-    IsSchemaPropertyBaseName(const TfToken &baseName);
+    static bool IsSchemaPropertyBaseName(const TfToken& baseName);
 
     /// Checks if the given path \p path is of an API schema of type
     /// CollectionAPI. If so, it stores the instance name of
     /// the schema in \p name and returns true. Otherwise, it returns false.
     USD_API
-    static bool
-    IsCollectionAPIPath(const SdfPath &path, TfToken *name);
+    static bool IsCollectionAPIPath(const SdfPath& path, TfToken* name);
 
     /// Returns true if this <b>multiple-apply</b> API schema can be applied,
-    /// with the given instance name, \p name, to the given \p prim. If this 
-    /// schema can not be a applied the prim, this returns false and, if 
+    /// with the given instance name, \p name, to the given \p prim. If this
+    /// schema can not be a applied the prim, this returns false and, if
     /// provided, populates \p whyNot with the reason it can not be applied.
-    /// 
+    ///
     /// Note that if CanApply returns false, that does not necessarily imply
     /// that calling Apply will fail. Callers are expected to call CanApply
-    /// before calling Apply if they want to ensure that it is valid to 
+    /// before calling Apply if they want to ensure that it is valid to
     /// apply a schema.
-    /// 
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -297,23 +282,21 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USD_API
-    static bool 
-    CanApply(const UsdPrim &prim, const TfToken &name, 
-             std::string *whyNot=nullptr);
+    static bool CanApply(const UsdPrim& prim, const TfToken& name, std::string* whyNot = nullptr);
 
-    /// Applies this <b>multiple-apply</b> API schema to the given \p prim 
-    /// along with the given instance name, \p name. 
-    /// 
-    /// This information is stored by adding "CollectionAPI:<i>name</i>" 
+    /// Applies this <b>multiple-apply</b> API schema to the given \p prim
+    /// along with the given instance name, \p name.
+    ///
+    /// This information is stored by adding "CollectionAPI:<i>name</i>"
     /// to the token-valued, listOp metadata \em apiSchemas on the prim.
-    /// For example, if \p name is 'instance1', the token 
+    /// For example, if \p name is 'instance1', the token
     /// 'CollectionAPI:instance1' is added to 'apiSchemas'.
-    /// 
-    /// \return A valid UsdCollectionAPI object is returned upon success. 
-    /// An invalid (or empty) UsdCollectionAPI object is returned upon 
-    /// failure. See \ref UsdPrim::ApplyAPI() for 
-    /// conditions resulting in failure. 
-    /// 
+    ///
+    /// \return A valid UsdCollectionAPI object is returned upon success.
+    /// An invalid (or empty) UsdCollectionAPI object is returned upon
+    /// failure. See \ref UsdPrim::ApplyAPI() for
+    /// conditions resulting in failure.
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -321,8 +304,7 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USD_API
-    static UsdCollectionAPI 
-    Apply(const UsdPrim &prim, const TfToken &name);
+    static UsdCollectionAPI Apply(const UsdPrim& prim, const TfToken& name);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -335,17 +317,17 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USD_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USD_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // EXPANSIONRULE 
+    // EXPANSIONRULE
     // --------------------------------------------------------------------- //
     /// Specifies how the paths that are included in
     /// the collection must be expanded to determine its members.
@@ -360,17 +342,17 @@ public:
     USD_API
     UsdAttribute GetExpansionRuleAttr() const;
 
-    /// See GetExpansionRuleAttr(), and also 
+    /// See GetExpansionRuleAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USD_API
-    UsdAttribute CreateExpansionRuleAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateExpansionRuleAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // INCLUDEROOT 
+    // INCLUDEROOT
     // --------------------------------------------------------------------- //
     /// Boolean attribute indicating whether the pseudo-root
     /// path `</>` should be counted as one of the included target
@@ -386,17 +368,17 @@ public:
     USD_API
     UsdAttribute GetIncludeRootAttr() const;
 
-    /// See GetIncludeRootAttr(), and also 
+    /// See GetIncludeRootAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USD_API
-    UsdAttribute CreateIncludeRootAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateIncludeRootAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // MEMBERSHIPEXPRESSION 
+    // MEMBERSHIPEXPRESSION
     // --------------------------------------------------------------------- //
     /// Specifies a path expression that determines membership in this
     /// collection.
@@ -410,24 +392,25 @@ public:
     USD_API
     UsdAttribute GetMembershipExpressionAttr() const;
 
-    /// See GetMembershipExpressionAttr(), and also 
+    /// See GetMembershipExpressionAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USD_API
-    UsdAttribute CreateMembershipExpressionAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateMembershipExpressionAttr(VtValue const& defaultValue = VtValue(),
+                                                bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // COLLECTION 
+    // COLLECTION
     // --------------------------------------------------------------------- //
-    /// This property represents the collection for the purpose of 
-    /// allowing another collection to include it. When this property is 
+    /// This property represents the collection for the purpose of
+    /// allowing another collection to include it. When this property is
     /// targeted by another collection's <i>includes</i> relationship, the rules
     /// of this collection will be inserted into the rules of the collection
     /// that includes it.
-    /// 
+    ///
     ///
     /// | ||
     /// | -- | -- |
@@ -438,17 +421,17 @@ public:
     USD_API
     UsdAttribute GetCollectionAttr() const;
 
-    /// See GetCollectionAttr(), and also 
+    /// See GetCollectionAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USD_API
-    UsdAttribute CreateCollectionAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateCollectionAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // INCLUDES 
+    // INCLUDES
     // --------------------------------------------------------------------- //
     /// Specifies a list of targets that are included in the collection.
     /// This can target prims or properties directly. A collection can insert
@@ -459,14 +442,14 @@ public:
     USD_API
     UsdRelationship GetIncludesRel() const;
 
-    /// See GetIncludesRel(), and also 
+    /// See GetIncludesRel(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create
     USD_API
     UsdRelationship CreateIncludesRel() const;
 
 public:
     // --------------------------------------------------------------------- //
-    // EXCLUDES 
+    // EXCLUDES
     // --------------------------------------------------------------------- //
     /// Specifies a list of targets that are excluded below
     /// the included paths in this collection. This can target prims or
@@ -475,53 +458,51 @@ public:
     /// reason about. Finally, it is invalid for a collection to exclude
     /// paths that are not included in it. The presence of such "orphaned"
     /// excluded paths will not affect the set of paths included in the
-    /// collection, but may affect the performance of querying membership of 
+    /// collection, but may affect the performance of querying membership of
     /// a path in the collection (see
-    /// UsdCollectionAPI::MembershipQuery::IsPathIncluded) 
-    /// or of enumerating the objects belonging to the collection (see 
+    /// UsdCollectionAPI::MembershipQuery::IsPathIncluded)
+    /// or of enumerating the objects belonging to the collection (see
     /// UsdCollectionAPI::GetIncludedObjects).
     ///
     USD_API
     UsdRelationship GetExcludesRel() const;
 
-    /// See GetExcludesRel(), and also 
+    /// See GetExcludesRel(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create
     USD_API
     UsdRelationship CreateExcludesRel() const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
     // --(BEGIN CUSTOM CODE)--
 
 public:
-    /// Returns the collection represented by the given collection path, 
+    /// Returns the collection represented by the given collection path,
     /// \p collectionPath on the given USD stage.
     USD_API
-    static UsdCollectionAPI GetCollection(const UsdStagePtr &stage, 
-                                          const SdfPath &collectionPath);
+    static UsdCollectionAPI GetCollection(const UsdStagePtr& stage, const SdfPath& collectionPath);
 
-    /// Returns the schema object representing a collection named \p name on 
+    /// Returns the schema object representing a collection named \p name on
     /// the given \p prim.
     USD_API
-    static UsdCollectionAPI GetCollection(const UsdPrim &prim, 
-                                          const TfToken &name);
+    static UsdCollectionAPI GetCollection(const UsdPrim& prim, const TfToken& name);
 
     /// Returns all the named collections on the given USD prim.
     /// \deprecated Use GetAll(prim) instead.
     USD_API
-    static std::vector<UsdCollectionAPI> GetAllCollections(const UsdPrim &prim);
+    static std::vector<UsdCollectionAPI> GetAllCollections(const UsdPrim& prim);
 
-    /// Returns the canonical path that represents this collection. 
-    /// This points to the property named "collection:{collectionName}" on the 
-    /// prim defining the collection. This is the path to be used to "include" 
+    /// Returns the canonical path that represents this collection.
+    /// This points to the property named "collection:{collectionName}" on the
+    /// prim defining the collection. This is the path to be used to "include"
     /// this collection in another collection.
     ///
     /// \sa GetCollectionAttr()
@@ -530,12 +511,10 @@ public:
 
     /// Returns the canonical path to the collection named, \p name on the given
     /// prim, \p prim.
-    /// 
+    ///
     /// \sa GetCollectionPath()
     USD_API
-    static SdfPath GetNamedCollectionPath(
-        const UsdPrim &prim, 
-        const TfToken &collectionName);
+    static SdfPath GetNamedCollectionPath(const UsdPrim& prim, const TfToken& collectionName);
 
     /// Obtain a complete SdfPathExpression from this collection's
     /// membershipExpression.  First, UsdAttribute::Get() the value of
@@ -547,7 +526,7 @@ public:
     /// with SdfPathExpression::Nothing() as well.
     USD_API
     SdfPathExpression ResolveCompleteMembershipExpression() const;
-    
+
     // Convenient alias for UsdCollectionMembershipQuery object
     using MembershipQuery = UsdCollectionMembershipQuery;
 
@@ -559,7 +538,7 @@ public:
     /// Populates the UsdCollectionMembershipQuery object with data from this
     /// collection, so it can be used to query inclusion or exclusion of paths.
     USD_API
-    void ComputeMembershipQuery(UsdCollectionMembershipQuery *query) const;
+    void ComputeMembershipQuery(UsdCollectionMembershipQuery* query) const;
 
     /// Return true if the collection cannot possibly include anything.
     ///
@@ -592,90 +571,86 @@ public:
     /// uses the `membershipExpression` attribute to determine membership and
     /// not the `includes` and `excludes` relationships.  Equivalent to
     /// `!IsInRelationshipsMode()`.
-    bool IsInExpressionMode() const {
-        return !IsInRelationshipsMode();
-    }
+    bool IsInExpressionMode() const { return !IsInRelationshipsMode(); }
 
     /// Returns all the usd objects that satisfy the predicate, \p pred in the
     /// collection represented by the UsdCollectionMembershipQuery object, \p
     /// query.
-    /// 
+    ///
     /// The results depends on the load state of the UsdStage, \p stage.
     USD_API
-    static std::set<UsdObject> ComputeIncludedObjects(
-        const UsdCollectionMembershipQuery &query,
-        const UsdStageWeakPtr &stage,
-        const Usd_PrimFlagsPredicate &pred=UsdPrimDefaultPredicate);
+    static std::set<UsdObject> ComputeIncludedObjects(const UsdCollectionMembershipQuery& query,
+                                                      const UsdStageWeakPtr& stage,
+                                                      const Usd_PrimFlagsPredicate& pred = UsdPrimDefaultPredicate);
 
     /// Returns all the paths that satisfy the predicate, \p pred in the
     /// collection represented by the UsdCollectionMembershipQuery object, \p
     /// query.
-    /// 
+    ///
     /// The result depends on the load state of the UsdStage, \p stage.
     USD_API
-    static SdfPathSet ComputeIncludedPaths(
-        const UsdCollectionMembershipQuery &query,
-        const UsdStageWeakPtr &stage,
-        const Usd_PrimFlagsPredicate &pred=UsdPrimDefaultPredicate);
+    static SdfPathSet ComputeIncludedPaths(const UsdCollectionMembershipQuery& query,
+                                           const UsdStageWeakPtr& stage,
+                                           const Usd_PrimFlagsPredicate& pred = UsdPrimDefaultPredicate);
 
     /// \anchor UsdCollectionAPI_AuthoringAPI
     /// \name Collection Authoring API
-    /// 
-    /// Convenience API for adding or removing prims and properties to (or 
+    ///
+    /// Convenience API for adding or removing prims and properties to (or
     /// from) a collection..
-    /// 
+    ///
     /// @{
 
-    /// Includes or adds the given path, \p pathToInclude in the collection. 
-    /// 
-    /// This does nothing if the path is already included in the collection. 
-    /// 
-    /// This does not modify the expansion-rule of the collection. Hence, if the 
-    /// expansionRule is <i>expandPrims</i> or <i>expandPrimsAndProperties</i>, 
-    /// then the descendants of \p pathToInclude will be also included in the 
+    /// Includes or adds the given path, \p pathToInclude in the collection.
+    ///
+    /// This does nothing if the path is already included in the collection.
+    ///
+    /// This does not modify the expansion-rule of the collection. Hence, if the
+    /// expansionRule is <i>expandPrims</i> or <i>expandPrimsAndProperties</i>,
+    /// then the descendants of \p pathToInclude will be also included in the
     /// collection unless explicitly excluded.
-    /// 
+    ///
     /// \sa UsdCollectionAPI::ExcludePath()
-    USD_API 
-    bool IncludePath(const SdfPath &pathToInclude) const;
+    USD_API
+    bool IncludePath(const SdfPath& pathToInclude) const;
 
     /// Excludes or removes the given path, \p pathToExclude from the collection.
-    /// 
+    ///
     /// If the collection is empty, the collection becomes one that
     /// includes all paths except the givne path.  Otherwise, this does
-    /// nothing if the path is not included in the collection. 
+    /// nothing if the path is not included in the collection.
     ///
-    /// This does not modify the expansion-rule of the collection. Hence, if the 
-    /// expansionRule is <i>expandPrims</i> or <i>expandPrimsAndProperties</i>, 
-    /// then the descendants of \p pathToExclude will also be excluded from the 
+    /// This does not modify the expansion-rule of the collection. Hence, if the
+    /// expansionRule is <i>expandPrims</i> or <i>expandPrimsAndProperties</i>,
+    /// then the descendants of \p pathToExclude will also be excluded from the
     /// collection, unless explicitly included.
     ///
     /// \sa UsdCollectionAPI::IncludePath()
     USD_API
-    bool ExcludePath(const SdfPath &pathToExclude) const; 
+    bool ExcludePath(const SdfPath& pathToExclude) const;
 
     /// @}
-    
+
     /// Validates the collection by checking the following rules:
-    /// * a collection's expansionRule should be one of "explicitOnly", 
+    /// * a collection's expansionRule should be one of "explicitOnly",
     ///   "expandPrims" or "expandPrimsAndProperties".
-    /// * a collection should not have have a circular dependency on 
+    /// * a collection should not have have a circular dependency on
     ///   another collection.
     /// * a collection should not have both includes and excludes
     ///   among its top-level rules
-    USD_API 
-    bool Validate(std::string *reason) const; 
+    USD_API
+    bool Validate(std::string* reason) const;
 
-    /// Resets the collection by clearing both the includes and excludes 
+    /// Resets the collection by clearing both the includes and excludes
     /// targets of the collection in the current UsdEditTarget.
-    /// 
-    /// \note This does not modify the "includeRoot" attribute which is used 
+    ///
+    /// \note This does not modify the "includeRoot" attribute which is used
     /// to include or exclude everything (i.e. the pseudoRoot) in the USD stage.
     USD_API
-    bool ResetCollection() const; 
+    bool ResetCollection() const;
 
-    /// Blocks the targets of the includes and excludes relationships of the 
-    /// collection, making it 
+    /// Blocks the targets of the includes and excludes relationships of the
+    /// collection, making it
     /// <* <i>empty</i> if "includeRoot" is false (or unset) or
     /// * <i>include everything</i> if "includeRoot" is true.
     /// (assuming there are no opinions in stronger edit targets).
@@ -685,10 +660,9 @@ public:
     /// Test whether a given \p name contains the "collection:" prefix
     ///
     USD_API
-    static bool CanContainPropertyName(const TfToken &name);
+    static bool CanContainPropertyName(const TfToken& name);
 
 private:
-
     // Helper method for computing the UsdCollectionMembershipQuery object for
     // a collection.
     // This makes recursive calls if the collection includes other collections.
@@ -699,16 +673,14 @@ private:
     // circular dependency is detected amongst the included collections.
     // If it is nullptr, a warning is issued when a circular dependency is
     // detected.
-    void _ComputeMembershipQueryImpl(
-        UsdCollectionMembershipQuery *query,
-        const SdfPathSet &chainedCollectionPaths,
-        bool *foundCircularDependency=nullptr) const;
+    void _ComputeMembershipQueryImpl(UsdCollectionMembershipQuery* query,
+                                     const SdfPathSet& chainedCollectionPaths,
+                                     bool* foundCircularDependency = nullptr) const;
 
     // The same as ResolveCompleteMembershipExpression(), but set
     // `foundCircularDependency` to true if a circular dependency is encountered
     // during resolution.
-    SdfPathExpression
-    _ResolveCompleteMembershipExpression(bool *foundCircularDependency) const;
+    SdfPathExpression _ResolveCompleteMembershipExpression(bool* foundCircularDependency) const;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -14,26 +14,19 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 TF_DEFINE_PUBLIC_TOKENS(UsdUsdaFileFormatTokens, USD_USDA_FILE_FORMAT_TOKENS);
 
-TF_REGISTRY_FUNCTION(TfType)
-{
+TF_REGISTRY_FUNCTION(TfType) {
     SDF_DEFINE_FILE_FORMAT(UsdUsdaFileFormat, SdfTextFileFormat);
 }
 
 UsdUsdaFileFormat::UsdUsdaFileFormat()
-    : SdfTextFileFormat(UsdUsdaFileFormatTokens->Id,
-                        UsdUsdaFileFormatTokens->Version,
-                        UsdUsdFileFormatTokens->Target)
-{
+    : SdfTextFileFormat(UsdUsdaFileFormatTokens->Id, UsdUsdaFileFormatTokens->Version, UsdUsdFileFormatTokens->Target) {
     // Do Nothing.
 }
 
-UsdUsdaFileFormat::~UsdUsdaFileFormat()
-{
+UsdUsdaFileFormat::~UsdUsdaFileFormat() {
     // Do Nothing.
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

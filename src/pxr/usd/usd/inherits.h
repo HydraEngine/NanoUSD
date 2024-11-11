@@ -24,11 +24,11 @@ SDF_DECLARE_HANDLES(SdfPrimSpec);
 /// A proxy class for applying listOp edits to the inherit paths list for a
 /// prim.
 ///
-/// All paths passed to the UsdInherits API are expected to be in the 
+/// All paths passed to the UsdInherits API are expected to be in the
 /// namespace of the owning prim's stage. Subroot prim inherit paths
 /// will be translated from this namespace to the  namespace of the current
-/// edit target, if necessary. If a path cannot be translated, a coding error 
-/// will be issued and no changes will be made. Root prim inherit paths will 
+/// edit target, if necessary. If a path cannot be translated, a coding error
+/// will be issued and no changes will be made. Root prim inherit paths will
 /// not be translated.
 ///
 class UsdInherits {
@@ -40,13 +40,12 @@ public:
     /// Adds a path to the inheritPaths listOp at the current EditTarget,
     /// in the position specified by \p position.
     USD_API
-    bool AddInherit(const SdfPath &primPath,
-                    UsdListPosition position=UsdListPositionBackOfPrependList);
+    bool AddInherit(const SdfPath& primPath, UsdListPosition position = UsdListPositionBackOfPrependList);
 
     /// Removes the specified path from the inheritPaths listOp at the
     /// current EditTarget.
     USD_API
-    bool RemoveInherit(const SdfPath &primPath);
+    bool RemoveInherit(const SdfPath& primPath);
 
     /// Removes the authored inheritPaths listOp edits at the current edit
     /// target.
@@ -69,9 +68,9 @@ public:
     /// opinions could appear.
     USD_API
     SdfPathVector GetAllDirectInherits() const;
-    
+
     /// Return the prim this object is bound to.
-    const UsdPrim &GetPrim() const { return _prim; }
+    const UsdPrim& GetPrim() const { return _prim; }
     UsdPrim GetPrim() { return _prim; }
 
     explicit operator bool() { return bool(_prim); }
@@ -80,10 +79,9 @@ public:
     // Private Methods and Members
     // ---------------------------------------------------------------------- //
 private:
-
     UsdPrim _prim;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_INHERITS_H
+#endif  // PXR_USD_USD_INHERITS_H

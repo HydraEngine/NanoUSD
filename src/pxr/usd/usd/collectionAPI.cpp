@@ -14,22 +14,15 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType)
-{
-    TfType::Define<UsdCollectionAPI,
-        TfType::Bases< UsdAPISchemaBase > >();
-    
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<UsdCollectionAPI, TfType::Bases<UsdAPISchemaBase>>();
 }
 
 /* virtual */
-UsdCollectionAPI::~UsdCollectionAPI()
-{
-}
+UsdCollectionAPI::~UsdCollectionAPI() {}
 
 /* static */
-UsdCollectionAPI
-UsdCollectionAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdCollectionAPI UsdCollectionAPI::Get(const UsdStagePtr& stage, const SdfPath& path) {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdCollectionAPI();
@@ -42,55 +35,42 @@ UsdCollectionAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
     return UsdCollectionAPI(stage->GetPrimAtPath(path.GetPrimPath()), name);
 }
 
-UsdCollectionAPI
-UsdCollectionAPI::Get(const UsdPrim &prim, const TfToken &name)
-{
+UsdCollectionAPI UsdCollectionAPI::Get(const UsdPrim& prim, const TfToken& name) {
     return UsdCollectionAPI(prim, name);
 }
 
 /* static */
-std::vector<UsdCollectionAPI>
-UsdCollectionAPI::GetAll(const UsdPrim &prim)
-{
+std::vector<UsdCollectionAPI> UsdCollectionAPI::GetAll(const UsdPrim& prim) {
     std::vector<UsdCollectionAPI> schemas;
-    
-    for (const auto &schemaName :
-         UsdAPISchemaBase::_GetMultipleApplyInstanceNames(prim, _GetStaticTfType())) {
+
+    for (const auto& schemaName : UsdAPISchemaBase::_GetMultipleApplyInstanceNames(prim, _GetStaticTfType())) {
         schemas.emplace_back(prim, schemaName);
     }
 
     return schemas;
 }
 
-
 /* static */
-bool 
-UsdCollectionAPI::IsSchemaPropertyBaseName(const TfToken &baseName)
-{
+bool UsdCollectionAPI::IsSchemaPropertyBaseName(const TfToken& baseName) {
     static TfTokenVector attrsAndRels = {
-        UsdSchemaRegistry::GetMultipleApplyNameTemplateBaseName(
-            UsdTokens->collection_MultipleApplyTemplate_ExpansionRule),
-        UsdSchemaRegistry::GetMultipleApplyNameTemplateBaseName(
-            UsdTokens->collection_MultipleApplyTemplate_IncludeRoot),
-        UsdSchemaRegistry::GetMultipleApplyNameTemplateBaseName(
-            UsdTokens->collection_MultipleApplyTemplate_MembershipExpression),
-        UsdSchemaRegistry::GetMultipleApplyNameTemplateBaseName(
-            UsdTokens->collection_MultipleApplyTemplate_),
-        UsdSchemaRegistry::GetMultipleApplyNameTemplateBaseName(
-            UsdTokens->collection_MultipleApplyTemplate_Includes),
-        UsdSchemaRegistry::GetMultipleApplyNameTemplateBaseName(
-            UsdTokens->collection_MultipleApplyTemplate_Excludes),
+            UsdSchemaRegistry::GetMultipleApplyNameTemplateBaseName(
+                    UsdTokens->collection_MultipleApplyTemplate_ExpansionRule),
+            UsdSchemaRegistry::GetMultipleApplyNameTemplateBaseName(
+                    UsdTokens->collection_MultipleApplyTemplate_IncludeRoot),
+            UsdSchemaRegistry::GetMultipleApplyNameTemplateBaseName(
+                    UsdTokens->collection_MultipleApplyTemplate_MembershipExpression),
+            UsdSchemaRegistry::GetMultipleApplyNameTemplateBaseName(UsdTokens->collection_MultipleApplyTemplate_),
+            UsdSchemaRegistry::GetMultipleApplyNameTemplateBaseName(
+                    UsdTokens->collection_MultipleApplyTemplate_Includes),
+            UsdSchemaRegistry::GetMultipleApplyNameTemplateBaseName(
+                    UsdTokens->collection_MultipleApplyTemplate_Excludes),
     };
 
-    return find(attrsAndRels.begin(), attrsAndRels.end(), baseName)
-            != attrsAndRels.end();
+    return find(attrsAndRels.begin(), attrsAndRels.end(), baseName) != attrsAndRels.end();
 }
 
 /* static */
-bool
-UsdCollectionAPI::IsCollectionAPIPath(
-    const SdfPath &path, TfToken *name)
-{
+bool UsdCollectionAPI::IsCollectionAPIPath(const SdfPath& path, TfToken* name) {
     if (!path.IsPropertyPath()) {
         return false;
     }
@@ -98,7 +78,7 @@ UsdCollectionAPI::IsCollectionAPIPath(
     std::string propertyName = path.GetName();
     TfTokenVector tokens = SdfPath::TokenizeIdentifierAsTokens(propertyName);
 
-    // The baseName of the  path can't be one of the 
+    // The baseName of the  path can't be one of the
     // schema properties. We should validate this in the creation (or apply)
     // API.
     TfToken baseName = *tokens.rbegin();
@@ -106,10 +86,8 @@ UsdCollectionAPI::IsCollectionAPIPath(
         return false;
     }
 
-    if (tokens.size() >= 2
-        && tokens[0] == UsdTokens->collection) {
-        *name = TfToken(propertyName.substr(
-           UsdTokens->collection.GetString().size() + 1));
+    if (tokens.size() >= 2 && tokens[0] == UsdTokens->collection) {
+        *name = TfToken(propertyName.substr(UsdTokens->collection.GetString().size() + 1));
         return true;
     }
 
@@ -117,23 +95,17 @@ UsdCollectionAPI::IsCollectionAPIPath(
 }
 
 /* virtual */
-UsdSchemaKind UsdCollectionAPI::_GetSchemaKind() const
-{
+UsdSchemaKind UsdCollectionAPI::_GetSchemaKind() const {
     return UsdCollectionAPI::schemaKind;
 }
 
 /* static */
-bool
-UsdCollectionAPI::CanApply(
-    const UsdPrim &prim, const TfToken &name, std::string *whyNot)
-{
+bool UsdCollectionAPI::CanApply(const UsdPrim& prim, const TfToken& name, std::string* whyNot) {
     return prim.CanApplyAPI<UsdCollectionAPI>(name, whyNot);
 }
 
 /* static */
-UsdCollectionAPI
-UsdCollectionAPI::Apply(const UsdPrim &prim, const TfToken &name)
-{
+UsdCollectionAPI UsdCollectionAPI::Apply(const UsdPrim& prim, const TfToken& name) {
     if (prim.ApplyAPI<UsdCollectionAPI>(name)) {
         return UsdCollectionAPI(prim, name);
     }
@@ -141,194 +113,118 @@ UsdCollectionAPI::Apply(const UsdPrim &prim, const TfToken &name)
 }
 
 /* static */
-const TfType &
-UsdCollectionAPI::_GetStaticTfType()
-{
+const TfType& UsdCollectionAPI::_GetStaticTfType() {
     static TfType tfType = TfType::Find<UsdCollectionAPI>();
     return tfType;
 }
 
 /* static */
-bool 
-UsdCollectionAPI::_IsTypedSchema()
-{
+bool UsdCollectionAPI::_IsTypedSchema() {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdCollectionAPI::_GetTfType() const
-{
+const TfType& UsdCollectionAPI::_GetTfType() const {
     return _GetStaticTfType();
 }
 
 /// Returns the property name prefixed with the correct namespace prefix, which
 /// is composed of the the API's propertyNamespacePrefix metadata and the
 /// instance name of the API.
-static inline
-TfToken
-_GetNamespacedPropertyName(const TfToken instanceName, const TfToken propName)
-{
+static inline TfToken _GetNamespacedPropertyName(const TfToken instanceName, const TfToken propName) {
     return UsdSchemaRegistry::MakeMultipleApplyNameInstance(propName, instanceName);
 }
 
-UsdAttribute
-UsdCollectionAPI::GetExpansionRuleAttr() const
-{
+UsdAttribute UsdCollectionAPI::GetExpansionRuleAttr() const {
     return GetPrim().GetAttribute(
-        _GetNamespacedPropertyName(
-            GetName(),
-            UsdTokens->collection_MultipleApplyTemplate_ExpansionRule));
+            _GetNamespacedPropertyName(GetName(), UsdTokens->collection_MultipleApplyTemplate_ExpansionRule));
 }
 
-UsdAttribute
-UsdCollectionAPI::CreateExpansionRuleAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
+UsdAttribute UsdCollectionAPI::CreateExpansionRuleAttr(VtValue const& defaultValue, bool writeSparsely) const {
     return UsdSchemaBase::_CreateAttr(
-                       _GetNamespacedPropertyName(
-                            GetName(),
-                           UsdTokens->collection_MultipleApplyTemplate_ExpansionRule),
-                       SdfValueTypeNames->Token,
-                       /* custom = */ false,
-                       SdfVariabilityUniform,
-                       defaultValue,
-                       writeSparsely);
+            _GetNamespacedPropertyName(GetName(), UsdTokens->collection_MultipleApplyTemplate_ExpansionRule),
+            SdfValueTypeNames->Token,
+            /* custom = */ false, SdfVariabilityUniform, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdCollectionAPI::GetIncludeRootAttr() const
-{
+UsdAttribute UsdCollectionAPI::GetIncludeRootAttr() const {
     return GetPrim().GetAttribute(
-        _GetNamespacedPropertyName(
-            GetName(),
-            UsdTokens->collection_MultipleApplyTemplate_IncludeRoot));
+            _GetNamespacedPropertyName(GetName(), UsdTokens->collection_MultipleApplyTemplate_IncludeRoot));
 }
 
-UsdAttribute
-UsdCollectionAPI::CreateIncludeRootAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
+UsdAttribute UsdCollectionAPI::CreateIncludeRootAttr(VtValue const& defaultValue, bool writeSparsely) const {
     return UsdSchemaBase::_CreateAttr(
-                       _GetNamespacedPropertyName(
-                            GetName(),
-                           UsdTokens->collection_MultipleApplyTemplate_IncludeRoot),
-                       SdfValueTypeNames->Bool,
-                       /* custom = */ false,
-                       SdfVariabilityUniform,
-                       defaultValue,
-                       writeSparsely);
+            _GetNamespacedPropertyName(GetName(), UsdTokens->collection_MultipleApplyTemplate_IncludeRoot),
+            SdfValueTypeNames->Bool,
+            /* custom = */ false, SdfVariabilityUniform, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdCollectionAPI::GetMembershipExpressionAttr() const
-{
+UsdAttribute UsdCollectionAPI::GetMembershipExpressionAttr() const {
     return GetPrim().GetAttribute(
-        _GetNamespacedPropertyName(
-            GetName(),
-            UsdTokens->collection_MultipleApplyTemplate_MembershipExpression));
+            _GetNamespacedPropertyName(GetName(), UsdTokens->collection_MultipleApplyTemplate_MembershipExpression));
 }
 
-UsdAttribute
-UsdCollectionAPI::CreateMembershipExpressionAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
+UsdAttribute UsdCollectionAPI::CreateMembershipExpressionAttr(VtValue const& defaultValue, bool writeSparsely) const {
     return UsdSchemaBase::_CreateAttr(
-                       _GetNamespacedPropertyName(
-                            GetName(),
-                           UsdTokens->collection_MultipleApplyTemplate_MembershipExpression),
-                       SdfValueTypeNames->PathExpression,
-                       /* custom = */ false,
-                       SdfVariabilityUniform,
-                       defaultValue,
-                       writeSparsely);
+            _GetNamespacedPropertyName(GetName(), UsdTokens->collection_MultipleApplyTemplate_MembershipExpression),
+            SdfValueTypeNames->PathExpression,
+            /* custom = */ false, SdfVariabilityUniform, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdCollectionAPI::GetCollectionAttr() const
-{
-    return GetPrim().GetAttribute(
-        _GetNamespacedPropertyName(
-            GetName(),
-            UsdTokens->collection_MultipleApplyTemplate_));
+UsdAttribute UsdCollectionAPI::GetCollectionAttr() const {
+    return GetPrim().GetAttribute(_GetNamespacedPropertyName(GetName(), UsdTokens->collection_MultipleApplyTemplate_));
 }
 
-UsdAttribute
-UsdCollectionAPI::CreateCollectionAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
+UsdAttribute UsdCollectionAPI::CreateCollectionAttr(VtValue const& defaultValue, bool writeSparsely) const {
     return UsdSchemaBase::_CreateAttr(
-                       _GetNamespacedPropertyName(
-                            GetName(),
-                           UsdTokens->collection_MultipleApplyTemplate_),
-                       SdfValueTypeNames->Opaque,
-                       /* custom = */ false,
-                       SdfVariabilityUniform,
-                       defaultValue,
-                       writeSparsely);
+            _GetNamespacedPropertyName(GetName(), UsdTokens->collection_MultipleApplyTemplate_),
+            SdfValueTypeNames->Opaque,
+            /* custom = */ false, SdfVariabilityUniform, defaultValue, writeSparsely);
 }
 
-UsdRelationship
-UsdCollectionAPI::GetIncludesRel() const
-{
+UsdRelationship UsdCollectionAPI::GetIncludesRel() const {
     return GetPrim().GetRelationship(
-        _GetNamespacedPropertyName(
-            GetName(),
-            UsdTokens->collection_MultipleApplyTemplate_Includes));
+            _GetNamespacedPropertyName(GetName(), UsdTokens->collection_MultipleApplyTemplate_Includes));
 }
 
-UsdRelationship
-UsdCollectionAPI::CreateIncludesRel() const
-{
+UsdRelationship UsdCollectionAPI::CreateIncludesRel() const {
     return GetPrim().CreateRelationship(
-                       _GetNamespacedPropertyName(
-                           GetName(),
-                           UsdTokens->collection_MultipleApplyTemplate_Includes),
-                       /* custom = */ false);
+            _GetNamespacedPropertyName(GetName(), UsdTokens->collection_MultipleApplyTemplate_Includes),
+            /* custom = */ false);
 }
 
-UsdRelationship
-UsdCollectionAPI::GetExcludesRel() const
-{
+UsdRelationship UsdCollectionAPI::GetExcludesRel() const {
     return GetPrim().GetRelationship(
-        _GetNamespacedPropertyName(
-            GetName(),
-            UsdTokens->collection_MultipleApplyTemplate_Excludes));
+            _GetNamespacedPropertyName(GetName(), UsdTokens->collection_MultipleApplyTemplate_Excludes));
 }
 
-UsdRelationship
-UsdCollectionAPI::CreateExcludesRel() const
-{
+UsdRelationship UsdCollectionAPI::CreateExcludesRel() const {
     return GetPrim().CreateRelationship(
-                       _GetNamespacedPropertyName(
-                           GetName(),
-                           UsdTokens->collection_MultipleApplyTemplate_Excludes),
-                       /* custom = */ false);
+            _GetNamespacedPropertyName(GetName(), UsdTokens->collection_MultipleApplyTemplate_Excludes),
+            /* custom = */ false);
 }
 
 namespace {
-static inline TfTokenVector
-_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
-{
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector& left, const TfTokenVector& right) {
     TfTokenVector result;
     result.reserve(left.size() + right.size());
     result.insert(result.end(), left.begin(), left.end());
     result.insert(result.end(), right.begin(), right.end());
     return result;
 }
-}
+}  // namespace
 
 /*static*/
-const TfTokenVector&
-UsdCollectionAPI::GetSchemaAttributeNames(bool includeInherited)
-{
+const TfTokenVector& UsdCollectionAPI::GetSchemaAttributeNames(bool includeInherited) {
     static TfTokenVector localNames = {
-        UsdTokens->collection_MultipleApplyTemplate_ExpansionRule,
-        UsdTokens->collection_MultipleApplyTemplate_IncludeRoot,
-        UsdTokens->collection_MultipleApplyTemplate_MembershipExpression,
-        UsdTokens->collection_MultipleApplyTemplate_,
+            UsdTokens->collection_MultipleApplyTemplate_ExpansionRule,
+            UsdTokens->collection_MultipleApplyTemplate_IncludeRoot,
+            UsdTokens->collection_MultipleApplyTemplate_MembershipExpression,
+            UsdTokens->collection_MultipleApplyTemplate_,
     };
     static TfTokenVector allNames =
-        _ConcatenateAttributeNames(
-            UsdAPISchemaBase::GetSchemaAttributeNames(true),
-            localNames);
+            _ConcatenateAttributeNames(UsdAPISchemaBase::GetSchemaAttributeNames(true), localNames);
 
     if (includeInherited)
         return allNames;
@@ -337,19 +233,15 @@ UsdCollectionAPI::GetSchemaAttributeNames(bool includeInherited)
 }
 
 /*static*/
-TfTokenVector
-UsdCollectionAPI::GetSchemaAttributeNames(
-    bool includeInherited, const TfToken &instanceName)
-{
-    const TfTokenVector &attrNames = GetSchemaAttributeNames(includeInherited);
+TfTokenVector UsdCollectionAPI::GetSchemaAttributeNames(bool includeInherited, const TfToken& instanceName) {
+    const TfTokenVector& attrNames = GetSchemaAttributeNames(includeInherited);
     if (instanceName.IsEmpty()) {
         return attrNames;
     }
     TfTokenVector result;
     result.reserve(attrNames.size());
-    for (const TfToken &attrName : attrNames) {
-        result.push_back(
-            UsdSchemaRegistry::MakeMultipleApplyNameInstance(attrName, instanceName));
+    for (const TfToken& attrName : attrNames) {
+        result.push_back(UsdSchemaRegistry::MakeMultipleApplyNameInstance(attrName, instanceName));
     }
     return result;
 }
@@ -377,50 +269,34 @@ PXR_NAMESPACE_OPEN_SCOPE
 using PathExpansionRuleMap = UsdCollectionMembershipQuery::PathExpansionRuleMap;
 
 /* static */
-UsdCollectionAPI 
-UsdCollectionAPI::GetCollection(const UsdStagePtr &stage, 
-                                const SdfPath &collectionPath)
-{
+UsdCollectionAPI UsdCollectionAPI::GetCollection(const UsdStagePtr& stage, const SdfPath& collectionPath) {
     TfToken collectionName;
     if (!IsCollectionAPIPath(collectionPath, &collectionName)) {
-        TF_CODING_ERROR("Invalid collection path <%s>.", 
-                        collectionPath.GetText());
+        TF_CODING_ERROR("Invalid collection path <%s>.", collectionPath.GetText());
         return UsdCollectionAPI();
     }
 
-    return UsdCollectionAPI(stage->GetPrimAtPath(collectionPath.GetPrimPath()), 
-                            collectionName);
+    return UsdCollectionAPI(stage->GetPrimAtPath(collectionPath.GetPrimPath()), collectionName);
 }
 
 /* static */
-UsdCollectionAPI 
-UsdCollectionAPI::GetCollection(const UsdPrim &prim, 
-                                const TfToken &name)
-{
-   return UsdCollectionAPI(prim, name);
+UsdCollectionAPI UsdCollectionAPI::GetCollection(const UsdPrim& prim, const TfToken& name) {
+    return UsdCollectionAPI(prim, name);
 }
 
-SdfPath 
-UsdCollectionAPI::GetCollectionPath() const
-{
-    return GetPath().AppendProperty(_GetNamespacedPropertyName(
-            GetName(), UsdTokens->collection_MultipleApplyTemplate_));
+SdfPath UsdCollectionAPI::GetCollectionPath() const {
+    return GetPath().AppendProperty(
+            _GetNamespacedPropertyName(GetName(), UsdTokens->collection_MultipleApplyTemplate_));
 }
 
 /* static */
-SdfPath 
-UsdCollectionAPI::GetNamedCollectionPath(
-    const UsdPrim &prim, 
-    const TfToken &collectionName)
-{
-    return prim.GetPath().AppendProperty(_GetNamespacedPropertyName(
-            collectionName, UsdTokens->collection_MultipleApplyTemplate_));
+SdfPath UsdCollectionAPI::GetNamedCollectionPath(const UsdPrim& prim, const TfToken& collectionName) {
+    return prim.GetPath().AppendProperty(
+            _GetNamespacedPropertyName(collectionName, UsdTokens->collection_MultipleApplyTemplate_));
 }
 
 /* static */
-std::vector<UsdCollectionAPI>
-UsdCollectionAPI::GetAllCollections(const UsdPrim &prim)
-{
+std::vector<UsdCollectionAPI> UsdCollectionAPI::GetAllCollections(const UsdPrim& prim) {
     std::vector<UsdCollectionAPI> collections;
 
     auto appliedSchemas = prim.GetAppliedSchemas();
@@ -428,14 +304,11 @@ UsdCollectionAPI::GetAllCollections(const UsdPrim &prim)
         return collections;
     }
 
-    static const std::string collAPIPrefix = 
-        UsdTokens->CollectionAPI.GetString() + 
-        UsdObject::GetNamespaceDelimiter();
+    static const std::string collAPIPrefix = UsdTokens->CollectionAPI.GetString() + UsdObject::GetNamespaceDelimiter();
 
-    for (const auto &appliedSchema : appliedSchemas) {
+    for (const auto& appliedSchema : appliedSchemas) {
         if (TfStringStartsWith(appliedSchema, collAPIPrefix)) {
-            const std::string collectionName = 
-                appliedSchema.GetString().substr(collAPIPrefix.size());
+            const std::string collectionName = appliedSchema.GetString().substr(collAPIPrefix.size());
             collections.emplace_back(prim, TfToken(collectionName));
         }
     }
@@ -443,11 +316,9 @@ UsdCollectionAPI::GetAllCollections(const UsdPrim &prim)
     return collections;
 }
 
-bool 
-UsdCollectionAPI::IncludePath(const SdfPath &pathToInclude) const
-{
+bool UsdCollectionAPI::IncludePath(const SdfPath& pathToInclude) const {
     // If the prim is already included in the collection, do nothing.
-    UsdCollectionMembershipQuery query  = ComputeMembershipQuery();
+    UsdCollectionMembershipQuery query = ComputeMembershipQuery();
     if (query.IsPathIncluded(pathToInclude)) {
         return true;
     }
@@ -462,8 +333,7 @@ UsdCollectionAPI::IncludePath(const SdfPath &pathToInclude) const
     if (UsdRelationship excludesRel = GetExcludesRel()) {
         excludesRel.GetTargets(&excludes);
 
-        if (std::find(excludes.begin(), excludes.end(), pathToInclude) != 
-                excludes.end()) {
+        if (std::find(excludes.begin(), excludes.end(), pathToInclude) != excludes.end()) {
             excludesRel.RemoveTarget(pathToInclude);
             // Update the query object we have by updating the map and
             // reconstructing the query
@@ -471,14 +341,13 @@ UsdCollectionAPI::IncludePath(const SdfPath &pathToInclude) const
             auto it = map.find(pathToInclude);
             if (TF_VERIFY(it != map.end())) {
                 map.erase(it);
-                query = UsdCollectionMembershipQuery(
-                    std::move(map), query.GetIncludedCollections());
+                query = UsdCollectionMembershipQuery(std::move(map), query.GetIncludedCollections());
             }
         }
     }
 
-    // Now that we've removed the explicit excludes if there was one, 
-    // we can add the prim if it's not already included in the collection. 
+    // Now that we've removed the explicit excludes if there was one,
+    // we can add the prim if it's not already included in the collection.
     if (!query.IsPathIncluded(pathToInclude)) {
         return CreateIncludesRel().AddTarget(pathToInclude);
     }
@@ -486,14 +355,11 @@ UsdCollectionAPI::IncludePath(const SdfPath &pathToInclude) const
     return true;
 }
 
-bool 
-UsdCollectionAPI::ExcludePath(const SdfPath &pathToExclude) const
-{
+bool UsdCollectionAPI::ExcludePath(const SdfPath& pathToExclude) const {
     // If the path is already excluded from a non-empty collection
     // (or simply not included at all), do nothing.
     UsdCollectionMembershipQuery query = ComputeMembershipQuery();
-    if (!query.GetAsPathExpansionRuleMap().empty() &&
-        !query.IsPathIncluded(pathToExclude)) {
+    if (!query.GetAsPathExpansionRuleMap().empty() && !query.IsPathIncluded(pathToExclude)) {
         return true;
     }
 
@@ -507,34 +373,29 @@ UsdCollectionAPI::ExcludePath(const SdfPath &pathToExclude) const
     if (UsdRelationship includesRel = GetIncludesRel()) {
         includesRel.GetTargets(&includes);
 
-        if (std::find(includes.begin(), includes.end(), pathToExclude) != 
-                includes.end()) {
+        if (std::find(includes.begin(), includes.end(), pathToExclude) != includes.end()) {
             includesRel.RemoveTarget(pathToExclude);
-            // Update the query object we have, instead of having to 
+            // Update the query object we have, instead of having to
             // recompute it.
             PathExpansionRuleMap map = query.GetAsPathExpansionRuleMap();
             auto it = map.find(pathToExclude);
             if (TF_VERIFY(it != map.end())) {
                 map.erase(it);
-                query = UsdCollectionMembershipQuery(
-                    std::move(map), query.GetIncludedCollections());
+                query = UsdCollectionMembershipQuery(std::move(map), query.GetIncludedCollections());
             }
         }
     }
 
-    // Now that we've removed the explicit include if there was one, 
+    // Now that we've removed the explicit include if there was one,
     // we can add an explicit exclude, if required.
-    if (query.GetAsPathExpansionRuleMap().empty() ||
-        query.IsPathIncluded(pathToExclude)) {
+    if (query.GetAsPathExpansionRuleMap().empty() || query.IsPathIncluded(pathToExclude)) {
         return CreateExcludesRel().AddTarget(pathToExclude);
     }
 
     return true;
 }
 
-bool
-UsdCollectionAPI::HasNoIncludedPaths() const
-{
+bool UsdCollectionAPI::HasNoIncludedPaths() const {
     SdfPathVector includes, excludes;
     GetIncludesRel().GetTargets(&includes);
     GetExcludesRel().GetTargets(&excludes);
@@ -546,70 +407,59 @@ UsdCollectionAPI::HasNoIncludedPaths() const
     return includes.empty() && !includeRoot && (!excludes.empty() || !membExpr);
 }
 
-bool
-UsdCollectionAPI::IsInRelationshipsMode() const
-{
+bool UsdCollectionAPI::IsInRelationshipsMode() const {
     UsdCollectionMembershipQuery memQuery;
     ComputeMembershipQuery(&memQuery);
     return memQuery.UsesPathExpansionRuleMap();
 }
 
-static inline
-SdfPathExpression
-_ResolveCompleteMembershipExpressionImpl(
-    UsdCollectionAPI const &originalColl,
-    UsdCollectionAPI const &thisColl,
-    pxr_tsl::robin_set<std::pair<UsdPrim, TfToken>, TfHash> &visited,
-    bool *foundCircularDependency)
-{
+static inline SdfPathExpression _ResolveCompleteMembershipExpressionImpl(
+        UsdCollectionAPI const& originalColl,
+        UsdCollectionAPI const& thisColl,
+        pxr_tsl::robin_set<std::pair<UsdPrim, TfToken>, TfHash>& visited,
+        bool* foundCircularDependency) {
     // Ensure visited contains the root, originalColl.
     if (visited.empty()) {
         visited.emplace(originalColl.GetPrim(), originalColl.GetName());
     }
-    
+
     const UsdPrim thisPrim = thisColl.GetPrim();
-    
+
     SdfPathExpression thisExpr;
     if (!thisPrim || !thisColl.GetMembershipExpressionAttr().Get(&thisExpr)) {
         return thisExpr;
     }
 
     // Resolve any references.
-    const auto resolveRefs =
-        [&](SdfPathExpression::ExpressionReference const &ref) {
+    const auto resolveRefs = [&](SdfPathExpression::ExpressionReference const& ref) {
         // We support references like %<path>:<name> and %:<name>.  In both
         // cases they identify a collection API, the latter is just shorthand
         // for the named collection on this collection prim.
         if (ref.name.empty()) {
             TF_CODING_ERROR(
-                "Unexpected reference to empty name in expression '%s' from "
-                "collection '%s' on prim <%s>; substituting empty expression",
-                thisExpr.GetText().c_str(), thisColl.GetName().GetText(),
-                thisPrim.GetPath().GetAsString().c_str());
+                    "Unexpected reference to empty name in expression '%s' from "
+                    "collection '%s' on prim <%s>; substituting empty expression",
+                    thisExpr.GetText().c_str(), thisColl.GetName().GetText(), thisPrim.GetPath().GetAsString().c_str());
             return SdfPathExpression::Nothing();
         }
-        
+
         // Replace "weaker" references with Nothing.
         if (ref == SdfPathExpression::ExpressionReference::Weaker()) {
             return SdfPathExpression::Nothing();
         }
-        
-        const TfToken refCollectionName { ref.name };
-        const UsdPrim refCollectionPrim = ref.path.IsEmpty()
-            ? thisColl.GetPrim()
-            : thisPrim.GetStage()->GetPrimAtPath(ref.path);
-        
-        UsdCollectionAPI refCollection =
-            UsdCollectionAPI(refCollectionPrim, refCollectionName);
-        
+
+        const TfToken refCollectionName{ref.name};
+        const UsdPrim refCollectionPrim =
+                ref.path.IsEmpty() ? thisColl.GetPrim() : thisPrim.GetStage()->GetPrimAtPath(ref.path);
+
+        UsdCollectionAPI refCollection = UsdCollectionAPI(refCollectionPrim, refCollectionName);
+
         // If we can't find a prim, warn and resolve the reference as Nothing.
         if (!refCollection) {
             TF_WARN("No collection at path <%s> while resolving references in "
                     "expression '%s' from collection '%s' on prim <%s>; "
                     "substituting empty expression",
-                    ref.path.GetAsString().c_str(),
-                    thisExpr.GetText().c_str(),
-                    thisColl.GetName().GetText(),
+                    ref.path.GetAsString().c_str(), thisExpr.GetText().c_str(), thisColl.GetName().GetText(),
                     thisPrim.GetPath().GetAsString().c_str());
             return SdfPathExpression::Nothing();
         }
@@ -617,8 +467,7 @@ _ResolveCompleteMembershipExpressionImpl(
         // Check to see if we've visited this collection previously while
         // resolving references.  If we have, skip it, and substitute Nothing()
         // here.
-        const bool visitedInserted =
-            visited.emplace(refCollectionPrim, refCollectionName).second;
+        const bool visitedInserted = visited.emplace(refCollectionPrim, refCollectionName).second;
         if (!visitedInserted) {
             SdfPathExpression originalExpr;
             originalColl.GetMembershipExpressionAttr().Get(&originalExpr);
@@ -628,29 +477,24 @@ _ResolveCompleteMembershipExpressionImpl(
                     "'%s' on prim <%s>, found while resolving references for "
                     "expression '%s' from collection '%s' on prim <%s>; "
                     "substituting empty expression for the second occurrence",
-                    refCollectionName.GetText(),
-                    refCollectionPrim.GetPath().GetAsString().c_str(),
-                    thisExpr.GetText().c_str(),
-                    thisColl.GetName().GetText(),
-                    thisPrim.GetPath().GetAsString().c_str(),
-                    originalExpr.GetText().c_str(),
-                    originalColl.GetName().GetText(),
+                    refCollectionName.GetText(), refCollectionPrim.GetPath().GetAsString().c_str(),
+                    thisExpr.GetText().c_str(), thisColl.GetName().GetText(), thisPrim.GetPath().GetAsString().c_str(),
+                    originalExpr.GetText().c_str(), originalColl.GetName().GetText(),
                     originalColl.GetPrim().GetPath().GetAsString().c_str());
             *foundCircularDependency = true;
             return SdfPathExpression::Nothing();
         }
 
         // Get the referenced collection expr fully resolved, and insert that.
-        const auto ret = _ResolveCompleteMembershipExpressionImpl(
-            originalColl, refCollection, visited, foundCircularDependency);
+        const auto ret =
+                _ResolveCompleteMembershipExpressionImpl(originalColl, refCollection, visited, foundCircularDependency);
 
         // Allow returning to this referenced collection down a different
         // branch.  Note that we cannot use a returned iterator from the
         // visited.emplace() call above since the recursive call to
         // _ResolveCompleteMembershipExpressionImpl() can insert new elements
         // causing a rehash, invalidating the iterator.
-        const auto visitedIter =
-            visited.find({ refCollectionPrim, refCollectionName });
+        const auto visitedIter = visited.find({refCollectionPrim, refCollectionName});
         if (TF_VERIFY(visitedIter != visited.end())) {
             visited.erase(visitedIter);
         }
@@ -661,41 +505,30 @@ _ResolveCompleteMembershipExpressionImpl(
     return thisExpr.ResolveReferences(resolveRefs);
 }
 
-SdfPathExpression
-UsdCollectionAPI::ResolveCompleteMembershipExpression() const
-{
+SdfPathExpression UsdCollectionAPI::ResolveCompleteMembershipExpression() const {
     bool ignored = false;
     return _ResolveCompleteMembershipExpression(&ignored);
 }
 
-SdfPathExpression
-UsdCollectionAPI
-::_ResolveCompleteMembershipExpression(bool *foundCircularDependency) const
-{
+SdfPathExpression UsdCollectionAPI ::_ResolveCompleteMembershipExpression(bool* foundCircularDependency) const {
     // Track visited referenced collections to avoid infinite recursion.
     pxr_tsl::robin_set<std::pair<UsdPrim, TfToken>, TfHash> visitedCollections;
-    return _ResolveCompleteMembershipExpressionImpl(
-        *this, *this, visitedCollections, foundCircularDependency);
+    return _ResolveCompleteMembershipExpressionImpl(*this, *this, visitedCollections, foundCircularDependency);
 }
 
-UsdCollectionMembershipQuery 
-UsdCollectionAPI::ComputeMembershipQuery() const
-{
+UsdCollectionMembershipQuery UsdCollectionAPI::ComputeMembershipQuery() const {
     UsdCollectionMembershipQuery query;
     ComputeMembershipQuery(&query);
     return query;
 }
 
-void 
-UsdCollectionAPI::ComputeMembershipQuery(
-    UsdCollectionMembershipQuery *query) const
-{
+void UsdCollectionAPI::ComputeMembershipQuery(UsdCollectionMembershipQuery* query) const {
     if (!query) {
         TF_CODING_ERROR("Invalid query pointer.");
         return;
     }
 
-    SdfPathSet chainedCollectionPaths { GetCollectionPath() };
+    SdfPathSet chainedCollectionPaths{GetCollectionPath()};
     _ComputeMembershipQueryImpl(query, chainedCollectionPaths);
 
     // Now embed the expression evaluator & the top-level expansion rule.
@@ -708,19 +541,13 @@ UsdCollectionAPI::ComputeMembershipQuery(
     PathExpansionRuleMap map = query->GetAsPathExpansionRuleMap();
     SdfPathSet collections = query->GetIncludedCollections();
 
-    *query = UsdCollectionMembershipQuery(
-        std::move(map), std::move(collections), expRule);
-    query->SetExpressionEvaluator({
-            GetPrim().GetStage(), ResolveCompleteMembershipExpression()
-        });
+    *query = UsdCollectionMembershipQuery(std::move(map), std::move(collections), expRule);
+    query->SetExpressionEvaluator({GetPrim().GetStage(), ResolveCompleteMembershipExpression()});
 }
 
-void
-UsdCollectionAPI::_ComputeMembershipQueryImpl(
-    UsdCollectionMembershipQuery *query,
-    const SdfPathSet &chainedCollectionPaths,
-    bool *foundCircularDependency) const
-{
+void UsdCollectionAPI::_ComputeMembershipQueryImpl(UsdCollectionMembershipQuery* query,
+                                                   const SdfPathSet& chainedCollectionPaths,
+                                                   bool* foundCircularDependency) const {
     if (!TF_VERIFY(query)) {
         return;
     }
@@ -754,10 +581,10 @@ UsdCollectionAPI::_ComputeMembershipQueryImpl(
     }
 
     UsdStageWeakPtr stage = GetPrim().GetStage();
-    
-    for (const SdfPath &includedPath : includes) {
+
+    for (const SdfPath& includedPath : includes) {
         TfToken collectionName;
-        // Check if the included path is a collection. If it is, then 
+        // Check if the included path is a collection. If it is, then
         // handle it specially.
         if (IsCollectionAPIPath(includedPath, &collectionName)) {
             if (chainedCollectionPaths.count(includedPath) > 0) {
@@ -765,15 +592,16 @@ UsdCollectionAPI::_ComputeMembershipQueryImpl(
                     *foundCircularDependency = true;
                 } else {
                     // Issue a warning message if the clients of this method
-                    // don't care about knowing if there's a circular 
+                    // don't care about knowing if there's a circular
                     // dependency.
-                    std::string includedCollectionsStr; 
-                    for (const SdfPath &collPath : chainedCollectionPaths) {
+                    std::string includedCollectionsStr;
+                    for (const SdfPath& collPath : chainedCollectionPaths) {
                         includedCollectionsStr.append(collPath.GetString());
                         includedCollectionsStr.append(", ");
                     }
                     TF_WARN("Found circular dependency involving the following "
-                        "collections: [%s]", includedCollectionsStr.c_str());
+                            "collections: [%s]",
+                            includedCollectionsStr.c_str());
                 }
                 // Continuing here avoids infinite recursion.
                 continue;
@@ -783,13 +611,12 @@ UsdCollectionAPI::_ComputeMembershipQueryImpl(
             UsdPrim includedPrim = stage->GetPrimAtPath(includedPrimPath);
 
             // The included collection must belong to a valid prim.
-            // XXX: Should we check validity? We should skip circular 
+            // XXX: Should we check validity? We should skip circular
             // dependency check if we do validate.
             if (!includedPrim) {
                 TF_WARN("Could not get prim at path <%s>, therefore cannot "
-                    "include its collection '%s' in collection '%s'.",
-                    includedPrimPath.GetText(), collectionName.GetText(),
-                    GetName().GetText());
+                        "include its collection '%s' in collection '%s'.",
+                        includedPrimPath.GetText(), collectionName.GetText(), GetName().GetText());
                 continue;
             }
 
@@ -797,32 +624,29 @@ UsdCollectionAPI::_ComputeMembershipQueryImpl(
 
             // Recursively compute the included collection's membership map with
             // an updated set of seen/included collection paths.
-            // 
-            // Create a copy so we can add this collection to the list 
+            //
+            // Create a copy so we can add this collection to the list
             // before calling ComputeMembershipQuery.
             SdfPathSet seenCollectionPaths = chainedCollectionPaths;
             seenCollectionPaths.insert(includedPath);
             UsdCollectionMembershipQuery includedQuery;
-            includedCollection._ComputeMembershipQueryImpl(&includedQuery,
-                    seenCollectionPaths, foundCircularDependency);
+            includedCollection._ComputeMembershipQueryImpl(&includedQuery, seenCollectionPaths,
+                                                           foundCircularDependency);
 
-            const PathExpansionRuleMap& includedMap =
-                includedQuery.GetAsPathExpansionRuleMap();
+            const PathExpansionRuleMap& includedMap = includedQuery.GetAsPathExpansionRuleMap();
 
             // Merge path expansion rule maps
             // We can't just do an insert here as we need to overwrite existing
             // entries with new values of expansion rule from other map
-            for (const auto &pathAndExpansionRule : includedMap) {
+            for (const auto& pathAndExpansionRule : includedMap) {
                 map[pathAndExpansionRule.first] = pathAndExpansionRule.second;
             }
 
             // Merge included collections
             collections.insert(includedPath);
 
-            const SdfPathSet& includedCollections = 
-                includedQuery.GetIncludedCollections();
-            collections.insert(
-                includedCollections.begin(), includedCollections.end());
+            const SdfPathSet& includedCollections = includedQuery.GetIncludedCollections();
+            collections.insert(includedCollections.begin(), includedCollections.end());
 
         } else {
             // Append included path
@@ -831,49 +655,38 @@ UsdCollectionAPI::_ComputeMembershipQueryImpl(
     }
 
     // Process the excludes after the includes.
-    for (const auto &p: excludes) {
+    for (const auto& p : excludes) {
         // Append excluded path
         map[p] = UsdTokens->exclude;
     }
 
-    *query = UsdCollectionMembershipQuery(
-        std::move(map), std::move(collections));
+    *query = UsdCollectionMembershipQuery(std::move(map), std::move(collections));
 }
 
 /* static */
-std::set<UsdObject> 
-UsdCollectionAPI::ComputeIncludedObjects(
-    const UsdCollectionMembershipQuery &query,
-    const UsdStageWeakPtr &stage,
-    const Usd_PrimFlagsPredicate &pred)
-{
+std::set<UsdObject> UsdCollectionAPI::ComputeIncludedObjects(const UsdCollectionMembershipQuery& query,
+                                                             const UsdStageWeakPtr& stage,
+                                                             const Usd_PrimFlagsPredicate& pred) {
     return UsdComputeIncludedObjectsFromCollection(query, stage, pred);
 }
 
 /* static */
-SdfPathSet
-UsdCollectionAPI::ComputeIncludedPaths(
-    const UsdCollectionMembershipQuery &query,
-    const UsdStageWeakPtr &stage,
-    const Usd_PrimFlagsPredicate &pred)
-{
+SdfPathSet UsdCollectionAPI::ComputeIncludedPaths(const UsdCollectionMembershipQuery& query,
+                                                  const UsdStageWeakPtr& stage,
+                                                  const Usd_PrimFlagsPredicate& pred) {
     return UsdComputeIncludedPathsFromCollection(query, stage, pred);
 }
 
-static bool
-_AllRootmostRulesPassFilter(
-    UsdCollectionMembershipQuery::PathExpansionRuleMap const& ruleMap,
-    std::function<bool(std::pair<SdfPath, TfToken> const&)> const& filter)
-{
+static bool _AllRootmostRulesPassFilter(UsdCollectionMembershipQuery::PathExpansionRuleMap const& ruleMap,
+                                        std::function<bool(std::pair<SdfPath, TfToken> const&)> const& filter) {
     if (ruleMap.empty()) {
         return false;
     }
-    for (const auto &rule: ruleMap) {
+    for (const auto& rule : ruleMap) {
         // Check if this is a rootmost path (in other words, not
         // contained under another rule).
         bool isRootmost = true;
-        for (SdfPath p = rule.first.GetParentPath();
-             p != SdfPath::EmptyPath(); p = p.GetParentPath()) {
+        for (SdfPath p = rule.first.GetParentPath(); p != SdfPath::EmptyPath(); p = p.GetParentPath()) {
             if (ruleMap.find(p) != ruleMap.end()) {
                 isRootmost = false;
                 break;
@@ -886,38 +699,32 @@ _AllRootmostRulesPassFilter(
     return true;
 }
 
-bool 
-UsdCollectionAPI::Validate(std::string *reason) const
-{
-    TfToken expansionRule; 
+bool UsdCollectionAPI::Validate(std::string* reason) const {
+    TfToken expansionRule;
     if (UsdAttribute expRuleAttr = GetExpansionRuleAttr()) {
         expRuleAttr.Get(&expansionRule);
     }
 
     // Validate value of expansionRule.
-    if (!expansionRule.IsEmpty() && 
-        expansionRule != UsdTokens->explicitOnly && 
-        expansionRule != UsdTokens->expandPrims &&
-        expansionRule != UsdTokens->expandPrimsAndProperties) {
-
+    if (!expansionRule.IsEmpty() && expansionRule != UsdTokens->explicitOnly &&
+        expansionRule != UsdTokens->expandPrims && expansionRule != UsdTokens->expandPrimsAndProperties) {
         if (reason) {
-            *reason += TfStringPrintf("Invalid expansionRule value '%s'\n", 
-                                      expansionRule.GetText());
+            *reason += TfStringPrintf("Invalid expansionRule value '%s'\n", expansionRule.GetText());
         }
         return false;
     }
 
     // Check for circular dependencies.
-    bool foundCircularDependency = false; 
+    bool foundCircularDependency = false;
     SdfPathSet chainedCollectionPaths{GetCollectionPath()};
     // We're not interested in the computed query object here.
     UsdCollectionMembershipQuery query;
-    _ComputeMembershipQueryImpl(&query, chainedCollectionPaths,
-                                &foundCircularDependency);
+    _ComputeMembershipQueryImpl(&query, chainedCollectionPaths, &foundCircularDependency);
     if (foundCircularDependency) {
         if (reason) {
-            *reason += "Found one or more circular dependencies amongst "
-                "the set of included (directly and transitively) collections.\n";
+            *reason +=
+                    "Found one or more circular dependencies amongst "
+                    "the set of included (directly and transitively) collections.\n";
         }
         return false;
     }
@@ -925,20 +732,19 @@ UsdCollectionAPI::Validate(std::string *reason) const
     // Prohibit using both includes and excludes in top-level rules,
     // since the intent is ambiguous.
     if (query.HasExcludes()) {
-        bool allExcludes = _AllRootmostRulesPassFilter(
-            query.GetAsPathExpansionRuleMap(),
-            [](std::pair<SdfPath, TfToken> const& rule) -> bool {
-                return rule.second == UsdTokens->exclude;
-            });
-        bool allIncludes = _AllRootmostRulesPassFilter(
-            query.GetAsPathExpansionRuleMap(),
-            [](std::pair<SdfPath, TfToken> const& rule) -> bool {
-                return rule.second != UsdTokens->exclude;
-            });
+        bool allExcludes = _AllRootmostRulesPassFilter(query.GetAsPathExpansionRuleMap(),
+                                                       [](std::pair<SdfPath, TfToken> const& rule) -> bool {
+                                                           return rule.second == UsdTokens->exclude;
+                                                       });
+        bool allIncludes = _AllRootmostRulesPassFilter(query.GetAsPathExpansionRuleMap(),
+                                                       [](std::pair<SdfPath, TfToken> const& rule) -> bool {
+                                                           return rule.second != UsdTokens->exclude;
+                                                       });
         if (!allExcludes && !allIncludes) {
             if (reason) {
-                *reason += "Found both includes and excludes among the "
-                    "root-most rules -- interpretation is ambiguous.\n";
+                *reason +=
+                        "Found both includes and excludes among the "
+                        "root-most rules -- interpretation is ambiguous.\n";
             }
             return false;
         }
@@ -947,23 +753,23 @@ UsdCollectionAPI::Validate(std::string *reason) const
     if (!query.UsesPathExpansionRuleMap()) {
         // Check membershipExpression validity.
         bool circular = false;
-        SdfPathExpression expr =
-            _ResolveCompleteMembershipExpression(&circular);
+        SdfPathExpression expr = _ResolveCompleteMembershipExpression(&circular);
         if (circular) {
             if (reason) {
-                *reason += "Found one or more circular dependencies amongst "
-                    "collections referenced by the membershipExpression.\n";
+                *reason +=
+                        "Found one or more circular dependencies amongst "
+                        "collections referenced by the membershipExpression.\n";
                 return false;
             }
         }
 
         if (expr) {
-            UsdObjectCollectionExpressionEvaluator
-                eval { GetPrim().GetStage(), expr };
+            UsdObjectCollectionExpressionEvaluator eval{GetPrim().GetStage(), expr};
             if (eval.IsEmpty()) {
                 if (reason) {
-                    *reason += "Failed to build evaluator for "
-                        "membershipExpression.\n";
+                    *reason +=
+                            "Failed to build evaluator for "
+                            "membershipExpression.\n";
                 }
                 return false;
             }
@@ -973,9 +779,7 @@ UsdCollectionAPI::Validate(std::string *reason) const
     return true;
 }
 
-bool 
-UsdCollectionAPI::ResetCollection() const
-{
+bool UsdCollectionAPI::ResetCollection() const {
     bool success = true;
     if (UsdRelationship includesRel = GetIncludesRel()) {
         success &= includesRel.ClearTargets(/* removeSpec */ true);
@@ -989,9 +793,7 @@ UsdCollectionAPI::ResetCollection() const
     return success;
 }
 
-bool 
-UsdCollectionAPI::BlockCollection() const
-{
+bool UsdCollectionAPI::BlockCollection() const {
     bool success = true;
     if (UsdRelationship includesRel = GetIncludesRel()) {
         success &= includesRel.SetTargets({});
@@ -1000,15 +802,13 @@ UsdCollectionAPI::BlockCollection() const
         success &= excludesRel.SetTargets({});
     }
     if (UsdAttribute membershipExpr = GetMembershipExpressionAttr()) {
-        success &= membershipExpr.Set(SdfValueBlock {});
+        success &= membershipExpr.Set(SdfValueBlock{});
     }
     return success;
 }
 
 /* static */
-bool
-UsdCollectionAPI::CanContainPropertyName(const TfToken &name)
-{
+bool UsdCollectionAPI::CanContainPropertyName(const TfToken& name) {
     return TfStringStartsWith(name, UsdTokens->collection);
 }
 

@@ -14,7 +14,7 @@
 #include "pxr/usd/usdGeom/xformable.h"
 #include "pxr/usd/usd/prim.h"
 #include "pxr/usd/usd/stage.h"
-#include "pxr/usd/usdLux/lightAPI.h" 
+#include "pxr/usd/usdLux/lightAPI.h"
 
 #include "pxr/base/vt/value.h"
 
@@ -36,13 +36,12 @@ class SdfAssetPath;
 /// \class UsdLuxNonboundableLightBase
 ///
 /// Base class for intrinsic lights that are not boundable.
-/// 
-/// The primary purpose of this class is to provide a direct API to the 
-/// functions provided by LightAPI for concrete derived light types.
-/// 
 ///
-class UsdLuxNonboundableLightBase : public UsdGeomXformable
-{
+/// The primary purpose of this class is to provide a direct API to the
+/// functions provided by LightAPI for concrete derived light types.
+///
+///
+class UsdLuxNonboundableLightBase : public UsdGeomXformable {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -53,18 +52,12 @@ public:
     /// Equivalent to UsdLuxNonboundableLightBase::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdLuxNonboundableLightBase(const UsdPrim& prim=UsdPrim())
-        : UsdGeomXformable(prim)
-    {
-    }
+    explicit UsdLuxNonboundableLightBase(const UsdPrim& prim = UsdPrim()) : UsdGeomXformable(prim) {}
 
     /// Construct a UsdLuxNonboundableLightBase on the prim held by \p schemaObj .
     /// Should be preferred over UsdLuxNonboundableLightBase(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdLuxNonboundableLightBase(const UsdSchemaBase& schemaObj)
-        : UsdGeomXformable(schemaObj)
-    {
-    }
+    explicit UsdLuxNonboundableLightBase(const UsdSchemaBase& schemaObj) : UsdGeomXformable(schemaObj) {}
 
     /// Destructor.
     USDLUX_API
@@ -74,8 +67,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDLUX_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdLuxNonboundableLightBase holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -87,9 +79,7 @@ public:
     /// \endcode
     ///
     USDLUX_API
-    static UsdLuxNonboundableLightBase
-    Get(const UsdStagePtr &stage, const SdfPath &path);
-
+    static UsdLuxNonboundableLightBase Get(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -102,30 +92,30 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDLUX_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDLUX_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
     // --(BEGIN CUSTOM CODE)--
 
     /// \name LightAPI
-    /// 
+    ///
     /// Convenience accessors for the light's built-in UsdLuxLightAPI
-    /// 
+    ///
     /// @{
 
     /// Contructs and returns a UsdLuxLightAPI object for this light.
@@ -138,9 +128,7 @@ public:
 
     /// See UsdLuxLightAPI::CreateIntensityAttr().
     USDLUX_API
-    UsdAttribute CreateIntensityAttr(
-        VtValue const &defaultValue = VtValue(), 
-        bool writeSparsely=false) const;
+    UsdAttribute CreateIntensityAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
     /// See UsdLuxLightAPI::GetExposureAttr().
     USDLUX_API
@@ -148,9 +136,7 @@ public:
 
     /// See UsdLuxLightAPI::CreateExposureAttr().
     USDLUX_API
-    UsdAttribute CreateExposureAttr(
-        VtValue const &defaultValue = VtValue(), 
-        bool writeSparsely=false) const;
+    UsdAttribute CreateExposureAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
     /// See UsdLuxLightAPI::GetDiffuseAttr().
     USDLUX_API
@@ -158,9 +144,7 @@ public:
 
     /// See UsdLuxLightAPI::CreateDiffuseAttr().
     USDLUX_API
-    UsdAttribute CreateDiffuseAttr(
-        VtValue const &defaultValue = VtValue(), 
-        bool writeSparsely=false) const;
+    UsdAttribute CreateDiffuseAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
     /// See UsdLuxLightAPI::GetSpecularAttr().
     USDLUX_API
@@ -168,9 +152,7 @@ public:
 
     /// See UsdLuxLightAPI::CreateSpecularAttr().
     USDLUX_API
-    UsdAttribute CreateSpecularAttr(
-        VtValue const &defaultValue = VtValue(), 
-        bool writeSparsely=false) const;
+    UsdAttribute CreateSpecularAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
     /// See UsdLuxLightAPI::GetNormalizeAttr().
     USDLUX_API
@@ -178,9 +160,7 @@ public:
 
     /// See UsdLuxLightAPI::CreateNormalizeAttr().
     USDLUX_API
-    UsdAttribute CreateNormalizeAttr(
-        VtValue const &defaultValue = VtValue(), 
-        bool writeSparsely=false) const;
+    UsdAttribute CreateNormalizeAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
     /// See UsdLuxLightAPI::GetColorAttr().
     USDLUX_API
@@ -188,9 +168,7 @@ public:
 
     /// See UsdLuxLightAPI::CreateColorAttr().
     USDLUX_API
-    UsdAttribute CreateColorAttr(
-        VtValue const &defaultValue = VtValue(), 
-        bool writeSparsely=false) const;
+    UsdAttribute CreateColorAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
     /// See UsdLuxLightAPI::GetEnableColorTemperatureAttr().
     USDLUX_API
@@ -198,9 +176,8 @@ public:
 
     /// See UsdLuxLightAPI::CreateEnableColorTemperatureAttr().
     USDLUX_API
-    UsdAttribute CreateEnableColorTemperatureAttr(
-        VtValue const &defaultValue = VtValue(), 
-        bool writeSparsely=false) const;
+    UsdAttribute CreateEnableColorTemperatureAttr(VtValue const& defaultValue = VtValue(),
+                                                  bool writeSparsely = false) const;
 
     /// See UsdLuxLightAPI::GetColorTemperatureAttr().
     USDLUX_API
@@ -208,9 +185,7 @@ public:
 
     /// See UsdLuxLightAPI::CreateColorTemperatureAttr().
     USDLUX_API
-    UsdAttribute CreateColorTemperatureAttr(
-        VtValue const &defaultValue = VtValue(), 
-        bool writeSparsely=false) const;
+    UsdAttribute CreateColorTemperatureAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
     /// See UsdLuxLightAPI::GetFiltersRel().
     USDLUX_API

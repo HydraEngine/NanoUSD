@@ -16,20 +16,17 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 // Implementation storage + refcount for Usd_Shared.
 template <class T>
 struct Usd_Counted {
     constexpr Usd_Counted() : count(0) {}
-    explicit Usd_Counted(T const &data) : data(data), count(0) {}
-    explicit Usd_Counted(T &&data) : data(std::move(data)), count(0) {}
-    
-    friend inline void
-    TfDelegatedCountIncrement(Usd_Counted const *c) {
+    explicit Usd_Counted(T const& data) : data(data), count(0) {}
+    explicit Usd_Counted(T&& data) : data(std::move(data)), count(0) {}
+
+    friend inline void TfDelegatedCountIncrement(Usd_Counted const* c) {
         c->count.fetch_add(1, std::memory_order_relaxed);
     }
-    friend inline void
-    TfDelegatedCountDecrement(Usd_Counted const *c) noexcept {
+    friend inline void TfDelegatedCountDecrement(Usd_Counted const* c) noexcept {
         if (c->count.fetch_sub(1, std::memory_order_release) == 1) {
             std::atomic_thread_fence(std::memory_order_acquire);
             delete c;
@@ -46,16 +43,13 @@ constexpr Usd_EmptySharedTagType Usd_EmptySharedTag{};
 // This class provides a simple way to share a data object between clients.  It
 // can be used to do simple copy-on-write, etc.
 template <class T>
-struct Usd_Shared
-{
+struct Usd_Shared {
     // Construct a Usd_Shared with a value-initialized T instance.
     Usd_Shared() : _held(TfMakeDelegatedCountPtr<Usd_Counted<T>>()) {}
     // Create a copy of \p obj.
-    explicit Usd_Shared(T const &obj) :
-        _held(TfMakeDelegatedCountPtr<Usd_Counted<T>>(obj)) {}
+    explicit Usd_Shared(T const& obj) : _held(TfMakeDelegatedCountPtr<Usd_Counted<T>>(obj)) {}
     // Move from \p obj.
-    explicit Usd_Shared(T &&obj) :
-        _held(TfMakeDelegatedCountPtr<Usd_Counted<T>>(std::move(obj))) {}
+    explicit Usd_Shared(T&& obj) : _held(TfMakeDelegatedCountPtr<Usd_Counted<T>>(std::move(obj))) {}
 
     // Create an empty shared, which may not be accessed via Get(),
     // GetMutable(), IsUnique(), Clone(), or MakeUnique().  This is useful when
@@ -65,9 +59,9 @@ struct Usd_Shared
     Usd_Shared(Usd_EmptySharedTagType) {}
 
     // Return a const reference to the shared data.
-    T const &Get() const { return _held->data; }
+    T const& Get() const { return _held->data; }
     // Return a mutable reference to the shared data.
-    T &GetMutable() const { return _held->data; }
+    T& GetMutable() const { return _held->data; }
     // Return true if no other Usd_Shared instance shares this instance's data.
     bool IsUnique() const { return _held->count == 1; }
     // Make a new copy of the held data and refer to it.
@@ -76,27 +70,25 @@ struct Usd_Shared
     // \code
     // if (not shared.IsUnique()) { shared.Clone(); }
     // \endcode
-    void MakeUnique() { if (!IsUnique()) Clone(); }
+    void MakeUnique() {
+        if (!IsUnique()) Clone();
+    }
 
     // Equality and inequality.
-    bool operator==(Usd_Shared const &other) const {
-        return _held == other._held || _held->data == other._held->data;
-    }
-    bool operator!=(Usd_Shared const &other) const { return *this != other; }
+    bool operator==(Usd_Shared const& other) const { return _held == other._held || _held->data == other._held->data; }
+    bool operator!=(Usd_Shared const& other) const { return *this != other; }
 
     // Swap.
-    void swap(Usd_Shared &other) { _held.swap(other._held); }
-    friend inline void swap(Usd_Shared &l, Usd_Shared &r) { l.swap(r); }
+    void swap(Usd_Shared& other) { _held.swap(other._held); }
+    friend inline void swap(Usd_Shared& l, Usd_Shared& r) { l.swap(r); }
 
     // hash_value.
-    friend inline size_t hash_value(Usd_Shared const &sh) {
-        return TfHash()(sh._held->data);
-    }
+    friend inline size_t hash_value(Usd_Shared const& sh) { return TfHash()(sh._held->data); }
+
 private:
     TfDelegatedCountPtr<Usd_Counted<T>> _held;
 };
 
-
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_SHARED_H
+#endif  // PXR_USD_USD_SHARED_H

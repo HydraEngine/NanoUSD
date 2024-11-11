@@ -17,7 +17,7 @@
 #include "pxr/usd/usdLux/tokens.h"
 
 #include "pxr/usd/usdShade/input.h"
-#include "pxr/usd/usdShade/output.h" 
+#include "pxr/usd/usdShade/output.h"
 
 #include "pxr/base/vt/value.h"
 
@@ -40,8 +40,7 @@ class SdfAssetPath;
 ///
 /// Controls for shaping a light's emission.
 ///
-class UsdLuxShapingAPI : public UsdAPISchemaBase
-{
+class UsdLuxShapingAPI : public UsdAPISchemaBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -52,18 +51,12 @@ public:
     /// Equivalent to UsdLuxShapingAPI::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdLuxShapingAPI(const UsdPrim& prim=UsdPrim())
-        : UsdAPISchemaBase(prim)
-    {
-    }
+    explicit UsdLuxShapingAPI(const UsdPrim& prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
     /// Construct a UsdLuxShapingAPI on the prim held by \p schemaObj .
     /// Should be preferred over UsdLuxShapingAPI(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdLuxShapingAPI(const UsdSchemaBase& schemaObj)
-        : UsdAPISchemaBase(schemaObj)
-    {
-    }
+    explicit UsdLuxShapingAPI(const UsdSchemaBase& schemaObj) : UsdAPISchemaBase(schemaObj) {}
 
     /// Destructor.
     USDLUX_API
@@ -73,8 +66,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDLUX_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdLuxShapingAPI holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -86,20 +78,18 @@ public:
     /// \endcode
     ///
     USDLUX_API
-    static UsdLuxShapingAPI
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdLuxShapingAPI Get(const UsdStagePtr& stage, const SdfPath& path);
 
-
-    /// Returns true if this <b>single-apply</b> API schema can be applied to 
-    /// the given \p prim. If this schema can not be a applied to the prim, 
-    /// this returns false and, if provided, populates \p whyNot with the 
+    /// Returns true if this <b>single-apply</b> API schema can be applied to
+    /// the given \p prim. If this schema can not be a applied to the prim,
+    /// this returns false and, if provided, populates \p whyNot with the
     /// reason it can not be applied.
-    /// 
+    ///
     /// Note that if CanApply returns false, that does not necessarily imply
     /// that calling Apply will fail. Callers are expected to call CanApply
-    /// before calling Apply if they want to ensure that it is valid to 
+    /// before calling Apply if they want to ensure that it is valid to
     /// apply a schema.
-    /// 
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -107,18 +97,17 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDLUX_API
-    static bool 
-    CanApply(const UsdPrim &prim, std::string *whyNot=nullptr);
+    static bool CanApply(const UsdPrim& prim, std::string* whyNot = nullptr);
 
     /// Applies this <b>single-apply</b> API schema to the given \p prim.
-    /// This information is stored by adding "ShapingAPI" to the 
+    /// This information is stored by adding "ShapingAPI" to the
     /// token-valued, listOp metadata \em apiSchemas on the prim.
-    /// 
-    /// \return A valid UsdLuxShapingAPI object is returned upon success. 
-    /// An invalid (or empty) UsdLuxShapingAPI object is returned upon 
-    /// failure. See \ref UsdPrim::ApplyAPI() for conditions 
-    /// resulting in failure. 
-    /// 
+    ///
+    /// \return A valid UsdLuxShapingAPI object is returned upon success.
+    /// An invalid (or empty) UsdLuxShapingAPI object is returned upon
+    /// failure. See \ref UsdPrim::ApplyAPI() for conditions
+    /// resulting in failure.
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -126,8 +115,7 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDLUX_API
-    static UsdLuxShapingAPI 
-    Apply(const UsdPrim &prim);
+    static UsdLuxShapingAPI Apply(const UsdPrim& prim);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -140,17 +128,17 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDLUX_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDLUX_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // SHAPING:FOCUS 
+    // SHAPING:FOCUS
     // --------------------------------------------------------------------- //
     /// A control to shape the spread of light.  Higher focus
     /// values pull light towards the center and narrow the spread.
@@ -165,17 +153,17 @@ public:
     USDLUX_API
     UsdAttribute GetShapingFocusAttr() const;
 
-    /// See GetShapingFocusAttr(), and also 
+    /// See GetShapingFocusAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDLUX_API
-    UsdAttribute CreateShapingFocusAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateShapingFocusAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // SHAPING:FOCUSTINT 
+    // SHAPING:FOCUSTINT
     // --------------------------------------------------------------------- //
     /// Off-axis color tint.  This tints the emission in the
     /// falloff region.  The default tint is black.
@@ -189,17 +177,17 @@ public:
     USDLUX_API
     UsdAttribute GetShapingFocusTintAttr() const;
 
-    /// See GetShapingFocusTintAttr(), and also 
+    /// See GetShapingFocusTintAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDLUX_API
-    UsdAttribute CreateShapingFocusTintAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateShapingFocusTintAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // SHAPING:CONE:ANGLE 
+    // SHAPING:CONE:ANGLE
     // --------------------------------------------------------------------- //
     /// Angular limit off the primary axis to restrict the
     /// light spread.
@@ -212,17 +200,17 @@ public:
     USDLUX_API
     UsdAttribute GetShapingConeAngleAttr() const;
 
-    /// See GetShapingConeAngleAttr(), and also 
+    /// See GetShapingConeAngleAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDLUX_API
-    UsdAttribute CreateShapingConeAngleAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateShapingConeAngleAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // SHAPING:CONE:SOFTNESS 
+    // SHAPING:CONE:SOFTNESS
     // --------------------------------------------------------------------- //
     /// Controls the cutoff softness for cone angle.
     /// TODO: clarify semantics
@@ -235,17 +223,18 @@ public:
     USDLUX_API
     UsdAttribute GetShapingConeSoftnessAttr() const;
 
-    /// See GetShapingConeSoftnessAttr(), and also 
+    /// See GetShapingConeSoftnessAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDLUX_API
-    UsdAttribute CreateShapingConeSoftnessAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateShapingConeSoftnessAttr(VtValue const& defaultValue = VtValue(),
+                                               bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // SHAPING:IES:FILE 
+    // SHAPING:IES:FILE
     // --------------------------------------------------------------------- //
     /// An IES (Illumination Engineering Society) light
     /// profile describing the angular distribution of light.
@@ -258,17 +247,17 @@ public:
     USDLUX_API
     UsdAttribute GetShapingIesFileAttr() const;
 
-    /// See GetShapingIesFileAttr(), and also 
+    /// See GetShapingIesFileAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDLUX_API
-    UsdAttribute CreateShapingIesFileAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateShapingIesFileAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // SHAPING:IES:ANGLESCALE 
+    // SHAPING:IES:ANGLESCALE
     // --------------------------------------------------------------------- //
     /// Rescales the angular distribution of the IES profile.
     /// TODO: clarify semantics
@@ -281,17 +270,18 @@ public:
     USDLUX_API
     UsdAttribute GetShapingIesAngleScaleAttr() const;
 
-    /// See GetShapingIesAngleScaleAttr(), and also 
+    /// See GetShapingIesAngleScaleAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDLUX_API
-    UsdAttribute CreateShapingIesAngleScaleAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateShapingIesAngleScaleAttr(VtValue const& defaultValue = VtValue(),
+                                                bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // SHAPING:IES:NORMALIZE 
+    // SHAPING:IES:NORMALIZE
     // --------------------------------------------------------------------- //
     /// Normalizes the IES profile so that it affects the shaping
     /// of the light while preserving the overall energy output.
@@ -304,21 +294,22 @@ public:
     USDLUX_API
     UsdAttribute GetShapingIesNormalizeAttr() const;
 
-    /// See GetShapingIesNormalizeAttr(), and also 
+    /// See GetShapingIesNormalizeAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDLUX_API
-    UsdAttribute CreateShapingIesNormalizeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateShapingIesNormalizeAttr(VtValue const& defaultValue = VtValue(),
+                                               bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
@@ -326,14 +317,14 @@ public:
 
     // -------------------------------------------------------------------------
     /// \name Conversion to and from UsdShadeConnectableAPI
-    /// 
+    ///
     /// @{
 
     /// Constructor that takes a ConnectableAPI object.
     /// Allow implicit conversion of UsdShadeConnectableAPI to
     /// UsdLuxShapingAPI.
     USDLUX_API
-    UsdLuxShapingAPI(const UsdShadeConnectableAPI &connectable);
+    UsdLuxShapingAPI(const UsdShadeConnectableAPI& connectable);
 
     /// Contructs and returns a UsdShadeConnectableAPI object with this shaping
     /// API prim. Note that a valid UsdLuxShapingAPI will only return a valid
@@ -347,63 +338,61 @@ public:
     // -------------------------------------------------------------------------
     /// \name Outputs API
     ///
-    /// Outputs represent a typed attribute on a shaping API whose value is 
-    /// computed externally. 
-    /// 
+    /// Outputs represent a typed attribute on a shaping API whose value is
+    /// computed externally.
+    ///
     /// @{
 
     /// Create an output which can either have a value or can be connected.
-    /// The attribute representing the output is created in the "outputs:" 
-    /// namespace. Outputs on a shaping API cannot be connected, as their 
+    /// The attribute representing the output is created in the "outputs:"
+    /// namespace. Outputs on a shaping API cannot be connected, as their
     /// value is assumed to be computed externally.
-    /// 
+    ///
     USDLUX_API
-    UsdShadeOutput CreateOutput(const TfToken& name,
-                                const SdfValueTypeName& typeName);
+    UsdShadeOutput CreateOutput(const TfToken& name, const SdfValueTypeName& typeName);
 
     /// Return the requested output if it exists.
-    /// 
+    ///
     USDLUX_API
-    UsdShadeOutput GetOutput(const TfToken &name) const;
+    UsdShadeOutput GetOutput(const TfToken& name) const;
 
     /// Outputs are represented by attributes in the "outputs:" namespace.
     /// If \p onlyAuthored is true (the default), then only return authored
     /// attributes; otherwise, this also returns un-authored builtins.
-    /// 
+    ///
     USDLUX_API
-    std::vector<UsdShadeOutput> GetOutputs(bool onlyAuthored=true) const;
+    std::vector<UsdShadeOutput> GetOutputs(bool onlyAuthored = true) const;
 
     /// @}
 
-    // ------------------------------------------------------------------------- 
+    // -------------------------------------------------------------------------
 
     /// \name Inputs API
     ///
-    /// Inputs are connectable attribute with a typed value. 
-    /// 
-    /// Shaping API parameters are encoded as inputs. 
-    /// 
+    /// Inputs are connectable attribute with a typed value.
+    ///
+    /// Shaping API parameters are encoded as inputs.
+    ///
     /// @{
 
     /// Create an input which can either have a value or can be connected.
-    /// The attribute representing the input is created in the "inputs:" 
+    /// The attribute representing the input is created in the "inputs:"
     /// namespace. Inputs on shaping API are connectable.
-    /// 
+    ///
     USDLUX_API
-    UsdShadeInput CreateInput(const TfToken& name,
-                              const SdfValueTypeName& typeName);
+    UsdShadeInput CreateInput(const TfToken& name, const SdfValueTypeName& typeName);
 
     /// Return the requested input if it exists.
-    /// 
+    ///
     USDLUX_API
-    UsdShadeInput GetInput(const TfToken &name) const;
+    UsdShadeInput GetInput(const TfToken& name) const;
 
     /// Inputs are represented by attributes in the "inputs:" namespace.
     /// If \p onlyAuthored is true (the default), then only return authored
     /// attributes; otherwise, this also returns un-authored builtins.
-    /// 
+    ///
     USDLUX_API
-    std::vector<UsdShadeInput> GetInputs(bool onlyAuthored=true) const;
+    std::vector<UsdShadeInput> GetInputs(bool onlyAuthored = true) const;
 
     /// @}
 };

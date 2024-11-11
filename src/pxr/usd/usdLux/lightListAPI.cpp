@@ -14,22 +14,15 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType)
-{
-    TfType::Define<UsdLuxLightListAPI,
-        TfType::Bases< UsdAPISchemaBase > >();
-    
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<UsdLuxLightListAPI, TfType::Bases<UsdAPISchemaBase>>();
 }
 
 /* virtual */
-UsdLuxLightListAPI::~UsdLuxLightListAPI()
-{
-}
+UsdLuxLightListAPI::~UsdLuxLightListAPI() {}
 
 /* static */
-UsdLuxLightListAPI
-UsdLuxLightListAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdLuxLightListAPI UsdLuxLightListAPI::Get(const UsdStagePtr& stage, const SdfPath& path) {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdLuxLightListAPI();
@@ -37,25 +30,18 @@ UsdLuxLightListAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
     return UsdLuxLightListAPI(stage->GetPrimAtPath(path));
 }
 
-
 /* virtual */
-UsdSchemaKind UsdLuxLightListAPI::_GetSchemaKind() const
-{
+UsdSchemaKind UsdLuxLightListAPI::_GetSchemaKind() const {
     return UsdLuxLightListAPI::schemaKind;
 }
 
 /* static */
-bool
-UsdLuxLightListAPI::CanApply(
-    const UsdPrim &prim, std::string *whyNot)
-{
+bool UsdLuxLightListAPI::CanApply(const UsdPrim& prim, std::string* whyNot) {
     return prim.CanApplyAPI<UsdLuxLightListAPI>(whyNot);
 }
 
 /* static */
-UsdLuxLightListAPI
-UsdLuxLightListAPI::Apply(const UsdPrim &prim)
-{
+UsdLuxLightListAPI UsdLuxLightListAPI::Apply(const UsdPrim& prim) {
     if (prim.ApplyAPI<UsdLuxLightListAPI>()) {
         return UsdLuxLightListAPI(prim);
     }
@@ -63,81 +49,58 @@ UsdLuxLightListAPI::Apply(const UsdPrim &prim)
 }
 
 /* static */
-const TfType &
-UsdLuxLightListAPI::_GetStaticTfType()
-{
+const TfType& UsdLuxLightListAPI::_GetStaticTfType() {
     static TfType tfType = TfType::Find<UsdLuxLightListAPI>();
     return tfType;
 }
 
 /* static */
-bool 
-UsdLuxLightListAPI::_IsTypedSchema()
-{
+bool UsdLuxLightListAPI::_IsTypedSchema() {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdLuxLightListAPI::_GetTfType() const
-{
+const TfType& UsdLuxLightListAPI::_GetTfType() const {
     return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdLuxLightListAPI::GetLightListCacheBehaviorAttr() const
-{
+UsdAttribute UsdLuxLightListAPI::GetLightListCacheBehaviorAttr() const {
     return GetPrim().GetAttribute(UsdLuxTokens->lightListCacheBehavior);
 }
 
-UsdAttribute
-UsdLuxLightListAPI::CreateLightListCacheBehaviorAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdLuxTokens->lightListCacheBehavior,
-                       SdfValueTypeNames->Token,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdLuxLightListAPI::CreateLightListCacheBehaviorAttr(VtValue const& defaultValue,
+                                                                  bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdLuxTokens->lightListCacheBehavior, SdfValueTypeNames->Token,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
-UsdRelationship
-UsdLuxLightListAPI::GetLightListRel() const
-{
+UsdRelationship UsdLuxLightListAPI::GetLightListRel() const {
     return GetPrim().GetRelationship(UsdLuxTokens->lightList);
 }
 
-UsdRelationship
-UsdLuxLightListAPI::CreateLightListRel() const
-{
+UsdRelationship UsdLuxLightListAPI::CreateLightListRel() const {
     return GetPrim().CreateRelationship(UsdLuxTokens->lightList,
-                       /* custom = */ false);
+                                        /* custom = */ false);
 }
 
 namespace {
-static inline TfTokenVector
-_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
-{
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector& left, const TfTokenVector& right) {
     TfTokenVector result;
     result.reserve(left.size() + right.size());
     result.insert(result.end(), left.begin(), left.end());
     result.insert(result.end(), right.begin(), right.end());
     return result;
 }
-}
+}  // namespace
 
 /*static*/
-const TfTokenVector&
-UsdLuxLightListAPI::GetSchemaAttributeNames(bool includeInherited)
-{
+const TfTokenVector& UsdLuxLightListAPI::GetSchemaAttributeNames(bool includeInherited) {
     static TfTokenVector localNames = {
-        UsdLuxTokens->lightListCacheBehavior,
+            UsdLuxTokens->lightListCacheBehavior,
     };
     static TfTokenVector allNames =
-        _ConcatenateAttributeNames(
-            UsdAPISchemaBase::GetSchemaAttributeNames(true),
-            localNames);
+            _ConcatenateAttributeNames(UsdAPISchemaBase::GetSchemaAttributeNames(true), localNames);
 
     if (includeInherited)
         return allNames;
@@ -162,27 +125,19 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfEnum)
-{
-    TF_ADD_ENUM_NAME(UsdLuxLightListAPI::ComputeModeConsultModelHierarchyCache,
-                     "Consult lightList cache");
-    TF_ADD_ENUM_NAME(UsdLuxLightListAPI::ComputeModeIgnoreCache,
-                     "Ignore lightList cache");
+TF_REGISTRY_FUNCTION(TfEnum) {
+    TF_ADD_ENUM_NAME(UsdLuxLightListAPI::ComputeModeConsultModelHierarchyCache, "Consult lightList cache");
+    TF_ADD_ENUM_NAME(UsdLuxLightListAPI::ComputeModeIgnoreCache, "Ignore lightList cache");
 }
 
-static void
-_Traverse(const UsdPrim &prim,
-          UsdLuxLightListAPI::ComputeMode mode,
-          SdfPathSet *lights)
-{
+static void _Traverse(const UsdPrim& prim, UsdLuxLightListAPI::ComputeMode mode, SdfPathSet* lights) {
     // If requested, check lightList cache.
     if (mode == UsdLuxLightListAPI::ComputeModeConsultModelHierarchyCache &&
         prim.GetPath().IsPrimPath() /* no cache on pseudoRoot */) {
         UsdLuxLightListAPI listAPI(prim);
         TfToken cacheBehavior;
         if (listAPI.GetLightListCacheBehaviorAttr().Get(&cacheBehavior)) {
-            if (cacheBehavior == UsdLuxTokens->consumeAndContinue ||
-                cacheBehavior == UsdLuxTokens->consumeAndHalt) {
+            if (cacheBehavior == UsdLuxTokens->consumeAndContinue || cacheBehavior == UsdLuxTokens->consumeAndHalt) {
                 // Check stored lightList.
                 UsdRelationship rel = listAPI.GetLightListRel();
                 SdfPathVector targets;
@@ -204,25 +159,20 @@ _Traverse(const UsdPrim &prim,
         // When consulting the cache we only traverse model hierarchy.
         flags = flags && UsdPrimIsModel;
     }
-    for (const UsdPrim &child:
-         prim.GetFilteredChildren(UsdTraverseInstanceProxies(flags))) {
+    for (const UsdPrim& child : prim.GetFilteredChildren(UsdTraverseInstanceProxies(flags))) {
         _Traverse(child, mode, lights);
     }
 }
 
-SdfPathSet
-UsdLuxLightListAPI::ComputeLightList(UsdLuxLightListAPI::ComputeMode mode) const
-{
+SdfPathSet UsdLuxLightListAPI::ComputeLightList(UsdLuxLightListAPI::ComputeMode mode) const {
     SdfPathSet result;
     _Traverse(GetPrim(), mode, &result);
     return result;
 }
 
-void
-UsdLuxLightListAPI::StoreLightList(const SdfPathSet &lights) const
-{
+void UsdLuxLightListAPI::StoreLightList(const SdfPathSet& lights) const {
     SdfPathVector targets;
-    for (const SdfPath &p: lights) {
+    for (const SdfPath& p : lights) {
         if (p.IsAbsolutePath() && !p.HasPrefix(GetPath())) {
             // Light path does not have this prim as a prefix; ignore.
             continue;
@@ -233,9 +183,7 @@ UsdLuxLightListAPI::StoreLightList(const SdfPathSet &lights) const
     CreateLightListCacheBehaviorAttr().Set(UsdLuxTokens->consumeAndContinue);
 }
 
-void
-UsdLuxLightListAPI::InvalidateLightList() const
-{
+void UsdLuxLightListAPI::InvalidateLightList() const {
     CreateLightListCacheBehaviorAttr().Set(UsdLuxTokens->ignore);
 }
 

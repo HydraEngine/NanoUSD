@@ -35,19 +35,18 @@ class SdfAssetPath;
 
 /// \class UsdHydraGenerativeProceduralAPI
 ///
-/// 
+///
 /// This API extends and configures the core UsdProcGenerativeProcedural schema
 /// defined within usdProc for use with hydra generative procedurals as defined
 /// within hdGp.
-/// 
+///
 ///
 /// For any described attribute \em Fallback \em Value or \em Allowed \em Values below
 /// that are text/tokens, the actual token is published and defined in \ref UsdHydraTokens.
 /// So to set an attribute to the value "rightHanded", use UsdHydraTokens->rightHanded
 /// as the value.
 ///
-class UsdHydraGenerativeProceduralAPI : public UsdAPISchemaBase
-{
+class UsdHydraGenerativeProceduralAPI : public UsdAPISchemaBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -58,18 +57,12 @@ public:
     /// Equivalent to UsdHydraGenerativeProceduralAPI::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdHydraGenerativeProceduralAPI(const UsdPrim& prim=UsdPrim())
-        : UsdAPISchemaBase(prim)
-    {
-    }
+    explicit UsdHydraGenerativeProceduralAPI(const UsdPrim& prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
     /// Construct a UsdHydraGenerativeProceduralAPI on the prim held by \p schemaObj .
     /// Should be preferred over UsdHydraGenerativeProceduralAPI(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdHydraGenerativeProceduralAPI(const UsdSchemaBase& schemaObj)
-        : UsdAPISchemaBase(schemaObj)
-    {
-    }
+    explicit UsdHydraGenerativeProceduralAPI(const UsdSchemaBase& schemaObj) : UsdAPISchemaBase(schemaObj) {}
 
     /// Destructor.
     USDHYDRA_API
@@ -79,8 +72,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDHYDRA_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdHydraGenerativeProceduralAPI holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -92,20 +84,18 @@ public:
     /// \endcode
     ///
     USDHYDRA_API
-    static UsdHydraGenerativeProceduralAPI
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdHydraGenerativeProceduralAPI Get(const UsdStagePtr& stage, const SdfPath& path);
 
-
-    /// Returns true if this <b>single-apply</b> API schema can be applied to 
-    /// the given \p prim. If this schema can not be a applied to the prim, 
-    /// this returns false and, if provided, populates \p whyNot with the 
+    /// Returns true if this <b>single-apply</b> API schema can be applied to
+    /// the given \p prim. If this schema can not be a applied to the prim,
+    /// this returns false and, if provided, populates \p whyNot with the
     /// reason it can not be applied.
-    /// 
+    ///
     /// Note that if CanApply returns false, that does not necessarily imply
     /// that calling Apply will fail. Callers are expected to call CanApply
-    /// before calling Apply if they want to ensure that it is valid to 
+    /// before calling Apply if they want to ensure that it is valid to
     /// apply a schema.
-    /// 
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -113,18 +103,17 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDHYDRA_API
-    static bool 
-    CanApply(const UsdPrim &prim, std::string *whyNot=nullptr);
+    static bool CanApply(const UsdPrim& prim, std::string* whyNot = nullptr);
 
     /// Applies this <b>single-apply</b> API schema to the given \p prim.
-    /// This information is stored by adding "HydraGenerativeProceduralAPI" to the 
+    /// This information is stored by adding "HydraGenerativeProceduralAPI" to the
     /// token-valued, listOp metadata \em apiSchemas on the prim.
-    /// 
-    /// \return A valid UsdHydraGenerativeProceduralAPI object is returned upon success. 
-    /// An invalid (or empty) UsdHydraGenerativeProceduralAPI object is returned upon 
-    /// failure. See \ref UsdPrim::ApplyAPI() for conditions 
-    /// resulting in failure. 
-    /// 
+    ///
+    /// \return A valid UsdHydraGenerativeProceduralAPI object is returned upon success.
+    /// An invalid (or empty) UsdHydraGenerativeProceduralAPI object is returned upon
+    /// failure. See \ref UsdPrim::ApplyAPI() for conditions
+    /// resulting in failure.
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -132,8 +121,7 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDHYDRA_API
-    static UsdHydraGenerativeProceduralAPI 
-    Apply(const UsdPrim &prim);
+    static UsdHydraGenerativeProceduralAPI Apply(const UsdPrim& prim);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -146,17 +134,17 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDHYDRA_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDHYDRA_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // PROCEDURALTYPE 
+    // PROCEDURALTYPE
     // --------------------------------------------------------------------- //
     /// The registered name of a HdGpGenerativeProceduralPlugin to
     /// be executed.
@@ -169,26 +157,26 @@ public:
     USDHYDRA_API
     UsdAttribute GetProceduralTypeAttr() const;
 
-    /// See GetProceduralTypeAttr(), and also 
+    /// See GetProceduralTypeAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDHYDRA_API
-    UsdAttribute CreateProceduralTypeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateProceduralTypeAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // PROCEDURALSYSTEM 
+    // PROCEDURALSYSTEM
     // --------------------------------------------------------------------- //
-    /// 
+    ///
     /// This value should correspond to a configured instance of
     /// HdGpGenerativeProceduralResolvingSceneIndex which will evaluate the
     /// procedural. The default value of "hydraGenerativeProcedural" matches
     /// the equivalent default of HdGpGenerativeProceduralResolvingSceneIndex.
     /// Multiple instances of the scene index can be used to determine where
     /// within a scene index chain a given procedural will be evaluated.
-    /// 
+    ///
     ///
     /// | ||
     /// | -- | -- |
@@ -198,21 +186,21 @@ public:
     USDHYDRA_API
     UsdAttribute GetProceduralSystemAttr() const;
 
-    /// See GetProceduralSystemAttr(), and also 
+    /// See GetProceduralSystemAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDHYDRA_API
-    UsdAttribute CreateProceduralSystemAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateProceduralSystemAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //

@@ -26,16 +26,11 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-#define USD_COLLECTION_MEMBERSHIP_QUERY_TOKENS \
-    (IncludedByMembershipExpression)           \
-    (ExcludedByMembershipExpression)
+#define USD_COLLECTION_MEMBERSHIP_QUERY_TOKENS (IncludedByMembershipExpression)(ExcludedByMembershipExpression)
 
-TF_DECLARE_PUBLIC_TOKENS(UsdCollectionMembershipQueryTokens,
-                         USD_API, USD_COLLECTION_MEMBERSHIP_QUERY_TOKENS);
+TF_DECLARE_PUBLIC_TOKENS(UsdCollectionMembershipQueryTokens, USD_API, USD_COLLECTION_MEMBERSHIP_QUERY_TOKENS);
 
-
-class Usd_CollectionMembershipQueryBase
-{
+class Usd_CollectionMembershipQueryBase {
 public:
     /// Holds an unordered map describing membership of paths in this collection
     /// and the associated expansionRule for how the paths are to be expanded.
@@ -46,8 +41,7 @@ public:
     /// If a collection includes another collection, the included collection's
     /// PathExpansionRuleMap is merged into this one. If a path is excluded,
     /// its expansion rule is set to UsdTokens->exclude.
-    using PathExpansionRuleMap = std::unordered_map<SdfPath,
-          TfToken, SdfPath::Hash>;
+    using PathExpansionRuleMap = std::unordered_map<SdfPath, TfToken, SdfPath::Hash>;
 
     /// Default Constructor, creates an empty Usd_CollectionMembershipQueryBase
     /// object
@@ -56,43 +50,33 @@ public:
     /// Constructor that takes a path expansion rule map.  The map is scanned
     /// for 'excludes' when the Usd_CollectionMembershipQueryBase object is
     /// constructed.
-    Usd_CollectionMembershipQueryBase(
-        const PathExpansionRuleMap& pathExpansionRuleMap,
-        const SdfPathSet& includedCollections);
+    Usd_CollectionMembershipQueryBase(const PathExpansionRuleMap& pathExpansionRuleMap,
+                                      const SdfPathSet& includedCollections);
 
     /// Constructor that takes a path expansion rule map as an rvalue reference
-    Usd_CollectionMembershipQueryBase(
-        PathExpansionRuleMap&& pathExpansionRuleMap,
-        SdfPathSet&& includedCollections);
+    Usd_CollectionMembershipQueryBase(PathExpansionRuleMap&& pathExpansionRuleMap, SdfPathSet&& includedCollections);
 
     /// Constructor that additionally takes an additional expression evaluator
     /// and a top-level expansion rule.
-    Usd_CollectionMembershipQueryBase(
-        const PathExpansionRuleMap& pathExpansionRuleMap,
-        const SdfPathSet& includedCollections,
-        const TfToken &topExpansionRule);
+    Usd_CollectionMembershipQueryBase(const PathExpansionRuleMap& pathExpansionRuleMap,
+                                      const SdfPathSet& includedCollections,
+                                      const TfToken& topExpansionRule);
 
     /// Constructor that additionally takes an additional expression evaluator
     /// as an rvalue reference and a top-level expansion rule.
-    Usd_CollectionMembershipQueryBase(
-        PathExpansionRuleMap&& pathExpansionRuleMap,
-        SdfPathSet&& includedCollections,
-        TfToken const &topExpansionRule);
-    
+    Usd_CollectionMembershipQueryBase(PathExpansionRuleMap&& pathExpansionRuleMap,
+                                      SdfPathSet&& includedCollections,
+                                      TfToken const& topExpansionRule);
+
     /// Returns true if the collection excludes one or more paths below an
     /// included path via the excludes relationship (see
     /// UsdCollectionAPI::GetExcludesRel()).
-    bool HasExcludes() const {
-        return _hasExcludes;
-    }
-    
+    bool HasExcludes() const { return _hasExcludes; }
 
     /// Returns a raw map of the paths included or excluded in the
     /// collection along with the expansion rules for the included
     /// paths.
-    const PathExpansionRuleMap& GetAsPathExpansionRuleMap() const {
-        return _pathExpansionRuleMap;
-    }
+    const PathExpansionRuleMap& GetAsPathExpansionRuleMap() const { return _pathExpansionRuleMap; }
 
     /// Returns a set of paths for all collections that were included in the
     /// collection from which this Usd_CollectionMembershipQueryBase object was
@@ -100,21 +84,16 @@ public:
     /// other collections will be part of this set. The collection from which
     /// this Usd_CollectionMembershipQueryBase object was computed is *not* part
     /// of this set.
-    const SdfPathSet& GetIncludedCollections() const {
-        return _includedCollections;
-    }
+    const SdfPathSet& GetIncludedCollections() const { return _includedCollections; }
 
     /// Return the top expansion rule for this query object.  This rule is the
     /// expansion rule from the UsdCollectionAPI instance that was used to build
     /// this query object.  The top expansion rule is used when evaluating the
     /// expression associated with this query, to determine whether it should
     /// match prims only, or both prims and properties.
-    TfToken GetTopExpansionRule() const {
-        return _topExpansionRule;
-    }
+    TfToken GetTopExpansionRule() const { return _topExpansionRule; }
 
 protected:
-
     /// Hash functor
     struct _Hash {
         USD_API
@@ -122,18 +101,15 @@ protected:
     };
 
     /// Hash function
-    inline size_t _GetHash() const {
-        return _Hash()(*this);
-    }
+    inline size_t _GetHash() const { return _Hash()(*this); }
 
     USD_API
-    bool _IsPathIncludedByRuleMap(const SdfPath &path,
-                                  TfToken *expansionRule=nullptr) const;
+    bool _IsPathIncludedByRuleMap(const SdfPath& path, TfToken* expansionRule = nullptr) const;
 
     USD_API
-    bool _IsPathIncludedByRuleMap(const SdfPath &path,
-                                  const TfToken &parentExpansionRule,
-                                  TfToken *expansionRule=nullptr) const;
+    bool _IsPathIncludedByRuleMap(const SdfPath& path,
+                                  const TfToken& parentExpansionRule,
+                                  TfToken* expansionRule = nullptr) const;
 
     // Return true if the _pathExpansionRuleMap is empty, meaning that we would
     // use an expression in the derived class, for example.
@@ -141,23 +117,22 @@ protected:
     bool _HasEmptyRuleMap() const;
 
     TfToken _topExpansionRule;
-    
+
     PathExpansionRuleMap _pathExpansionRuleMap;
 
     SdfPathSet _includedCollections;
 
     // A cached flag indicating whether _pathExpansionRuleMap contains
     // any exclude rules.
-    bool _hasExcludes=false;
+    bool _hasExcludes = false;
 };
 
 /// Compute an SdfPathExpression that matches the same paths as \p ruleMap.  The
 /// resulting SdfPathExpression is always complete (see
 /// SdfPathExpression::IsComplete()) and never contains predicates.
 USD_API
-SdfPathExpression
-UsdComputePathExpressionFromCollectionMembershipQueryRuleMap(
-    Usd_CollectionMembershipQueryBase::PathExpansionRuleMap const &ruleMap);
+SdfPathExpression UsdComputePathExpressionFromCollectionMembershipQueryRuleMap(
+        Usd_CollectionMembershipQueryBase::PathExpansionRuleMap const& ruleMap);
 
 // -------------------------------------------------------------------------- //
 // UsdCollectionMembershipQuery                                               //
@@ -170,11 +145,10 @@ UsdComputePathExpressionFromCollectionMembershipQueryRuleMap(
 /// UsdCollectionMembershipQuery object can be used to answer queries about
 /// membership of paths in the collection efficiently.
 template <class ExprEval>
-class Usd_CollectionMembershipQuery : public Usd_CollectionMembershipQueryBase
-{
+class Usd_CollectionMembershipQuery : public Usd_CollectionMembershipQueryBase {
 public:
     using ExpressionEvaluator = ExprEval;
-    
+
     using Usd_CollectionMembershipQueryBase::Usd_CollectionMembershipQueryBase;
 
     /// \overload
@@ -204,22 +178,15 @@ public:
     ///
     /// The python version of this method only returns the boolean result.  It
     /// does not return an SdfPredicateFunctionResult or set \p expansionRule.
-    SdfPredicateFunctionResult
-    IsPathIncluded(const SdfPath &path,
-                   TfToken *expansionRule=nullptr) const {
+    SdfPredicateFunctionResult IsPathIncluded(const SdfPath& path, TfToken* expansionRule = nullptr) const {
         // If we have a rule map, go that way.  Otherwise try the expression.
         if (UsesPathExpansionRuleMap()) {
-            return SdfPredicateFunctionResult::MakeVarying(
-                _IsPathIncludedByRuleMap(path, expansionRule));
+            return SdfPredicateFunctionResult::MakeVarying(_IsPathIncludedByRuleMap(path, expansionRule));
         }
-        const SdfPredicateFunctionResult
-            res = GetExpressionEvaluator().Match(path);
+        const SdfPredicateFunctionResult res = GetExpressionEvaluator().Match(path);
         if (expansionRule) {
-            *expansionRule = res ?
-                UsdCollectionMembershipQueryTokens->
-                    IncludedByMembershipExpression : 
-                UsdCollectionMembershipQueryTokens->
-                    ExcludedByMembershipExpression;
+            *expansionRule = res ? UsdCollectionMembershipQueryTokens->IncludedByMembershipExpression
+                                 : UsdCollectionMembershipQueryTokens->ExcludedByMembershipExpression;
         }
         return res;
     }
@@ -242,24 +209,18 @@ public:
     ///
     /// The python version of this method only returns the boolean result.
     /// It does not return \p expansionRule.
-    SdfPredicateFunctionResult
-    IsPathIncluded(const SdfPath &path,
-                   const TfToken &parentExpansionRule,
-                   TfToken *expansionRule=nullptr) const {
+    SdfPredicateFunctionResult IsPathIncluded(const SdfPath& path,
+                                              const TfToken& parentExpansionRule,
+                                              TfToken* expansionRule = nullptr) const {
         // If we have a rule map, go that way.  Otherwise try the expression.
         if (UsesPathExpansionRuleMap()) {
             return SdfPredicateFunctionResult::MakeVarying(
-                _IsPathIncludedByRuleMap(
-                    path, parentExpansionRule, expansionRule));
+                    _IsPathIncludedByRuleMap(path, parentExpansionRule, expansionRule));
         }
-        const SdfPredicateFunctionResult
-            res = GetExpressionEvaluator().Match(path);
+        const SdfPredicateFunctionResult res = GetExpressionEvaluator().Match(path);
         if (expansionRule) {
-            *expansionRule = res ?
-                UsdCollectionMembershipQueryTokens->
-                    IncludedByMembershipExpression : 
-                UsdCollectionMembershipQueryTokens->
-                    ExcludedByMembershipExpression;
+            *expansionRule = res ? UsdCollectionMembershipQueryTokens->IncludedByMembershipExpression
+                                 : UsdCollectionMembershipQueryTokens->ExcludedByMembershipExpression;
         }
         return res;
     }
@@ -267,50 +228,35 @@ public:
     /// Return true if this query uses the explicit path-expansion rule method
     /// to determine collection membership.  Otherwise, return false if it uses
     /// the pattern-based membership expression to determine membership.
-    bool UsesPathExpansionRuleMap() const {
-        return !_HasEmptyRuleMap();
+    bool UsesPathExpansionRuleMap() const { return !_HasEmptyRuleMap(); }
+
+    void SetExpressionEvaluator(ExpressionEvaluator&& exprEval) { _exprEval = std::move(exprEval); }
+
+    void SetExpressionEvaluator(ExpressionEvaluator const& exprEval) {
+        SetExpressionEvaluator(ExpressionEvaluator{exprEval});
     }
 
-    void
-    SetExpressionEvaluator(ExpressionEvaluator &&exprEval) {
-        _exprEval = std::move(exprEval);
-    }
-
-    void
-    SetExpressionEvaluator(ExpressionEvaluator const &exprEval) {
-        SetExpressionEvaluator(ExpressionEvaluator { exprEval } );
-    }
-    
     /// Return the expression evaluator associated with this query object.  This
     /// may be an empty evaluator.  See HasExpression().
-    ExpressionEvaluator const &
-    GetExpressionEvaluator() const {
-        return _exprEval;
-    }
+    ExpressionEvaluator const& GetExpressionEvaluator() const { return _exprEval; }
 
     /// Return true if the expression evaluator associated with this query
     /// object is not empty.  See GetExpressionEvaluator().
-    bool HasExpression() const {
-        return !_exprEval.IsEmpty();
-    }
+    bool HasExpression() const { return !_exprEval.IsEmpty(); }
 
     /// Equality operator
     bool operator==(Usd_CollectionMembershipQuery const& rhs) const {
         // Note that MembershipQuery objects that have non-empty _exprEval never
         // compare equal to each other.  This is because the evaluator objects
         // run code, and there's no good way to determine equivalence.
-        return _topExpansionRule == rhs._topExpansionRule &&
-            _hasExcludes == rhs._hasExcludes &&
-            _pathExpansionRuleMap == rhs._pathExpansionRuleMap &&
-            _includedCollections == rhs._includedCollections &&
-            _exprEval.IsEmpty() == rhs._exprEval.IsEmpty();
+        return _topExpansionRule == rhs._topExpansionRule && _hasExcludes == rhs._hasExcludes &&
+               _pathExpansionRuleMap == rhs._pathExpansionRuleMap && _includedCollections == rhs._includedCollections &&
+               _exprEval.IsEmpty() == rhs._exprEval.IsEmpty();
         ;
     }
 
     /// Inequality operator
-    bool operator!=(Usd_CollectionMembershipQuery const& rhs) const {
-        return !(*this == rhs);
-    }
+    bool operator!=(Usd_CollectionMembershipQuery const& rhs) const { return !(*this == rhs); }
 
     /// Hash functor
     struct Hash {
@@ -320,34 +266,28 @@ public:
     };
 
     /// Hash function
-    inline size_t GetHash() const {
-        return Hash()(*this);
-    }
-    
+    inline size_t GetHash() const { return Hash()(*this); }
+
 private:
     ExpressionEvaluator _exprEval;
 };
-
 
 /// \class UsdObjectCollectionExpressionEvaluator
 ///
 /// \brief Evaluates SdfPathExpressions with objects from a given UsdStage.
 class UsdObjectCollectionExpressionEvaluator {
     struct PathToObj {
-        UsdObject operator()(SdfPath const &path) const {
-            return stage->GetObjectAtPath(path);
-        }
+        UsdObject operator()(SdfPath const& path) const { return stage->GetObjectAtPath(path); }
         UsdStageWeakPtr stage;
     };
-    
+
 public:
     using PathExprEval = SdfPathExpressionEval<UsdObject>;
-    using IncrementalSearcher =
-        typename PathExprEval::IncrementalSearcher<PathToObj>;
-    
+    using IncrementalSearcher = typename PathExprEval::IncrementalSearcher<PathToObj>;
+
     /// Construct an empty evaluator.
     UsdObjectCollectionExpressionEvaluator() = default;
-    
+
     /// Construct an evaluator that evalutates \p expr on objects from \p
     /// stage.  The \p expr must be "complete" (see
     /// SdfPathExpression::IsComplete()).
@@ -359,28 +299,23 @@ public:
     /// UsdCollectionAPI::ResolveCompleteMembershipExpression() to produce
     /// an approprate expression.
     USD_API
-    UsdObjectCollectionExpressionEvaluator(UsdStageWeakPtr const &stage,
-                                           SdfPathExpression const &expr);
+    UsdObjectCollectionExpressionEvaluator(UsdStageWeakPtr const& stage, SdfPathExpression const& expr);
 
     /// Return true if this evaluator has an invalid stage or an empty
     /// underlying SdfPathExpressionEval object.
-    bool IsEmpty() const {
-        return !_stage || _evaluator.IsEmpty();
-    }
+    bool IsEmpty() const { return !_stage || _evaluator.IsEmpty(); }
 
     /// Return the stage this object was constructed with, or nullptr if it
     /// was default constructed.
-    UsdStageWeakPtr const &GetStage() const { return _stage; }
+    UsdStageWeakPtr const& GetStage() const { return _stage; }
 
     /// Return the result of evaluating the expression against \p path.
     USD_API
-    SdfPredicateFunctionResult
-    Match(SdfPath const &path) const;
+    SdfPredicateFunctionResult Match(SdfPath const& path) const;
 
     /// Return the result of evaluating the expression against \p object.
     USD_API
-    SdfPredicateFunctionResult
-    Match(UsdObject const &object) const;
+    SdfPredicateFunctionResult Match(UsdObject const& object) const;
 
     /// Create an incremental searcher from this evaluator.  See
     /// SdfPathExpressionEval::IncrementalSearcher for more info and API.
@@ -391,14 +326,13 @@ public:
     /// UsdObjectCollectionExpressionEvaluator object's lifetime ends.
     USD_API
     IncrementalSearcher MakeIncrementalSearcher() const;
-    
+
 private:
     UsdStageWeakPtr _stage;
     PathExprEval _evaluator;
 };
 
-using UsdCollectionMembershipQuery =
-    Usd_CollectionMembershipQuery<UsdObjectCollectionExpressionEvaluator>;
+using UsdCollectionMembershipQuery = Usd_CollectionMembershipQuery<UsdObjectCollectionExpressionEvaluator>;
 
 /// Returns all the usd objects that satisfy the predicate, \p pred in the
 /// collection represented by the UsdCollectionMembershipQuery object, \p
@@ -407,9 +341,9 @@ using UsdCollectionMembershipQuery =
 /// The results depends on the load state of the UsdStage, \p stage.
 USD_API
 std::set<UsdObject> UsdComputeIncludedObjectsFromCollection(
-    const UsdCollectionMembershipQuery &query,
-    const UsdStageWeakPtr &stage,
-    const Usd_PrimFlagsPredicate &pred=UsdPrimDefaultPredicate);
+        const UsdCollectionMembershipQuery& query,
+        const UsdStageWeakPtr& stage,
+        const Usd_PrimFlagsPredicate& pred = UsdPrimDefaultPredicate);
 
 /// Returns all the paths that satisfy the predicate, \p pred in the
 /// collection represented by the UsdCollectionMembershipQuery object, \p
@@ -417,10 +351,9 @@ std::set<UsdObject> UsdComputeIncludedObjectsFromCollection(
 ///
 /// The result depends on the load state of the UsdStage, \p stage.
 USD_API
-SdfPathSet UsdComputeIncludedPathsFromCollection(
-    const UsdCollectionMembershipQuery &query,
-    const UsdStageWeakPtr &stage,
-    const Usd_PrimFlagsPredicate &pred=UsdPrimDefaultPredicate);
+SdfPathSet UsdComputeIncludedPathsFromCollection(const UsdCollectionMembershipQuery& query,
+                                                 const UsdStageWeakPtr& stage,
+                                                 const Usd_PrimFlagsPredicate& pred = UsdPrimDefaultPredicate);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

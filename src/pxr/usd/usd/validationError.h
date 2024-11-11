@@ -32,24 +32,18 @@ class UsdValidator;
 ///       hence reported as warning by the validation task.
 /// Info: Associates the UsdValidationErrorType with information which needs to
 ///       be reported to the users by the validation task.
-enum class UsdValidationErrorType {
-    None = 0,
-    Error,
-    Warn,
-    Info
-};
+enum class UsdValidationErrorType { None = 0, Error, Warn, Info };
 
 /// \class UsdValidationErrorSite
 ///
 /// UsdValidationErrorSite is important information available from a
 /// ValidationError, which annotates the site where the Error was reported by a
-/// validation task. 
+/// validation task.
 ///
-/// An Error could be reported in a SdfLayer (in layer metadata, for example), 
-/// or a UsdStage (in stage metadata, for example) or a Prim within a stage, or 
+/// An Error could be reported in a SdfLayer (in layer metadata, for example),
+/// or a UsdStage (in stage metadata, for example) or a Prim within a stage, or
 /// a property of a prim.
-struct UsdValidationErrorSite
-{
+struct UsdValidationErrorSite {
 public:
     UsdValidationErrorSite() = default;
 
@@ -57,12 +51,11 @@ public:
     /// \p objectPath.
     ///
     /// Object Path here could be a prim or a property spec path.
-    /// 
+    ///
     /// Note that to identify a layer metadata, objectPath can be set as the
     /// pseudoRoot.
     USD_API
-    UsdValidationErrorSite(const SdfLayerHandle &layer,
-                                    const SdfPath &objectPath);
+    UsdValidationErrorSite(const SdfLayerHandle& layer, const SdfPath& objectPath);
 
     /// Initialize an UsdValidationErrorSite using a \p usdStage and an \p
     /// objectPath.
@@ -75,21 +68,17 @@ public:
     /// Note that to identify stage's root layer metadata, objectPath can be set
     /// as the pseudoRoot.
     USD_API
-    UsdValidationErrorSite(const UsdStagePtr &usdStage, 
-                           const SdfPath &objectPath,
-                           const SdfLayerHandle &layer=SdfLayerHandle());
+    UsdValidationErrorSite(const UsdStagePtr& usdStage,
+                           const SdfPath& objectPath,
+                           const SdfLayerHandle& layer = SdfLayerHandle());
 
     /// Returns true if UsdValidationErrorSite instance can either point to a
     /// prim or property spec in a layer or a prim or property on a stage.
-    bool IsValid() const 
-    {
-        return IsValidSpecInLayer() || IsPrim() || IsProperty();
-    }
+    bool IsValid() const { return IsValidSpecInLayer() || IsPrim() || IsProperty(); }
 
     /// Returns true if the objectPath and layer represent a spec in the layer;
     /// false otherwise.
-    bool IsValidSpecInLayer() const 
-    {
+    bool IsValidSpecInLayer() const {
         if (!_layer || _objectPath.IsEmpty()) {
             return false;
         }
@@ -98,17 +87,11 @@ public:
 
     /// Returns true if UsdValidationErrorSite represents a prim on a stage,
     /// false otherwise.
-    bool IsPrim() const
-    {
-        return GetPrim().IsValid();
-    }
+    bool IsPrim() const { return GetPrim().IsValid(); }
 
     /// Returns true if UsdValidationErrorSite represents a property on a stage,
     /// false otherwise.
-    bool IsProperty() const
-    {
-        return GetProperty().IsValid();
-    }
+    bool IsProperty() const { return GetProperty().IsValid(); }
 
     /// Returns the SdfPropertySpecHandle associated with this
     /// ValidationErrorSite's layer and objectPath.
@@ -116,8 +99,7 @@ public:
     /// Returns an invalid SdfPropertySpecHandle if no valid property spec is
     /// found, or when UsdValidationErrorSite instance doesn't have a
     /// layer.
-    const SdfPropertySpecHandle GetPropertySpec() const
-    {
+    const SdfPropertySpecHandle GetPropertySpec() const {
         if (!_layer) {
             return SdfPropertySpecHandle();
         }
@@ -127,10 +109,9 @@ public:
     /// Returns the SdfPrimSpecHandle associated with this ValidationErrorSite's
     /// layer and objectPath.
     ///
-    /// Returns an invalid SdfPrimSpecHandle if no valid prim spec is found, or 
+    /// Returns an invalid SdfPrimSpecHandle if no valid prim spec is found, or
     /// when UsdValidationErrorSite instance doesn't have a layer.
-    const SdfPrimSpecHandle GetPrimSpec() const
-    {
+    const SdfPrimSpecHandle GetPrimSpec() const {
         if (!_layer) {
             return SdfPrimSpecHandle();
         }
@@ -138,23 +119,16 @@ public:
     }
 
     /// Returns the SdfLayerHandle associated with this UsdValidatorErrorSite
-    const SdfLayerHandle& GetLayer() const
-    {
-        return _layer;
-    }
+    const SdfLayerHandle& GetLayer() const { return _layer; }
 
     /// Returns the UsdStage associated with this UsdValidationErrorSite;
     /// nullptr othewrise.
-    const UsdStagePtr& GetStage() const
-    {
-        return _usdStage;
-    }
+    const UsdStagePtr& GetStage() const { return _usdStage; }
 
     /// Returns UsdPrim associated with this UsdValidationErrorSite, that is
     /// when UsdStage is present and objectPath represents a prim path on this
     /// stage; if not, an invalid prim is returned.
-    UsdPrim GetPrim() const
-    {
+    UsdPrim GetPrim() const {
         if (_usdStage) {
             return _usdStage->GetPrimAtPath(_objectPath);
         }
@@ -164,8 +138,7 @@ public:
     /// Returns UsdProperty associated with this UsdValidationErrorSite, that is
     /// when UsdStage is present and objectPath represents a property path on
     /// this stage; if not, an invalid property is returned.
-    UsdProperty GetProperty() const
-    {
+    UsdProperty GetProperty() const {
         if (_usdStage) {
             return _usdStage->GetPropertyAtPath(_objectPath);
         }
@@ -175,23 +148,19 @@ public:
     /// Returns true if \p other UsdValidationErrorSite has same valued members
     /// as this UsdValidationErrorSite, false otherwise.
     bool operator==(const UsdValidationErrorSite& other) const {
-        return (_layer == other._layer) &&
-               (_usdStage == other._usdStage) &&
-               (_objectPath == other._objectPath);
+        return (_layer == other._layer) && (_usdStage == other._usdStage) && (_objectPath == other._objectPath);
     }
 
     /// Returns false if \p other UsdValidationErrorSite has same valued members
     /// as this UsdValidationErrorSite, true otherwise.
-    bool operator!=(const UsdValidationErrorSite& other) const {
-        return !(*this == other);
-    }
+    bool operator!=(const UsdValidationErrorSite& other) const { return !(*this == other); }
 
 private:
     UsdStagePtr _usdStage;
     SdfLayerHandle _layer;
     SdfPath _objectPath;
 
-}; // UsdValidationErrorSite
+};  // UsdValidationErrorSite
 
 using UsdValidationErrorSites = std::vector<UsdValidationErrorSite>;
 
@@ -203,17 +172,17 @@ using UsdValidationErrorSites = std::vector<UsdValidationErrorSite>;
 /// A UsdValidationError instance contains important information, like:
 ///
 /// - Name - A name the validator writer provided for the error. This is then
-///        used to construct an identifier for the error. 
+///        used to construct an identifier for the error.
 ///
-/// - UsdValidationErrorType - severity of an error, 
+/// - UsdValidationErrorType - severity of an error,
 ///
-/// - UsdValidationErrorSites - on what sites validationError was reported by a 
-///                          validation task, 
+/// - UsdValidationErrorSites - on what sites validationError was reported by a
+///                          validation task,
 ///
 /// - Message - Message providing more information associated with the error.
 ///           Such a message is provided by the validator writer, when providing
 ///           implementation for the validation task function.
-/// 
+///
 /// UsdValidationError instances will be stored in the UsdValidationContext
 /// responsible for executing a set of UsdValidators.
 ///
@@ -223,74 +192,48 @@ public:
     USD_API
     UsdValidationError();
 
-    /// Instantiate a ValidationError by providing its \p name, \p errorType, 
+    /// Instantiate a ValidationError by providing its \p name, \p errorType,
     /// \p errorSites and an \p errorMsg.
     USD_API
-    UsdValidationError(const TfToken &name,
-                       const UsdValidationErrorType &errorType, 
-                       const UsdValidationErrorSites &errorSites, 
-                       const std::string &errorMsg);
+    UsdValidationError(const TfToken& name,
+                       const UsdValidationErrorType& errorType,
+                       const UsdValidationErrorSites& errorSites,
+                       const std::string& errorMsg);
 
     bool operator==(const UsdValidationError& other) const {
-        return (_name == other._name) &&
-               (_errorType == other._errorType) &&
-               (_errorSites == other._errorSites) &&
-               (_errorMsg == other._errorMsg) &&
-               (_validator == other._validator);
+        return (_name == other._name) && (_errorType == other._errorType) && (_errorSites == other._errorSites) &&
+               (_errorMsg == other._errorMsg) && (_validator == other._validator);
     }
 
-    bool operator!=(const UsdValidationError& other) const {
-        return !(*this == other);
-    }
+    bool operator!=(const UsdValidationError& other) const { return !(*this == other); }
 
     /// Returns the name token of the UsdValidationError
-    const TfToken& GetName() const &
-    {
-        return _name;
-    }
+    const TfToken& GetName() const& { return _name; }
 
     /// Returns the name token of the UsdValidationError by-value
-    TfToken GetName() &&
-    {
-        return std::move(_name);
-    }
-    
+    TfToken GetName() && { return std::move(_name); }
+
     /// Returns the UsdValidationErrorType associated with this
     /// UsdValidationError
-    UsdValidationErrorType GetType() const
-    {
-        return _errorType;
-    }
+    UsdValidationErrorType GetType() const { return _errorType; }
 
     /// Returns the UsdValidationErrorSite associated with this
     /// UsdValidationError
-    const UsdValidationErrorSites& GetSites() const &
-    {
-        return _errorSites;
-    }
+    const UsdValidationErrorSites& GetSites() const& { return _errorSites; }
 
     /// Returns the UsdValidationErrorSite associated with this
     /// UsdValidationError by-value
-    UsdValidationErrorSites GetSites() &&
-    {
-        return std::move(_errorSites);
-    }
+    UsdValidationErrorSites GetSites() && { return std::move(_errorSites); }
 
     /// Returns the UsdValidator that reported this error.
     ///
     /// This will return nullptr if there is no UsdValidator associated with
-    /// this error. This will never be nullptr for validation errors returned 
+    /// this error. This will never be nullptr for validation errors returned
     /// from calls to UsdValidator::Validate.
-    const UsdValidator* GetValidator() const
-    {
-        return _validator;
-    }
+    const UsdValidator* GetValidator() const { return _validator; }
 
     /// Returns the message associated with this UsdValidationError
-    const std::string& GetMessage() const
-    {
-        return _errorMsg;
-    }
+    const std::string& GetMessage() const { return _errorMsg; }
 
     /// An identifier for the error constructed from the validator name this
     /// error was generated from and its name.
@@ -304,7 +247,7 @@ public:
     /// For an error that was generated without a name, the identifier will be
     /// same as the validator name which generated the error.
     ///
-    /// For an error which is created directly and not via 
+    /// For an error which is created directly and not via
     /// UsdValidator::Validate() call, we throw a coding error, as its an
     /// improper use of the API.
     USD_API
@@ -316,9 +259,7 @@ public:
 
     /// Returns true if UsdValidationErrorType is UsdValidationErrorType::None,
     /// false otherwise
-    bool HasNoError() const {
-      return _errorType == UsdValidationErrorType::None;
-    }
+    bool HasNoError() const { return _errorType == UsdValidationErrorType::None; }
 
 private:
     // UsdValidatorError holds a pointer to the UsdValidator that generated it, so
@@ -327,11 +268,11 @@ private:
 
     // Used by UsdValidator::Validate methods to embed itself to the reported
     // errors.
-    void _SetValidator(const UsdValidator *validator);
+    void _SetValidator(const UsdValidator* validator);
 
-    // _validator is set when ValidationError is generated via a 
+    // _validator is set when ValidationError is generated via a
     // UsdValidator::Validate() call.
-    const UsdValidator *_validator;
+    const UsdValidator* _validator;
 
     // These data members should not be modified other than during
     // initialization by the validate task functions.
@@ -343,9 +284,9 @@ private:
     // TODO:(Subsequent iterations)
     // - VtValue of a random value the error wants to propagate down to the
     // fixer
-    
-}; // UsdValidationError
+
+};  // UsdValidationError
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_VALIDATION_ERROR_H
+#endif  // PXR_USD_USD_VALIDATION_ERROR_H

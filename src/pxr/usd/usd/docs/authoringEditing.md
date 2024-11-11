@@ -4,5 +4,5 @@
 
 ## Client Safety and Response to Edits {#Usd_Notification}
 
-See the section on \ref Usd_BoolReturns for how to ensure retained Usd objects 
+See the section on \ref Usd_BoolReturns for how to ensure retained Usd objects
 are still valid for use.

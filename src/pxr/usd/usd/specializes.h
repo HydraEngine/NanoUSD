@@ -24,11 +24,11 @@ SDF_DECLARE_HANDLES(SdfPrimSpec);
 /// A proxy class for applying listOp edits to the specializes list for a
 /// prim.
 ///
-/// All paths passed to the UsdSpecializes API are expected to be in the 
-/// namespace of the owning prim's stage. Subroot prim specializes paths  
-/// will be translated from this namespace to the namespace of the current 
-/// edit target, if necessary. If a path cannot be translated, a coding error 
-/// will be issued and no changes will be made. Root prim specializes paths 
+/// All paths passed to the UsdSpecializes API are expected to be in the
+/// namespace of the owning prim's stage. Subroot prim specializes paths
+/// will be translated from this namespace to the namespace of the current
+/// edit target, if necessary. If a path cannot be translated, a coding error
+/// will be issued and no changes will be made. Root prim specializes paths
 /// will not be translated.
 ///
 class UsdSpecializes {
@@ -37,17 +37,15 @@ class UsdSpecializes {
     explicit UsdSpecializes(const UsdPrim& prim) : _prim(prim) {}
 
 public:
-
     /// Adds a path to the specializes listOp at the current EditTarget,
     /// in the position specified by \p position.
     USD_API
-    bool AddSpecialize(const SdfPath &primPath,
-               UsdListPosition position=UsdListPositionBackOfPrependList);
+    bool AddSpecialize(const SdfPath& primPath, UsdListPosition position = UsdListPositionBackOfPrependList);
 
     /// Removes the specified path from the specializes listOp at the
     /// current EditTarget.
     USD_API
-    bool RemoveSpecialize(const SdfPath &primPath);
+    bool RemoveSpecialize(const SdfPath& primPath);
 
     /// Removes the authored specializes listOp edits at the current edit
     /// target.
@@ -61,7 +59,7 @@ public:
     bool SetSpecializes(const SdfPathVector& items);
 
     /// Return the prim this object is bound to.
-    const UsdPrim &GetPrim() const { return _prim; }
+    const UsdPrim& GetPrim() const { return _prim; }
     UsdPrim GetPrim() { return _prim; }
 
     explicit operator bool() { return bool(_prim); }
@@ -70,10 +68,9 @@ public:
     // Private Methods and Members
     // ---------------------------------------------------------------------- //
 private:
-
     UsdPrim _prim;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif //PXR_USD_USD_SPECIALIZES_H
+#endif  // PXR_USD_USD_SPECIALIZES_H

@@ -20,7 +20,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 TF_DECLARE_WEAK_PTRS(UsdStage);
 
 /// \class UsdEditTarget
@@ -60,10 +59,8 @@ TF_DECLARE_WEAK_PTRS(UsdStage);
 /// to UsdEditTargets.  A UsdEditTarget constructed in this way means direct
 /// opinions in a layer in a stage's local LayerStack.
 ///
-class UsdEditTarget
-{
+class UsdEditTarget {
 public:
-
     /// Construct a null EditTarget.  A null EditTarget will return paths
     /// unchanged when asked to map paths.
     USD_API
@@ -76,42 +73,36 @@ public:
     /// To automatically supply the appropriate layer offset for the given
     /// layer, see UsdStage::GetEditTargetForLayer().
     USD_API
-    UsdEditTarget(const SdfLayerHandle &layer,
-                  SdfLayerOffset offset = SdfLayerOffset());
+    UsdEditTarget(const SdfLayerHandle& layer, SdfLayerOffset offset = SdfLayerOffset());
 
     /// Convenience implicit conversion from SdfLayerRefPtr.  See above
     /// constructor for more information.
     USD_API
-    UsdEditTarget(const SdfLayerRefPtr &layer,
-                  SdfLayerOffset offset = SdfLayerOffset());
+    UsdEditTarget(const SdfLayerRefPtr& layer, SdfLayerOffset offset = SdfLayerOffset());
 
     /// Construct an EditTarget with \a layer and \a node.  The mapping
     /// will be used to map paths from the scene into the \a layer's namespace
     /// given the \a PcpNodeRef \a node's mapping.
     USD_API
-    UsdEditTarget(const SdfLayerHandle &layer, const PcpNodeRef &node);
+    UsdEditTarget(const SdfLayerHandle& layer, const PcpNodeRef& node);
 
     /// Convenience constructor taking SdfLayerRefPtr.  See above
     /// constructor for more information.
     USD_API
-    UsdEditTarget(const SdfLayerRefPtr &layer, const PcpNodeRef &node);
+    UsdEditTarget(const SdfLayerRefPtr& layer, const PcpNodeRef& node);
 
     /// Convenience constructor for editing a direct variant in a local
     /// LayerStack.  The \p varSelPath must be a prim variant selection path
     /// (see SdfPath::IsPrimVariantSelectionPath()).
     USD_API
-    static UsdEditTarget
-    ForLocalDirectVariant(const SdfLayerHandle &layer,
-                          const SdfPath &varSelPath);
+    static UsdEditTarget ForLocalDirectVariant(const SdfLayerHandle& layer, const SdfPath& varSelPath);
 
     /// Equality comparison.
     USD_API
-    bool operator==(const UsdEditTarget &other) const;
+    bool operator==(const UsdEditTarget& other) const;
 
     /// Inequality comparison.
-    bool operator!=(const UsdEditTarget &other) const {
-        return !(*this == other);
-    }
+    bool operator!=(const UsdEditTarget& other) const { return !(*this == other); }
 
     /// Return true if this EditTarget is null.  Null EditTargets map
     /// paths unchanged, and have no layer or LayerStack identifier.
@@ -122,7 +113,7 @@ public:
     bool IsValid() const { return _layer; }
 
     /// Return the layer this EditTarget contains.
-    const SdfLayerHandle &GetLayer() const & { return _layer; }
+    const SdfLayerHandle& GetLayer() const& { return _layer; }
     SdfLayerHandle GetLayer() && { return std::move(_layer); }
 
     /// Map the provided \a scenePath into a SdfSpec path for the
@@ -130,7 +121,7 @@ public:
     /// targets and EditTargets for which \a IsLocalLayer are true return
     /// scenePath unchanged.
     USD_API
-    SdfPath MapToSpecPath(const SdfPath &scenePath) const;
+    SdfPath MapToSpecPath(const SdfPath& scenePath) const;
 
     /// Convenience function for getting the PrimSpec in the edit
     /// target's layer for \a scenePath.  This is equivalent to
@@ -139,8 +130,7 @@ public:
     /// mapping from \a scenePath to a SdfPrimSpec path in the layer, return
     /// null.
     USD_API
-    SdfPrimSpecHandle
-    GetPrimSpecForScenePath(const SdfPath &scenePath) const;
+    SdfPrimSpecHandle GetPrimSpecForScenePath(const SdfPath& scenePath) const;
 
     /// Convenience function for getting the PropertySpec in the edit
     /// target's layer for \a scenePath.  This is equivalent to
@@ -149,8 +139,7 @@ public:
     /// valid mapping from \a scenePath to a SdfPropertySpec path in the layer,
     /// return null.
     USD_API
-    SdfPropertySpecHandle
-    GetPropertySpecForScenePath(const SdfPath &scenePath) const;
+    SdfPropertySpecHandle GetPropertySpecForScenePath(const SdfPath& scenePath) const;
 
     /// Convenience function for getting the AttributeSpec in the edit
     /// target's layer for \a scenePath.  This is equivalent to
@@ -159,8 +148,7 @@ public:
     /// valid mapping from \a scenePath to a SdfAttributeSpec path
     /// in the layer, return null.
     USD_API
-    SdfAttributeSpecHandle
-    GetAttributeSpecForScenePath(const SdfPath &scenePath) const;
+    SdfAttributeSpecHandle GetAttributeSpecForScenePath(const SdfPath& scenePath) const;
 
     /// Convenience function for getting the RelationshipSpec in the edit
     /// target's layer for \a scenePath.  This is equivalent to
@@ -170,8 +158,7 @@ public:
     /// valid mapping from \a scenePath to a SdfRelationshipSpec path
     /// in the layer, return null.
     USD_API
-    SdfRelationshipSpecHandle
-    GetRelationshipSpecForScenePath(const SdfPath &scenePath) const;
+    SdfRelationshipSpecHandle GetRelationshipSpecForScenePath(const SdfPath& scenePath) const;
 
     /// Convenience function for getting the Spec in the edit
     /// target's layer for \a scenePath.  This is equivalent to
@@ -180,13 +167,11 @@ public:
     /// mapping from \a scenePath to a SdfSpec path in the layer, return
     /// null.
     USD_API
-    SdfSpecHandle
-    GetSpecForScenePath(const SdfPath &scenePath) const;
+    SdfSpecHandle GetSpecForScenePath(const SdfPath& scenePath) const;
 
     /// Returns the PcpMapFunction representing the map from source
     /// specs (including any variant selections) to the stage.
-    const PcpMapFunction &
-    GetMapFunction() const { return _mapping; }
+    const PcpMapFunction& GetMapFunction() const { return _mapping; }
 
     /// Return a new EditTarget composed over \a weaker.  This is
     /// typically used to make an EditTarget "explicit".  For example, an edit
@@ -198,18 +183,15 @@ public:
     /// EditTarget over an explicit EditTarget with layer, mapping and layer
     /// stack identifier.
     USD_API
-    UsdEditTarget ComposeOver(const UsdEditTarget &weaker) const;
+    UsdEditTarget ComposeOver(const UsdEditTarget& weaker) const;
 
 private:
-
-    UsdEditTarget(const SdfLayerHandle &layer,
-                  const PcpMapFunction &mapping);
+    UsdEditTarget(const SdfLayerHandle& layer, const PcpMapFunction& mapping);
 
     SdfLayerHandle _layer;
     PcpMapFunction _mapping;
 };
 
-
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_EDIT_TARGET_H
+#endif  // PXR_USD_USD_EDIT_TARGET_H

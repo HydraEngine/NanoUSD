@@ -14,11 +14,9 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType)
-{
-    TfType::Define<UsdGeomCube,
-        TfType::Bases< UsdGeomGprim > >();
-    
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<UsdGeomCube, TfType::Bases<UsdGeomGprim>>();
+
     // Register the usd prim typename as an alias under UsdSchemaBase. This
     // enables one to call
     // TfType::Find<UsdSchemaBase>().FindDerivedByName("Cube")
@@ -28,14 +26,10 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdGeomCube::~UsdGeomCube()
-{
-}
+UsdGeomCube::~UsdGeomCube() {}
 
 /* static */
-UsdGeomCube
-UsdGeomCube::Get(const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdGeomCube UsdGeomCube::Get(const UsdStagePtr& stage, const SdfPath& path) {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdGeomCube();
@@ -44,106 +38,72 @@ UsdGeomCube::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdGeomCube
-UsdGeomCube::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdGeomCube UsdGeomCube::Define(const UsdStagePtr& stage, const SdfPath& path) {
     static TfToken usdPrimTypeName("Cube");
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdGeomCube();
     }
-    return UsdGeomCube(
-        stage->DefinePrim(path, usdPrimTypeName));
+    return UsdGeomCube(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
-UsdSchemaKind UsdGeomCube::_GetSchemaKind() const
-{
+UsdSchemaKind UsdGeomCube::_GetSchemaKind() const {
     return UsdGeomCube::schemaKind;
 }
 
 /* static */
-const TfType &
-UsdGeomCube::_GetStaticTfType()
-{
+const TfType& UsdGeomCube::_GetStaticTfType() {
     static TfType tfType = TfType::Find<UsdGeomCube>();
     return tfType;
 }
 
 /* static */
-bool 
-UsdGeomCube::_IsTypedSchema()
-{
+bool UsdGeomCube::_IsTypedSchema() {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdGeomCube::_GetTfType() const
-{
+const TfType& UsdGeomCube::_GetTfType() const {
     return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdGeomCube::GetSizeAttr() const
-{
+UsdAttribute UsdGeomCube::GetSizeAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->size);
 }
 
-UsdAttribute
-UsdGeomCube::CreateSizeAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->size,
-                       SdfValueTypeNames->Double,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomCube::CreateSizeAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->size, SdfValueTypeNames->Double,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomCube::GetExtentAttr() const
-{
+UsdAttribute UsdGeomCube::GetExtentAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->extent);
 }
 
-UsdAttribute
-UsdGeomCube::CreateExtentAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->extent,
-                       SdfValueTypeNames->Float3Array,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomCube::CreateExtentAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->extent, SdfValueTypeNames->Float3Array,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
 namespace {
-static inline TfTokenVector
-_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
-{
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector& left, const TfTokenVector& right) {
     TfTokenVector result;
     result.reserve(left.size() + right.size());
     result.insert(result.end(), left.begin(), left.end());
     result.insert(result.end(), right.begin(), right.end());
     return result;
 }
-}
+}  // namespace
 
 /*static*/
-const TfTokenVector&
-UsdGeomCube::GetSchemaAttributeNames(bool includeInherited)
-{
+const TfTokenVector& UsdGeomCube::GetSchemaAttributeNames(bool includeInherited) {
     static TfTokenVector localNames = {
-        UsdGeomTokens->size,
-        UsdGeomTokens->extent,
+            UsdGeomTokens->size,
+            UsdGeomTokens->extent,
     };
-    static TfTokenVector allNames =
-        _ConcatenateAttributeNames(
-            UsdGeomGprim::GetSchemaAttributeNames(true),
-            localNames);
+    static TfTokenVector allNames = _ConcatenateAttributeNames(UsdGeomGprim::GetSchemaAttributeNames(true), localNames);
 
     if (includeInherited)
         return allNames;
@@ -167,9 +127,7 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool
-UsdGeomCube::ComputeExtent(double size, VtVec3fArray* extent)
-{
+bool UsdGeomCube::ComputeExtent(double size, VtVec3fArray* extent) {
     // Create Sized Extent
     extent->resize(2);
 
@@ -179,15 +137,11 @@ UsdGeomCube::ComputeExtent(double size, VtVec3fArray* extent)
     return true;
 }
 
-bool
-UsdGeomCube::ComputeExtent(double size, const GfMatrix4d& transform,
-    VtVec3fArray* extent)
-{
+bool UsdGeomCube::ComputeExtent(double size, const GfMatrix4d& transform, VtVec3fArray* extent) {
     // Create Sized Extent
     extent->resize(2);
 
-    GfBBox3d bbox = GfBBox3d(
-        GfRange3d(GfVec3d(size * -0.5), GfVec3d(size * 0.5)), transform);
+    GfBBox3d bbox = GfBBox3d(GfRange3d(GfVec3d(size * -0.5), GfVec3d(size * 0.5)), transform);
     GfRange3d range = bbox.ComputeAlignedRange();
     (*extent)[0] = GfVec3f(range.GetMin());
     (*extent)[1] = GfVec3f(range.GetMax());
@@ -195,13 +149,10 @@ UsdGeomCube::ComputeExtent(double size, const GfMatrix4d& transform,
     return true;
 }
 
-static bool
-_ComputeExtentForCube(
-    const UsdGeomBoundable& boundable,
-    const UsdTimeCode& time,
-    const GfMatrix4d* transform,
-    VtVec3fArray* extent)
-{
+static bool _ComputeExtentForCube(const UsdGeomBoundable& boundable,
+                                  const UsdTimeCode& time,
+                                  const GfMatrix4d* transform,
+                                  VtVec3fArray* extent) {
     const UsdGeomCube cubeSchema(boundable);
     if (!TF_VERIFY(cubeSchema)) {
         return false;
@@ -219,10 +170,8 @@ _ComputeExtentForCube(
     }
 }
 
-TF_REGISTRY_FUNCTION(UsdGeomBoundable)
-{
-    UsdGeomRegisterComputeExtentFunction<UsdGeomCube>(
-        _ComputeExtentForCube);
+TF_REGISTRY_FUNCTION(UsdGeomBoundable) {
+    UsdGeomRegisterComputeExtentFunction<UsdGeomCube>(_ComputeExtentForCube);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -39,8 +39,7 @@ class SdfAssetPath;
 /// of a dome light.  Transmits light in the -Z direction.
 /// The rectangle is 1 unit in length.
 ///
-class UsdLuxPortalLight : public UsdLuxBoundableLightBase
-{
+class UsdLuxPortalLight : public UsdLuxBoundableLightBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -51,18 +50,12 @@ public:
     /// Equivalent to UsdLuxPortalLight::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdLuxPortalLight(const UsdPrim& prim=UsdPrim())
-        : UsdLuxBoundableLightBase(prim)
-    {
-    }
+    explicit UsdLuxPortalLight(const UsdPrim& prim = UsdPrim()) : UsdLuxBoundableLightBase(prim) {}
 
     /// Construct a UsdLuxPortalLight on the prim held by \p schemaObj .
     /// Should be preferred over UsdLuxPortalLight(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdLuxPortalLight(const UsdSchemaBase& schemaObj)
-        : UsdLuxBoundableLightBase(schemaObj)
-    {
-    }
+    explicit UsdLuxPortalLight(const UsdSchemaBase& schemaObj) : UsdLuxBoundableLightBase(schemaObj) {}
 
     /// Destructor.
     USDLUX_API
@@ -72,8 +65,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDLUX_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdLuxPortalLight holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -85,8 +77,7 @@ public:
     /// \endcode
     ///
     USDLUX_API
-    static UsdLuxPortalLight
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdLuxPortalLight Get(const UsdStagePtr& stage, const SdfPath& path);
 
     /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
     /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -111,8 +102,7 @@ public:
     /// the opinion at the current EditTarget.
     ///
     USDLUX_API
-    static UsdLuxPortalLight
-    Define(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdLuxPortalLight Define(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -125,17 +115,17 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDLUX_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDLUX_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // WIDTH 
+    // WIDTH
     // --------------------------------------------------------------------- //
     /// Width of the portal rectangle in the local X axis.
     ///
@@ -147,17 +137,17 @@ public:
     USDLUX_API
     UsdAttribute GetWidthAttr() const;
 
-    /// See GetWidthAttr(), and also 
+    /// See GetWidthAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDLUX_API
-    UsdAttribute CreateWidthAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateWidthAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // HEIGHT 
+    // HEIGHT
     // --------------------------------------------------------------------- //
     /// Height of the portal rectangle in the local Y axis.
     ///
@@ -169,21 +159,21 @@ public:
     USDLUX_API
     UsdAttribute GetHeightAttr() const;
 
-    /// See GetHeightAttr(), and also 
+    /// See GetHeightAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDLUX_API
-    UsdAttribute CreateHeightAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateHeightAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //

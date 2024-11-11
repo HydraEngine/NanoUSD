@@ -15,14 +15,12 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 class UsdStageCache;
 
 // Private helper wrapper class, holds a const reference to a stage cache.
 struct Usd_NonPopulatingStageCacheWrapper {
-    explicit Usd_NonPopulatingStageCacheWrapper(const UsdStageCache &cache)
-        : cache(cache) {}
-    const UsdStageCache &cache;
+    explicit Usd_NonPopulatingStageCacheWrapper(const UsdStageCache& cache) : cache(cache) {}
+    const UsdStageCache& cache;
 };
 
 // Using a template arg for 'cache' in UsdUseButDoNotPopulateCache enforces
@@ -34,13 +32,11 @@ struct Usd_NonPopulatingStageCacheWrapper {
 /// UsdStageCacheContext is present on the stack.  See UsdStageCacheContext for
 /// more details and example use.
 template <class StageCache>
-Usd_NonPopulatingStageCacheWrapper
-UsdUseButDoNotPopulateCache(StageCache &cache) {
+Usd_NonPopulatingStageCacheWrapper UsdUseButDoNotPopulateCache(StageCache& cache) {
     return Usd_NonPopulatingStageCacheWrapper(cache);
 }
 
-enum UsdStageCacheContextBlockType
-{
+enum UsdStageCacheContextBlockType {
     /// Indicate that a UsdStageCacheContext should ignore all currently bound
     /// UsdStageCacheContexts, preventing reading from or writing to their
     /// UsdStageCaches.  See UsdStageCache for more details and example use.
@@ -75,7 +71,7 @@ enum UsdStageCacheContextBlockType
 ///     auto stage = UsdStage::Open(<args>);
 ///
 ///     assert(stageCache.Contains(stage));
-///     
+///
 ///     // A subsequent Open() call with the same arguments will retrieve the
 ///     // stage from cache.
 ///     auto stage2 = UsdStage::Open(<args>);
@@ -101,44 +97,37 @@ enum UsdStageCacheContextBlockType
 /// UsdStageCacheContext objects that exist in one thread's stack do not
 /// influence calls to UsdStage::Open() from a different thread.
 ///
-TF_DEFINE_STACKED(UsdStageCacheContext, true, USD_API)
-{
+TF_DEFINE_STACKED(UsdStageCacheContext, true, USD_API) {
 public:
     /// Bind a cache for calls to UsdStage::Open() to read from and write to.
-    explicit UsdStageCacheContext(UsdStageCache &cache)
-        : _rwCache(&cache)
-        , _isReadOnlyCache(false)
-        , _blockType(Usd_NoBlock) {}
+    explicit UsdStageCacheContext(UsdStageCache & cache)
+        : _rwCache(&cache), _isReadOnlyCache(false), _blockType(Usd_NoBlock) {}
 
     /// Bind a cache for calls to UsdStage::Open() to read from.
     /// \see UsdUseButDoNotPopulateCache()
     explicit UsdStageCacheContext(Usd_NonPopulatingStageCacheWrapper holder)
-        : _roCache(&holder.cache)
-        , _isReadOnlyCache(true)
-        , _blockType(Usd_NoBlock) {}
+        : _roCache(&holder.cache), _isReadOnlyCache(true), _blockType(Usd_NoBlock) {}
 
     /// Disable cache use completely (with UsdBlockStageCaches) or only
     /// for writing (with UsdBlockStageCacheWrites).
-    explicit UsdStageCacheContext(UsdStageCacheContextBlockType blockType)
-        : _blockType(blockType) {}
+    explicit UsdStageCacheContext(UsdStageCacheContextBlockType blockType) : _blockType(blockType) {}
 
 private:
     friend class UsdStage;
 
-    static std::vector<const UsdStageCache *> _GetReadOnlyCaches();
-    static std::vector<const UsdStageCache *> _GetReadableCaches();
-    static std::vector<UsdStageCache *> _GetWritableCaches();
+    static std::vector<const UsdStageCache*> _GetReadOnlyCaches();
+    static std::vector<const UsdStageCache*> _GetReadableCaches();
+    static std::vector<UsdStageCache*> _GetWritableCaches();
 
     // A blocking context is encoded with both members variables null.
     union {
-        UsdStageCache *_rwCache;
-        const UsdStageCache *_roCache;
+        UsdStageCache* _rwCache;
+        const UsdStageCache* _roCache;
     };
     bool _isReadOnlyCache;
     UsdStageCacheContextBlockType _blockType;
 };
 
-
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_STAGE_CACHE_CONTEXT_H
+#endif  // PXR_USD_USD_STAGE_CACHE_CONTEXT_H

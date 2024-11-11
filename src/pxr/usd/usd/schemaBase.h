@@ -16,11 +16,10 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 /// \class UsdSchemaBase
 ///
 /// The base class for all schema types in Usd.
-/// 
+///
 /// Schema objects hold a ::UsdPrim internally and provide a layer of specific
 /// named API atop the underlying scene graph.
 ///
@@ -47,42 +46,33 @@ public:
     /// prim type in scene description.  If this is true,
     /// GetStaticPrimDefinition() will return a valid prim definition with
     /// a non-empty typeName.
-    bool IsConcrete() const {
-        return GetSchemaKind() == UsdSchemaKind::ConcreteTyped;
-    }
+    bool IsConcrete() const { return GetSchemaKind() == UsdSchemaKind::ConcreteTyped; }
 
     /// Returns whether or not this class inherits from UsdTyped. Types which
     /// inherit from UsdTyped can impart a typename on a UsdPrim.
     bool IsTyped() const {
-        return GetSchemaKind() == UsdSchemaKind::ConcreteTyped
-            || GetSchemaKind() == UsdSchemaKind::AbstractTyped;
+        return GetSchemaKind() == UsdSchemaKind::ConcreteTyped || GetSchemaKind() == UsdSchemaKind::AbstractTyped;
     }
 
     /// Returns whether this is an API schema or not.
     bool IsAPISchema() const {
-        return GetSchemaKind() == UsdSchemaKind::NonAppliedAPI
-            || GetSchemaKind() == UsdSchemaKind::SingleApplyAPI
-            || GetSchemaKind() == UsdSchemaKind::MultipleApplyAPI;
+        return GetSchemaKind() == UsdSchemaKind::NonAppliedAPI || GetSchemaKind() == UsdSchemaKind::SingleApplyAPI ||
+               GetSchemaKind() == UsdSchemaKind::MultipleApplyAPI;
     }
 
     /// Returns whether this is an applied API schema or not. If this returns
     /// true this class will have an Apply() method
     bool IsAppliedAPISchema() const {
-        return GetSchemaKind() == UsdSchemaKind::SingleApplyAPI
-            || GetSchemaKind() == UsdSchemaKind::MultipleApplyAPI;
+        return GetSchemaKind() == UsdSchemaKind::SingleApplyAPI || GetSchemaKind() == UsdSchemaKind::MultipleApplyAPI;
     }
 
     /// Returns whether this is an applied API schema or not. If this returns
     /// true the constructor, Get and Apply methods of this class will take
     /// in the name of the API schema instance.
-    bool IsMultipleApplyAPISchema() const {
-        return GetSchemaKind() == UsdSchemaKind::MultipleApplyAPI;
-    }
+    bool IsMultipleApplyAPISchema() const { return GetSchemaKind() == UsdSchemaKind::MultipleApplyAPI; }
 
     /// Returns the kind of schema this class is.
-    UsdSchemaKind GetSchemaKind() const {
-        return _GetSchemaKind();
-    }
+    UsdSchemaKind GetSchemaKind() const { return _GetSchemaKind(); }
 
     /// Construct and store \p prim as the held prim.
     USD_API
@@ -103,11 +93,10 @@ public:
     UsdPrim GetPrim() const { return UsdPrim(_primData, _proxyPrimPath); }
 
     /// Shorthand for GetPrim()->GetPath().
-    SdfPath GetPath() const { 
+    SdfPath GetPath() const {
         if (!_proxyPrimPath.IsEmpty()) {
             return _proxyPrimPath;
-        }
-        else if (Usd_PrimDataConstPtr p = get_pointer(_primData)) {
+        } else if (Usd_PrimDataConstPtr p = get_pointer(_primData)) {
             return p->GetPath();
         }
         return SdfPath::EmptyPath();
@@ -123,13 +112,11 @@ public:
     /// To get the held prim instance's definition, use
     /// UsdPrim::GetPrimDefinition().  \sa UsdPrim::GetPrimDefinition()
     USD_API
-    const UsdPrimDefinition *GetSchemaClassPrimDefinition() const;
+    const UsdPrimDefinition* GetSchemaClassPrimDefinition() const;
 
     //@}
 
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true)
-    {
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true) {
         /* This only exists for consistency */
         static TfTokenVector names;
         return names;
@@ -142,46 +129,39 @@ public:
     /// the held prim is not expired and its type is the schema's type or a
     /// subtype of the schema's type.  Otherwise return false.  This method
     /// invokes polymorphic behavior.
-    /// 
+    ///
     /// \sa UsdSchemaBase::_IsCompatible()
     USD_API
-    explicit operator bool() const {
-        return _primData && _IsCompatible();
-    }
+    explicit operator bool() const { return _primData && _IsCompatible(); }
 
 protected:
     /// Returns the kind of schema this class is.
     ///
     /// \sa UsdSchemaBase::schemaKind
-    virtual UsdSchemaKind _GetSchemaKind() const {
-        return schemaKind;
-    }
+    virtual UsdSchemaKind _GetSchemaKind() const { return schemaKind; }
 
     /// \deprecated
-    /// This has been replace with _GetSchemaKind but is around for now for 
+    /// This has been replace with _GetSchemaKind but is around for now for
     /// backwards compatibility while schemas are being updated.
     ///
     /// Leaving this around for one more release as schema classes up until now
-    /// have been generated with an override of this function. We don't want 
-    /// those classes to immediately not compile before a chance is given to 
+    /// have been generated with an override of this function. We don't want
+    /// those classes to immediately not compile before a chance is given to
     /// regenerate the schemas.
-    virtual UsdSchemaKind _GetSchemaType() const {
-        return schemaKind;
-    }
+    virtual UsdSchemaKind _GetSchemaType() const { return schemaKind; }
 
     // Helper for subclasses to get the TfType for this schema object's dynamic
     // C++ type.
-    const TfType &_GetType() const {
-        return _GetTfType();
-    }
+    const TfType& _GetType() const { return _GetTfType(); }
 
     USD_API
-    UsdAttribute _CreateAttr(TfToken const &attrName,
-                             SdfValueTypeName const & typeName,
-                             bool custom, SdfVariability variability,
-                             VtValue const &defaultValue, 
+    UsdAttribute _CreateAttr(TfToken const& attrName,
+                             SdfValueTypeName const& typeName,
+                             bool custom,
+                             SdfVariability variability,
+                             VtValue const& defaultValue,
                              bool writeSparsely) const;
-    
+
     /// Subclasses may override _IsCompatible to do specific compatibility
     /// checking with the given prim, such as type compatibility or value
     /// compatibility.  This check is performed when clients invoke the
@@ -193,19 +173,18 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USD_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     // Subclasses should not override _GetTfType.  It is implemented by the
     // schema class code generator.
     USD_API
-    virtual const TfType &_GetTfType() const;
+    virtual const TfType& _GetTfType() const;
 
     // The held prim and proxy prim path.
     Usd_PrimDataHandle _primData;
     SdfPath _proxyPrimPath;
 };
 
-
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif //PXR_USD_USD_SCHEMA_BASE_H
+#endif  // PXR_USD_USD_SCHEMA_BASE_H

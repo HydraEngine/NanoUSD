@@ -22,13 +22,13 @@ class PcpPrimIndex;
 
 /// \class Usd_ClipCache
 ///
-/// Private helper object for computing and caching clip information for 
+/// Private helper object for computing and caching clip information for
 /// a prim on a UsdStage.
 ///
-class Usd_ClipCache
-{
-    Usd_ClipCache(Usd_ClipCache const &) = delete;
-    Usd_ClipCache &operator=(Usd_ClipCache const &) = delete;
+class Usd_ClipCache {
+    Usd_ClipCache(Usd_ClipCache const&) = delete;
+    Usd_ClipCache& operator=(Usd_ClipCache const&) = delete;
+
 public:
     Usd_ClipCache();
     ~Usd_ClipCache();
@@ -39,11 +39,10 @@ public:
     /// PopulateClipsForPrim.  Protects member data reads/writes with a mutex
     /// during its lifetime.
     /// \sa PopulateClipsForPrim.
-    struct ConcurrentPopulationContext
-    {
-        explicit ConcurrentPopulationContext(Usd_ClipCache &cache);
+    struct ConcurrentPopulationContext {
+        explicit ConcurrentPopulationContext(Usd_ClipCache& cache);
         ~ConcurrentPopulationContext();
-        Usd_ClipCache &_cache;
+        Usd_ClipCache& _cache;
         std::mutex _mutex;
     };
 
@@ -51,13 +50,12 @@ public:
     /// that may contribute opinions to attributes on \p prim are found,
     /// false otherwise.
     ///
-    /// This function assumes that clips for ancestors of \p prim have 
+    /// This function assumes that clips for ancestors of \p prim have
     /// already been populated.
-    bool PopulateClipsForPrim(
-        const SdfPath& path, const PcpPrimIndex& primIndex);
+    bool PopulateClipsForPrim(const SdfPath& path, const PcpPrimIndex& primIndex);
 
     /// Get all the layers that have been opened because we needed to extract
-    /// data from their corresponding clips.  USD tries to be as lazy as 
+    /// data from their corresponding clips.  USD tries to be as lazy as
     /// possible about opening clip layers to avoid unnecessary latency and
     /// memory bloat; however, once a layer is open, it will generally be
     /// kept open for the life of the stage.
@@ -66,23 +64,21 @@ public:
     /// Reload all clip layers that have been opened. Generated clip manifests
     /// will also be regenerated.
     void Reload();
-    
+
     /// Get all clips that may contribute opinions to attributes on the
     /// prim at \p path, including clips that were authored on ancestral prims.
     ///
     /// The returned vector contains all clips that affect the prim at \p path
     /// in strength order. Each individual list of value clips will be ordered
     /// by start time.
-    const std::vector<Usd_ClipSetRefPtr>& 
-    GetClipsForPrim(const SdfPath& path) const;
+    const std::vector<Usd_ClipSetRefPtr>& GetClipsForPrim(const SdfPath& path) const;
 
     /// \struct Lifeboat
     ///
     /// Structure for keeping invalidated clip data alive.
     /// \sa InvalidateClipsForPrim.
     ///
-    struct Lifeboat
-    {
+    struct Lifeboat {
         explicit Lifeboat(Usd_ClipCache& cache);
         ~Lifeboat();
         Usd_ClipCache& _cache;
@@ -91,7 +87,7 @@ public:
         std::unique_ptr<Data> _data;
     };
 
-    /// Invalidates the clip cache for prims at and below \p path. 
+    /// Invalidates the clip cache for prims at and below \p path.
     /// A Lifeboat object must be active for this cache before calling
     /// this function. This potentially allows the underlying clip layers
     /// to be reused if the clip cache is repopulated while the lifeboat
@@ -102,24 +98,22 @@ public:
     void InvalidateClipsForPrim(const SdfPath& path);
 
 private:
-    void _ComputeClipsFromPrimIndex(
-        const SdfPath& usdPrimPath,
-        const PcpPrimIndex& primIndex, 
-        std::vector<Usd_ClipSetRefPtr>* clips) const;
+    void _ComputeClipsFromPrimIndex(const SdfPath& usdPrimPath,
+                                    const PcpPrimIndex& primIndex,
+                                    std::vector<Usd_ClipSetRefPtr>* clips) const;
 
-    inline const std::vector<Usd_ClipSetRefPtr>& 
-    _GetClipsForPrim_NoLock(const SdfPath& path) const;
+    inline const std::vector<Usd_ClipSetRefPtr>& _GetClipsForPrim_NoLock(const SdfPath& path) const;
 
     // Map from prim path to all clips that apply to that prim, including
     // ancestral clips. This map is sparse; only prims where clips are
     // authored will have entries.
-    typedef SdfPathTable<std::vector<Usd_ClipSetRefPtr> >_ClipTable;
+    typedef SdfPathTable<std::vector<Usd_ClipSetRefPtr>> _ClipTable;
     _ClipTable _table;
 
-    ConcurrentPopulationContext *_concurrentPopulationContext;
-    Lifeboat *_lifeboat;
+    ConcurrentPopulationContext* _concurrentPopulationContext;
+    Lifeboat* _lifeboat;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_CLIP_CACHE_H
+#endif  // PXR_USD_USD_CLIP_CACHE_H

@@ -28,12 +28,10 @@ class Usd_InterpolatorBase;
 
 /// Returns true if the given scene description metadata \p fieldName is
 /// associated with value clip functionality.
-bool
-UsdIsClipRelatedField(const TfToken& fieldName);
+bool UsdIsClipRelatedField(const TfToken& fieldName);
 
 /// Returns list of all field names associated with value clip functionality.
-std::vector<TfToken>
-UsdGetClipRelatedFields();
+std::vector<TfToken> UsdGetClipRelatedFields();
 
 /// Sentinel values authored on the edges of a clipTimes range.
 constexpr double Usd_ClipTimesEarliest = -std::numeric_limits<double>::max();
@@ -44,22 +42,22 @@ constexpr double Usd_ClipTimesLatest = std::numeric_limits<double>::max();
 /// Represents a clip from which time samples may be read during
 /// value resolution.
 ///
-struct Usd_Clip
-{
-    Usd_Clip(Usd_Clip const &) = delete;
-    Usd_Clip &operator=(Usd_Clip const &) = delete;
+struct Usd_Clip {
+    Usd_Clip(Usd_Clip const&) = delete;
+    Usd_Clip& operator=(Usd_Clip const&) = delete;
+
 public:
     /// A clip has two time domains: an external and an internal domain.
     /// The internal time domain is what is authored in the clip layer.
     /// The external time domain is what is used by clients of Usd_Clip.
-    /// 
+    ///
     /// The TimeMapping object specifies a mapping from external time to
     /// internal time. For example, mapping [ 0:10 ] means that a request
     /// for time samples at time 0 should retrieve the sample authored at
     /// time 10 in the clip layer. Consumers of Usd_Clip will always deal
     /// with external times. Usd_Clip will convert between time domains as
     /// needed.
-    /// 
+    ///
     /// The mappings that apply to a clip are given in a TimeMappings object.
     /// Times are linearly interpolated between entries in this object.
     /// For instance, given a mapping [ 0:10, 10:20 ], external time 0 maps
@@ -67,10 +65,10 @@ public:
     /// The simplest way to visualize this is to imagine that TimeMappings
     /// specifies a piecewise-linear function, with each pair of TimeMapping
     /// entries specifying a single segment.
-    /// 
+    ///
     /// Time mappings are authored in the 'clipTimes' metadata. This allows
     /// users to control the timing of animation from clips, potentially
-    /// offsetting or scaling the animation. 
+    /// offsetting or scaling the animation.
     typedef double ExternalTime;
     typedef double InternalTime;
     struct TimeMapping {
@@ -79,78 +77,59 @@ public:
         bool isJumpDiscontinuity;
 
         TimeMapping() {}
-        TimeMapping(const ExternalTime e, const InternalTime i) 
-            : externalTime(e)
-            , internalTime(i)
-            , isJumpDiscontinuity(false)
-        {}
+        TimeMapping(const ExternalTime e, const InternalTime i)
+            : externalTime(e), internalTime(i), isJumpDiscontinuity(false) {}
     };
 
     typedef std::vector<TimeMapping> TimeMappings;
 
     /// Structure used to sort TimeMapping objects. Used by both Usd_Clip and
     /// Usd_ClipSet.
-    struct Usd_SortByExternalTime
-    {
-        bool
-        operator()(const Usd_Clip::TimeMapping& x,
-                   const Usd_Clip::ExternalTime y) const
-        {
+    struct Usd_SortByExternalTime {
+        bool operator()(const Usd_Clip::TimeMapping& x, const Usd_Clip::ExternalTime y) const {
             return x.externalTime < y;
         }
 
-        bool
-        operator()(const Usd_Clip::TimeMapping& x,
-                   const Usd_Clip::TimeMapping& y) const
-        {
+        bool operator()(const Usd_Clip::TimeMapping& x, const Usd_Clip::TimeMapping& y) const {
             return x.externalTime < y.externalTime;
         }
     };
 
     Usd_Clip();
-    Usd_Clip(
-        const PcpLayerStackPtr& clipSourceLayerStack,
-        const SdfPath& clipSourcePrimPath,
-        size_t clipSourceLayerIndex,
-        const SdfAssetPath& clipAssetPath,
-        const SdfPath& clipPrimPath,
-        ExternalTime clipAuthoredStartTime,
-        ExternalTime clipStartTime,
-        ExternalTime clipEndTime,
-        const std::shared_ptr<TimeMappings> &timeMapping);
+    Usd_Clip(const PcpLayerStackPtr& clipSourceLayerStack,
+             const SdfPath& clipSourcePrimPath,
+             size_t clipSourceLayerIndex,
+             const SdfAssetPath& clipAssetPath,
+             const SdfPath& clipPrimPath,
+             ExternalTime clipAuthoredStartTime,
+             ExternalTime clipStartTime,
+             ExternalTime clipEndTime,
+             const std::shared_ptr<TimeMappings>& timeMapping);
 
     bool HasField(const SdfPath& path, const TfToken& field) const;
 
     SdfPropertySpecHandle GetPropertyAtPath(const SdfPath& path) const;
 
     template <class T>
-    bool HasField(
-        const SdfPath& path, const TfToken& field,
-        T* value) const
-    {
-        return _GetLayerForClip()->HasField(
-            _TranslatePathToClip(path), field, value);
+    bool HasField(const SdfPath& path, const TfToken& field, T* value) const {
+        return _GetLayerForClip()->HasField(_TranslatePathToClip(path), field, value);
     }
 
-    std::type_info const &
-    GetFieldTypeid(const SdfPath& path, const TfToken& field) const {
-        return _GetLayerForClip()->GetFieldTypeid(
-            _TranslatePathToClip(path), field);
-    }    
+    std::type_info const& GetFieldTypeid(const SdfPath& path, const TfToken& field) const {
+        return _GetLayerForClip()->GetFieldTypeid(_TranslatePathToClip(path), field);
+    }
 
     size_t GetNumTimeSamplesForPath(const SdfPath& path) const;
 
-    std::set<ExternalTime>
-    ListTimeSamplesForPath(const SdfPath& path) const;
+    std::set<ExternalTime> ListTimeSamplesForPath(const SdfPath& path) const;
 
-    bool GetBracketingTimeSamplesForPath(
-        const SdfPath& path, ExternalTime time, 
-        ExternalTime* tLower, ExternalTime* tUpper) const;
+    bool GetBracketingTimeSamplesForPath(const SdfPath& path,
+                                         ExternalTime time,
+                                         ExternalTime* tLower,
+                                         ExternalTime* tUpper) const;
 
     template <class T>
-    bool QueryTimeSample(
-        const SdfPath& path, ExternalTime time, 
-        Usd_InterpolatorBase* interpolator, T* value) const;
+    bool QueryTimeSample(const SdfPath& path, ExternalTime time, Usd_InterpolatorBase* interpolator, T* value) const;
 
     /// Return true if this clip has authored time samples for the attribute
     /// corresponding to the given \p path. Clips may add time sample times
@@ -188,7 +167,7 @@ public:
     /// The authored start time for this clip. This generally is equivalent
     /// to the clip's startTime, but for the earliest active clip:
     ///
-    /// - authoredStartTime: the stage time value authored in the clip set's 
+    /// - authoredStartTime: the stage time value authored in the clip set's
     ///   active metadata
     /// - startTime: Usd_ClipTimesEarliest
     ///
@@ -209,23 +188,18 @@ private:
 
     // Helpers for retrieving time sample information from within
     // clip layers and translating them to external times.
-    bool 
-    _GetBracketingTimeSamplesForPathFromClipLayer(
-        const SdfPath& path, 
-        ExternalTime time, ExternalTime* tLower, ExternalTime* tUpper) const;
+    bool _GetBracketingTimeSamplesForPathFromClipLayer(const SdfPath& path,
+                                                       ExternalTime time,
+                                                       ExternalTime* tLower,
+                                                       ExternalTime* tUpper) const;
 
-    void
-    _ListTimeSamplesForPathFromClipLayer(
-        const SdfPath& path,
-        std::set<ExternalTime>* samples) const;
+    void _ListTimeSamplesForPathFromClipLayer(const SdfPath& path, std::set<ExternalTime>* samples) const;
 
-    SdfPath _TranslatePathToClip(const SdfPath &path) const;
+    SdfPath _TranslatePathToClip(const SdfPath& path) const;
 
     // Helpers to translate between internal and external time domains.
-    InternalTime _TranslateTimeToInternal(
-        ExternalTime extTime) const;
-    ExternalTime _TranslateTimeToExternal(
-        InternalTime clipTime, size_t i1, size_t i2) const;
+    InternalTime _TranslateTimeToInternal(ExternalTime extTime) const;
+    ExternalTime _TranslateTimeToExternal(InternalTime clipTime, size_t i1, size_t i2) const;
 
     SdfLayerRefPtr _GetLayerForClip() const;
 
@@ -238,9 +212,8 @@ private:
 typedef std::shared_ptr<Usd_Clip> Usd_ClipRefPtr;
 typedef std::vector<Usd_ClipRefPtr> Usd_ClipRefPtrVector;
 
-std::ostream&
-operator<<(std::ostream& out, const Usd_ClipRefPtr& clip);
+std::ostream& operator<<(std::ostream& out, const Usd_ClipRefPtr& clip);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_CLIP_H
+#endif  // PXR_USD_USD_CLIP_H

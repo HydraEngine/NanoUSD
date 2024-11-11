@@ -35,18 +35,17 @@ class SdfAssetPath;
 
 /// \class UsdLuxListAPI
 ///
-/// 
+///
 /// \deprecated
 /// Use LightListAPI instead
-/// 
+///
 ///
 /// For any described attribute \em Fallback \em Value or \em Allowed \em Values below
 /// that are text/tokens, the actual token is published and defined in \ref UsdLuxTokens.
 /// So to set an attribute to the value "rightHanded", use UsdLuxTokens->rightHanded
 /// as the value.
 ///
-class UsdLuxListAPI : public UsdAPISchemaBase
-{
+class UsdLuxListAPI : public UsdAPISchemaBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -57,18 +56,12 @@ public:
     /// Equivalent to UsdLuxListAPI::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdLuxListAPI(const UsdPrim& prim=UsdPrim())
-        : UsdAPISchemaBase(prim)
-    {
-    }
+    explicit UsdLuxListAPI(const UsdPrim& prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
     /// Construct a UsdLuxListAPI on the prim held by \p schemaObj .
     /// Should be preferred over UsdLuxListAPI(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdLuxListAPI(const UsdSchemaBase& schemaObj)
-        : UsdAPISchemaBase(schemaObj)
-    {
-    }
+    explicit UsdLuxListAPI(const UsdSchemaBase& schemaObj) : UsdAPISchemaBase(schemaObj) {}
 
     /// Destructor.
     USDLUX_API
@@ -78,8 +71,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDLUX_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdLuxListAPI holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -91,20 +83,18 @@ public:
     /// \endcode
     ///
     USDLUX_API
-    static UsdLuxListAPI
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdLuxListAPI Get(const UsdStagePtr& stage, const SdfPath& path);
 
-
-    /// Returns true if this <b>single-apply</b> API schema can be applied to 
-    /// the given \p prim. If this schema can not be a applied to the prim, 
-    /// this returns false and, if provided, populates \p whyNot with the 
+    /// Returns true if this <b>single-apply</b> API schema can be applied to
+    /// the given \p prim. If this schema can not be a applied to the prim,
+    /// this returns false and, if provided, populates \p whyNot with the
     /// reason it can not be applied.
-    /// 
+    ///
     /// Note that if CanApply returns false, that does not necessarily imply
     /// that calling Apply will fail. Callers are expected to call CanApply
-    /// before calling Apply if they want to ensure that it is valid to 
+    /// before calling Apply if they want to ensure that it is valid to
     /// apply a schema.
-    /// 
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -112,18 +102,17 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDLUX_API
-    static bool 
-    CanApply(const UsdPrim &prim, std::string *whyNot=nullptr);
+    static bool CanApply(const UsdPrim& prim, std::string* whyNot = nullptr);
 
     /// Applies this <b>single-apply</b> API schema to the given \p prim.
-    /// This information is stored by adding "ListAPI" to the 
+    /// This information is stored by adding "ListAPI" to the
     /// token-valued, listOp metadata \em apiSchemas on the prim.
-    /// 
-    /// \return A valid UsdLuxListAPI object is returned upon success. 
-    /// An invalid (or empty) UsdLuxListAPI object is returned upon 
-    /// failure. See \ref UsdPrim::ApplyAPI() for conditions 
-    /// resulting in failure. 
-    /// 
+    ///
+    /// \return A valid UsdLuxListAPI object is returned upon success.
+    /// An invalid (or empty) UsdLuxListAPI object is returned upon
+    /// failure. See \ref UsdPrim::ApplyAPI() for conditions
+    /// resulting in failure.
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -131,8 +120,7 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDLUX_API
-    static UsdLuxListAPI 
-    Apply(const UsdPrim &prim);
+    static UsdLuxListAPI Apply(const UsdPrim& prim);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -145,19 +133,19 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDLUX_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDLUX_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // LIGHTLISTCACHEBEHAVIOR 
+    // LIGHTLISTCACHEBEHAVIOR
     // --------------------------------------------------------------------- //
-    /// 
+    ///
     /// Controls how the lightList should be interpreted.
     /// Valid values are:
     /// - consumeAndHalt: The lightList should be consulted,
@@ -170,7 +158,7 @@ public:
     /// - ignore: The lightList should be entirely ignored.  This
     /// provides a simple way to temporarily invalidate an existing
     /// cache.  This is the fallback behavior.
-    /// 
+    ///
     ///
     /// | ||
     /// | -- | -- |
@@ -181,35 +169,36 @@ public:
     USDLUX_API
     UsdAttribute GetLightListCacheBehaviorAttr() const;
 
-    /// See GetLightListCacheBehaviorAttr(), and also 
+    /// See GetLightListCacheBehaviorAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDLUX_API
-    UsdAttribute CreateLightListCacheBehaviorAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateLightListCacheBehaviorAttr(VtValue const& defaultValue = VtValue(),
+                                                  bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // LIGHTLIST 
+    // LIGHTLIST
     // --------------------------------------------------------------------- //
     /// Relationship to lights in the scene.
     ///
     USDLUX_API
     UsdRelationship GetLightListRel() const;
 
-    /// See GetLightListRel(), and also 
+    /// See GetLightListRel(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create
     USDLUX_API
     UsdRelationship CreateLightListRel() const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
@@ -237,7 +226,7 @@ public:
     /// paths stored in lightList caches. The lightList:cacheBehavior
     /// attribute gives further control over the cache behavior; see the
     /// class overview for details.
-    /// 
+    ///
     /// When instances are present, ComputeLightList(ComputeModeIgnoreCache)
     /// will return the instance-uniqiue paths to any lights discovered
     /// within those instances.  Lights within a UsdGeomPointInstancer
@@ -251,7 +240,7 @@ public:
     /// will be silently ignored.
     /// This will set the listList:cacheBehavior to "consumeAndContinue".
     USDLUX_API
-    void StoreLightList(const SdfPathSet &) const;
+    void StoreLightList(const SdfPathSet&) const;
 
     /// Mark any stored lightlist as invalid, by setting the
     /// lightList:cacheBehavior attribute to ignore.

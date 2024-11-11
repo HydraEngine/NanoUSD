@@ -14,11 +14,9 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType)
-{
-    TfType::Define<UsdGeomCylinder_1,
-        TfType::Bases< UsdGeomGprim > >();
-    
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<UsdGeomCylinder_1, TfType::Bases<UsdGeomGprim>>();
+
     // Register the usd prim typename as an alias under UsdSchemaBase. This
     // enables one to call
     // TfType::Find<UsdSchemaBase>().FindDerivedByName("Cylinder_1")
@@ -28,14 +26,10 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdGeomCylinder_1::~UsdGeomCylinder_1()
-{
-}
+UsdGeomCylinder_1::~UsdGeomCylinder_1() {}
 
 /* static */
-UsdGeomCylinder_1
-UsdGeomCylinder_1::Get(const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdGeomCylinder_1 UsdGeomCylinder_1::Get(const UsdStagePtr& stage, const SdfPath& path) {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdGeomCylinder_1();
@@ -44,160 +38,99 @@ UsdGeomCylinder_1::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdGeomCylinder_1
-UsdGeomCylinder_1::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdGeomCylinder_1 UsdGeomCylinder_1::Define(const UsdStagePtr& stage, const SdfPath& path) {
     static TfToken usdPrimTypeName("Cylinder_1");
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdGeomCylinder_1();
     }
-    return UsdGeomCylinder_1(
-        stage->DefinePrim(path, usdPrimTypeName));
+    return UsdGeomCylinder_1(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
-UsdSchemaKind UsdGeomCylinder_1::_GetSchemaKind() const
-{
+UsdSchemaKind UsdGeomCylinder_1::_GetSchemaKind() const {
     return UsdGeomCylinder_1::schemaKind;
 }
 
 /* static */
-const TfType &
-UsdGeomCylinder_1::_GetStaticTfType()
-{
+const TfType& UsdGeomCylinder_1::_GetStaticTfType() {
     static TfType tfType = TfType::Find<UsdGeomCylinder_1>();
     return tfType;
 }
 
 /* static */
-bool 
-UsdGeomCylinder_1::_IsTypedSchema()
-{
+bool UsdGeomCylinder_1::_IsTypedSchema() {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdGeomCylinder_1::_GetTfType() const
-{
+const TfType& UsdGeomCylinder_1::_GetTfType() const {
     return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdGeomCylinder_1::GetHeightAttr() const
-{
+UsdAttribute UsdGeomCylinder_1::GetHeightAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->height);
 }
 
-UsdAttribute
-UsdGeomCylinder_1::CreateHeightAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->height,
-                       SdfValueTypeNames->Double,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomCylinder_1::CreateHeightAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->height, SdfValueTypeNames->Double,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomCylinder_1::GetRadiusTopAttr() const
-{
+UsdAttribute UsdGeomCylinder_1::GetRadiusTopAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->radiusTop);
 }
 
-UsdAttribute
-UsdGeomCylinder_1::CreateRadiusTopAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->radiusTop,
-                       SdfValueTypeNames->Double,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomCylinder_1::CreateRadiusTopAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->radiusTop, SdfValueTypeNames->Double,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomCylinder_1::GetRadiusBottomAttr() const
-{
+UsdAttribute UsdGeomCylinder_1::GetRadiusBottomAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->radiusBottom);
 }
 
-UsdAttribute
-UsdGeomCylinder_1::CreateRadiusBottomAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->radiusBottom,
-                       SdfValueTypeNames->Double,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomCylinder_1::CreateRadiusBottomAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->radiusBottom, SdfValueTypeNames->Double,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomCylinder_1::GetAxisAttr() const
-{
+UsdAttribute UsdGeomCylinder_1::GetAxisAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->axis);
 }
 
-UsdAttribute
-UsdGeomCylinder_1::CreateAxisAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->axis,
-                       SdfValueTypeNames->Token,
-                       /* custom = */ false,
-                       SdfVariabilityUniform,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomCylinder_1::CreateAxisAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->axis, SdfValueTypeNames->Token,
+                                      /* custom = */ false, SdfVariabilityUniform, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomCylinder_1::GetExtentAttr() const
-{
+UsdAttribute UsdGeomCylinder_1::GetExtentAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->extent);
 }
 
-UsdAttribute
-UsdGeomCylinder_1::CreateExtentAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->extent,
-                       SdfValueTypeNames->Float3Array,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomCylinder_1::CreateExtentAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->extent, SdfValueTypeNames->Float3Array,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
 namespace {
-static inline TfTokenVector
-_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
-{
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector& left, const TfTokenVector& right) {
     TfTokenVector result;
     result.reserve(left.size() + right.size());
     result.insert(result.end(), left.begin(), left.end());
     result.insert(result.end(), right.begin(), right.end());
     return result;
 }
-}
+}  // namespace
 
 /*static*/
-const TfTokenVector&
-UsdGeomCylinder_1::GetSchemaAttributeNames(bool includeInherited)
-{
+const TfTokenVector& UsdGeomCylinder_1::GetSchemaAttributeNames(bool includeInherited) {
     static TfTokenVector localNames = {
-        UsdGeomTokens->height,
-        UsdGeomTokens->radiusTop,
-        UsdGeomTokens->radiusBottom,
-        UsdGeomTokens->axis,
-        UsdGeomTokens->extent,
+            UsdGeomTokens->height, UsdGeomTokens->radiusTop, UsdGeomTokens->radiusBottom,
+            UsdGeomTokens->axis,   UsdGeomTokens->extent,
     };
-    static TfTokenVector allNames =
-        _ConcatenateAttributeNames(
-            UsdGeomGprim::GetSchemaAttributeNames(true),
-            localNames);
+    static TfTokenVector allNames = _ConcatenateAttributeNames(UsdGeomGprim::GetSchemaAttributeNames(true), localNames);
 
     if (includeInherited)
         return allNames;
@@ -221,10 +154,7 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-static bool
-_ComputeExtentMax(double height, double radiusTop, double radiusBottom,
-    const TfToken &axis, GfVec3f *max)
-{
+static bool _ComputeExtentMax(double height, double radiusTop, double radiusBottom, const TfToken& axis, GfVec3f* max) {
     const double radiusForBox = std::max(radiusTop, radiusBottom);
     if (axis == UsdGeomTokens->x) {
         *max = GfVec3f(height * 0.5, radiusForBox, radiusForBox);
@@ -233,16 +163,14 @@ _ComputeExtentMax(double height, double radiusTop, double radiusBottom,
     } else if (axis == UsdGeomTokens->z) {
         *max = GfVec3f(radiusForBox, radiusForBox, height * 0.5);
     } else {
-        return false; // invalid axis
+        return false;  // invalid axis
     }
-    
+
     return true;
 }
 
-bool
-UsdGeomCylinder_1::ComputeExtent(double height, double radiusTop, 
-    double radiusBottom, const TfToken &axis, VtVec3fArray *extent)
-{
+bool UsdGeomCylinder_1::ComputeExtent(
+        double height, double radiusTop, double radiusBottom, const TfToken& axis, VtVec3fArray* extent) {
     // Create Sized extent
     extent->resize(2);
 
@@ -257,11 +185,12 @@ UsdGeomCylinder_1::ComputeExtent(double height, double radiusTop,
     return true;
 }
 
-bool
-UsdGeomCylinder_1::ComputeExtent(double height, double radiusTop, 
-    double radiusBottom, const TfToken &axis, const GfMatrix4d &transform,
-    VtVec3fArray *extent)
-{
+bool UsdGeomCylinder_1::ComputeExtent(double height,
+                                      double radiusTop,
+                                      double radiusBottom,
+                                      const TfToken& axis,
+                                      const GfMatrix4d& transform,
+                                      VtVec3fArray* extent) {
     // Create sized extent
     extent->resize(2);
 
@@ -278,13 +207,10 @@ UsdGeomCylinder_1::ComputeExtent(double height, double radiusTop,
     return true;
 }
 
-static bool
-_ComputeExtentForCylinder(
-    const UsdGeomBoundable &boundable,
-    const UsdTimeCode &time,
-    const GfMatrix4d *transform,
-    VtVec3fArray *extent)
-{
+static bool _ComputeExtentForCylinder(const UsdGeomBoundable& boundable,
+                                      const UsdTimeCode& time,
+                                      const GfMatrix4d* transform,
+                                      VtVec3fArray* extent) {
     const UsdGeomCylinder_1 cylinderSchema(boundable);
     if (!TF_VERIFY(cylinderSchema)) {
         return false;
@@ -311,18 +237,14 @@ _ComputeExtentForCylinder(
     }
 
     if (transform) {
-        return UsdGeomCylinder_1::ComputeExtent(
-            height, radiusTop, radiusBottom, axis, *transform, extent);
+        return UsdGeomCylinder_1::ComputeExtent(height, radiusTop, radiusBottom, axis, *transform, extent);
     } else {
-        return UsdGeomCylinder_1::ComputeExtent(height, radiusTop, radiusBottom, 
-                axis, extent);
+        return UsdGeomCylinder_1::ComputeExtent(height, radiusTop, radiusBottom, axis, extent);
     }
 }
 
-TF_REGISTRY_FUNCTION(UsdGeomBoundable)
-{
-    UsdGeomRegisterComputeExtentFunction<UsdGeomCylinder_1>(
-            _ComputeExtentForCylinder);
+TF_REGISTRY_FUNCTION(UsdGeomBoundable) {
+    UsdGeomRegisterComputeExtentFunction<UsdGeomCylinder_1>(_ComputeExtentForCylinder);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -25,24 +25,23 @@ class ArAsset;
 /// the .usdz file format. It is not a general-purpose zip reader, as it does
 /// not implement the full zip file specification. In particular:
 ///
-/// - This class does not natively support decompressing data from a zip 
+/// - This class does not natively support decompressing data from a zip
 ///   archive. Clients may access the data exactly as stored in the file and
 ///   perform their own decompression if desired.
 ///
 /// - This class does not rely on the central directory in order to read the
 ///   contents of the file. This allows it to operate on partial zip archives.
 ///   However, this also means it may handle certain zip files incorrectly.
-///   For example, if a file was deleted from a zip archive by just removing 
-///   its central directory header, that file will still be found by this 
+///   For example, if a file was deleted from a zip archive by just removing
+///   its central directory header, that file will still be found by this
 ///   class.
 ///
-class UsdZipFile
-{
+class UsdZipFile {
 private:
     class _Impl;
 
 public:
-    /// Opens the zip archive at \p filePath. 
+    /// Opens the zip archive at \p filePath.
     /// Returns invalid object on error.
     USD_API
     static UsdZipFile Open(const std::string& filePath);
@@ -65,8 +64,7 @@ public:
 
     /// \class FileInfo
     /// Information for a file in the zip archive.
-    class FileInfo
-    {
+    class FileInfo {
     public:
         /// Offset of the beginning of this file's data from the start of
         /// the zip archive.
@@ -95,15 +93,14 @@ public:
 
     /// \class Iterator
     /// Iterator for traversing and inspecting the contents of the zip archive.
-    class Iterator 
-    {
+    class Iterator {
         // Proxy type for operator->(), needed since this iterator's value
         // is generated on the fly.
-        class _ArrowProxy
-        {
+        class _ArrowProxy {
         public:
-            explicit _ArrowProxy(const std::string& s) : _s(s) { }
+            explicit _ArrowProxy(const std::string& s) : _s(s) {}
             const std::string* operator->() const { return &_s; }
+
         private:
             std::string _s;
         };
@@ -153,7 +150,7 @@ public:
 
         /// Returns pointer to the beginning of the current file in the
         /// zip archive. The contents of the current file span the range
-        /// [GetFile(), GetFile() + GetFileInfo().size). 
+        /// [GetFile(), GetFile() + GetFileInfo().size).
         ///
         /// Note that this points to the raw data stored in the zip archive;
         /// no decompression or other transformation is applied.
@@ -211,8 +208,7 @@ private:
 /// by this class should be valid zip files and readable by external zip
 /// libraries and utilities.
 ///
-class UsdZipFileWriter
-{
+class UsdZipFileWriter {
 public:
     /// Create a new file writer with \p filePath as the destination file path
     /// where the zip archive will be written. The zip file will not be written
@@ -249,11 +245,10 @@ public:
     ///
     /// Returns the file path used to identify the file in the zip archive
     /// on success. This path conforms to the zip file specification and may
-    /// not be the same as \p filePath or \p filePathInArchive. Returns an 
+    /// not be the same as \p filePath or \p filePathInArchive. Returns an
     /// empty string on failure.
     USD_API
-    std::string AddFile(const std::string& filePath,
-                        const std::string& filePathInArchive = std::string());
+    std::string AddFile(const std::string& filePath, const std::string& filePathInArchive = std::string());
 
     /// Finalizes the zip archive and saves it to the destination file path.
     /// Once saved, the file writer is invalid and may not be reused.
@@ -262,7 +257,7 @@ public:
     bool Save();
 
     /// Discards the zip archive so that it is not saved to the destination
-    /// file path. Once discarded, the file writer is invalid and may not be 
+    /// file path. Once discarded, the file writer is invalid and may not be
     /// reused.
     USD_API
     void Discard();
@@ -276,4 +271,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_ZIP_FILE_H
+#endif  // PXR_USD_USD_ZIP_FILE_H

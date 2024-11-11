@@ -19,19 +19,16 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 /// \class UsdCrateInfo
 ///
 /// A class for introspecting the underlying qualities of .usdc 'crate' files,
 /// for diagnostic purposes.
 ///
-class UsdCrateInfo
-{
+class UsdCrateInfo {
 public:
     struct Section {
         Section() = default;
-        Section(std::string const &name, int64_t start, int64_t size)
-            : name(name), start(start), size(size) {}
+        Section(std::string const& name, int64_t start, int64_t size) : name(name), start(start), size(size) {}
         std::string name;
         int64_t start = -1, size = -1;
     };
@@ -47,7 +44,7 @@ public:
 
     /// Attempt to open and read \p fileName.
     USD_API
-    static UsdCrateInfo Open(std::string const &fileName);
+    static UsdCrateInfo Open(std::string const& fileName);
 
     /// Return summary statistics structure for this file.
     USD_API
@@ -60,7 +57,7 @@ public:
     /// Return the file version.
     USD_API
     TfToken GetFileVersion() const;
-    
+
     /// Return the software version.
     USD_API
     TfToken GetSoftwareVersion() const;
@@ -69,12 +66,10 @@ public:
     explicit operator bool() const { return (bool)_impl; }
 
 private:
-
     struct _Impl;
     std::shared_ptr<_Impl> _impl;
 };
 
-
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_CRATE_INFO_H
+#endif  // PXR_USD_USD_CRATE_INFO_H

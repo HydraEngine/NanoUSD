@@ -21,14 +21,12 @@ TF_DECLARE_WEAK_PTRS(UsdStage);
 
 // Utility class for returning UsdEditContexts to python.  For use in wrapping
 // code.
-struct UsdPyEditContext
-{
+struct UsdPyEditContext {
     USD_API
-    explicit UsdPyEditContext(
-        const std::pair<UsdStagePtr, UsdEditTarget> &stageTarget);
+    explicit UsdPyEditContext(const std::pair<UsdStagePtr, UsdEditTarget>& stageTarget);
     USD_API
-    explicit UsdPyEditContext(const UsdStagePtr &stage,
-                              const UsdEditTarget &editTarget=UsdEditTarget());
+    explicit UsdPyEditContext(const UsdStagePtr& stage, const UsdEditTarget& editTarget = UsdEditTarget());
+
 private:
     friend struct Usd_PyEditContextAccess;
 
@@ -37,7 +35,6 @@ private:
     std::shared_ptr<UsdEditContext> _editContext;
 };
 
-
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_PY_EDIT_CONTEXT_H
+#endif  // PXR_USD_USD_PY_EDIT_CONTEXT_H

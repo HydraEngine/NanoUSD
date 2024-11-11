@@ -11,20 +11,12 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
-TF_REGISTRY_FUNCTION(TfEnum)
-{
-    TF_ADD_ENUM_NAME(UsdResolveInfoSourceNone,
-                     "No value");
-    TF_ADD_ENUM_NAME(UsdResolveInfoSourceFallback,
-                     "Built-in fallback value");
-    TF_ADD_ENUM_NAME(UsdResolveInfoSourceDefault,
-                     "Attribute default value");
-    TF_ADD_ENUM_NAME(UsdResolveInfoSourceTimeSamples,
-                     "Attribute time samples");
-    TF_ADD_ENUM_NAME(UsdResolveInfoSourceValueClips,
-                     "Value clips");
+TF_REGISTRY_FUNCTION(TfEnum) {
+    TF_ADD_ENUM_NAME(UsdResolveInfoSourceNone, "No value");
+    TF_ADD_ENUM_NAME(UsdResolveInfoSourceFallback, "Built-in fallback value");
+    TF_ADD_ENUM_NAME(UsdResolveInfoSourceDefault, "Attribute default value");
+    TF_ADD_ENUM_NAME(UsdResolveInfoSourceTimeSamples, "Attribute time samples");
+    TF_ADD_ENUM_NAME(UsdResolveInfoSourceValueClips, "Value clips");
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

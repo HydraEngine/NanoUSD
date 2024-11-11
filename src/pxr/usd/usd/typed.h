@@ -37,12 +37,11 @@ class SdfAssetPath;
 /// The base class for all \em typed schemas (those that can impart a
 /// typeName to a UsdPrim), and therefore the base class for all
 /// concrete, instantiable "IsA" schemas.
-/// 
+///
 /// UsdTyped implements a typeName-based query for its override of
 /// UsdSchemaBase::_IsCompatible().  It provides no other behavior.
 ///
-class UsdTyped : public UsdSchemaBase
-{
+class UsdTyped : public UsdSchemaBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -53,18 +52,12 @@ public:
     /// Equivalent to UsdTyped::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdTyped(const UsdPrim& prim=UsdPrim())
-        : UsdSchemaBase(prim)
-    {
-    }
+    explicit UsdTyped(const UsdPrim& prim = UsdPrim()) : UsdSchemaBase(prim) {}
 
     /// Construct a UsdTyped on the prim held by \p schemaObj .
     /// Should be preferred over UsdTyped(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdTyped(const UsdSchemaBase& schemaObj)
-        : UsdSchemaBase(schemaObj)
-    {
-    }
+    explicit UsdTyped(const UsdSchemaBase& schemaObj) : UsdSchemaBase(schemaObj) {}
 
     /// Destructor.
     USD_API
@@ -74,8 +67,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USD_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdTyped holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -87,9 +79,7 @@ public:
     /// \endcode
     ///
     USD_API
-    static UsdTyped
-    Get(const UsdStagePtr &stage, const SdfPath &path);
-
+    static UsdTyped Get(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -102,21 +92,21 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USD_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USD_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //

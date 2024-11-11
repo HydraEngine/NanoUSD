@@ -21,25 +21,23 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 TF_DEFINE_PUBLIC_TOKENS(UsdGeomXformOpTypes, USDGEOM_XFORM_OP_TYPES);
 
-TF_REGISTRY_FUNCTION(TfEnum)
-{
+TF_REGISTRY_FUNCTION(TfEnum) {
     // Type
-    TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeInvalid,   "");
+    TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeInvalid, "");
     TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeTranslate, "translate");
-    TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeScale,     "scale");
-    TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateX,   "rotateX");
-    TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateY,   "rotateY");
-    TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateZ,   "rotateZ");
+    TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeScale, "scale");
+    TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateX, "rotateX");
+    TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateY, "rotateY");
+    TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateZ, "rotateZ");
     TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateXYZ, "rotateXYZ");
     TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateXZY, "rotateXZY");
     TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateYXZ, "rotateYXZ");
     TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateYZX, "rotateYZX");
     TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateZXY, "rotateZXY");
     TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeRotateZYX, "rotateZYX");
-    TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeOrient,    "orient");
+    TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeOrient, "orient");
     TF_ADD_ENUM_NAME(UsdGeomXformOp::TypeTransform, "transform");
 
     TF_ADD_ENUM_NAME(UsdGeomXformOp::PrecisionDouble, "Double");
@@ -48,58 +46,40 @@ TF_REGISTRY_FUNCTION(TfEnum)
 };
 
 TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
-    ((xformOpPrefix, "xformOp:"))
-    ((inverseXformOpPrefix, "!invert!xformOp:"))
-    ((invertPrefix, "!invert!"))
+        _tokens,
+        ((xformOpPrefix, "xformOp:"))((inverseXformOpPrefix, "!invert!xformOp:"))((invertPrefix, "!invert!"))
 
-    // This following tokens are not used here, but they're listed so they 
-    // become immortal and are not ref-counted.
-    // Tokens for the xformOps that are missing here (eg, RotateXYZ, translate,
-    // scale etc.)are added in UsdGeomXformCommonAPI.
-    ((xformOpTransform, "xformOp:transform"))
-    ((xformOpRotateX, "xformOp:rotateX"))
-    ((xformOpRotateY, "xformOp:rotateY"))
-    ((xformOpRotateZ, "xformOp:rotateZ"))
-    ((xformOpOrient, "xformOp:orient"))
+        // This following tokens are not used here, but they're listed so they
+        // become immortal and are not ref-counted.
+        // Tokens for the xformOps that are missing here (eg, RotateXYZ, translate,
+        // scale etc.)are added in UsdGeomXformCommonAPI.
+        ((xformOpTransform, "xformOp:transform"))((xformOpRotateX, "xformOp:rotateX"))(
+                (xformOpRotateY, "xformOp:rotateY"))((xformOpRotateZ, "xformOp:rotateZ"))((xformOpOrient,
+                                                                                           "xformOp:orient"))
 
-    // XXX: backwards compatibility
-    (transform)
+        // XXX: backwards compatibility
+        (transform)
 
 );
 
 // Validate that the given \p name contains the xform namespace.
 // Does not validate name as a legal property identifier
-static
-bool
-_IsNamespaced(const TfToken& opName)
-{
+static bool _IsNamespaced(const TfToken& opName) {
     return TfStringStartsWith(opName, _tokens->xformOpPrefix);
 }
-    
-static
-TfToken
-_MakeNamespaced(const TfToken& name)
-{
-    return _IsNamespaced(name) ? name : 
-        TfToken(_tokens->xformOpPrefix.GetString() + 
-                name.GetString());
+
+static TfToken _MakeNamespaced(const TfToken& name) {
+    return _IsNamespaced(name) ? name : TfToken(_tokens->xformOpPrefix.GetString() + name.GetString());
 }
 
-// Returns whether the given op is an inverse operation. i.e, it starts with 
+// Returns whether the given op is an inverse operation. i.e, it starts with
 // "!invert!:xformOp:".
-static
-bool 
-_IsInverseOp(TfToken const &opName)
-{
+static bool _IsInverseOp(TfToken const& opName) {
     return TfStringStartsWith(opName, _tokens->inverseXformOpPrefix);
 }
 
-UsdGeomXformOp::UsdGeomXformOp(const UsdAttribute &attr, bool isInverseOp)
-    : _attr(attr),
-      _opType(TypeInvalid),
-      _isInverseOp(isInverseOp)
-{
+UsdGeomXformOp::UsdGeomXformOp(const UsdAttribute& attr, bool isInverseOp)
+    : _attr(attr), _opType(TypeInvalid), _isInverseOp(isInverseOp) {
     if (!attr) {
         // Legal to construct an XformOp with invalid attr, however IsDefined()
         // and explicit bool operator will return false.
@@ -107,8 +87,8 @@ UsdGeomXformOp::UsdGeomXformOp(const UsdAttribute &attr, bool isInverseOp)
     }
 
     // _Initialize _opType.
-    const TfToken &name = GetName();
-    const std::vector<std::string> &opNameComponents = SplitName();
+    const TfToken& name = GetName();
+    const std::vector<std::string>& opNameComponents = SplitName();
 
     if (_IsNamespaced(name)) {
         _opType = GetOpTypeEnum(TfToken(opNameComponents[1]));
@@ -117,95 +97,67 @@ UsdGeomXformOp::UsdGeomXformOp(const UsdAttribute &attr, bool isInverseOp)
     }
 }
 
-void
-UsdGeomXformOp::_Init()
-{
+void UsdGeomXformOp::_Init() {
     // _Initialize _opType.
-    const TfToken &name = GetName();
+    const TfToken& name = GetName();
 
     // Take the second namespace component.
     static char nsDelim = UsdObject::GetNamespaceDelimiter();
-    char const *start = strchr(name.GetText(), nsDelim);
+    char const* start = strchr(name.GetText(), nsDelim);
     if (!start) {
-        TF_CODING_ERROR("Invalid xform op: <%s>.",
-                        GetAttr().GetPath().GetText());
+        TF_CODING_ERROR("Invalid xform op: <%s>.", GetAttr().GetPath().GetText());
         return;
     }
     ++start;
-    char const *end = strchr(start, nsDelim);
+    char const* end = strchr(start, nsDelim);
     if (!end) {
         end = start + strlen(start);
     }
-    _opType = _GetOpTypeEnumFromCString(start, end-start);
+    _opType = _GetOpTypeEnumFromCString(start, end - start);
     if (_opType == TypeInvalid) {
-        TF_CODING_ERROR("Invalid xform opType token '%s'.",
-                        std::string(start, end).c_str());
+        TF_CODING_ERROR("Invalid xform opType token '%s'.", std::string(start, end).c_str());
     }
 }
 
-UsdGeomXformOp::UsdGeomXformOp(const UsdAttribute &attr, bool isInverseOp,
-                               _ValidAttributeTagType)
-    : _attr(attr)
-    , _opType(TypeInvalid)
-    , _isInverseOp(isInverseOp)
-{
+UsdGeomXformOp::UsdGeomXformOp(const UsdAttribute& attr, bool isInverseOp, _ValidAttributeTagType)
+    : _attr(attr), _opType(TypeInvalid), _isInverseOp(isInverseOp) {
     _Init();
 }
 
-UsdGeomXformOp::UsdGeomXformOp(UsdAttributeQuery &&query, bool isInverseOp,
-                               _ValidAttributeTagType)
-    : _attr(std::move(query))
-    , _opType(TypeInvalid)
-    , _isInverseOp(isInverseOp)
-{
+UsdGeomXformOp::UsdGeomXformOp(UsdAttributeQuery&& query, bool isInverseOp, _ValidAttributeTagType)
+    : _attr(std::move(query)), _opType(TypeInvalid), _isInverseOp(isInverseOp) {
     _Init();
 }
 
-TfToken 
-UsdGeomXformOp::GetOpName() const
-{
-    return _isInverseOp ? TfToken(_tokens->invertPrefix.GetString() + 
-                                  GetName().GetString()) 
-                        : GetName();
+TfToken UsdGeomXformOp::GetOpName() const {
+    return _isInverseOp ? TfToken(_tokens->invertPrefix.GetString() + GetName().GetString()) : GetName();
 }
 
 /* static */
-bool 
-UsdGeomXformOp::IsXformOp(const UsdAttribute &attr)
-{
-    if (!attr)
-        return false;
+bool UsdGeomXformOp::IsXformOp(const UsdAttribute& attr) {
+    if (!attr) return false;
 
     return IsXformOp(attr.GetName());
 }
 
 /* static */
-bool
-UsdGeomXformOp::IsXformOp(const TfToken &attrName) 
-{
+bool UsdGeomXformOp::IsXformOp(const TfToken& attrName) {
     return _IsNamespaced(attrName);
 }
 
 /* static */
-UsdAttribute
-UsdGeomXformOp::_GetXformOpAttr(UsdPrim const& prim, const TfToken &opName,
-                                bool *isInverseOp)
-{
+UsdAttribute UsdGeomXformOp::_GetXformOpAttr(UsdPrim const& prim, const TfToken& opName, bool* isInverseOp) {
     *isInverseOp = _IsInverseOp(opName);
 
-    // Is it is an inverse operation, strip off the "invert:" at the beginning 
+    // Is it is an inverse operation, strip off the "invert:" at the beginning
     // of opName to get the associated attribute's name.
-    return *isInverseOp ?
-        prim.GetAttribute(
-            TfToken(opName.GetString().substr(
-                        _tokens->invertPrefix.GetString().size()))) :
-        prim.GetAttribute(opName);
+    return *isInverseOp
+                   ? prim.GetAttribute(TfToken(opName.GetString().substr(_tokens->invertPrefix.GetString().size())))
+                   : prim.GetAttribute(opName);
 }
 
 /* static */
-UsdGeomXformOp::Precision 
-UsdGeomXformOp::GetPrecisionFromValueTypeName(const SdfValueTypeName &typeName)
-{
+UsdGeomXformOp::Precision UsdGeomXformOp::GetPrecisionFromValueTypeName(const SdfValueTypeName& typeName) {
     if (typeName == SdfValueTypeNames->Matrix4d)
         return PrecisionDouble;
     else if (typeName == SdfValueTypeNames->Double3)
@@ -226,41 +178,50 @@ UsdGeomXformOp::GetPrecisionFromValueTypeName(const SdfValueTypeName &typeName)
         return PrecisionFloat;
     else if (typeName == SdfValueTypeNames->Quath)
         return PrecisionHalf;
-    
+
     TF_CODING_ERROR("Invalid typeName '%s' specified.", typeName.GetAsToken().GetText());
     // Return default precision, which is double.
     return PrecisionDouble;
 }
 
 /* static */
-TfToken const &
-UsdGeomXformOp::GetOpTypeToken(UsdGeomXformOp::Type const opType)
-{
-    switch(opType) {
-        case TypeTransform: return UsdGeomXformOpTypes->transform;
-        case TypeTranslate: return UsdGeomXformOpTypes->translate;
-        case TypeScale: return UsdGeomXformOpTypes->scale;
-        case TypeRotateX: return UsdGeomXformOpTypes->rotateX;
-        case TypeRotateY: return UsdGeomXformOpTypes->rotateY;
-        case TypeRotateZ: return UsdGeomXformOpTypes->rotateZ;
-        case TypeRotateXYZ: return UsdGeomXformOpTypes->rotateXYZ;
-        case TypeRotateXZY: return UsdGeomXformOpTypes->rotateXZY;
-        case TypeRotateYXZ: return UsdGeomXformOpTypes->rotateYXZ;
-        case TypeRotateYZX: return UsdGeomXformOpTypes->rotateYZX;
-        case TypeRotateZXY: return UsdGeomXformOpTypes->rotateZXY;
-        case TypeRotateZYX: return UsdGeomXformOpTypes->rotateZYX;
-        case TypeOrient: return UsdGeomXformOpTypes->orient;
-        case TypeInvalid: 
-        default: 
+TfToken const& UsdGeomXformOp::GetOpTypeToken(UsdGeomXformOp::Type const opType) {
+    switch (opType) {
+        case TypeTransform:
+            return UsdGeomXformOpTypes->transform;
+        case TypeTranslate:
+            return UsdGeomXformOpTypes->translate;
+        case TypeScale:
+            return UsdGeomXformOpTypes->scale;
+        case TypeRotateX:
+            return UsdGeomXformOpTypes->rotateX;
+        case TypeRotateY:
+            return UsdGeomXformOpTypes->rotateY;
+        case TypeRotateZ:
+            return UsdGeomXformOpTypes->rotateZ;
+        case TypeRotateXYZ:
+            return UsdGeomXformOpTypes->rotateXYZ;
+        case TypeRotateXZY:
+            return UsdGeomXformOpTypes->rotateXZY;
+        case TypeRotateYXZ:
+            return UsdGeomXformOpTypes->rotateYXZ;
+        case TypeRotateYZX:
+            return UsdGeomXformOpTypes->rotateYZX;
+        case TypeRotateZXY:
+            return UsdGeomXformOpTypes->rotateZXY;
+        case TypeRotateZYX:
+            return UsdGeomXformOpTypes->rotateZYX;
+        case TypeOrient:
+            return UsdGeomXformOpTypes->orient;
+        case TypeInvalid:
+        default:
             static TfToken empty;
             return empty;
     }
 }
 
 /* static */
-UsdGeomXformOp::Type 
-UsdGeomXformOp::GetOpTypeEnum(TfToken const &opTypeToken)
-{
+UsdGeomXformOp::Type UsdGeomXformOp::GetOpTypeEnum(TfToken const& opTypeToken) {
     if (opTypeToken == UsdGeomXformOpTypes->transform)
         return TypeTransform;
     else if (opTypeToken == UsdGeomXformOpTypes->translate)
@@ -290,17 +251,16 @@ UsdGeomXformOp::GetOpTypeEnum(TfToken const &opTypeToken)
         return TypeOrient;
     else if (opTypeToken == "")
         return TypeInvalid;
-    
+
     TF_CODING_ERROR("Invalid xform opType token '%s'.", opTypeToken.GetText());
     return TypeInvalid;
 }
 
 /* static */
-UsdGeomXformOp::Type
-UsdGeomXformOp::_GetOpTypeEnumFromCString(char const *str, size_t len)
+UsdGeomXformOp::Type UsdGeomXformOp::_GetOpTypeEnumFromCString(char const* str, size_t len)
 
 {
-    auto check = [str, len](char const *name) {
+    auto check = [str, len](char const* name) {
         return (strlen(name) == len) && (strncmp(name, str, len) == 0);
     };
     if (check("transform"))
@@ -336,59 +296,63 @@ UsdGeomXformOp::_GetOpTypeEnumFromCString(char const *str, size_t len)
 }
 
 /* static */
-const SdfValueTypeName &
-UsdGeomXformOp::GetValueTypeName(
-    const UsdGeomXformOp::Type opType,
-    const UsdGeomXformOp::Precision precision)
-{
+const SdfValueTypeName& UsdGeomXformOp::GetValueTypeName(const UsdGeomXformOp::Type opType,
+                                                         const UsdGeomXformOp::Precision precision) {
     switch (opType) {
         case TypeTransform: {
             // Regardless of the requested precision, this must be Matrix4d,
             // because Matrix4f values are not supported in Sdf.
             if (precision != PrecisionDouble)
-                TF_CODING_ERROR("Matrix transformations can only be encoded in "
-                    "double precision. Overriding precision to double.");
+                TF_CODING_ERROR(
+                        "Matrix transformations can only be encoded in "
+                        "double precision. Overriding precision to double.");
             return SdfValueTypeNames->Matrix4d;
         }
-        case TypeTranslate: 
-        case TypeScale: 
-        case TypeRotateXYZ: 
-        case TypeRotateXZY: 
-        case TypeRotateYXZ: 
-        case TypeRotateYZX: 
-        case TypeRotateZXY: 
+        case TypeTranslate:
+        case TypeScale:
+        case TypeRotateXYZ:
+        case TypeRotateXZY:
+        case TypeRotateYXZ:
+        case TypeRotateYZX:
+        case TypeRotateZXY:
         case TypeRotateZYX: {
             switch (precision) {
-                case PrecisionFloat: return SdfValueTypeNames->Float3;
-                case PrecisionHalf: return SdfValueTypeNames->Half3;
+                case PrecisionFloat:
+                    return SdfValueTypeNames->Float3;
+                case PrecisionHalf:
+                    return SdfValueTypeNames->Half3;
                 case PrecisionDouble:
                 default:
                     return SdfValueTypeNames->Double3;
             }
         }
-        case TypeRotateX: 
-        case TypeRotateY: 
+        case TypeRotateX:
+        case TypeRotateY:
         case TypeRotateZ: {
             switch (precision) {
-                case PrecisionFloat: return SdfValueTypeNames->Float;
-                case PrecisionHalf: return SdfValueTypeNames->Half;
+                case PrecisionFloat:
+                    return SdfValueTypeNames->Float;
+                case PrecisionHalf:
+                    return SdfValueTypeNames->Half;
                 case PrecisionDouble:
                 default:
                     return SdfValueTypeNames->Double;
             }
         }
-        
+
         case TypeOrient: {
             switch (precision) {
-                case PrecisionFloat: return SdfValueTypeNames->Quatf;
-                case PrecisionHalf: return SdfValueTypeNames->Quath;
+                case PrecisionFloat:
+                    return SdfValueTypeNames->Quatf;
+                case PrecisionHalf:
+                    return SdfValueTypeNames->Quath;
                 case PrecisionDouble:
                 default:
                     return SdfValueTypeNames->Quatd;
             }
         }
 
-        case TypeInvalid: 
+        case TypeInvalid:
         default: {
             static SdfValueTypeName empty;
             return empty;
@@ -396,29 +360,26 @@ UsdGeomXformOp::GetValueTypeName(
     }
 }
 
-UsdGeomXformOp::UsdGeomXformOp(
-    UsdPrim const& prim, 
-    UsdGeomXformOp::Type const opType,
-    UsdGeomXformOp::Precision const precision, 
-    TfToken const &opSuffix,
-    bool isInverseOp)
-    : _opType(opType)
-    , _isInverseOp(isInverseOp)
-{
+UsdGeomXformOp::UsdGeomXformOp(UsdPrim const& prim,
+                               UsdGeomXformOp::Type const opType,
+                               UsdGeomXformOp::Precision const precision,
+                               TfToken const& opSuffix,
+                               bool isInverseOp)
+    : _opType(opType), _isInverseOp(isInverseOp) {
     // Determine the typeName of the xformOp attribute to be created.
-    const SdfValueTypeName &typeName = GetValueTypeName(opType, precision);
+    const SdfValueTypeName& typeName = GetValueTypeName(opType, precision);
 
-    if (!typeName) { 
-        TF_CODING_ERROR("Invalid xform-op: incompatible combination of "
-            "opType (%s) and precision (%s).", 
-            TfEnum::GetName(opType).c_str(),
-            TfEnum::GetName(precision).c_str());
+    if (!typeName) {
+        TF_CODING_ERROR(
+                "Invalid xform-op: incompatible combination of "
+                "opType (%s) and precision (%s).",
+                TfEnum::GetName(opType).c_str(), TfEnum::GetName(precision).c_str());
         return;
-    } 
+    }
 
-    TfToken attrName = UsdGeomXformOp::GetOpName(opType, opSuffix, 
-        // isInverseOp is handled below
-        /*isInverseOp*/ false);
+    TfToken attrName = UsdGeomXformOp::GetOpName(opType, opSuffix,
+                                                 // isInverseOp is handled below
+                                                 /*isInverseOp*/ false);
 
     // attrName can never be empty.
     TF_VERIFY(!attrName.IsEmpty());
@@ -431,42 +392,27 @@ UsdGeomXformOp::UsdGeomXformOp(
     // and _attr will be invalid, which is what we want
 }
 
-UsdGeomXformOp::Precision 
-UsdGeomXformOp::GetPrecision() const
-{
+UsdGeomXformOp::Precision UsdGeomXformOp::GetPrecision() const {
     return GetPrecisionFromValueTypeName(GetTypeName());
 }
 
 /* static */
-TfToken 
-UsdGeomXformOp::GetOpName(
-    const Type opType, 
-    const TfToken &opSuffix,
-    bool isInverseOp)
-{
+TfToken UsdGeomXformOp::GetOpName(const Type opType, const TfToken& opSuffix, bool isInverseOp) {
     TfToken opName = _MakeNamespaced(GetOpTypeToken(opType));
 
-    if (!opSuffix.IsEmpty())
-        opName = TfToken(opName.GetString() + ":" + opSuffix.GetString());
+    if (!opSuffix.IsEmpty()) opName = TfToken(opName.GetString() + ":" + opSuffix.GetString());
 
-    if (isInverseOp)
-        opName = TfToken(_tokens->invertPrefix.GetString() + opName.GetString());
+    if (isInverseOp) opName = TfToken(_tokens->invertPrefix.GetString() + opName.GetString());
 
     return opName;
 }
 
-bool
-UsdGeomXformOp::HasSuffix(const TfToken &suffix) const
-{
+bool UsdGeomXformOp::HasSuffix(const TfToken& suffix) const {
     return TfStringEndsWith(GetName(), suffix);
 }
 
 /* static */
-GfMatrix4d 
-UsdGeomXformOp::GetOpTransform(UsdGeomXformOp::Type const opType,
-                               VtValue const &opVal,
-                               bool isInverseOp)
-{
+GfMatrix4d UsdGeomXformOp::GetOpTransform(UsdGeomXformOp::Type const opType, VtValue const& opVal, bool isInverseOp) {
     // This will be the most common case.
     if (opType == TypeTransform) {
         GfMatrix4d mat(1.);
@@ -477,20 +423,22 @@ UsdGeomXformOp::GetOpTransform(UsdGeomXformOp::Type const opType,
             mat = GfMatrix4d(opVal.UncheckedGet<GfMatrix4f>());
         } else {
             isMatrixVal = false;
-            TF_CODING_ERROR("Invalid combination of opType (%s) "
-                "and opVal (%s). Returning identity matrix.",
-                TfEnum::GetName(opType).c_str(),
-                TfStringify(opVal).c_str());
+            TF_CODING_ERROR(
+                    "Invalid combination of opType (%s) "
+                    "and opVal (%s). Returning identity matrix.",
+                    TfEnum::GetName(opType).c_str(), TfStringify(opVal).c_str());
             return GfMatrix4d(1.);
-        } 
+        }
 
         if (isMatrixVal && isInverseOp) {
-            double determinant=0;
+            double determinant = 0;
             mat = mat.GetInverse(&determinant);
 
             if (GfIsClose(determinant, 0.0, 1e-9)) {
-                TF_CODING_ERROR("Cannot invert singular transform op with "
-                    "value %s.", TfStringify(opVal).c_str());
+                TF_CODING_ERROR(
+                        "Cannot invert singular transform op with "
+                        "value %s.",
+                        TfStringify(opVal).c_str());
             }
         }
 
@@ -500,7 +448,7 @@ UsdGeomXformOp::GetOpTransform(UsdGeomXformOp::Type const opType,
     double doubleVal = 0.;
     bool isScalarVal = true;
     if (opVal.IsHolding<double>()) {
-        doubleVal  = opVal.UncheckedGet<double>();
+        doubleVal = opVal.UncheckedGet<double>();
     } else if (opVal.IsHolding<float>()) {
         doubleVal = opVal.UncheckedGet<float>();
     } else if (opVal.IsHolding<GfHalf>()) {
@@ -510,8 +458,7 @@ UsdGeomXformOp::GetOpTransform(UsdGeomXformOp::Type const opType,
     }
 
     if (isScalarVal) {
-        if (isInverseOp) 
-            doubleVal = -doubleVal;
+        if (isInverseOp) doubleVal = -doubleVal;
 
         if (opType == TypeRotateX) {
             return GfMatrix4d(1.).SetRotate(GfRotation(GfVec3d::XAxis(), doubleVal));
@@ -535,57 +482,47 @@ UsdGeomXformOp::GetOpTransform(UsdGeomXformOp::Type const opType,
     }
 
     if (isVecVal) {
-        switch(opType) {
+        switch (opType) {
             case TypeTranslate:
-                if (isInverseOp) 
-                    vec3dVal = -vec3dVal;
+                if (isInverseOp) vec3dVal = -vec3dVal;
                 return GfMatrix4d(1.).SetTranslate(vec3dVal);
             case TypeScale:
                 if (isInverseOp) {
-                    vec3dVal = GfVec3d(1/vec3dVal[0], 
-                                       1/vec3dVal[1], 
-                                       1/vec3dVal[2]);
+                    vec3dVal = GfVec3d(1 / vec3dVal[0], 1 / vec3dVal[1], 1 / vec3dVal[2]);
                 }
                 return GfMatrix4d(1.).SetScale(vec3dVal);
             default: {
-                if (isInverseOp) 
-                    vec3dVal = -vec3dVal;
+                if (isInverseOp) vec3dVal = -vec3dVal;
                 // Must be one of the 3-axis rotates.
                 GfMatrix3d xRot(GfRotation(GfVec3d::XAxis(), vec3dVal[0]));
                 GfMatrix3d yRot(GfRotation(GfVec3d::YAxis(), vec3dVal[1]));
                 GfMatrix3d zRot(GfRotation(GfVec3d::ZAxis(), vec3dVal[2]));
                 GfMatrix3d rotationMat(1.);
                 switch (opType) {
-                    case TypeRotateXYZ: 
+                    case TypeRotateXYZ:
                         // Inv(ABC) = Inv(C) * Inv(B) * Inv(A)
-                        rotationMat = !isInverseOp ? (xRot * yRot * zRot) 
-                                                      : (zRot * yRot * xRot);
+                        rotationMat = !isInverseOp ? (xRot * yRot * zRot) : (zRot * yRot * xRot);
                         break;
-                    case TypeRotateXZY: 
-                        rotationMat = !isInverseOp ? (xRot * zRot * yRot)
-                                                      : (yRot * zRot * xRot);
+                    case TypeRotateXZY:
+                        rotationMat = !isInverseOp ? (xRot * zRot * yRot) : (yRot * zRot * xRot);
                         break;
-                    case TypeRotateYXZ: 
-                        rotationMat = !isInverseOp ? (yRot * xRot * zRot)
-                                                      : (zRot * xRot * yRot);
+                    case TypeRotateYXZ:
+                        rotationMat = !isInverseOp ? (yRot * xRot * zRot) : (zRot * xRot * yRot);
                         break;
-                    case TypeRotateYZX: 
-                        rotationMat = !isInverseOp ? (yRot * zRot * xRot)
-                                                      : (xRot * zRot * yRot);
+                    case TypeRotateYZX:
+                        rotationMat = !isInverseOp ? (yRot * zRot * xRot) : (xRot * zRot * yRot);
                         break;
                     case TypeRotateZXY:
-                        rotationMat = !isInverseOp ? (zRot * xRot * yRot)
-                                                      : (yRot * xRot * zRot);
+                        rotationMat = !isInverseOp ? (zRot * xRot * yRot) : (yRot * xRot * zRot);
                         break;
-                    case TypeRotateZYX: 
-                        rotationMat = !isInverseOp ? (zRot * yRot * xRot)
-                                                      : (xRot * yRot * zRot);
+                    case TypeRotateZYX:
+                        rotationMat = !isInverseOp ? (zRot * yRot * xRot) : (xRot * yRot * zRot);
                         break;
                     default:
-                        TF_CODING_ERROR("Invalid combination of opType (%s) "
-                            "and opVal (%s). Returning identity matrix.",
-                            TfEnum::GetName(opType).c_str(),
-                            TfStringify(opVal).c_str());
+                        TF_CODING_ERROR(
+                                "Invalid combination of opType (%s) "
+                                "and opVal (%s). Returning identity matrix.",
+                                TfEnum::GetName(opType).c_str(), TfStringify(opVal).c_str());
                         return GfMatrix4d(1.);
                 }
                 return GfMatrix4d(1.).SetRotate(rotationMat);
@@ -598,40 +535,36 @@ UsdGeomXformOp::GetOpTransform(UsdGeomXformOp::Type const opType,
         if (opVal.IsHolding<GfQuatd>())
             quatVal = opVal.UncheckedGet<GfQuatd>();
         else if (opVal.IsHolding<GfQuatf>()) {
-            const GfQuatf &quatf = opVal.UncheckedGet<GfQuatf>();
+            const GfQuatf& quatf = opVal.UncheckedGet<GfQuatf>();
             quatVal = GfQuatd(quatf.GetReal(), quatf.GetImaginary());
         } else if (opVal.IsHolding<GfQuath>()) {
-            const GfQuath &quath = opVal.UncheckedGet<GfQuath>();
+            const GfQuath& quath = opVal.UncheckedGet<GfQuath>();
             quatVal = GfQuatd(quath.GetReal(), quath.GetImaginary());
         }
 
         GfRotation quatRotation(quatVal);
-        if (isInverseOp)
-            quatRotation = quatRotation.GetInverse();
+        if (isInverseOp) quatRotation = quatRotation.GetInverse();
 
         return GfMatrix4d(quatRotation, GfVec3d(0.));
     }
-    
-    TF_CODING_ERROR("Invalid combination of opType (%s) and opVal (%s). "
-        "Returning identity matrix.", TfEnum::GetName(opType).c_str(), 
-        TfStringify(opVal).c_str());
+
+    TF_CODING_ERROR(
+            "Invalid combination of opType (%s) and opVal (%s). "
+            "Returning identity matrix.",
+            TfEnum::GetName(opType).c_str(), TfStringify(opVal).c_str());
 
     return GfMatrix4d(1.);
 }
 
-GfMatrix4d 
-UsdGeomXformOp::GetOpTransform(UsdTimeCode time) const
-{
+GfMatrix4d UsdGeomXformOp::GetOpTransform(UsdTimeCode time) const {
     GfMatrix4d result(1);
 
     VtValue opVal;
-    if (!Get(&opVal, time))
-        return result;
+    if (!Get(&opVal, time)) return result;
 
-    result = GetOpTransform(GetOpType(), opVal, _isInverseOp); 
+    result = GetOpTransform(GetOpType(), opVal, _isInverseOp);
 
     return result;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

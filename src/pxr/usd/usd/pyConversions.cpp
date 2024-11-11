@@ -26,19 +26,14 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 // XXX: This function is no longer required -- remove.
-TfPyObjWrapper
-UsdVtValueToPython(const VtValue &value)
-{
+TfPyObjWrapper UsdVtValueToPython(const VtValue& value) {
     // Convert to python.
     TfPyLock lock;
     return TfPyObjWrapper(TfPyObject(value));
 }
 
-VtValue 
-UsdPythonToSdfType(TfPyObjWrapper pyVal, SdfValueTypeName const &targetType)
-{
+VtValue UsdPythonToSdfType(TfPyObjWrapper pyVal, SdfValueTypeName const& targetType) {
     using namespace pxr_boost::python;
 
     // Extract VtValue from python object.
@@ -58,22 +53,17 @@ UsdPythonToSdfType(TfPyObjWrapper pyVal, SdfValueTypeName const &targetType)
     // continue with the given value.  Deeper in the 'Set()' implementation,
     // we'll issue a detailed type mismatch error.
     VtValue cast = VtValue::CastToTypeOf(val, defVal);
-    if (!cast.IsEmpty())
-        cast.Swap(val);
+    if (!cast.IsEmpty()) cast.Swap(val);
 
     return val;
 }
 
-bool
-UsdPythonToMetadataValue(
-    const TfToken &key, const TfToken &keyPath, 
-    TfPyObjWrapper pyVal, VtValue *result)
-{
+bool UsdPythonToMetadataValue(const TfToken& key, const TfToken& keyPath, TfPyObjWrapper pyVal, VtValue* result) {
     using namespace pxr_boost::python;
 
-    SdfSchema const &schema = SdfSchema::GetInstance();
+    SdfSchema const& schema = SdfSchema::GetInstance();
 
-    SdfSchema::FieldDefinition const *fieldDef = schema.GetFieldDefinition(key);
+    SdfSchema::FieldDefinition const* fieldDef = schema.GetFieldDefinition(key);
 
     if (!fieldDef) {
         TF_CODING_ERROR("Unregistered metadata key: %s", key.GetText());
@@ -96,23 +86,17 @@ UsdPythonToMetadataValue(
         value.UncheckedSwap(inDict);
         std::string errMsg;
         if (!SdfConvertToValidMetadataDictionary(&inDict, &errMsg)) {
-            TfPyThrowValueError(
-                TfStringPrintf(
-                    "Invalid value type for %s%s%s: %s.",
-                    key.GetText(), keyPath.IsEmpty() ? "" : ":",
-                    keyPath.GetText(), errMsg.c_str()));
+            TfPyThrowValueError(TfStringPrintf("Invalid value type for %s%s%s: %s.", key.GetText(),
+                                               keyPath.IsEmpty() ? "" : ":", keyPath.GetText(), errMsg.c_str()));
         }
         value.UncheckedSwap(inDict);
     }
 
     if (!keyPath.IsEmpty() && fallback.IsHolding<VtDictionary>()) {
         if (!fieldDef->IsValidMapValue(value)) {
-            TfPyThrowValueError(
-                TfStringPrintf(
-                    "Invalid value type for dictionary key-path '%s:%s': '%s'.",
-                    key.GetString().c_str(),
-                    keyPath.GetText(),
-                    TfPyRepr(pyVal.Get()).c_str()));
+            TfPyThrowValueError(TfStringPrintf("Invalid value type for dictionary key-path '%s:%s': '%s'.",
+                                               key.GetString().c_str(), keyPath.GetText(),
+                                               TfPyRepr(pyVal.Get()).c_str()));
         }
         // Clear out the fallback here, since we allow any scene desc type in
         // dicts.
@@ -124,9 +108,8 @@ UsdPythonToMetadataValue(
     if (!fallback.IsEmpty()) {
         if (fallback.IsHolding<TfTokenVector>()) {
             value = extract<TfTokenVector>(pyVal.Get())();
-        }
-        else if (fallback.IsHolding< std::vector<std::string> >()) {
-            extract<std::vector<std::string> > getVecString(pyVal.Get());
+        } else if (fallback.IsHolding<std::vector<std::string>>()) {
+            extract<std::vector<std::string>> getVecString(pyVal.Get());
             extract<VtStringArray> getStringArray(pyVal.Get());
             if (getVecString.check()) {
                 value = getVecString();
@@ -134,33 +117,25 @@ UsdPythonToMetadataValue(
                 VtStringArray a = getStringArray();
                 value = std::vector<std::string>(a.begin(), a.end());
             }
-        }
-        else {
+        } else {
             value.CastToTypeOf(fallback);
         }
     }
     // If we failed to produce a value, or if we don't have a fallback and the
     // value we do have is not valid for either the field definition or the
     // schema, then complain.
-    if (value.IsEmpty() ||
-        (fallback.IsEmpty() &&
-         (!fieldDef->IsValidValue(value) || !schema.IsValidValue(value)))) {
+    if (value.IsEmpty() || (fallback.IsEmpty() && (!fieldDef->IsValidValue(value) || !schema.IsValidValue(value)))) {
         VtValue origValue = extract<VtValue>(pyVal.Get())();
-        TfPyThrowValueError(
-            TfStringPrintf(
-                "Invalid value '%s' (type '%s') for key '%s%s'.%s",
-                TfPyRepr(pyVal.Get()).c_str(),
-                origValue.GetTypeName().c_str(),
-                key.GetText(),
-                keyPath.IsEmpty() ? "" :
-                TfStringPrintf(":%s", keyPath.GetText()).c_str(),
-                fallback.IsEmpty() ? "" :
-                TfStringPrintf(" Expected type '%s'", fallback.GetType().
-                               GetTypeName().c_str()).c_str()));
+        TfPyThrowValueError(TfStringPrintf(
+                "Invalid value '%s' (type '%s') for key '%s%s'.%s", TfPyRepr(pyVal.Get()).c_str(),
+                origValue.GetTypeName().c_str(), key.GetText(),
+                keyPath.IsEmpty() ? "" : TfStringPrintf(":%s", keyPath.GetText()).c_str(),
+                fallback.IsEmpty()
+                        ? ""
+                        : TfStringPrintf(" Expected type '%s'", fallback.GetType().GetTypeName().c_str()).c_str()));
     }
     result->Swap(value);
     return true;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

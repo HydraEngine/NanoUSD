@@ -15,22 +15,16 @@
 #include <iostream>
 #include <string>
 
-
 PXR_NAMESPACE_OPEN_SCOPE
-
 
 TF_DEFINE_PUBLIC_TOKENS(UsdTimeCodeTokens, USD_TIME_CODE_TOKENS);
 
-
-void
-UsdTimeCode::_IssueGetValueOnDefaultError() const
-{
+void UsdTimeCode::_IssueGetValueOnDefaultError() const {
     // TF_CODING_ERROR("Called UsdTimeCode::GetValue() on a Default UsdTimeCode.  "
     //                 "Returning a quiet NaN.");
 }
 
-std::ostream& operator<<(std::ostream& os, const UsdTimeCode& time)
-{
+std::ostream& operator<<(std::ostream& os, const UsdTimeCode& time) {
     if (time.IsDefault()) {
         os << UsdTimeCodeTokens->DEFAULT;
     } else if (time.IsEarliestTime()) {
@@ -42,8 +36,7 @@ std::ostream& operator<<(std::ostream& os, const UsdTimeCode& time)
     return os;
 }
 
-std::istream& operator>>(std::istream& is, UsdTimeCode& time)
-{
+std::istream& operator>>(std::istream& is, UsdTimeCode& time) {
     std::string valueString;
     is >> valueString;
     const TfToken valueToken(valueString);
@@ -64,6 +57,4 @@ std::istream& operator>>(std::istream& is, UsdTimeCode& time)
     return is;
 }
 
-
 PXR_NAMESPACE_CLOSE_SCOPE
-

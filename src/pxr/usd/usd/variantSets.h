@@ -20,7 +20,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 SDF_DECLARE_HANDLES(SdfLayer);
 SDF_DECLARE_HANDLES(SdfPrimSpec);
 SDF_DECLARE_HANDLES(SdfVariantSetSpec);
@@ -51,20 +50,19 @@ public:
     /// vs.SetVariantSelection("myFirstVariation");
     /// {
     ///     UsdEditContext ctx(vs.GetVariantEditContext());
-    ///     // Now all of our subsequent edits will go "inside" the 
+    ///     // Now all of our subsequent edits will go "inside" the
     ///     // 'myFirstVariation' variant of 'myVariantSet'
     /// }
     /// \endcode
     USD_API
-    bool AddVariant(const std::string& variantName,
-                    UsdListPosition position=UsdListPositionBackOfPrependList);
+    bool AddVariant(const std::string& variantName, UsdListPosition position = UsdListPositionBackOfPrependList);
 
     /// Return the composed variant names for this VariantSet, ordered
     /// lexicographically.
     USD_API
     std::vector<std::string> GetVariantNames() const;
 
-    /// Returns true if this VariantSet already possesses a variant 
+    /// Returns true if this VariantSet already possesses a variant
     // named \p variantName in any layer.
     USD_API
     bool HasAuthoredVariant(const std::string& variantName) const;
@@ -80,26 +78,26 @@ public:
     /// If requested, the variant selection (if any) will be returned in
     /// \p value .
     USD_API
-    bool HasAuthoredVariantSelection(std::string *value = nullptr) const;
+    bool HasAuthoredVariantSelection(std::string* value = nullptr) const;
 
     /// Author a variant selection for this VariantSet, setting it to
-    /// \a variantName in the stage's current EditTarget. If \p variantName 
-    /// is empty, clear the variant selection (see ClearVariantSelection). 
-    /// Call BlockVariantSelection to explicitly set an empty variant 
+    /// \a variantName in the stage's current EditTarget. If \p variantName
+    /// is empty, clear the variant selection (see ClearVariantSelection).
+    /// Call BlockVariantSelection to explicitly set an empty variant
     /// selection.
     ///
-    /// Return true if the selection was successfully authored or cleared, 
+    /// Return true if the selection was successfully authored or cleared,
     /// false otherwise.
     USD_API
-    bool SetVariantSelection(const std::string &variantName);
+    bool SetVariantSelection(const std::string& variantName);
 
     /// Clear any selection for this VariantSet from the current EditTarget.
     /// Return true on success, false otherwise.
     USD_API
     bool ClearVariantSelection();
 
-    /// Block any weaker selections for this VariantSet by authoring an 
-    /// empty string at the stage's current EditTarget. 
+    /// Block any weaker selections for this VariantSet by authoring an
+    /// empty string at the stage's current EditTarget.
     /// Return true on success, false otherwise.
     USD_API
     bool BlockVariantSelection();
@@ -117,8 +115,7 @@ public:
     /// restriction in the future, if need arises, but it introduces several
     /// complications in specification and behavior.
     USD_API
-    UsdEditTarget
-    GetVariantEditTarget(const SdfLayerHandle &layer = SdfLayerHandle()) const;
+    UsdEditTarget GetVariantEditTarget(const SdfLayerHandle& layer = SdfLayerHandle()) const;
 
     /// Helper function for configuring a UsdStage's EditTarget to author
     /// into the currently selected variant.  Returns configuration for a
@@ -145,36 +142,24 @@ public:
     ///
     /// See GetVariantEditTarget() for discussion of \p layer parameter
     USD_API
-    std::pair<UsdStagePtr, UsdEditTarget>
-    GetVariantEditContext(const SdfLayerHandle &layer = SdfLayerHandle()) const;
-
+    std::pair<UsdStagePtr, UsdEditTarget> GetVariantEditContext(const SdfLayerHandle& layer = SdfLayerHandle()) const;
 
     /// Return this VariantSet's held prim.
-    UsdPrim const &GetPrim() const { return _prim; }
-
+    UsdPrim const& GetPrim() const { return _prim; }
 
     /// Return this VariantSet's name
-    std::string const &GetName() const { return _variantSetName; }
-
+    std::string const& GetName() const { return _variantSetName; }
 
     /// Is this UsdVariantSet object usable?  If not, calling any of
     /// its other methods is likely to crash.
-    bool IsValid() const {
-        return static_cast<bool>(_prim);
-    }
+    bool IsValid() const { return static_cast<bool>(_prim); }
 
     /// Equivalent to IsValid().
-    explicit operator bool() const {
-        return IsValid();
-    }
+    explicit operator bool() const { return IsValid(); }
 
 private:
-    UsdVariantSet(const UsdPrim &prim,
-                  const std::string &variantSetName)
-        : _prim(prim)
-        , _variantSetName(variantSetName)
-    {
-    }
+    UsdVariantSet(const UsdPrim& prim, const std::string& variantSetName)
+        : _prim(prim), _variantSetName(variantSetName) {}
 
     SdfPrimSpecHandle _CreatePrimSpecForEditing();
     SdfVariantSetSpecHandle _AddVariantSet(UsdListPosition position);
@@ -186,7 +171,6 @@ private:
     friend class UsdVariantSets;
 };
 
-
 // TODO:
 // VariantSet Names are stored as SdListOps, but a VariantSet is an actual spec
 // (like a Prim). Is it important to make that distinction here?
@@ -196,7 +180,7 @@ private:
 /// UsdVariantSets represents the collection of
 /// \ref UsdVariantSet "VariantSets" that are present on a UsdPrim.
 ///
-/// A UsdVariantSets object, retrieved from a prim via 
+/// A UsdVariantSets object, retrieved from a prim via
 /// UsdPrim::GetVariantSets(), provides the API for interrogating and modifying
 /// the composed list of VariantSets active defined on the prim, and also
 /// the facility for authoring a VariantSet \em selection for any of those
@@ -204,12 +188,11 @@ private:
 ///
 class UsdVariantSets {
 public:
-
     /// Find an existing, or create a new VariantSet on the originating UsdPrim,
     /// named \p variantSetName.
     ///
     /// This step is not always necessary, because if this UsdVariantSets
-    /// object is valid, then 
+    /// object is valid, then
     /// \code
     /// varSetsObj.GetVariantSet(variantSetName).AddVariant(variantName);
     /// \endcode
@@ -218,7 +201,7 @@ public:
     /// without necessarily populating it with variants.
     USD_API
     UsdVariantSet AddVariantSet(const std::string& variantSetName,
-                UsdListPosition position=UsdListPositionBackOfPrependList);
+                                UsdListPosition position = UsdListPositionBackOfPrependList);
 
     // TODO: don't we want remove and reorder, clear, etc. also?
 
@@ -232,9 +215,7 @@ public:
     USD_API
     std::vector<std::string> GetNames() const;
 
-    UsdVariantSet operator[](const std::string& variantSetName) const {
-        return GetVariantSet(variantSetName);
-    }
+    UsdVariantSet operator[](const std::string& variantSetName) const { return GetVariantSet(variantSetName); }
 
     /// Return a UsdVariantSet object for \p variantSetName.  This always
     /// succeeds, although the returned VariantSet will be invalid if
@@ -254,29 +235,22 @@ public:
     std::string GetVariantSelection(const std::string& variantSetName) const;
 
     USD_API
-    bool SetSelection(const std::string& variantSetName,
-                      const std::string& variantName);
+    bool SetSelection(const std::string& variantSetName, const std::string& variantName);
 
     /// Returns the composed map of all variant selections authored on the
-    /// the originating UsdPrim, regardless of whether a corresponding 
+    /// the originating UsdPrim, regardless of whether a corresponding
     /// variant set exists.
     USD_API
     SdfVariantSelectionMap GetAllVariantSelections() const;
 
-
 private:
-    explicit UsdVariantSets(const UsdPrim& prim) 
-        : _prim(prim)
-    {
-        /* NOTHING */
-    }
+    explicit UsdVariantSets(const UsdPrim& prim) : _prim(prim) { /* NOTHING */ }
 
     UsdPrim _prim;
 
     friend class UsdPrim;
 };
 
-
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif //PXR_USD_USD_VARIANT_SETS_H
+#endif  // PXR_USD_USD_VARIANT_SETS_H

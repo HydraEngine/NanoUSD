@@ -19,8 +19,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Usd throws this exception when code attempts to access an invalid
 /// (i.e. expired or null) prim.
-class UsdExpiredPrimAccessError : public TfBaseException
-{
+class UsdExpiredPrimAccessError : public TfBaseException {
 public:
     using TfBaseException::TfBaseException;
     USD_API virtual ~UsdExpiredPrimAccessError() override;

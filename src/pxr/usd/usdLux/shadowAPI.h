@@ -17,7 +17,7 @@
 #include "pxr/usd/usdLux/tokens.h"
 
 #include "pxr/usd/usdShade/input.h"
-#include "pxr/usd/usdShade/output.h" 
+#include "pxr/usd/usdShade/output.h"
 
 #include "pxr/base/vt/value.h"
 
@@ -41,8 +41,7 @@ class SdfAssetPath;
 /// Controls to refine a light's shadow behavior.  These are
 /// non-physical controls that are valuable for visual lighting work.
 ///
-class UsdLuxShadowAPI : public UsdAPISchemaBase
-{
+class UsdLuxShadowAPI : public UsdAPISchemaBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -53,18 +52,12 @@ public:
     /// Equivalent to UsdLuxShadowAPI::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdLuxShadowAPI(const UsdPrim& prim=UsdPrim())
-        : UsdAPISchemaBase(prim)
-    {
-    }
+    explicit UsdLuxShadowAPI(const UsdPrim& prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
     /// Construct a UsdLuxShadowAPI on the prim held by \p schemaObj .
     /// Should be preferred over UsdLuxShadowAPI(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdLuxShadowAPI(const UsdSchemaBase& schemaObj)
-        : UsdAPISchemaBase(schemaObj)
-    {
-    }
+    explicit UsdLuxShadowAPI(const UsdSchemaBase& schemaObj) : UsdAPISchemaBase(schemaObj) {}
 
     /// Destructor.
     USDLUX_API
@@ -74,8 +67,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDLUX_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdLuxShadowAPI holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -87,20 +79,18 @@ public:
     /// \endcode
     ///
     USDLUX_API
-    static UsdLuxShadowAPI
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdLuxShadowAPI Get(const UsdStagePtr& stage, const SdfPath& path);
 
-
-    /// Returns true if this <b>single-apply</b> API schema can be applied to 
-    /// the given \p prim. If this schema can not be a applied to the prim, 
-    /// this returns false and, if provided, populates \p whyNot with the 
+    /// Returns true if this <b>single-apply</b> API schema can be applied to
+    /// the given \p prim. If this schema can not be a applied to the prim,
+    /// this returns false and, if provided, populates \p whyNot with the
     /// reason it can not be applied.
-    /// 
+    ///
     /// Note that if CanApply returns false, that does not necessarily imply
     /// that calling Apply will fail. Callers are expected to call CanApply
-    /// before calling Apply if they want to ensure that it is valid to 
+    /// before calling Apply if they want to ensure that it is valid to
     /// apply a schema.
-    /// 
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -108,18 +98,17 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDLUX_API
-    static bool 
-    CanApply(const UsdPrim &prim, std::string *whyNot=nullptr);
+    static bool CanApply(const UsdPrim& prim, std::string* whyNot = nullptr);
 
     /// Applies this <b>single-apply</b> API schema to the given \p prim.
-    /// This information is stored by adding "ShadowAPI" to the 
+    /// This information is stored by adding "ShadowAPI" to the
     /// token-valued, listOp metadata \em apiSchemas on the prim.
-    /// 
-    /// \return A valid UsdLuxShadowAPI object is returned upon success. 
-    /// An invalid (or empty) UsdLuxShadowAPI object is returned upon 
-    /// failure. See \ref UsdPrim::ApplyAPI() for conditions 
-    /// resulting in failure. 
-    /// 
+    ///
+    /// \return A valid UsdLuxShadowAPI object is returned upon success.
+    /// An invalid (or empty) UsdLuxShadowAPI object is returned upon
+    /// failure. See \ref UsdPrim::ApplyAPI() for conditions
+    /// resulting in failure.
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -127,8 +116,7 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDLUX_API
-    static UsdLuxShadowAPI 
-    Apply(const UsdPrim &prim);
+    static UsdLuxShadowAPI Apply(const UsdPrim& prim);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -141,17 +129,17 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDLUX_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDLUX_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // SHADOW:ENABLE 
+    // SHADOW:ENABLE
     // --------------------------------------------------------------------- //
     /// Enables shadows to be cast by this light.
     ///
@@ -163,17 +151,17 @@ public:
     USDLUX_API
     UsdAttribute GetShadowEnableAttr() const;
 
-    /// See GetShadowEnableAttr(), and also 
+    /// See GetShadowEnableAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDLUX_API
-    UsdAttribute CreateShadowEnableAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateShadowEnableAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // SHADOW:COLOR 
+    // SHADOW:COLOR
     // --------------------------------------------------------------------- //
     /// The color of shadows cast by the light.  This is a
     /// non-physical control.  The default is to cast black shadows.
@@ -186,23 +174,23 @@ public:
     USDLUX_API
     UsdAttribute GetShadowColorAttr() const;
 
-    /// See GetShadowColorAttr(), and also 
+    /// See GetShadowColorAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDLUX_API
-    UsdAttribute CreateShadowColorAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateShadowColorAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // SHADOW:DISTANCE 
+    // SHADOW:DISTANCE
     // --------------------------------------------------------------------- //
     /// The maximum distance shadows are cast. The distance is
-    /// measured as the distance between the point on the surface and the 
+    /// measured as the distance between the point on the surface and the
     /// occluder.
     /// The default value (-1) indicates no limit.
-    /// 
+    ///
     ///
     /// | ||
     /// | -- | -- |
@@ -212,26 +200,26 @@ public:
     USDLUX_API
     UsdAttribute GetShadowDistanceAttr() const;
 
-    /// See GetShadowDistanceAttr(), and also 
+    /// See GetShadowDistanceAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDLUX_API
-    UsdAttribute CreateShadowDistanceAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateShadowDistanceAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // SHADOW:FALLOFF 
+    // SHADOW:FALLOFF
     // --------------------------------------------------------------------- //
-    /// The size of the shadow falloff zone within the shadow max 
-    /// distance, which can be used to hide the hard cut-off for shadows seen 
-    /// stretching past the max distance. The falloff zone is the area that 
-    /// fades from full shadowing at the beginning of the falloff zone to no 
-    /// shadowing at the max distance from the occluder. The falloff zone 
-    /// distance cannot exceed the shadow max distance. A falloff value equal 
-    /// to or less than zero (with -1 as the default) indicates no falloff. 
-    /// 
+    /// The size of the shadow falloff zone within the shadow max
+    /// distance, which can be used to hide the hard cut-off for shadows seen
+    /// stretching past the max distance. The falloff zone is the area that
+    /// fades from full shadowing at the beginning of the falloff zone to no
+    /// shadowing at the max distance from the occluder. The falloff zone
+    /// distance cannot exceed the shadow max distance. A falloff value equal
+    /// to or less than zero (with -1 as the default) indicates no falloff.
+    ///
     ///
     /// | ||
     /// | -- | -- |
@@ -241,17 +229,17 @@ public:
     USDLUX_API
     UsdAttribute GetShadowFalloffAttr() const;
 
-    /// See GetShadowFalloffAttr(), and also 
+    /// See GetShadowFalloffAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDLUX_API
-    UsdAttribute CreateShadowFalloffAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateShadowFalloffAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // SHADOW:FALLOFFGAMMA 
+    // SHADOW:FALLOFFGAMMA
     // --------------------------------------------------------------------- //
     /// A gamma (i.e., exponential) control over shadow strength
     /// with linear distance within the falloff zone. This controls the rate
@@ -266,21 +254,22 @@ public:
     USDLUX_API
     UsdAttribute GetShadowFalloffGammaAttr() const;
 
-    /// See GetShadowFalloffGammaAttr(), and also 
+    /// See GetShadowFalloffGammaAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDLUX_API
-    UsdAttribute CreateShadowFalloffGammaAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateShadowFalloffGammaAttr(VtValue const& defaultValue = VtValue(),
+                                              bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
@@ -288,14 +277,14 @@ public:
 
     // -------------------------------------------------------------------------
     /// \name Conversion to and from UsdShadeConnectableAPI
-    /// 
+    ///
     /// @{
 
     /// Constructor that takes a ConnectableAPI object.
     /// Allow implicit conversion of UsdShadeConnectableAPI to
     /// UsdLuxShadowAPI.
     USDLUX_API
-    UsdLuxShadowAPI(const UsdShadeConnectableAPI &connectable);
+    UsdLuxShadowAPI(const UsdShadeConnectableAPI& connectable);
 
     /// Contructs and returns a UsdShadeConnectableAPI object with this shadow
     /// API prim. Note that a valid UsdLuxShadowAPI will only return a valid
@@ -309,63 +298,61 @@ public:
     // -------------------------------------------------------------------------
     /// \name Outputs API
     ///
-    /// Outputs represent a typed attribute on a shadow API whose value is 
-    /// computed externally. 
-    /// 
+    /// Outputs represent a typed attribute on a shadow API whose value is
+    /// computed externally.
+    ///
     /// @{
 
     /// Create an output which can either have a value or can be connected.
-    /// The attribute representing the output is created in the "outputs:" 
-    /// namespace. Outputs on a shadow API cannot be connected, as their 
+    /// The attribute representing the output is created in the "outputs:"
+    /// namespace. Outputs on a shadow API cannot be connected, as their
     /// value is assumed to be computed externally.
-    /// 
+    ///
     USDLUX_API
-    UsdShadeOutput CreateOutput(const TfToken& name,
-                                const SdfValueTypeName& typeName);
+    UsdShadeOutput CreateOutput(const TfToken& name, const SdfValueTypeName& typeName);
 
     /// Return the requested output if it exists.
-    /// 
+    ///
     USDLUX_API
-    UsdShadeOutput GetOutput(const TfToken &name) const;
+    UsdShadeOutput GetOutput(const TfToken& name) const;
 
     /// Outputs are represented by attributes in the "outputs:" namespace.
     /// If \p onlyAuthored is true (the default), then only return authored
     /// attributes; otherwise, this also returns un-authored builtins.
-    /// 
+    ///
     USDLUX_API
-    std::vector<UsdShadeOutput> GetOutputs(bool onlyAuthored=true) const;
+    std::vector<UsdShadeOutput> GetOutputs(bool onlyAuthored = true) const;
 
     /// @}
 
-    // ------------------------------------------------------------------------- 
+    // -------------------------------------------------------------------------
 
     /// \name Inputs API
     ///
-    /// Inputs are connectable attribute with a typed value. 
-    /// 
-    /// Shadow API parameters are encoded as inputs. 
-    /// 
+    /// Inputs are connectable attribute with a typed value.
+    ///
+    /// Shadow API parameters are encoded as inputs.
+    ///
     /// @{
 
     /// Create an input which can either have a value or can be connected.
-    /// The attribute representing the input is created in the "inputs:" 
+    /// The attribute representing the input is created in the "inputs:"
     /// namespace. Inputs on shadow API are connectable.
-    /// 
+    ///
     USDLUX_API
-    UsdShadeInput CreateInput(const TfToken& name,
-                              const SdfValueTypeName& typeName);
+    UsdShadeInput CreateInput(const TfToken& name, const SdfValueTypeName& typeName);
 
     /// Return the requested input if it exists.
-    /// 
+    ///
     USDLUX_API
-    UsdShadeInput GetInput(const TfToken &name) const;
+    UsdShadeInput GetInput(const TfToken& name) const;
 
     /// Inputs are represented by attributes in the "inputs:" namespace.
     /// If \p onlyAuthored is true (the default), then only return authored
     /// attributes; otherwise, this also returns un-authored builtins.
-    /// 
+    ///
     USDLUX_API
-    std::vector<UsdShadeInput> GetInputs(bool onlyAuthored=true) const;
+    std::vector<UsdShadeInput> GetInputs(bool onlyAuthored = true) const;
 
     /// @}
 };

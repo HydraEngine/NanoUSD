@@ -32,18 +32,17 @@ class UsdPrim;
 /// validator's plugin. PlugInfo can provide the following validator metadata:
 ///
 /// - name: A required field. This metadatum stores the validator name. For
-/// validators defined in a plugin, the name must be a fully qualified name 
+/// validators defined in a plugin, the name must be a fully qualified name
 /// which includes the pluginName as well, separated by ":". This ensures,
 /// plugin provided validator names are guaranteed to be unique.
 /// - pluginPtr: Pointer to the plugin where a plugin based validator is defined.
 /// nullptr for a non-plugin based validator.
-/// - keywords: Keywords associated with this validator. 
-/// - doc: Doc string explaining the purpose of the validator. 
+/// - keywords: Keywords associated with this validator.
+/// - doc: Doc string explaining the purpose of the validator.
 /// - schemaTypes: If the validator is associated with specific schemaTypes.
 /// - isSuite: If the validator represents a suite of validators.
 ///
-struct UsdValidatorMetadata
-{
+struct UsdValidatorMetadata {
     /// Name of the validator.
     ///
     /// For plugin provided validators, this is prefixed with the pluginName,
@@ -53,11 +52,11 @@ struct UsdValidatorMetadata
     /// This is a mandatory field for a ValidatorMetadata.
     TfToken name;
 
-    /// Pointer to the plugin to which a plugin based validator belongs. 
+    /// Pointer to the plugin to which a plugin based validator belongs.
     ///
     /// For non-plugin based validator, pluginPtr is nullptr.
     PlugPluginPtr pluginPtr;
-    
+
     /// list of keywords extracted for this test from the plugInfo.json
     TfTokenVector keywords;
 
@@ -71,7 +70,7 @@ struct UsdValidatorMetadata
 
     /// whether this test represents a test suite or not
     bool isSuite;
-}; // UsdValidatorMetadata
+};  // UsdValidatorMetadata
 
 using UsdValidatorMetadataVector = std::vector<UsdValidatorMetadata>;
 
@@ -91,14 +90,11 @@ using UsdValidatorMetadataVector = std::vector<UsdValidatorMetadata>;
 /// @{
 
 /// UsdValidateLayerTaskFn: Validation logic operating on a given SdfLayerHandle
-using UsdValidateLayerTaskFn = std::function<UsdValidationErrorVector(
-    const SdfLayerHandle&)>;
+using UsdValidateLayerTaskFn = std::function<UsdValidationErrorVector(const SdfLayerHandle&)>;
 /// UsdValidateStageTaskFn: Validation logic operating on a given UsdStage
-using UsdValidateStageTaskFn = std::function<UsdValidationErrorVector(
-    const UsdStagePtr&)>;
+using UsdValidateStageTaskFn = std::function<UsdValidationErrorVector(const UsdStagePtr&)>;
 /// UsdValidatePrimTaskFn: Validation logic operating on a given UsdPrim
-using UsdValidatePrimTaskFn = std::function<UsdValidationErrorVector(
-    const UsdPrim&)>;
+using UsdValidatePrimTaskFn = std::function<UsdValidationErrorVector(const UsdPrim&)>;
 
 /// @}
 
@@ -110,55 +106,45 @@ using UsdValidatePrimTaskFn = std::function<UsdValidationErrorVector(
 /// registered and cached in the UsdValidationRegistry.  UsdValidator can
 /// consist of any one of the 3 testing tasks: LayerTestingTask,
 /// StageTestingTask or PrimTestingTask, which correspond to testing the given
-/// SdfLayer, an entire UsdStage or a UsdPrim respectively. 
+/// SdfLayer, an entire UsdStage or a UsdPrim respectively.
 ///
-/// UsdValidator instances are immutable and non-copyable. Note that all 
+/// UsdValidator instances are immutable and non-copyable. Note that all
 /// validators which are registered with the UsdValidationRegistry are immortal.
 ///
 /// \sa UsdValidationRegistry
-class UsdValidator
-{
+class UsdValidator {
 public:
     /// Instantiate a UsdValidator which has no validation logic implementation.
     /// This is primarily used by UsdValidatorSuite.
     USD_API
-    explicit UsdValidator(const UsdValidatorMetadata &metadata);
+    explicit UsdValidator(const UsdValidatorMetadata& metadata);
 
-    UsdValidator(const UsdValidator &other) = delete;
-    UsdValidator &operator=(const UsdValidator&) = delete;
+    UsdValidator(const UsdValidator& other) = delete;
+    UsdValidator& operator=(const UsdValidator&) = delete;
 
-    UsdValidator(UsdValidator &&other) noexcept = default;
+    UsdValidator(UsdValidator&& other) noexcept = default;
     UsdValidator& operator=(UsdValidator&&) noexcept = default;
 
     /// Instantiate a UsdValidator which has its validation logic implemented by
-    /// a UsdValidateLayerTaskFn. 
+    /// a UsdValidateLayerTaskFn.
     USD_API
-    UsdValidator(const UsdValidatorMetadata &metadata,
-                 const UsdValidateLayerTaskFn &validateLayerTaskFn);
+    UsdValidator(const UsdValidatorMetadata& metadata, const UsdValidateLayerTaskFn& validateLayerTaskFn);
 
     /// Instantiate a UsdValidator which has its validation logic implemented by
     /// a UsdValidateStageTaskFn.
     USD_API
-    UsdValidator(const UsdValidatorMetadata &metadata,
-                 const UsdValidateStageTaskFn &validateStageTaskFn);
+    UsdValidator(const UsdValidatorMetadata& metadata, const UsdValidateStageTaskFn& validateStageTaskFn);
 
     /// Instantiate a UsdValidator which has its validation logic implemented by
     /// a UsdValidatePrimTaskFn.
     USD_API
-    UsdValidator(const UsdValidatorMetadata &metadata,
-                 const UsdValidatePrimTaskFn &validatePrimTaskFn);
+    UsdValidator(const UsdValidatorMetadata& metadata, const UsdValidatePrimTaskFn& validatePrimTaskFn);
 
     /// Return metadata associated with this Validator.
-    const UsdValidatorMetadata& GetMetadata() const &
-    {
-        return _metadata;
-    }
+    const UsdValidatorMetadata& GetMetadata() const& { return _metadata; }
 
     /// Return metadata associated with this validator by-value.
-    UsdValidatorMetadata GetMetadata() &&
-    {
-        return std::move(_metadata);
-    }
+    UsdValidatorMetadata GetMetadata() && { return std::move(_metadata); }
 
     /// Run validation on the given \p layer by executing the contained
     /// validateTaskFn and returns UsdValidationErrorVector.
@@ -166,7 +152,7 @@ public:
     /// If this Validator doesn't provide a UsdValidateLayerTaskFn, then an
     /// empty vector is returned, which signifies no error.
     USD_API
-    UsdValidationErrorVector Validate(const SdfLayerHandle &layer) const;
+    UsdValidationErrorVector Validate(const SdfLayerHandle& layer) const;
 
     /// Run validation on the given \p usdStage by executing the contained
     /// validateTaskFn and returns UsdValidationErrorVector.
@@ -174,7 +160,7 @@ public:
     /// If this Validator doesn't provide a UsdValidateStageTaskFn, then an
     /// empty vector is returned, which signifies no error.
     USD_API
-    UsdValidationErrorVector Validate(const UsdStagePtr &usdStage) const;
+    UsdValidationErrorVector Validate(const UsdStagePtr& usdStage) const;
 
     /// Run validation on the given \p usdPrim by executing the contained
     /// validateTaskFn and returns UsdValidationErrorVector.
@@ -190,15 +176,13 @@ private:
     // the contained validators in a suite, which provides schemaTypes metadata
     // are compliant.
     friend class UsdValidationRegistry;
-    // In order to distribute validators into different sets based on the type 
+    // In order to distribute validators into different sets based on the type
     // of validation to be performed, ValidationContext needs to access
     // _GetValidateLayerTask, _GetValidateStageTask and _GetValidatePrimTask.
     friend class UsdValidationContext;
 
     UsdValidatorMetadata _metadata;
-    std::variant<UsdValidateLayerTaskFn, 
-                 UsdValidateStageTaskFn,
-                 UsdValidatePrimTaskFn> _validateTaskFn;
+    std::variant<UsdValidateLayerTaskFn, UsdValidateStageTaskFn, UsdValidatePrimTaskFn> _validateTaskFn;
 
     // Return UsdValidateLayerTaskFn if provided by the validator, else a
     // nullptr.
@@ -212,7 +196,7 @@ private:
     // nullptr.
     const UsdValidatePrimTaskFn* _GetValidatePrimTask() const;
 
-}; // UsdValidator
+};  // UsdValidator
 
 /// \class UsdValidatorSuite
 ///
@@ -223,59 +207,45 @@ private:
 /// instance then the validatorSuite will not be registered, and client will
 /// appropriately be warned.
 ///
-/// UsdValidatorSuite instances are immutable and non-copyable. Note that all 
-/// validator suites which are registered with the UsdValidationRegistry are 
+/// UsdValidatorSuite instances are immutable and non-copyable. Note that all
+/// validator suites which are registered with the UsdValidationRegistry are
 /// immortal.
 ///
 /// \sa UsdValidationRegistry
-class UsdValidatorSuite
-{
+class UsdValidatorSuite {
 public:
     /// Instantiate UsdValidatorSuite using \p metadata and a vector of \p
     /// validators.
     USD_API
-    UsdValidatorSuite(const UsdValidatorMetadata &metadata,
-                      const std::vector<const UsdValidator*>& validators);
+    UsdValidatorSuite(const UsdValidatorMetadata& metadata, const std::vector<const UsdValidator*>& validators);
 
-    UsdValidatorSuite(UsdValidatorSuite &&other) noexcept = default;
+    UsdValidatorSuite(UsdValidatorSuite&& other) noexcept = default;
 
     UsdValidatorSuite& operator=(UsdValidatorSuite&&) noexcept = default;
 
     /// Returns a vector of const UsdValidator pointers, which make this
     /// UsdValidatorSuite. Note that the validators are guaranteed to be valid,
     /// since their lifetime is managed by the UsdValidationRegistry, which has
-    /// a higher scope than individual validators. 
-    const std::vector<const UsdValidator*>& GetContainedValidators() const &
-    {
-        return _containedValidators;
-    }
+    /// a higher scope than individual validators.
+    const std::vector<const UsdValidator*>& GetContainedValidators() const& { return _containedValidators; }
 
     /// Returns a vector of const UsdValidator pointers, which make this
     /// UsdValidatorSuite. Note that the validators are guaranteed to be valid,
     /// since their lifetime is managed by the UsdValidationRegistry, which has
-    /// a higher scope than individual validators. 
-    std::vector<const UsdValidator*> GetContainedValidators() &&
-    {
-        return std::move(_containedValidators);
-    }
+    /// a higher scope than individual validators.
+    std::vector<const UsdValidator*> GetContainedValidators() && { return std::move(_containedValidators); }
 
     /// Return metadata associated with this validator.
-    const UsdValidatorMetadata& GetMetadata() const &
-    {
-        return _metadata;
-    }
+    const UsdValidatorMetadata& GetMetadata() const& { return _metadata; }
 
     /// Return metadata associated with this validator.
-    UsdValidatorMetadata GetMetadata() &&
-    {
-        return std::move(_metadata);
-    }
+    UsdValidatorMetadata GetMetadata() && { return std::move(_metadata); }
 
 private:
     UsdValidatorMetadata _metadata;
     std::vector<const UsdValidator*> _containedValidators;
-}; // UsdValidatorSuite
+};  // UsdValidatorSuite
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_VALIDATOR_H
+#endif  // PXR_USD_USD_VALIDATOR_H

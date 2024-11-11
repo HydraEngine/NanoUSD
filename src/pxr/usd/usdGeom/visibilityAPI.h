@@ -35,16 +35,16 @@ class SdfAssetPath;
 
 /// \class UsdGeomVisibilityAPI
 ///
-/// 
+///
 /// UsdGeomVisibilityAPI introduces properties that can be used to author
 /// visibility opinions.
-/// 
+///
 /// \note
 /// Currently, this schema only introduces the attributes that are used to
 /// control purpose visibility. Later, this schema will define _all_
 /// visibility-related properties and UsdGeomImageable will no longer define
 /// those properties.
-/// 
+///
 /// The purpose visibility attributes added by this schema,
 /// _guideVisibility_, _proxyVisibility_, and _renderVisibility_ can each be
 /// used to control visibility for geometry of the corresponding purpose
@@ -52,7 +52,7 @@ class SdfAssetPath;
 /// override. I.e., if _visibility_ evaluates to "invisible", purpose
 /// visibility is invisible; otherwise, purpose visibility is determined by
 /// the corresponding purpose visibility attribute.
-/// 
+///
 /// Note that the behavior of _guideVisibility_ is subtly different from the
 /// _proxyVisibility_ and _renderVisibility_ attributes, in that "guide"
 /// purpose visibility always evaluates to either "invisible" or "visible",
@@ -62,19 +62,18 @@ class SdfAssetPath;
 /// we have never found a need to have all guides visible in a scene by
 /// default, whereas we do find that flexibility useful for "proxy" and
 /// "render" geometry.
-/// 
+///
 /// This schema can only be applied to UsdGeomImageable prims. The
 /// UseGeomImageable schema provides API for computing the purpose visibility
 /// values that result from the attributes introduced by this schema.
-/// 
+///
 ///
 /// For any described attribute \em Fallback \em Value or \em Allowed \em Values below
 /// that are text/tokens, the actual token is published and defined in \ref UsdGeomTokens.
 /// So to set an attribute to the value "rightHanded", use UsdGeomTokens->rightHanded
 /// as the value.
 ///
-class UsdGeomVisibilityAPI : public UsdAPISchemaBase
-{
+class UsdGeomVisibilityAPI : public UsdAPISchemaBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -85,18 +84,12 @@ public:
     /// Equivalent to UsdGeomVisibilityAPI::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdGeomVisibilityAPI(const UsdPrim& prim=UsdPrim())
-        : UsdAPISchemaBase(prim)
-    {
-    }
+    explicit UsdGeomVisibilityAPI(const UsdPrim& prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
     /// Construct a UsdGeomVisibilityAPI on the prim held by \p schemaObj .
     /// Should be preferred over UsdGeomVisibilityAPI(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdGeomVisibilityAPI(const UsdSchemaBase& schemaObj)
-        : UsdAPISchemaBase(schemaObj)
-    {
-    }
+    explicit UsdGeomVisibilityAPI(const UsdSchemaBase& schemaObj) : UsdAPISchemaBase(schemaObj) {}
 
     /// Destructor.
     USDGEOM_API
@@ -106,8 +99,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDGEOM_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdGeomVisibilityAPI holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -119,20 +111,18 @@ public:
     /// \endcode
     ///
     USDGEOM_API
-    static UsdGeomVisibilityAPI
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdGeomVisibilityAPI Get(const UsdStagePtr& stage, const SdfPath& path);
 
-
-    /// Returns true if this <b>single-apply</b> API schema can be applied to 
-    /// the given \p prim. If this schema can not be a applied to the prim, 
-    /// this returns false and, if provided, populates \p whyNot with the 
+    /// Returns true if this <b>single-apply</b> API schema can be applied to
+    /// the given \p prim. If this schema can not be a applied to the prim,
+    /// this returns false and, if provided, populates \p whyNot with the
     /// reason it can not be applied.
-    /// 
+    ///
     /// Note that if CanApply returns false, that does not necessarily imply
     /// that calling Apply will fail. Callers are expected to call CanApply
-    /// before calling Apply if they want to ensure that it is valid to 
+    /// before calling Apply if they want to ensure that it is valid to
     /// apply a schema.
-    /// 
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -140,18 +130,17 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDGEOM_API
-    static bool 
-    CanApply(const UsdPrim &prim, std::string *whyNot=nullptr);
+    static bool CanApply(const UsdPrim& prim, std::string* whyNot = nullptr);
 
     /// Applies this <b>single-apply</b> API schema to the given \p prim.
-    /// This information is stored by adding "VisibilityAPI" to the 
+    /// This information is stored by adding "VisibilityAPI" to the
     /// token-valued, listOp metadata \em apiSchemas on the prim.
-    /// 
-    /// \return A valid UsdGeomVisibilityAPI object is returned upon success. 
-    /// An invalid (or empty) UsdGeomVisibilityAPI object is returned upon 
-    /// failure. See \ref UsdPrim::ApplyAPI() for conditions 
-    /// resulting in failure. 
-    /// 
+    ///
+    /// \return A valid UsdGeomVisibilityAPI object is returned upon success.
+    /// An invalid (or empty) UsdGeomVisibilityAPI object is returned upon
+    /// failure. See \ref UsdPrim::ApplyAPI() for conditions
+    /// resulting in failure.
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -159,8 +148,7 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDGEOM_API
-    static UsdGeomVisibilityAPI 
-    Apply(const UsdPrim &prim);
+    static UsdGeomVisibilityAPI Apply(const UsdPrim& prim);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -173,28 +161,28 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDGEOM_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDGEOM_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // GUIDEVISIBILITY 
+    // GUIDEVISIBILITY
     // --------------------------------------------------------------------- //
-    /// 
+    ///
     /// This attribute controls visibility for geometry with purpose "guide".
-    /// 
+    ///
     /// Unlike overall _visibility_, _guideVisibility_ is uniform, and
     /// therefore cannot be animated.
-    /// 
+    ///
     /// Also unlike overall _visibility_, _guideVisibility_ is tri-state, in
     /// that a descendant with an opinion of "visible" overrides an ancestor
     /// opinion of "invisible".
-    /// 
+    ///
     /// The _guideVisibility_ attribute works in concert with the overall
     /// _visibility_ attribute: The visibility of a prim with purpose "guide"
     /// is determined by the inherited values it receives for the _visibility_
@@ -202,7 +190,7 @@ public:
     /// "invisible", the prim is invisible. If _visibility_ evaluates to
     /// "inherited" and _guideVisibility_ evaluates to "visible", then the
     /// prim is visible. __Otherwise, it is invisible.__
-    /// 
+    ///
     ///
     /// | ||
     /// | -- | -- |
@@ -214,28 +202,28 @@ public:
     USDGEOM_API
     UsdAttribute GetGuideVisibilityAttr() const;
 
-    /// See GetGuideVisibilityAttr(), and also 
+    /// See GetGuideVisibilityAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateGuideVisibilityAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateGuideVisibilityAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // PROXYVISIBILITY 
+    // PROXYVISIBILITY
     // --------------------------------------------------------------------- //
-    /// 
+    ///
     /// This attribute controls visibility for geometry with purpose "proxy".
-    /// 
+    ///
     /// Unlike overall _visibility_, _proxyVisibility_ is uniform, and
     /// therefore cannot be animated.
-    /// 
+    ///
     /// Also unlike overall _visibility_, _proxyVisibility_ is tri-state, in
     /// that a descendant with an opinion of "visible" overrides an ancestor
     /// opinion of "invisible".
-    /// 
+    ///
     /// The _proxyVisibility_ attribute works in concert with the overall
     /// _visibility_ attribute: The visibility of a prim with purpose "proxy"
     /// is determined by the inherited values it receives for the _visibility_
@@ -246,7 +234,7 @@ public:
     /// then the prim is invisible; if _proxyVisibility_ evaluates to
     /// "inherited", then the prim may either be visible or invisible,
     /// depending on a fallback value determined by the calling context.
-    /// 
+    ///
     ///
     /// | ||
     /// | -- | -- |
@@ -258,29 +246,29 @@ public:
     USDGEOM_API
     UsdAttribute GetProxyVisibilityAttr() const;
 
-    /// See GetProxyVisibilityAttr(), and also 
+    /// See GetProxyVisibilityAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateProxyVisibilityAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateProxyVisibilityAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // RENDERVISIBILITY 
+    // RENDERVISIBILITY
     // --------------------------------------------------------------------- //
-    /// 
+    ///
     /// This attribute controls visibility for geometry with purpose
     /// "render".
-    /// 
+    ///
     /// Unlike overall _visibility_, _renderVisibility_ is uniform, and
     /// therefore cannot be animated.
-    /// 
+    ///
     /// Also unlike overall _visibility_, _renderVisibility_ is tri-state, in
     /// that a descendant with an opinion of "visible" overrides an ancestor
     /// opinion of "invisible".
-    /// 
+    ///
     /// The _renderVisibility_ attribute works in concert with the overall
     /// _visibility_ attribute: The visibility of a prim with purpose "render"
     /// is determined by the inherited values it receives for the _visibility_
@@ -291,7 +279,7 @@ public:
     /// then the prim is invisible; if _renderVisibility_ evaluates to
     /// "inherited", then the prim may either be visible or invisible,
     /// depending on a fallback value determined by the calling context.
-    /// 
+    ///
     ///
     /// | ||
     /// | -- | -- |
@@ -303,41 +291,41 @@ public:
     USDGEOM_API
     UsdAttribute GetRenderVisibilityAttr() const;
 
-    /// See GetRenderVisibilityAttr(), and also 
+    /// See GetRenderVisibilityAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateRenderVisibilityAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateRenderVisibilityAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
     // --(BEGIN CUSTOM CODE)--
-    
+
     /// Return the attribute that is used for expressing visibility opinions
     /// for the given \p purpose.
     ///
     /// The valid purpose tokens are "guide", "proxy", and "render" which
-    /// return the attributes *guideVisibility*, *proxyVisibility*, and 
+    /// return the attributes *guideVisibility*, *proxyVisibility*, and
     /// *renderVisibility* respectively.
     ///
-    /// Note that while "default" is a valid purpose token for 
+    /// Note that while "default" is a valid purpose token for
     /// UsdGeomImageable::GetPurposeVisibilityAttr, it is not a valid purpose
-    /// for this function, as UsdGeomVisibilityAPI itself does not have a 
+    /// for this function, as UsdGeomVisibilityAPI itself does not have a
     /// default visibility attribute. Calling this function with "default
     /// will result in a coding error.
     ///
     USDGEOM_API
-    UsdAttribute GetPurposeVisibilityAttr(const TfToken &purpose) const;
+    UsdAttribute GetPurposeVisibilityAttr(const TfToken& purpose) const;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

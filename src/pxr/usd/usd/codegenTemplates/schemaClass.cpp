@@ -11,118 +11,191 @@
 #include "pxr/usd/sdf/types.h"
 #include "pxr/usd/sdf/assetPath.h"
 
-{% if useExportAPI %}
-{{ namespaceOpen }}
-
-{% endif %}
-// Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType)
 {
-    TfType::Define<{{ cls.cppClassName }},
-        TfType::Bases< {{ cls.parentCppClassName }} > >();
-    
-{% if cls.isConcrete %}
+    % if useExportAPI %
+}
+{
+    {
+        namespaceOpen
+    }
+}
+
+{ % endif % }  // Register the schema with the TfType system.
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<{{cls.cppClassName}}, TfType::Bases<{{cls.parentCppClassName}}>>();
+
+    {
+        % if cls.isConcrete %
+    }
     // Register the usd prim typename as an alias under UsdSchemaBase. This
     // enables one to call
     // TfType::Find<UsdSchemaBase>().FindDerivedByName("{{ cls.usdPrimTypeName }}")
     // to find TfType<{{ cls.cppClassName }}>, which is how IsA queries are
     // answered.
-    TfType::AddAlias<UsdSchemaBase, {{ cls.cppClassName }}>("{{ cls.usdPrimTypeName }}");
-{% endif %}
+    TfType::AddAlias<UsdSchemaBase, {{cls.cppClassName}}>("{{ cls.usdPrimTypeName }}");
+    {
+        % endif %
+    }
 }
 
 /* virtual */
-{{ cls.cppClassName }}::~{{ cls.cppClassName }}()
 {
+    {
+        cls.cppClassName
+    }
 }
+::~{{cls.cppClassName}}() {}
 
-{% if not cls.isAPISchemaBase %}
-/* static */
-{{ cls.cppClassName }}
-{{ cls.cppClassName }}::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
+    % if not cls.isAPISchemaBase %
+}
+/* static */
+{
+    {
+        cls.cppClassName
+    }
+}
+{
+    {
+        cls.cppClassName
+    }
+}
+::Get(const UsdStagePtr& stage, const SdfPath& path) {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
-        return {{ cls.cppClassName }}();
+        return {{cls.cppClassName}}();
     }
-{% if cls.isMultipleApply and cls.propertyNamespace %}
+    {
+        % if cls.isMultipleApply and cls.propertyNamespace %
+    }
     TfToken name;
-    if (!Is{{ cls.usdPrimTypeName }}Path(path, &name)) {
+    if (!Is {
+            {
+                cls.usdPrimTypeName
+            }
+        } Path(path, &name)) {
         TF_CODING_ERROR("Invalid {{ cls.propertyNamespace.prefix }} path <%s>.", path.GetText());
-        return {{ cls.cppClassName }}();
+        return {{cls.cppClassName}}();
     }
-    return {{ cls.cppClassName }}(stage->GetPrimAtPath(path.GetPrimPath()), name);
-{% else %}
-    return {{ cls.cppClassName }}(stage->GetPrimAtPath(path));
-{% endif %}
+    return {{cls.cppClassName}}(stage->GetPrimAtPath(path.GetPrimPath()), name);
+    {
+        % else %
+    }
+    return {{cls.cppClassName}}(stage->GetPrimAtPath(path));
+    {
+        % endif %
+    }
 }
 
-{% if cls.isMultipleApply %}
-{{ cls.cppClassName }}
-{{ cls.cppClassName }}::Get(const UsdPrim &prim, const TfToken &name)
 {
-    return {{ cls.cppClassName }}(prim, name);
+    % if cls.isMultipleApply %
+}
+{
+    {
+        cls.cppClassName
+    }
+}
+{
+    {
+        cls.cppClassName
+    }
+}
+::Get(const UsdPrim& prim, const TfToken& name) {
+    return {{cls.cppClassName}}(prim, name);
 }
 
 /* static */
-std::vector<{{ cls.cppClassName }}>
-{{ cls.cppClassName }}::GetAll(const UsdPrim &prim)
-{
-    std::vector<{{ cls.cppClassName }}> schemas;
-    
-    for (const auto &schemaName :
-         UsdAPISchemaBase::_GetMultipleApplyInstanceNames(prim, _GetStaticTfType())) {
+std::vector<{{cls.cppClassName}}> {
+    {
+        cls.cppClassName
+    }
+}
+::GetAll(const UsdPrim& prim) {
+    std::vector<{{cls.cppClassName}}> schemas;
+
+    for (const auto& schemaName : UsdAPISchemaBase::_GetMultipleApplyInstanceNames(prim, _GetStaticTfType())) {
         schemas.emplace_back(prim, schemaName);
     }
 
     return schemas;
 }
 
-{% endif %}
-{% endif %}
-{% if cls.isConcrete %}
-/* static */
-{{ cls.cppClassName }}
-{{ cls.cppClassName }}::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
 {
+    % endif %
+}
+{
+    % endif %
+}
+{
+    % if cls.isConcrete %
+}
+/* static */
+{
+    {
+        cls.cppClassName
+    }
+}
+{
+    {
+        cls.cppClassName
+    }
+}
+::Define(const UsdStagePtr& stage, const SdfPath& path) {
     static TfToken usdPrimTypeName("{{ cls.usdPrimTypeName }}");
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
-        return {{ cls.cppClassName }}();
+        return {{cls.cppClassName}}();
     }
-    return {{ cls.cppClassName }}(
-        stage->DefinePrim(path, usdPrimTypeName));
+    return {{cls.cppClassName}}(stage->DefinePrim(path, usdPrimTypeName));
 }
-{% endif %}
-{% if cls.isMultipleApply and cls.propertyNamespace %}
+{
+    % endif %
+}
+{
+    % if cls.isMultipleApply and cls.propertyNamespace %
+}
 
 /* static */
-bool 
-{{ cls.cppClassName }}::IsSchemaPropertyBaseName(const TfToken &baseName)
-{
+bool {
+    {
+        cls.cppClassName
+    }
+}
+::IsSchemaPropertyBaseName(const TfToken& baseName) {
     static TfTokenVector attrsAndRels = {
 {% for attrName in cls.attrOrder %}
 {% set attr = cls.attrs[attrName] %}
         UsdSchemaRegistry::GetMultipleApplyNameTemplateBaseName(
-            {{ tokensPrefix }}Tokens->{{ attr.name }}),
+            {
+        {
+            tokensPrefix
+        }}Tokens->{{ attr.name }}),
 {% endfor %}
 {% for relName in cls.relOrder %}
 {% set rel = cls.rels[relName] %}
         UsdSchemaRegistry::GetMultipleApplyNameTemplateBaseName(
-            {{ tokensPrefix }}Tokens->{{ rel.name }}),
+            {
+        {
+            tokensPrefix
+        }}Tokens->{{ rel.name }}),
 {% endfor %}
     };
 
-    return find(attrsAndRels.begin(), attrsAndRels.end(), baseName)
-            != attrsAndRels.end();
+    return find(attrsAndRels.begin(), attrsAndRels.end(), baseName) != attrsAndRels.end();
 }
 
 /* static */
-bool
-{{ cls.cppClassName }}::Is{{ cls.usdPrimTypeName }}Path(
-    const SdfPath &path, TfToken *name)
-{
+bool {
+    {
+        cls.cppClassName
+    }
+}
+::Is {
+    {
+        cls.usdPrimTypeName
+    }
+}
+Path(const SdfPath& path, TfToken* name) {
     if (!path.IsPropertyPath()) {
         return false;
     }
@@ -130,7 +203,7 @@ bool
     std::string propertyName = path.GetName();
     TfTokenVector tokens = SdfPath::TokenizeIdentifierAsTokens(propertyName);
 
-    // The baseName of the {{ cls.usdPrimTypename }} path can't be one of the 
+    // The baseName of the {{ cls.usdPrimTypename }} path can't be one of the
     // schema properties. We should validate this in the creation (or apply)
     // API.
     TfToken baseName = *tokens.rbegin();
@@ -138,127 +211,245 @@ bool
         return false;
     }
 
-    if (tokens.size() >= 2
-        && tokens[0] == {{ tokensPrefix }}Tokens->{{ cls.propertyNamespace.token }}) {
-        *name = TfToken(propertyName.substr(
-           {{ tokensPrefix }}Tokens->{{ cls.propertyNamespace.token }}.GetString().size() + 1));
+    if (tokens.size() >= 2 && tokens[0] == {
+            {
+                tokensPrefix
+            }
+        } Tokens->{{cls.propertyNamespace.token}}) {
+        *name = TfToken(propertyName.substr({
+            {
+                tokensPrefix
+            }
+        } Tokens->{{cls.propertyNamespace.token}}.GetString()
+                                                    .size() +
+                                            1));
         return true;
     }
 
     return false;
 }
-{% endif %}
+{ % endif % }
 
 /* virtual */
-UsdSchemaKind {{ cls.cppClassName }}::_GetSchemaKind() const
-{
-    return {{ cls.cppClassName }}::schemaKind;
-}
-{% if cls.isAppliedAPISchema %}
-
-/* static */
-bool
-{% if not cls.isMultipleApply %}
-{{ cls.cppClassName }}::CanApply(
-    const UsdPrim &prim, std::string *whyNot)
-{% else %}
-{{ cls.cppClassName }}::CanApply(
-    const UsdPrim &prim, const TfToken &name, std::string *whyNot)
-{% endif %}
-{
-{% if cls.isMultipleApply %}
-    return prim.CanApplyAPI<{{ cls.cppClassName }}>(name, whyNot);
-{% else %}
-    return prim.CanApplyAPI<{{ cls.cppClassName }}>(whyNot);
-{% endif %}
-}
-
-/* static */
-{{ cls.cppClassName }}
-{% if not cls.isMultipleApply %}
-{{ cls.cppClassName }}::Apply(const UsdPrim &prim)
-{% else %}
-{{ cls.cppClassName }}::Apply(const UsdPrim &prim, const TfToken &name)
-{% endif %}
-{
-{% if cls.isMultipleApply %}
-    if (prim.ApplyAPI<{{ cls.cppClassName }}>(name)) {
-        return {{ cls.cppClassName }}(prim, name);
+UsdSchemaKind {
+    {
+        cls.cppClassName
     }
-{% else %}
-    if (prim.ApplyAPI<{{ cls.cppClassName }}>()) {
-        return {{ cls.cppClassName }}(prim);
-    }
-{% endif %}
-    return {{ cls.cppClassName }}();
 }
-{% endif %}
+::_GetSchemaKind() const {
+    return {
+        {
+            cls.cppClassName
+        }
+    }
+    ::schemaKind;
+}
+{
+    % if cls.isAppliedAPISchema %
+}
 
 /* static */
-const TfType &
-{{ cls.cppClassName }}::_GetStaticTfType()
+bool {
+    % if not cls.isMultipleApply %
+}
 {
-    static TfType tfType = TfType::Find<{{ cls.cppClassName }}>();
+    {
+        cls.cppClassName
+    }
+}
+::CanApply(const UsdPrim& prim, std::string* whyNot) {
+    % else %
+}
+{
+    {
+        cls.cppClassName
+    }
+}
+::CanApply(const UsdPrim& prim, const TfToken& name, std::string* whyNot) {
+    % endif %
+}
+{
+    {
+        % if cls.isMultipleApply %
+    }
+    return prim.CanApplyAPI<{{cls.cppClassName}}>(name, whyNot);
+    {
+        % else %
+    }
+    return prim.CanApplyAPI<{{cls.cppClassName}}>(whyNot);
+    {
+        % endif %
+    }
+}
+
+/* static */
+{
+    {
+        cls.cppClassName
+    }
+}
+{
+    % if not cls.isMultipleApply %
+}
+{
+    {
+        cls.cppClassName
+    }
+}
+::Apply(const UsdPrim& prim) {
+    % else %
+}
+{
+    {
+        cls.cppClassName
+    }
+}
+::Apply(const UsdPrim& prim, const TfToken& name) {
+    % endif %
+}
+{
+    {
+        % if cls.isMultipleApply %
+    }
+    if (prim.ApplyAPI<{{cls.cppClassName}}>(name)) {
+        return {{cls.cppClassName}}(prim, name);
+    }
+    {
+        % else %
+    }
+    if (prim.ApplyAPI<{{cls.cppClassName}}>()) {
+        return {{cls.cppClassName}}(prim);
+    }
+    {
+        % endif %
+    }
+    return {{cls.cppClassName}}();
+}
+{
+    % endif %
+}
+
+/* static */
+const TfType& {
+    {
+        cls.cppClassName
+    }
+}
+::_GetStaticTfType() {
+    static TfType tfType = TfType::Find<{{cls.cppClassName}}>();
     return tfType;
 }
 
 /* static */
-bool 
-{{ cls.cppClassName }}::_IsTypedSchema()
-{
+bool {
+    {
+        cls.cppClassName
+    }
+}
+::_IsTypedSchema() {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
 }
 
 /* virtual */
-const TfType &
-{{ cls.cppClassName }}::_GetTfType() const
-{
+const TfType& {
+    {
+        cls.cppClassName
+    }
+}
+::_GetTfType() const {
     return _GetStaticTfType();
 }
-{% if cls.isMultipleApply and cls.propertyNamespace %}
+{
+    % if cls.isMultipleApply and cls.propertyNamespace %
+}
 
 /// Returns the property name prefixed with the correct namespace prefix, which
 /// is composed of the the API's propertyNamespacePrefix metadata and the
 /// instance name of the API.
-static inline
-TfToken
-_GetNamespacedPropertyName(const TfToken instanceName, const TfToken propName)
-{
+static inline TfToken _GetNamespacedPropertyName(const TfToken instanceName, const TfToken propName) {
     return UsdSchemaRegistry::MakeMultipleApplyNameInstance(propName, instanceName);
 }
-{% endif %}
-
-{% for attrName in cls.attrOrder %}
-{% set attr = cls.attrs[attrName] %}
-{# Only emit Create/Get API and doxygen if apiName is not empty string. #}
-{% if attr.apiName != '' %}
-{% if attr.apiGet != "custom" %}
-UsdAttribute
-{{ cls.cppClassName }}::Get{{ Proper(attr.apiName) }}Attr() const
 {
-{% if cls.isMultipleApply and cls.propertyNamespace %}
-    return GetPrim().GetAttribute(
-        _GetNamespacedPropertyName(
-            GetName(),
-            {{ tokensPrefix }}Tokens->{{ attr.name }}));
-{% else %}
-    return GetPrim().GetAttribute({{ tokensPrefix }}Tokens->{{ attr.name }});
-{% endif %}
+    % endif %
 }
-{% endif %}
 
-UsdAttribute
-{{ cls.cppClassName }}::Create{{ Proper(attr.apiName) }}Attr(VtValue const &defaultValue, bool writeSparsely) const
+{% for attrName in cls.attrOrder %
+}
 {
-{% if cls.isMultipleApply and cls.propertyNamespace %}
+    % set attr = cls.attrs[attrName] %
+}
+{
+#Only emit Create / Get API and doxygen if apiName is not empty string.#
+}
+{
+    % if attr.apiName != '' %
+}
+{
+    % if attr.apiGet != "custom" %
+}
+UsdAttribute {
+    {
+        cls.cppClassName
+    }
+}
+::Get {
+    {
+        Proper(attr.apiName)
+    }
+}
+Attr() const {
+    {
+        % if cls.isMultipleApply and cls.propertyNamespace %
+    }
+    return GetPrim().GetAttribute(_GetNamespacedPropertyName(GetName(), {
+        {
+            tokensPrefix
+        }
+    } Tokens->{{attr.name}}));
+    {
+        % else %
+    }
+    return GetPrim().GetAttribute({
+        {
+            tokensPrefix
+        }
+    } Tokens->{{attr.name}});
+    {
+        % endif %
+    }
+}
+{ % endif % }
+
+UsdAttribute {
+    {
+        cls.cppClassName
+    }
+}
+::Create {
+    {
+        Proper(attr.apiName)
+    }
+}
+Attr(VtValue const& defaultValue, bool writeSparsely) const {
+    {
+        % if cls.isMultipleApply and cls.propertyNamespace %
+    }
     return UsdSchemaBase::_CreateAttr(
                        _GetNamespacedPropertyName(
                             GetName(),
-                           {{ tokensPrefix }}Tokens->{{ attr.name }}),
-{% else %}
-    return UsdSchemaBase::_CreateAttr({{ tokensPrefix }}Tokens->{{ attr.name }},
-{% endif %}
+                           {
+        {
+            tokensPrefix
+        }}Tokens->{{ attr.name }}),
+{
+        % else %}
+    return UsdSchemaBase::_CreateAttr({
+        {
+            tokensPrefix
+        }}Tokens->{{ attr.name }},
+{
+        % endif %}
                        {{ attr.usdType }},
                        /* custom = */ {{ "true" if attr.custom else "false" }},
                        {{ attr.variability }},
@@ -266,62 +457,123 @@ UsdAttribute
                        writeSparsely);
 }
 
-{% endif %}
-{% endfor %}
-{% for relName in cls.relOrder %}
-{% set rel = cls.rels[relName] %}
-{# Only emit Create/Get API and doxygen if apiName is not empty string. #}
-{% if rel.apiName != '' %}
-{% if rel.apiGet != "custom" %}
-UsdRelationship
-{{ cls.cppClassName }}::Get{{ Proper(rel.apiName) }}Rel() const
 {
-{% if cls.isMultipleApply and cls.propertyNamespace %}
-    return GetPrim().GetRelationship(
-        _GetNamespacedPropertyName(
-            GetName(),
-            {{ tokensPrefix }}Tokens->{{ rel.name }}));
-{% else %}
-    return GetPrim().GetRelationship({{ tokensPrefix }}Tokens->{{ rel.name }});
-{% endif %}
+    % endif %
 }
-{% endif %}
-
-UsdRelationship
-{{ cls.cppClassName }}::Create{{ Proper(rel.apiName) }}Rel() const
 {
-{% if cls.isMultipleApply and cls.propertyNamespace %}
+    % endfor %
+}
+{% for relName in cls.relOrder %
+}
+{
+    % set rel = cls.rels[relName] %
+}
+{
+#Only emit Create / Get API and doxygen if apiName is not empty string.#
+}
+{
+    % if rel.apiName != '' %
+}
+{
+    % if rel.apiGet != "custom" %
+}
+UsdRelationship {
+    {
+        cls.cppClassName
+    }
+}
+::Get {
+    {
+        Proper(rel.apiName)
+    }
+}
+Rel() const {
+    {
+        % if cls.isMultipleApply and cls.propertyNamespace %
+    }
+    return GetPrim().GetRelationship(_GetNamespacedPropertyName(GetName(), {
+        {
+            tokensPrefix
+        }
+    } Tokens->{{rel.name}}));
+    {
+        % else %
+    }
+    return GetPrim().GetRelationship({
+        {
+            tokensPrefix
+        }
+    } Tokens->{{rel.name}});
+    {
+        % endif %
+    }
+}
+{ % endif % }
+
+UsdRelationship {
+    {
+        cls.cppClassName
+    }
+}
+::Create {
+    {
+        Proper(rel.apiName)
+    }
+}
+Rel() const {
+    {
+        % if cls.isMultipleApply and cls.propertyNamespace %
+    }
     return GetPrim().CreateRelationship(
                        _GetNamespacedPropertyName(
                            GetName(),
-                           {{ tokensPrefix }}Tokens->{{ rel.name }}),
-{% else %}
-    return GetPrim().CreateRelationship({{ tokensPrefix }}Tokens->{{rel.name}},
-{% endif %}
+                           {
+        {
+            tokensPrefix
+        }}Tokens->{{ rel.name }}),
+{
+        % else %}
+    return GetPrim().CreateRelationship({
+        {
+            tokensPrefix
+        }}Tokens->{{rel.name}},
+{
+        % endif %}
                        /* custom = */ {{ "true" if rel.custom else "false" }});
 }
 
-{% endif %}
-{% endfor %}
-{% if cls.attrOrder|length > 0 %}
-namespace {
-static inline TfTokenVector
-_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
 {
+    % endif %
+}
+{
+    % endfor %
+}
+{
+    % if cls.attrOrder | length > 0 %
+}
+namespace {
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector& left, const TfTokenVector& right) {
     TfTokenVector result;
     result.reserve(left.size() + right.size());
     result.insert(result.end(), left.begin(), left.end());
     result.insert(result.end(), right.begin(), right.end());
     return result;
 }
-}
+}  // namespace
 
-{% endif %}
-/*static*/
-const TfTokenVector&
-{{ cls.cppClassName }}::GetSchemaAttributeNames(bool includeInherited)
 {
-{% if cls.attrOrder|length > 0 %}
+    % endif %
+}
+/*static*/
+const TfTokenVector& {
+    {
+        cls.cppClassName
+    }
+}
+::GetSchemaAttributeNames(bool includeInherited) {
+    {
+        % if cls.attrOrder | length > 0 %
+    }
     static TfTokenVector localNames = {
 {% for attrName in cls.attrOrder %}
 {% set attr = cls.attrs[attrName] %}
@@ -330,15 +582,21 @@ const TfTokenVector&
 {% endif %}
 {% endfor %}
     };
-    static TfTokenVector allNames =
-        _ConcatenateAttributeNames(
-            {{ cls.parentCppClassName }}::GetSchemaAttributeNames(true),
+    static TfTokenVector allNames = _ConcatenateAttributeNames(
+            {
+                {
+                    cls.parentCppClassName
+                }
+            } ::GetSchemaAttributeNames(true),
             localNames);
-{% else %}
+    {
+        % else %
+    }
     static TfTokenVector localNames;
-    static TfTokenVector allNames =
-        {{ cls.parentCppClassName }}::GetSchemaAttributeNames(true);
-{% endif %}
+    static TfTokenVector allNames = { {cls.parentCppClassName} } ::GetSchemaAttributeNames(true);
+    {
+        % endif %
+    }
 
     if (includeInherited)
         return allNames;
@@ -346,38 +604,54 @@ const TfTokenVector&
         return localNames;
 }
 
-{% if cls.isMultipleApply %}
-/*static*/
-TfTokenVector
-{{ cls.cppClassName }}::GetSchemaAttributeNames(
-    bool includeInherited, const TfToken &instanceName)
 {
-    const TfTokenVector &attrNames = GetSchemaAttributeNames(includeInherited);
+    % if cls.isMultipleApply %
+}
+/*static*/
+TfTokenVector {
+    {
+        cls.cppClassName
+    }
+}
+::GetSchemaAttributeNames(bool includeInherited, const TfToken& instanceName) {
+    const TfTokenVector& attrNames = GetSchemaAttributeNames(includeInherited);
     if (instanceName.IsEmpty()) {
         return attrNames;
     }
     TfTokenVector result;
     result.reserve(attrNames.size());
-    for (const TfToken &attrName : attrNames) {
-        result.push_back(
-            UsdSchemaRegistry::MakeMultipleApplyNameInstance(attrName, instanceName));
+    for (const TfToken& attrName : attrNames) {
+        result.push_back(UsdSchemaRegistry::MakeMultipleApplyNameInstance(attrName, instanceName));
     }
     return result;
 }
 
-{% endif %}
-{% if useExportAPI %}
-{{ namespaceClose }}
+{
+    % endif %
+}
+{
+    % if useExportAPI %
+}
+{
+    {
+        namespaceClose
+    }
+}
 
-{% endif %}
+{
+    % endif %
+}
 // ===================================================================== //
 // Feel free to add custom code below this line. It will be preserved by
 // the code generator.
-{% if useExportAPI %}
+{
+    % if useExportAPI %
+}
 //
 // Just remember to wrap code in the appropriate delimiters:
 // '{{ namespaceOpen }}', '{{ namespaceClose }}'.
-{% endif %}
+{
+    % endif %
+}
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
-

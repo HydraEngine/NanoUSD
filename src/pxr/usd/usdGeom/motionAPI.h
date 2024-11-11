@@ -39,16 +39,15 @@ class SdfAssetPath;
 /// may affect computations involving:
 /// - computed motion for motion blur
 /// - sampling for motion blur
-/// 
+///
 /// The \ref GetMotionBlurScaleAttr() "motion:blurScale" attribute allows
 /// artists to scale the __amount__ of motion blur to be rendered for parts
 /// of the scene without changing the recorded animation.  See
 /// \ref UsdGeomMotionAPI_blurScale for use and implementation details.
-/// 
-/// 
 ///
-class UsdGeomMotionAPI : public UsdAPISchemaBase
-{
+///
+///
+class UsdGeomMotionAPI : public UsdAPISchemaBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -59,18 +58,12 @@ public:
     /// Equivalent to UsdGeomMotionAPI::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdGeomMotionAPI(const UsdPrim& prim=UsdPrim())
-        : UsdAPISchemaBase(prim)
-    {
-    }
+    explicit UsdGeomMotionAPI(const UsdPrim& prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
     /// Construct a UsdGeomMotionAPI on the prim held by \p schemaObj .
     /// Should be preferred over UsdGeomMotionAPI(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdGeomMotionAPI(const UsdSchemaBase& schemaObj)
-        : UsdAPISchemaBase(schemaObj)
-    {
-    }
+    explicit UsdGeomMotionAPI(const UsdSchemaBase& schemaObj) : UsdAPISchemaBase(schemaObj) {}
 
     /// Destructor.
     USDGEOM_API
@@ -80,8 +73,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDGEOM_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdGeomMotionAPI holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -93,20 +85,18 @@ public:
     /// \endcode
     ///
     USDGEOM_API
-    static UsdGeomMotionAPI
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdGeomMotionAPI Get(const UsdStagePtr& stage, const SdfPath& path);
 
-
-    /// Returns true if this <b>single-apply</b> API schema can be applied to 
-    /// the given \p prim. If this schema can not be a applied to the prim, 
-    /// this returns false and, if provided, populates \p whyNot with the 
+    /// Returns true if this <b>single-apply</b> API schema can be applied to
+    /// the given \p prim. If this schema can not be a applied to the prim,
+    /// this returns false and, if provided, populates \p whyNot with the
     /// reason it can not be applied.
-    /// 
+    ///
     /// Note that if CanApply returns false, that does not necessarily imply
     /// that calling Apply will fail. Callers are expected to call CanApply
-    /// before calling Apply if they want to ensure that it is valid to 
+    /// before calling Apply if they want to ensure that it is valid to
     /// apply a schema.
-    /// 
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -114,18 +104,17 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDGEOM_API
-    static bool 
-    CanApply(const UsdPrim &prim, std::string *whyNot=nullptr);
+    static bool CanApply(const UsdPrim& prim, std::string* whyNot = nullptr);
 
     /// Applies this <b>single-apply</b> API schema to the given \p prim.
-    /// This information is stored by adding "MotionAPI" to the 
+    /// This information is stored by adding "MotionAPI" to the
     /// token-valued, listOp metadata \em apiSchemas on the prim.
-    /// 
-    /// \return A valid UsdGeomMotionAPI object is returned upon success. 
-    /// An invalid (or empty) UsdGeomMotionAPI object is returned upon 
-    /// failure. See \ref UsdPrim::ApplyAPI() for conditions 
-    /// resulting in failure. 
-    /// 
+    ///
+    /// \return A valid UsdGeomMotionAPI object is returned upon success.
+    /// An invalid (or empty) UsdGeomMotionAPI object is returned upon
+    /// failure. See \ref UsdPrim::ApplyAPI() for conditions
+    /// resulting in failure.
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -133,8 +122,7 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDGEOM_API
-    static UsdGeomMotionAPI 
-    Apply(const UsdPrim &prim);
+    static UsdGeomMotionAPI Apply(const UsdPrim& prim);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -147,37 +135,37 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDGEOM_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDGEOM_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // MOTIONBLURSCALE 
+    // MOTIONBLURSCALE
     // --------------------------------------------------------------------- //
     /// BlurScale is an __inherited__ float attribute that stipulates
     /// the rendered motion blur (as typically specified via UsdGeomCamera's
     /// _shutter:open_ and _shutter:close_ properties) should be scaled for
     /// __all objects__ at and beneath the prim in namespace on which the
     /// _motion:blurScale_ value is specified.
-    /// 
+    ///
     /// Without changing any other data in the scene, _blurScale_ allows artists to
     /// "dial in" the amount of blur on a per-object basis.  A _blurScale_
-    /// value of zero removes all blur, a value of 0.5 reduces blur by half, 
+    /// value of zero removes all blur, a value of 0.5 reduces blur by half,
     /// and a value of 2.0 doubles the blur.  The legal range for _blurScale_
     /// is [0, inf), although very high values may result in extremely expensive
     /// renders, and may exceed the capabilities of some renderers.
-    /// 
+    ///
     /// Although renderers are free to implement this feature however they see
     /// fit, see \ref UsdGeomMotionAPI_blurScale for our guidance on implementing
     /// the feature universally and efficiently.
-    /// 
+    ///
     /// \sa ComputeMotionBlurScale()
-    /// 
+    ///
     ///
     /// | ||
     /// | -- | -- |
@@ -187,29 +175,29 @@ public:
     USDGEOM_API
     UsdAttribute GetMotionBlurScaleAttr() const;
 
-    /// See GetMotionBlurScaleAttr(), and also 
+    /// See GetMotionBlurScaleAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateMotionBlurScaleAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateMotionBlurScaleAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // VELOCITYSCALE 
+    // VELOCITYSCALE
     // --------------------------------------------------------------------- //
     /// \deprecated
-    /// 
+    ///
     /// VelocityScale is an **inherited** float attribute that
     /// velocity-based schemas (e.g. PointBased, PointInstancer) can consume
     /// to compute interpolated positions and orientations by applying
-    /// velocity and angularVelocity, which is required for interpolating 
-    /// between samples when topology is varying over time.  Although these 
-    /// quantities are generally physically computed by a simulator, sometimes 
-    /// we require more or less motion-blur to achieve the desired look.  
-    /// VelocityScale allows artists to dial-in, as a post-sim correction, 
-    /// a scale factor to be applied to the velocity prior to computing 
+    /// velocity and angularVelocity, which is required for interpolating
+    /// between samples when topology is varying over time.  Although these
+    /// quantities are generally physically computed by a simulator, sometimes
+    /// we require more or less motion-blur to achieve the desired look.
+    /// VelocityScale allows artists to dial-in, as a post-sim correction,
+    /// a scale factor to be applied to the velocity prior to computing
     /// interpolated positions from it.
     ///
     /// | ||
@@ -220,22 +208,22 @@ public:
     USDGEOM_API
     UsdAttribute GetVelocityScaleAttr() const;
 
-    /// See GetVelocityScaleAttr(), and also 
+    /// See GetVelocityScaleAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateVelocityScaleAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateVelocityScaleAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // NONLINEARSAMPLECOUNT 
+    // NONLINEARSAMPLECOUNT
     // --------------------------------------------------------------------- //
     /// Determines the number of position or transformation samples
     /// created when motion is described by attributes contributing non-linear
     /// terms.
-    /// 
+    ///
     /// To give an example, imagine an application (such as a
     /// renderer) consuming 'points' and the USD document also
     /// contains 'accelerations' for the same prim. Unless the
@@ -245,11 +233,11 @@ public:
     /// 'points', 'velocities' and 'accelerations'. The number of these
     /// samples is given by 'nonlinearSampleCount'. The samples are
     /// equally spaced within the sampling interval.
-    /// 
+    ///
     /// Another example involves the PointInstancer where
     /// 'nonlinearSampleCount' is relevant when 'angularVelocities'
     /// or 'accelerations' are authored.
-    /// 
+    ///
     /// 'nonlinearSampleCount' is an **inherited** attribute, also
     /// see ComputeNonlinearSampleCount()
     ///
@@ -261,21 +249,22 @@ public:
     USDGEOM_API
     UsdAttribute GetNonlinearSampleCountAttr() const;
 
-    /// See GetNonlinearSampleCountAttr(), and also 
+    /// See GetNonlinearSampleCountAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDGEOM_API
-    UsdAttribute CreateNonlinearSampleCountAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateNonlinearSampleCountAttr(VtValue const& defaultValue = VtValue(),
+                                                bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
@@ -283,14 +272,14 @@ public:
 
     /// \deprecated
     ///
-    /// Compute the inherited value of *velocityScale* at \p time, i.e. the 
+    /// Compute the inherited value of *velocityScale* at \p time, i.e. the
     /// authored value on the prim closest to this prim in namespace, resolved
     /// upwards through its ancestors in namespace.
     ///
     /// \return the inherited value, or 1.0 if neither the prim nor any
     /// of its ancestors possesses an authored value.
     ///
-    /// \note this is a reference implementation that is not particularly 
+    /// \note this is a reference implementation that is not particularly
     /// efficient if evaluating over many prims, because it does not share
     /// inherited results.
     USDGEOM_API
@@ -303,27 +292,24 @@ public:
     /// \return the inherited value, or 3 if neither the prim nor any
     /// of its ancestors possesses an authored value.
     ///
-    /// \note this is a reference implementation that is not particularly 
+    /// \note this is a reference implementation that is not particularly
     /// efficient if evaluating over many prims, because it does not share
     /// inherited results.
     USDGEOM_API
-    int ComputeNonlinearSampleCount(
-        UsdTimeCode time = UsdTimeCode::Default()) const;
+    int ComputeNonlinearSampleCount(UsdTimeCode time = UsdTimeCode::Default()) const;
 
-    /// Compute the inherited value of *motion:blurScale* at \p time, i.e. the 
+    /// Compute the inherited value of *motion:blurScale* at \p time, i.e. the
     /// authored value on the prim closest to this prim in namespace, resolved
     /// upwards through its ancestors in namespace.
     ///
     /// \return the inherited value, or 1.0 if neither the prim nor any
     /// of its ancestors possesses an authored value.
     ///
-    /// \note this is a reference implementation that is not particularly 
+    /// \note this is a reference implementation that is not particularly
     /// efficient if evaluating over many prims, because it does not share
     /// inherited results.
     USDGEOM_API
-    float ComputeMotionBlurScale(
-        UsdTimeCode time = UsdTimeCode::Default()) const;
-
+    float ComputeMotionBlurScale(UsdTimeCode time = UsdTimeCode::Default()) const;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

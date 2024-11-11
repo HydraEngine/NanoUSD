@@ -17,7 +17,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 TF_DECLARE_WEAK_PTRS(UsdStage);
 
 /// \class UsdEditContext
@@ -47,10 +46,10 @@ TF_DECLARE_WEAK_PTRS(UsdStage);
 /// to either query or mutate it.  Using this class with a stage in such a way
 /// that it modifies the stage's EditTarget constitutes a mutation.
 ///
-class UsdEditContext
-{
-    UsdEditContext(UsdEditContext const &) = delete;
-    UsdEditContext &operator=(UsdEditContext const &) = delete;
+class UsdEditContext {
+    UsdEditContext(UsdEditContext const&) = delete;
+    UsdEditContext& operator=(UsdEditContext const&) = delete;
+
 public:
     /// Construct without modifying \a stage's current EditTarget.  Save
     /// \a stage's current EditTarget to restore on destruction.
@@ -58,31 +57,31 @@ public:
     /// If \a stage is invalid, a coding error will be issued by the
     /// constructor, and this class takes no action.
     USD_API
-    explicit UsdEditContext(const UsdStagePtr &stage);
+    explicit UsdEditContext(const UsdStagePtr& stage);
 
     /// Construct and save \a stage's current EditTarget to restore on
     /// destruction, then invoke stage->SetEditTarget(editTarget).
-    /// 
+    ///
     /// If \a stage is invalid, a coding error will be issued by the
     /// constructor, and this class takes no action.
     ///
     /// If \a editTarget is invalid, a coding error will be issued by the
     /// \a stage, and its EditTarget will not be modified.
     USD_API
-    UsdEditContext(const UsdStagePtr &stage, const UsdEditTarget &editTarget);
+    UsdEditContext(const UsdStagePtr& stage, const UsdEditTarget& editTarget);
 
     /// \overload
     /// This ctor is handy to construct an edit context from the return
     /// value of another function (Cannot return a UsdEditContext since it
     /// needs to be noncopyable).
-    /// 
+    ///
     /// If \a stage is invalid, a coding error will be issued by the
     /// constructor, and this class takes no action.
-    /// 
+    ///
     /// If \a editTarget is invalid, a coding error will be issued by the
     /// \a stage, and its EditTarget will not be modified.
     USD_API
-    UsdEditContext(const std::pair<UsdStagePtr, UsdEditTarget > &stageTarget);
+    UsdEditContext(const std::pair<UsdStagePtr, UsdEditTarget>& stageTarget);
 
     /// Restore the stage's original EditTarget if this context's stage is
     /// valid.  Otherwise do nothing.
@@ -99,4 +98,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_EDIT_CONTEXT_H
+#endif  // PXR_USD_USD_EDIT_CONTEXT_H

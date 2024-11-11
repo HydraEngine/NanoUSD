@@ -14,22 +14,15 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType)
-{
-    TfType::Define<UsdGeomModelAPI,
-        TfType::Bases< UsdAPISchemaBase > >();
-    
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<UsdGeomModelAPI, TfType::Bases<UsdAPISchemaBase>>();
 }
 
 /* virtual */
-UsdGeomModelAPI::~UsdGeomModelAPI()
-{
-}
+UsdGeomModelAPI::~UsdGeomModelAPI() {}
 
 /* static */
-UsdGeomModelAPI
-UsdGeomModelAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdGeomModelAPI UsdGeomModelAPI::Get(const UsdStagePtr& stage, const SdfPath& path) {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdGeomModelAPI();
@@ -37,25 +30,18 @@ UsdGeomModelAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
     return UsdGeomModelAPI(stage->GetPrimAtPath(path));
 }
 
-
 /* virtual */
-UsdSchemaKind UsdGeomModelAPI::_GetSchemaKind() const
-{
+UsdSchemaKind UsdGeomModelAPI::_GetSchemaKind() const {
     return UsdGeomModelAPI::schemaKind;
 }
 
 /* static */
-bool
-UsdGeomModelAPI::CanApply(
-    const UsdPrim &prim, std::string *whyNot)
-{
+bool UsdGeomModelAPI::CanApply(const UsdPrim& prim, std::string* whyNot) {
     return prim.CanApplyAPI<UsdGeomModelAPI>(whyNot);
 }
 
 /* static */
-UsdGeomModelAPI
-UsdGeomModelAPI::Apply(const UsdPrim &prim)
-{
+UsdGeomModelAPI UsdGeomModelAPI::Apply(const UsdPrim& prim) {
     if (prim.ApplyAPI<UsdGeomModelAPI>()) {
         return UsdGeomModelAPI(prim);
     }
@@ -63,230 +49,133 @@ UsdGeomModelAPI::Apply(const UsdPrim &prim)
 }
 
 /* static */
-const TfType &
-UsdGeomModelAPI::_GetStaticTfType()
-{
+const TfType& UsdGeomModelAPI::_GetStaticTfType() {
     static TfType tfType = TfType::Find<UsdGeomModelAPI>();
     return tfType;
 }
 
 /* static */
-bool 
-UsdGeomModelAPI::_IsTypedSchema()
-{
+bool UsdGeomModelAPI::_IsTypedSchema() {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdGeomModelAPI::_GetTfType() const
-{
+const TfType& UsdGeomModelAPI::_GetTfType() const {
     return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdGeomModelAPI::GetModelDrawModeAttr() const
-{
+UsdAttribute UsdGeomModelAPI::GetModelDrawModeAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->modelDrawMode);
 }
 
-UsdAttribute
-UsdGeomModelAPI::CreateModelDrawModeAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->modelDrawMode,
-                       SdfValueTypeNames->Token,
-                       /* custom = */ false,
-                       SdfVariabilityUniform,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomModelAPI::CreateModelDrawModeAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->modelDrawMode, SdfValueTypeNames->Token,
+                                      /* custom = */ false, SdfVariabilityUniform, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomModelAPI::GetModelApplyDrawModeAttr() const
-{
+UsdAttribute UsdGeomModelAPI::GetModelApplyDrawModeAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->modelApplyDrawMode);
 }
 
-UsdAttribute
-UsdGeomModelAPI::CreateModelApplyDrawModeAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->modelApplyDrawMode,
-                       SdfValueTypeNames->Bool,
-                       /* custom = */ false,
-                       SdfVariabilityUniform,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomModelAPI::CreateModelApplyDrawModeAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->modelApplyDrawMode, SdfValueTypeNames->Bool,
+                                      /* custom = */ false, SdfVariabilityUniform, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomModelAPI::GetModelDrawModeColorAttr() const
-{
+UsdAttribute UsdGeomModelAPI::GetModelDrawModeColorAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->modelDrawModeColor);
 }
 
-UsdAttribute
-UsdGeomModelAPI::CreateModelDrawModeColorAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->modelDrawModeColor,
-                       SdfValueTypeNames->Float3,
-                       /* custom = */ false,
-                       SdfVariabilityUniform,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomModelAPI::CreateModelDrawModeColorAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->modelDrawModeColor, SdfValueTypeNames->Float3,
+                                      /* custom = */ false, SdfVariabilityUniform, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomModelAPI::GetModelCardGeometryAttr() const
-{
+UsdAttribute UsdGeomModelAPI::GetModelCardGeometryAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->modelCardGeometry);
 }
 
-UsdAttribute
-UsdGeomModelAPI::CreateModelCardGeometryAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->modelCardGeometry,
-                       SdfValueTypeNames->Token,
-                       /* custom = */ false,
-                       SdfVariabilityUniform,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomModelAPI::CreateModelCardGeometryAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->modelCardGeometry, SdfValueTypeNames->Token,
+                                      /* custom = */ false, SdfVariabilityUniform, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomModelAPI::GetModelCardTextureXPosAttr() const
-{
+UsdAttribute UsdGeomModelAPI::GetModelCardTextureXPosAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->modelCardTextureXPos);
 }
 
-UsdAttribute
-UsdGeomModelAPI::CreateModelCardTextureXPosAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->modelCardTextureXPos,
-                       SdfValueTypeNames->Asset,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomModelAPI::CreateModelCardTextureXPosAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->modelCardTextureXPos, SdfValueTypeNames->Asset,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomModelAPI::GetModelCardTextureYPosAttr() const
-{
+UsdAttribute UsdGeomModelAPI::GetModelCardTextureYPosAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->modelCardTextureYPos);
 }
 
-UsdAttribute
-UsdGeomModelAPI::CreateModelCardTextureYPosAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->modelCardTextureYPos,
-                       SdfValueTypeNames->Asset,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomModelAPI::CreateModelCardTextureYPosAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->modelCardTextureYPos, SdfValueTypeNames->Asset,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomModelAPI::GetModelCardTextureZPosAttr() const
-{
+UsdAttribute UsdGeomModelAPI::GetModelCardTextureZPosAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->modelCardTextureZPos);
 }
 
-UsdAttribute
-UsdGeomModelAPI::CreateModelCardTextureZPosAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->modelCardTextureZPos,
-                       SdfValueTypeNames->Asset,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomModelAPI::CreateModelCardTextureZPosAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->modelCardTextureZPos, SdfValueTypeNames->Asset,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomModelAPI::GetModelCardTextureXNegAttr() const
-{
+UsdAttribute UsdGeomModelAPI::GetModelCardTextureXNegAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->modelCardTextureXNeg);
 }
 
-UsdAttribute
-UsdGeomModelAPI::CreateModelCardTextureXNegAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->modelCardTextureXNeg,
-                       SdfValueTypeNames->Asset,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomModelAPI::CreateModelCardTextureXNegAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->modelCardTextureXNeg, SdfValueTypeNames->Asset,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomModelAPI::GetModelCardTextureYNegAttr() const
-{
+UsdAttribute UsdGeomModelAPI::GetModelCardTextureYNegAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->modelCardTextureYNeg);
 }
 
-UsdAttribute
-UsdGeomModelAPI::CreateModelCardTextureYNegAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->modelCardTextureYNeg,
-                       SdfValueTypeNames->Asset,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomModelAPI::CreateModelCardTextureYNegAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->modelCardTextureYNeg, SdfValueTypeNames->Asset,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomModelAPI::GetModelCardTextureZNegAttr() const
-{
+UsdAttribute UsdGeomModelAPI::GetModelCardTextureZNegAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->modelCardTextureZNeg);
 }
 
-UsdAttribute
-UsdGeomModelAPI::CreateModelCardTextureZNegAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->modelCardTextureZNeg,
-                       SdfValueTypeNames->Asset,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomModelAPI::CreateModelCardTextureZNegAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->modelCardTextureZNeg, SdfValueTypeNames->Asset,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
 namespace {
-static inline TfTokenVector
-_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
-{
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector& left, const TfTokenVector& right) {
     TfTokenVector result;
     result.reserve(left.size() + right.size());
     result.insert(result.end(), left.begin(), left.end());
     result.insert(result.end(), right.begin(), right.end());
     return result;
 }
-}
+}  // namespace
 
 /*static*/
-const TfTokenVector&
-UsdGeomModelAPI::GetSchemaAttributeNames(bool includeInherited)
-{
+const TfTokenVector& UsdGeomModelAPI::GetSchemaAttributeNames(bool includeInherited) {
     static TfTokenVector localNames = {
-        UsdGeomTokens->modelDrawMode,
-        UsdGeomTokens->modelApplyDrawMode,
-        UsdGeomTokens->modelDrawModeColor,
-        UsdGeomTokens->modelCardGeometry,
-        UsdGeomTokens->modelCardTextureXPos,
-        UsdGeomTokens->modelCardTextureYPos,
-        UsdGeomTokens->modelCardTextureZPos,
-        UsdGeomTokens->modelCardTextureXNeg,
-        UsdGeomTokens->modelCardTextureYNeg,
-        UsdGeomTokens->modelCardTextureZNeg,
+            UsdGeomTokens->modelDrawMode,        UsdGeomTokens->modelApplyDrawMode,
+            UsdGeomTokens->modelDrawModeColor,   UsdGeomTokens->modelCardGeometry,
+            UsdGeomTokens->modelCardTextureXPos, UsdGeomTokens->modelCardTextureYPos,
+            UsdGeomTokens->modelCardTextureZPos, UsdGeomTokens->modelCardTextureXNeg,
+            UsdGeomTokens->modelCardTextureYNeg, UsdGeomTokens->modelCardTextureZNeg,
     };
     static TfTokenVector allNames =
-        _ConcatenateAttributeNames(
-            UsdAPISchemaBase::GetSchemaAttributeNames(true),
-            localNames);
+            _ConcatenateAttributeNames(UsdAPISchemaBase::GetSchemaAttributeNames(true), localNames);
 
     if (includeInherited)
         return allNames;
@@ -305,80 +194,62 @@ PXR_NAMESPACE_CLOSE_SCOPE
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
-using std::vector;
 using std::string;
+using std::vector;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool
-UsdGeomModelAPI::GetExtentsHint(VtVec3fArray *extents, 
-                                const UsdTimeCode &time) const
-{
-    UsdAttribute extentsHintAttr = 
-        GetPrim().GetAttribute(UsdGeomTokens->extentsHint);
-    
-    if (!extentsHintAttr)
-        return false;
+bool UsdGeomModelAPI::GetExtentsHint(VtVec3fArray* extents, const UsdTimeCode& time) const {
+    UsdAttribute extentsHintAttr = GetPrim().GetAttribute(UsdGeomTokens->extentsHint);
+
+    if (!extentsHintAttr) return false;
 
     return extentsHintAttr.Get(extents, time);
 }
 
-bool
-UsdGeomModelAPI::SetExtentsHint(VtVec3fArray const &extents, 
-                                const UsdTimeCode &time) const
-{
+bool UsdGeomModelAPI::SetExtentsHint(VtVec3fArray const& extents, const UsdTimeCode& time) const {
     const size_t extSize = extents.size();
-    const TfTokenVector &purposeTokens
-        = UsdGeomImageable::GetOrderedPurposeTokens();
+    const TfTokenVector& purposeTokens = UsdGeomImageable::GetOrderedPurposeTokens();
     if (extSize % 2 || extSize < 2 || extSize > 2 * purposeTokens.size()) {
         TF_CODING_ERROR(
-            "invalid extents size (%zu) - must be an even number >= 2 and <= "
-            "2 * UsdGeomImageable::GetOrderedPurposeTokens().size() (%zu)",
-            extSize, 2 * purposeTokens.size());
+                "invalid extents size (%zu) - must be an even number >= 2 and <= "
+                "2 * UsdGeomImageable::GetOrderedPurposeTokens().size() (%zu)",
+                extSize, 2 * purposeTokens.size());
         return false;
     }
 
-    UsdAttribute extentsHintAttr = 
-        GetPrim().CreateAttribute(UsdGeomTokens->extentsHint, 
-                                  SdfValueTypeNames->Float3Array,
-                                  /* custom = */ false);
+    UsdAttribute extentsHintAttr = GetPrim().CreateAttribute(UsdGeomTokens->extentsHint, SdfValueTypeNames->Float3Array,
+                                                             /* custom = */ false);
 
     return extentsHintAttr && extentsHintAttr.Set(extents, time);
 }
 
-UsdAttribute 
-UsdGeomModelAPI::GetExtentsHintAttr() const
-{
+UsdAttribute UsdGeomModelAPI::GetExtentsHintAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->extentsHint);
 }
 
-VtVec3fArray
-UsdGeomModelAPI::ComputeExtentsHint(UsdGeomBBoxCache& bboxCache) const
-{
-    static const TfTokenVector &purposeTokens =
-        UsdGeomImageable::GetOrderedPurposeTokens();
+VtVec3fArray UsdGeomModelAPI::ComputeExtentsHint(UsdGeomBBoxCache& bboxCache) const {
+    static const TfTokenVector& purposeTokens = UsdGeomImageable::GetOrderedPurposeTokens();
 
     if (!TF_VERIFY(!purposeTokens.empty(), "we have no purpose!")) {
         return {};
     }
 
     VtVec3fArray extents;
-    
+
     // If this model is itself a boundable, we call ComputeExtentFromPlugins().
     UsdGeomBoundable boundable(GetPrim());
     if (boundable) {
-        if (UsdGeomBoundable::ComputeExtentFromPlugins(
-                boundable, bboxCache.GetTime(), &extents) && extents.size()) {
+        if (UsdGeomBoundable::ComputeExtentFromPlugins(boundable, bboxCache.GetTime(), &extents) && extents.size()) {
             // Replicate the bounds across all the purposes for now.  Seems like
             // 'extent' for aggregate boundables should support per-purpose
             // extent, like extentsHint.
             extents.resize(2 * purposeTokens.size());
             for (size_t i = 1; i != purposeTokens.size(); ++i) {
-                extents[2*i] = extents[0];
-                extents[2*i+1] = extents[1];
+                extents[2 * i] = extents[0];
+                extents[2 * i + 1] = extents[1];
             }
-        }
-        else {
+        } else {
             // Leave a single empty range.
             extents.resize(2);
             extents[0] = GfRange3f().GetMin();
@@ -395,18 +266,15 @@ UsdGeomModelAPI::ComputeExtentsHint(UsdGeomBBoxCache& bboxCache) const
     std::vector<TfToken> purposeTokenVec(1);
     size_t lastNotEmpty = 0;
     for (size_t i = 0, end = purposeTokens.size(); i != end; ++i) {
-
         // Set the gprim purpose that we are interested in computing the bbox
         // for. This doesn't cause the cache to be blown.
         purposeTokenVec[0] = purposeTokens[i];
         bboxCache.SetIncludedPurposes(purposeTokenVec);
 
-        const GfRange3d range = bboxCache
-            .ComputeUntransformedBound(GetPrim())
-            .ComputeAlignedBox();
+        const GfRange3d range = bboxCache.ComputeUntransformedBound(GetPrim()).ComputeAlignedBox();
 
-        extents[2*i] = GfVec3f(range.GetMin());
-        extents[2*i+1] = GfVec3f(range.GetMax());
+        extents[2 * i] = GfVec3f(range.GetMin());
+        extents[2 * i + 1] = GfVec3f(range.GetMax());
 
         if (!range.IsEmpty()) {
             lastNotEmpty = i;
@@ -418,42 +286,30 @@ UsdGeomModelAPI::ComputeExtentsHint(UsdGeomBBoxCache& bboxCache) const
     return extents;
 }
 
-UsdGeomConstraintTarget 
-UsdGeomModelAPI::GetConstraintTarget(
-    const std::string &constraintName) const
-{
-    const TfToken &constraintAttrName = 
-        UsdGeomConstraintTarget::GetConstraintAttrName(constraintName);
+UsdGeomConstraintTarget UsdGeomModelAPI::GetConstraintTarget(const std::string& constraintName) const {
+    const TfToken& constraintAttrName = UsdGeomConstraintTarget::GetConstraintAttrName(constraintName);
 
     return UsdGeomConstraintTarget(GetPrim().GetAttribute(constraintAttrName));
 }
 
-UsdGeomConstraintTarget 
-UsdGeomModelAPI::CreateConstraintTarget(
-    const string &constraintName) const
-{
-    const TfToken &constraintAttrName = 
-        UsdGeomConstraintTarget::GetConstraintAttrName(constraintName);
+UsdGeomConstraintTarget UsdGeomModelAPI::CreateConstraintTarget(const string& constraintName) const {
+    const TfToken& constraintAttrName = UsdGeomConstraintTarget::GetConstraintAttrName(constraintName);
 
     // Check if the constraint target attribute already exists.
     UsdAttribute constraintAttr = GetPrim().GetAttribute(constraintAttrName);
     if (!constraintAttr) {
         // Create the attribute, if it doesn't exist.
-        constraintAttr = GetPrim().CreateAttribute(constraintAttrName, 
-            SdfValueTypeNames->Matrix4d, 
-            /* custom */ false, 
-            SdfVariabilityVarying);
+        constraintAttr = GetPrim().CreateAttribute(constraintAttrName, SdfValueTypeNames->Matrix4d,
+                                                   /* custom */ false, SdfVariabilityVarying);
     }
 
     return UsdGeomConstraintTarget(constraintAttr);
 }
 
-vector<UsdGeomConstraintTarget> 
-UsdGeomModelAPI::GetConstraintTargets() const
-{
+vector<UsdGeomConstraintTarget> UsdGeomModelAPI::GetConstraintTargets() const {
     vector<UsdGeomConstraintTarget> constraintTargets;
 
-    const vector<UsdAttribute> &attributes = GetPrim().GetAttributes();
+    const vector<UsdAttribute>& attributes = GetPrim().GetAttributes();
     TF_FOR_ALL(attrIt, attributes) {
         UsdGeomConstraintTarget constraintTarget(*attrIt);
 
@@ -467,10 +323,7 @@ UsdGeomModelAPI::GetConstraintTargets() const
 }
 
 namespace {
-static 
-bool
-_GetAuthoredDrawMode(const UsdPrim &prim, TfToken *drawMode)
-{
+static bool _GetAuthoredDrawMode(const UsdPrim& prim, TfToken* drawMode) {
     // Only check for the attribute on models; don't check the pseudo-root.
     if (!prim.IsModel() || !prim.GetParent()) {
         return false;
@@ -480,15 +333,12 @@ _GetAuthoredDrawMode(const UsdPrim &prim, TfToken *drawMode)
     UsdAttribute attr = modelAPI.GetModelDrawModeAttr();
     return attr && attr.Get(drawMode);
 }
-}
+}  // namespace
 
-TfToken
-UsdGeomModelAPI::ComputeModelDrawMode(const TfToken &parentDrawMode) const
-{
+TfToken UsdGeomModelAPI::ComputeModelDrawMode(const TfToken& parentDrawMode) const {
     TfToken drawMode = UsdGeomTokens->inherited;
 
-    if (_GetAuthoredDrawMode(GetPrim(), &drawMode) &&
-        drawMode != UsdGeomTokens->inherited) {
+    if (_GetAuthoredDrawMode(GetPrim(), &drawMode) && drawMode != UsdGeomTokens->inherited) {
         return drawMode;
     }
 
@@ -497,12 +347,8 @@ UsdGeomModelAPI::ComputeModelDrawMode(const TfToken &parentDrawMode) const
     }
 
     // Find the closest applicable model:drawMode among this prim's ancestors.
-    for (UsdPrim curPrim = GetPrim().GetParent(); 
-         curPrim; 
-         curPrim = curPrim.GetParent()) {
-
-        if (_GetAuthoredDrawMode(curPrim, &drawMode) &&
-            drawMode != UsdGeomTokens->inherited) {
+    for (UsdPrim curPrim = GetPrim().GetParent(); curPrim; curPrim = curPrim.GetParent()) {
+        if (_GetAuthoredDrawMode(curPrim, &drawMode) && drawMode != UsdGeomTokens->inherited) {
             return drawMode;
         }
     }
@@ -511,6 +357,4 @@ UsdGeomModelAPI::ComputeModelDrawMode(const TfToken &parentDrawMode) const
     return UsdGeomTokens->default_;
 }
 
-
 PXR_NAMESPACE_CLOSE_SCOPE
-

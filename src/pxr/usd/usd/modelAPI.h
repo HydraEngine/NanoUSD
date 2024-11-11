@@ -36,24 +36,23 @@ class SdfAssetPath;
 ///
 /// UsdModelAPI is an API schema that provides an interface to a prim's
 /// model qualities, if it does, in fact, represent the root prim of a model.
-/// 
-/// The first and foremost model quality is its \em kind, i.e. the metadata 
+///
+/// The first and foremost model quality is its \em kind, i.e. the metadata
 /// that establishes it as a model (See KindRegistry).  UsdModelAPI provides
 /// various methods for setting and querying the prim's kind, as well as
 /// queries (also available on UsdPrim) for asking what category of model
 /// the prim is.  See \ref Usd_ModelKind "Kind and Model-ness".
-/// 
+///
 /// UsdModelAPI also provides access to a prim's \ref Usd_Model_AssetInfo "assetInfo"
 /// data.  While any prim \em can host assetInfo, it is common that published
 /// (referenced) assets are packaged as models, therefore it is convenient
 /// to provide access to the one from the other.
-/// 
+///
 /// \todo establish an _IsCompatible() override that returns IsModel()
 /// \todo GetModelInstanceName()
-/// 
 ///
-class UsdModelAPI : public UsdAPISchemaBase
-{
+///
+class UsdModelAPI : public UsdAPISchemaBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -64,18 +63,12 @@ public:
     /// Equivalent to UsdModelAPI::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdModelAPI(const UsdPrim& prim=UsdPrim())
-        : UsdAPISchemaBase(prim)
-    {
-    }
+    explicit UsdModelAPI(const UsdPrim& prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
     /// Construct a UsdModelAPI on the prim held by \p schemaObj .
     /// Should be preferred over UsdModelAPI(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdModelAPI(const UsdSchemaBase& schemaObj)
-        : UsdAPISchemaBase(schemaObj)
-    {
-    }
+    explicit UsdModelAPI(const UsdSchemaBase& schemaObj) : UsdAPISchemaBase(schemaObj) {}
 
     /// Destructor.
     USD_API
@@ -85,8 +78,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USD_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdModelAPI holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -98,9 +90,7 @@ public:
     /// \endcode
     ///
     USD_API
-    static UsdModelAPI
-    Get(const UsdStagePtr &stage, const SdfPath &path);
-
+    static UsdModelAPI Get(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -113,21 +103,21 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USD_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USD_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
@@ -136,25 +126,22 @@ public:
     /// \anchor Usd_ModelKind
     /// \name Kind and Model-ness
     /// @{
-    
+
     /// \enum KindValidation
     ///
     /// Option for validating queries to a prim's kind metadata.
     /// \sa IsKind()
-    enum KindValidation{
-        KindValidationNone,
-        KindValidationModelHierarchy
-    };
+    enum KindValidation { KindValidationNone, KindValidationModelHierarchy };
 
     /// Retrieve the authored \p kind for this prim.
-    /// 
+    ///
     /// \return true if there was an authored kind that was successfully read,
     /// otherwise false.
     ///
     /// \sa UsdPrim::GetKind
     USD_API
     bool GetKind(TfToken* kind) const;
-    
+
     /// Author a \p kind for this prim, at the current UsdEditTarget.
     /// \return true if \p kind was successully authored, otherwise false.
     ///
@@ -164,7 +151,7 @@ public:
 
     /// Return true if the prim's kind metadata is or inherits from
     /// \p baseKind as defined by the Kind Registry.
-    /// 
+    ///
     /// If \p validation is KindValidationModelHierarchy (the default), then
     /// this also ensures that if baseKind is a model, the prim conforms to
     /// the rules of model hierarchy, as defined by IsModel. If set to
@@ -174,12 +161,11 @@ public:
     /// optimized for fast traversal.
     ///
     /// \note If a prim's model hierarchy is not valid, it is possible that
-    /// that prim.IsModel() and 
+    /// that prim.IsModel() and
     /// prim.IsKind("model", Usd.ModelAPI.KindValidationNone) return different
     /// answers. (As a corallary, this is also true for for prim.IsGroup())
     USD_API
-    bool IsKind(const TfToken& baseKind,
-                KindValidation validation=KindValidationModelHierarchy) const;
+    bool IsKind(const TfToken& baseKind, KindValidation validation = KindValidationModelHierarchy) const;
 
     /// Return true if this prim represents a model, based on its kind
     /// metadata.
@@ -196,105 +182,102 @@ public:
     /// \anchor Usd_Model_AssetInfo
     /// \name Model Asset Info API
     /// @{
-    
-    /// Returns the model's asset identifier as authored in the composed 
+
+    /// Returns the model's asset identifier as authored in the composed
     /// assetInfo dictionary.
-    /// 
-    /// The asset identifier can be used to resolve the model's root layer via 
+    ///
+    /// The asset identifier can be used to resolve the model's root layer via
     /// the asset resolver plugin.
-    /// 
+    ///
     USD_API
-    bool GetAssetIdentifier(SdfAssetPath *identifier) const;
+    bool GetAssetIdentifier(SdfAssetPath* identifier) const;
 
     /// Sets the model's asset identifier to the given asset path, \p identifier.
-    /// 
+    ///
     /// \sa GetAssetIdentifier()
     ///
     USD_API
-    void SetAssetIdentifier(const SdfAssetPath &identifier) const;
-    
+    void SetAssetIdentifier(const SdfAssetPath& identifier) const;
+
     /// Returns the model's asset name from the composed assetInfo dictionary.
-    /// 
-    /// The asset name is the name of the asset, as would be used in a database 
+    ///
+    /// The asset name is the name of the asset, as would be used in a database
     /// query.
     ///
     USD_API
-    bool GetAssetName(std::string *assetName) const;
+    bool GetAssetName(std::string* assetName) const;
 
     /// Sets the model's asset name to \p assetName.
-    /// 
+    ///
     /// \sa GetAssetName()
     ///
     USD_API
-    void SetAssetName(const std::string &assetName) const;
-    
-    /// Returns the model's resolved asset version.  
-    /// 
-    /// If you publish assets with an embedded version, then you may receive 
-    /// that version string.  You may, however, cause your authoring tools to 
-    /// record the resolved version <em>at the time at which a reference to the 
-    /// asset was added to an aggregate</em>, at the referencing site.  In 
-    /// such a pipeline, this API will always return that stronger opinion, 
-    /// even if the asset is republished with a newer version, and even though 
-    /// that newer version may be the one that is resolved when the UsdStage is 
-    /// opened.
-    /// 
-    USD_API
-    bool GetAssetVersion(std::string *version) const;
+    void SetAssetName(const std::string& assetName) const;
 
-    /// Sets the model's asset version string. 
-    /// 
+    /// Returns the model's resolved asset version.
+    ///
+    /// If you publish assets with an embedded version, then you may receive
+    /// that version string.  You may, however, cause your authoring tools to
+    /// record the resolved version <em>at the time at which a reference to the
+    /// asset was added to an aggregate</em>, at the referencing site.  In
+    /// such a pipeline, this API will always return that stronger opinion,
+    /// even if the asset is republished with a newer version, and even though
+    /// that newer version may be the one that is resolved when the UsdStage is
+    /// opened.
+    ///
+    USD_API
+    bool GetAssetVersion(std::string* version) const;
+
+    /// Sets the model's asset version string.
+    ///
     /// \sa GetAssetVersion()
     ///
     USD_API
-    void SetAssetVersion(const std::string &version) const;
+    void SetAssetVersion(const std::string& version) const;
 
-    /// Returns the list of asset dependencies referenced inside the 
+    /// Returns the list of asset dependencies referenced inside the
     /// payload of the model.
-    /// 
-    /// This typically contains identifiers of external assets that are 
-    /// referenced inside the model's payload. When the model is created, this 
-    /// list is compiled and set at the root of the model. This enables 
-    /// efficient dependency analysis without the need to include the model's 
+    ///
+    /// This typically contains identifiers of external assets that are
+    /// referenced inside the model's payload. When the model is created, this
+    /// list is compiled and set at the root of the model. This enables
+    /// efficient dependency analysis without the need to include the model's
     /// payload.
-    /// 
+    ///
     USD_API
-    bool GetPayloadAssetDependencies(VtArray<SdfAssetPath> *assetDeps) 
-        const;
-    
-    /// Sets the list of external asset dependencies referenced inside the 
+    bool GetPayloadAssetDependencies(VtArray<SdfAssetPath>* assetDeps) const;
+
+    /// Sets the list of external asset dependencies referenced inside the
     /// payload of a model.
-    /// 
+    ///
     /// \sa GetPayloadAssetDependencies()
     ///
     USD_API
-    void SetPayloadAssetDependencies(const VtArray<SdfAssetPath> &assetDeps) 
-        const;
+    void SetPayloadAssetDependencies(const VtArray<SdfAssetPath>& assetDeps) const;
 
     /// Returns the model's composed assetInfo dictionary.
-    /// 
-    /// The asset info dictionary is used to annotate models with various 
+    ///
+    /// The asset info dictionary is used to annotate models with various
     /// data related to asset management. For example, asset name,
     /// identifier, version etc.
-    /// 
-    /// The elements of this dictionary are composed element-wise, and are 
+    ///
+    /// The elements of this dictionary are composed element-wise, and are
     /// nestable.
     ///
     USD_API
-    bool GetAssetInfo(VtDictionary *info) const;
+    bool GetAssetInfo(VtDictionary* info) const;
 
-    /// Sets the model's assetInfo dictionary to \p info in the current edit 
+    /// Sets the model's assetInfo dictionary to \p info in the current edit
     /// target.
-    /// 
+    ///
     USD_API
-    void SetAssetInfo(const VtDictionary &info) const;
+    void SetAssetInfo(const VtDictionary& info) const;
 
     /// @}
 
 protected:
-    
-    template<typename T>
-    bool _GetAssetInfoByKey(const TfToken &key, T *val) const {
+    template <typename T>
+    bool _GetAssetInfoByKey(const TfToken& key, T* val) const {
         VtValue vtVal = GetPrim().GetAssetInfoByKey(key);
         if (!vtVal.IsEmpty() && vtVal.IsHolding<T>()) {
             *val = vtVal.UncheckedGet<T>();
@@ -318,11 +301,7 @@ protected:
 /// \sa UsdModelAPI::GetAssetName()
 /// \sa UsdModelAPI::GetAssetVersion()
 ///
-#define USDMODEL_ASSET_INFO_KEYS \
-    (identifier)                \
-    (name)                      \
-    (version)                   \
-    (payloadAssetDependencies)
+#define USDMODEL_ASSET_INFO_KEYS (identifier)(name)(version)(payloadAssetDependencies)
 
 TF_DECLARE_PUBLIC_TOKENS(UsdModelAPIAssetInfoKeys, USD_API, USDMODEL_ASSET_INFO_KEYS);
 

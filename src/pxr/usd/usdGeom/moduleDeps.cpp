@@ -17,23 +17,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_REGISTRY_FUNCTION(TfScriptModuleLoader) {
     // List of direct dependencies for this library.
-    const std::vector<TfToken> reqs = {
-        TfToken("arch"),
-        TfToken("gf"),
-        TfToken("js"),
-        TfToken("kind"),
-        TfToken("plug"),
-        TfToken("sdf"),
-        TfToken("tf"),
-        TfToken("trace"),
-        TfToken("usd"),
-        TfToken("vt"),
-        TfToken("work")
-    };
-    TfScriptModuleLoader::GetInstance().
-        RegisterLibrary(TfToken("usdGeom"), TfToken("pxr.UsdGeom"), reqs);
+    const std::vector<TfToken> reqs = {TfToken("arch"), TfToken("gf"),  TfToken("js"),  TfToken("kind"),
+                                       TfToken("plug"), TfToken("sdf"), TfToken("tf"),  TfToken("trace"),
+                                       TfToken("usd"),  TfToken("vt"),  TfToken("work")};
+    TfScriptModuleLoader::GetInstance().RegisterLibrary(TfToken("usdGeom"), TfToken("pxr.UsdGeom"), reqs);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-

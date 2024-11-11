@@ -40,7 +40,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// \section Usd_References Important Qualities and Effective Use of References
 ///
-/// \li Any prim can host zero, one or multiple references 
+/// \li Any prim can host zero, one or multiple references
 ///
 /// \li References are \ref SdfListOp "list editable"; that is, they compose
 /// differently than ordinary properties and metadata.  In any given
@@ -54,11 +54,11 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// See \ref Usd_Internal_References
 ///
 /// \li The \c identifier component of a reference in the provided API
-/// can be a resolvable asset-path to some external layer, empty, in which case 
-/// the reference targets the root layer of the LayerStack containing the 
+/// can be a resolvable asset-path to some external layer, empty, in which case
+/// the reference targets the root layer of the LayerStack containing the
 /// referencing layer, or the identifier of an existing anonymous, in-memory-only
-/// SdfLayer.  Care should be exercised in the latter case: calling Export() on 
-/// an anonymous layer to serialize it to a file will not attempt to replace 
+/// SdfLayer.  Care should be exercised in the latter case: calling Export() on
+/// an anonymous layer to serialize it to a file will not attempt to replace
 /// any references to anonymous layers with references to file-backed layers.
 ///
 /// \li Opinions brought in by reference on an ancestor prim are weaker than
@@ -77,14 +77,14 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \subsection Usd_Internal_References Expressing "internal" references to the containing LayerStack
 ///
 /// References may omit the identifier specifying the referenced layer.  This
-/// creates an "internal" reference. During composition, the referenced layer 
-/// will be resolved to the root layer of the LayerStack containing the 
+/// creates an "internal" reference. During composition, the referenced layer
+/// will be resolved to the root layer of the LayerStack containing the
 /// layer where the reference was authored.  See AddInternalReference().
 ///
 /// \subsection Usd_Subroot_References Referencing sub-root prims
 ///
 /// References may target any prim in a layer. In the simplest and most
-/// common case, a root prim in a layer will be referenced. However, 
+/// common case, a root prim in a layer will be referenced. However,
 /// referencing sub-root prims can be useful in a variety of other cases;
 /// for example, a user might organize prims into a meaningful hierarchy
 /// in a layer for display purposes, then use sub-root references to
@@ -141,7 +141,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// * Property and metadata opinions on the ancestors of the referenced prim
 ///   *are not* present in the composed stage and will never contribute to any
-///   computations. In this example, the opinion for the attribute /A.purpose 
+///   computations. In this example, the opinion for the attribute /A.purpose
 ///   in asset.usda will never be visible in the UsdStage for shot.usda.
 ///
 /// * Property and metadata opinions due to ancestral composition arcs
@@ -150,9 +150,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///   shot.usda, even though the inherit arc is authored on an ancestor
 ///   of the referenced prim.
 ///
-/// * A consequence of these rules is that users might not be able to 
+/// * A consequence of these rules is that users might not be able to
 ///   override ancestral variant selections that affect the referenced prim.
-///   In this example, the Model prim being referenced comes from the 
+///   In this example, the Model prim being referenced comes from the
 ///   variant selection {type=a} on prim /A/B in asset.usda. The {type=b}
 ///   variant cannot be selected in shot.usda, even if prims with the
 ///   same hierarchy happen to exist there. There are various workarounds
@@ -160,7 +160,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///   authored on /Class/B/Model in shot.usda instead because of the
 ///   inherit arc that was established on prim /A.
 ///
-/// \subsection Usd_Failing_References Reasons why adding a reference may fail, why adding a reference may succeed but still generate errors, and what it all means
+/// \subsection Usd_Failing_References Reasons why adding a reference may fail, why adding a reference may succeed but
+/// still generate errors, and what it all means
 ///
 /// AddReference() and SetReferences() can each fail for a number of
 /// reasons.  If one of the specified prim targets for one of the references
@@ -178,7 +179,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// UsdStage::ResolveIdentifierToEditTarget() before authoring the
 /// reference.</b>
 ///
-/// When adding an internal reference, the given prim path is expected to 
+/// When adding an internal reference, the given prim path is expected to
 /// be in the namespace of the owning prim's stage. Sub-root prim paths
 /// will be translated from this namespace to the namespace of the
 /// current edit target, if necessary. If a path cannot be translated,
@@ -207,35 +208,34 @@ public:
     /// to expect, and \ref Usd_OM_ListOps for details on list editing and
     /// composition of listOps.
     USD_API
-    bool AddReference(const SdfReference& ref,
-                  UsdListPosition position=UsdListPositionBackOfPrependList);
+    bool AddReference(const SdfReference& ref, UsdListPosition position = UsdListPositionBackOfPrependList);
 
-    /// \overload 
+    /// \overload
     USD_API
-    bool AddReference(const std::string &identifier,
-                  const SdfPath &primPath,
-                  const SdfLayerOffset &layerOffset = SdfLayerOffset(),
-                  UsdListPosition position=UsdListPositionBackOfPrependList);
+    bool AddReference(const std::string& identifier,
+                      const SdfPath& primPath,
+                      const SdfLayerOffset& layerOffset = SdfLayerOffset(),
+                      UsdListPosition position = UsdListPositionBackOfPrependList);
 
     /// \overload
     /// \sa \ref Usd_DefaultPrim_References "References Without Prim Paths"
     USD_API
-    bool AddReference(const std::string &identifier,
-                  const SdfLayerOffset &layerOffset = SdfLayerOffset(),
-                  UsdListPosition position=UsdListPositionBackOfPrependList);
+    bool AddReference(const std::string& identifier,
+                      const SdfLayerOffset& layerOffset = SdfLayerOffset(),
+                      UsdListPosition position = UsdListPositionBackOfPrependList);
 
     /// Add an internal reference to the specified prim.
     /// \sa \ref Usd_Internal_References "Internal References"
     USD_API
-    bool AddInternalReference(const SdfPath &primPath,
-                  const SdfLayerOffset &layerOffset = SdfLayerOffset(),
-                  UsdListPosition position=UsdListPositionBackOfPrependList);
+    bool AddInternalReference(const SdfPath& primPath,
+                              const SdfLayerOffset& layerOffset = SdfLayerOffset(),
+                              UsdListPosition position = UsdListPositionBackOfPrependList);
 
     /// Removes the specified reference from the references listOp at the
-    /// current EditTarget.  This does not necessarily eliminate the 
+    /// current EditTarget.  This does not necessarily eliminate the
     /// reference completely, as it may be added or set in another layer in
     /// the same LayerStack as the current EditTarget.
-    /// \sa \ref Usd_OM_ListOps 
+    /// \sa \ref Usd_OM_ListOps
     USD_API
     bool RemoveReference(const SdfReference& ref);
 
@@ -243,7 +243,7 @@ public:
     /// The same caveats for Remove() apply to Clear().  In fact, Clear() may
     /// actually increase the number of composed references, if the listOp
     /// being cleared contained the "remove" operator.
-    /// \sa \ref Usd_OM_ListOps 
+    /// \sa \ref Usd_OM_ListOps
     USD_API
     bool ClearReferences();
 
@@ -257,7 +257,7 @@ public:
     bool SetReferences(const SdfReferenceVector& items);
 
     /// Return the prim this object is bound to.
-    const UsdPrim &GetPrim() const { return _prim; }
+    const UsdPrim& GetPrim() const { return _prim; }
 
     /// \overload
     UsdPrim GetPrim() { return _prim; }
@@ -270,4 +270,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_REFERENCES_H
+#endif  // PXR_USD_USD_REFERENCES_H

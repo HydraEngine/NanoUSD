@@ -14,11 +14,9 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType)
-{
-    TfType::Define<UsdGeomHermiteCurves,
-        TfType::Bases< UsdGeomCurves > >();
-    
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<UsdGeomHermiteCurves, TfType::Bases<UsdGeomCurves>>();
+
     // Register the usd prim typename as an alias under UsdSchemaBase. This
     // enables one to call
     // TfType::Find<UsdSchemaBase>().FindDerivedByName("HermiteCurves")
@@ -28,14 +26,10 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdGeomHermiteCurves::~UsdGeomHermiteCurves()
-{
-}
+UsdGeomHermiteCurves::~UsdGeomHermiteCurves() {}
 
 /* static */
-UsdGeomHermiteCurves
-UsdGeomHermiteCurves::Get(const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdGeomHermiteCurves UsdGeomHermiteCurves::Get(const UsdStagePtr& stage, const SdfPath& path) {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdGeomHermiteCurves();
@@ -44,88 +38,63 @@ UsdGeomHermiteCurves::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdGeomHermiteCurves
-UsdGeomHermiteCurves::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdGeomHermiteCurves UsdGeomHermiteCurves::Define(const UsdStagePtr& stage, const SdfPath& path) {
     static TfToken usdPrimTypeName("HermiteCurves");
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdGeomHermiteCurves();
     }
-    return UsdGeomHermiteCurves(
-        stage->DefinePrim(path, usdPrimTypeName));
+    return UsdGeomHermiteCurves(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
-UsdSchemaKind UsdGeomHermiteCurves::_GetSchemaKind() const
-{
+UsdSchemaKind UsdGeomHermiteCurves::_GetSchemaKind() const {
     return UsdGeomHermiteCurves::schemaKind;
 }
 
 /* static */
-const TfType &
-UsdGeomHermiteCurves::_GetStaticTfType()
-{
+const TfType& UsdGeomHermiteCurves::_GetStaticTfType() {
     static TfType tfType = TfType::Find<UsdGeomHermiteCurves>();
     return tfType;
 }
 
 /* static */
-bool 
-UsdGeomHermiteCurves::_IsTypedSchema()
-{
+bool UsdGeomHermiteCurves::_IsTypedSchema() {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdGeomHermiteCurves::_GetTfType() const
-{
+const TfType& UsdGeomHermiteCurves::_GetTfType() const {
     return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdGeomHermiteCurves::GetTangentsAttr() const
-{
+UsdAttribute UsdGeomHermiteCurves::GetTangentsAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->tangents);
 }
 
-UsdAttribute
-UsdGeomHermiteCurves::CreateTangentsAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->tangents,
-                       SdfValueTypeNames->Vector3fArray,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomHermiteCurves::CreateTangentsAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->tangents, SdfValueTypeNames->Vector3fArray,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
 namespace {
-static inline TfTokenVector
-_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
-{
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector& left, const TfTokenVector& right) {
     TfTokenVector result;
     result.reserve(left.size() + right.size());
     result.insert(result.end(), left.begin(), left.end());
     result.insert(result.end(), right.begin(), right.end());
     return result;
 }
-}
+}  // namespace
 
 /*static*/
-const TfTokenVector&
-UsdGeomHermiteCurves::GetSchemaAttributeNames(bool includeInherited)
-{
+const TfTokenVector& UsdGeomHermiteCurves::GetSchemaAttributeNames(bool includeInherited) {
     static TfTokenVector localNames = {
-        UsdGeomTokens->tangents,
+            UsdGeomTokens->tangents,
     };
     static TfTokenVector allNames =
-        _ConcatenateAttributeNames(
-            UsdGeomCurves::GetSchemaAttributeNames(true),
-            localNames);
+            _ConcatenateAttributeNames(UsdGeomCurves::GetSchemaAttributeNames(true), localNames);
 
     if (includeInherited)
         return allNames;
@@ -146,16 +115,14 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-UsdGeomHermiteCurves::PointAndTangentArrays::PointAndTangentArrays(
-    const VtArray<GfVec3f>& interleaved)
-{
-    if (interleaved.empty()){
+UsdGeomHermiteCurves::PointAndTangentArrays::PointAndTangentArrays(const VtArray<GfVec3f>& interleaved) {
+    if (interleaved.empty()) {
         return;
     }
     if (interleaved.size() % 2 != 0) {
         TF_CODING_ERROR(
-            "Cannot separate odd-shaped interleaved points and tangents "
-            "data.");
+                "Cannot separate odd-shaped interleaved points and tangents "
+                "data.");
         return;
     }
     _points.resize(interleaved.size() / 2);
@@ -175,8 +142,7 @@ UsdGeomHermiteCurves::PointAndTangentArrays::PointAndTangentArrays(
     TF_VERIFY(tangentsIt == _tangents.end());
 }
 
-VtVec3fArray UsdGeomHermiteCurves::PointAndTangentArrays::Interleave() const
-{
+VtVec3fArray UsdGeomHermiteCurves::PointAndTangentArrays::Interleave() const {
     if (IsEmpty()) {
         return VtVec3fArray();
     }

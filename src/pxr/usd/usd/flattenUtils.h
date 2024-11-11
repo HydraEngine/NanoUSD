@@ -7,7 +7,7 @@
 #ifndef PXR_USD_USD_FLATTEN_UTILS_H
 #define PXR_USD_USD_FLATTEN_UTILS_H
 
-/// \file usd/flattenUtils.h 
+/// \file usd/flattenUtils.h
 ///
 /// Utilities for flattening layer stacks into a single layer.
 
@@ -48,9 +48,7 @@ SDF_DECLARE_HANDLES(SdfLayer);
 /// will be discarded.
 ///
 USD_API
-SdfLayerRefPtr
-UsdFlattenLayerStack(const PcpLayerStackRefPtr &layerStack,
-                     const std::string& tag = std::string());
+SdfLayerRefPtr UsdFlattenLayerStack(const PcpLayerStackRefPtr& layerStack, const std::string& tag = std::string());
 
 /// Callback function for overloaded version of \c UsdFlattenLayerStack.
 ///
@@ -59,15 +57,14 @@ UsdFlattenLayerStack(const PcpLayerStackRefPtr &layerStack,
 /// the flattened layer.
 ///
 /// \sa UsdFlattenLayerStackResolveAssetPath
-using UsdFlattenResolveAssetPathFn = std::function<std::string(
-    const SdfLayerHandle& sourceLayer, 
-    const std::string& assetPath)>;
+using UsdFlattenResolveAssetPathFn =
+        std::function<std::string(const SdfLayerHandle& sourceLayer, const std::string& assetPath)>;
 
 /// Flatten the \p layerStack into a single layer with the given optional \p tag
 /// and using the \p resolveAssetPathFn to resolve asset paths that are
 /// encountered.
 ///
-/// This is an advanced version of the above function.  
+/// This is an advanced version of the above function.
 ///
 /// One use case for this version of the function is to flatten a layer stack
 /// that contains relative asset paths that we want to preserve as relative
@@ -96,26 +93,21 @@ using UsdFlattenResolveAssetPathFn = std::function<std::string(
 /// instead of the original asset path.
 /// \sa UsdFlattenLayerStackResolveAssetPath.
 USD_API
-SdfLayerRefPtr
-UsdFlattenLayerStack(const PcpLayerStackRefPtr &layerStack,
-                     const UsdFlattenResolveAssetPathFn& resolveAssetPathFn,
-                     const std::string& tag = std::string());
+SdfLayerRefPtr UsdFlattenLayerStack(const PcpLayerStackRefPtr& layerStack,
+                                    const UsdFlattenResolveAssetPathFn& resolveAssetPathFn,
+                                    const std::string& tag = std::string());
 
 /// Implements the default asset path flattening behavior for
 /// \c UsdFlattenLayerStack. \p assetPath will be anchored to \p sourceLayer
 /// by calling SdfComputeAssetPathRelativeToLayer. This function assumes
 /// that \p assetPath does not contain a stage variable expression.
 USD_API
-std::string
-UsdFlattenLayerStackResolveAssetPath(
-    const SdfLayerHandle& sourceLayer,
-    const std::string& assetPath);
+std::string UsdFlattenLayerStackResolveAssetPath(const SdfLayerHandle& sourceLayer, const std::string& assetPath);
 
 /// \class UsdFlattenResolveAssetPathContext
 /// Context object containing information used when resolving asset paths
 /// during layer stack flattening.
-class UsdFlattenResolveAssetPathContext
-{
+class UsdFlattenResolveAssetPathContext {
 public:
     /// Layer where the asset path is authored
     SdfLayerHandle sourceLayer;
@@ -134,8 +126,7 @@ public:
 /// \c std::string that should be authored in the flattened layer.
 ///
 /// \sa UsdFlattenLayerStack
-using UsdFlattenResolveAssetPathAdvancedFn = std::function<
-    std::string(const UsdFlattenResolveAssetPathContext&)>;
+using UsdFlattenResolveAssetPathAdvancedFn = std::function<std::string(const UsdFlattenResolveAssetPathContext&)>;
 
 /// Flatten the \p layerStack into a single layer with the given optional \p tag
 /// and using the \p resolveAssetPathFn to resolve asset paths that are
@@ -148,11 +139,9 @@ using UsdFlattenResolveAssetPathAdvancedFn = std::function<
 /// another example, the callback might maintain stage variable expressions
 /// in their unevaluated form.
 USD_API
-SdfLayerRefPtr
-UsdFlattenLayerStack(
-    const PcpLayerStackRefPtr &layerStack,
-    const UsdFlattenResolveAssetPathAdvancedFn& resolveAssetPathFn,
-    const std::string& tag = std::string());
+SdfLayerRefPtr UsdFlattenLayerStack(const PcpLayerStackRefPtr& layerStack,
+                                    const UsdFlattenResolveAssetPathAdvancedFn& resolveAssetPathFn,
+                                    const std::string& tag = std::string());
 
 /// Implements the default asset path flattening behavior for
 /// \c UsdFlattenLayerStack. The asset path in \p context will be anchored to
@@ -160,9 +149,7 @@ UsdFlattenLayerStack(
 /// asset path contains a stage variable expression, it will be evaluated using
 /// the expression variables in \p context before being anchored.
 USD_API
-std::string
-UsdFlattenLayerStackResolveAssetPathAdvanced(
-    const UsdFlattenResolveAssetPathContext& context);
+std::string UsdFlattenLayerStackResolveAssetPathAdvanced(const UsdFlattenResolveAssetPathContext& context);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

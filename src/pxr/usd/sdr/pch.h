@@ -96,14 +96,14 @@
 #include <boost/python/to_python_converter.hpp>
 #include <boost/python/tuple.hpp>
 #include <boost/python/type_id.hpp>
-#if defined(__APPLE__) // Fix breakage caused by Python's pyport.h.
+#if defined(__APPLE__)  // Fix breakage caused by Python's pyport.h.
 #undef tolower
 #undef toupper
 #endif
-#endif // PXR_PYTHON_SUPPORT_ENABLED && !PXR_USE_INTERNAL_BOOST_PYTHON
+#endif  // PXR_PYTHON_SUPPORT_ENABLED && !PXR_USE_INTERNAL_BOOST_PYTHON
 #include <tbb/cache_aligned_allocator.h>
 #include <tbb/concurrent_queue.h>
 #include <tbb/spin_mutex.h>
 #ifdef PXR_PYTHON_SUPPORT_ENABLED
 #include "pxr/base/tf/pySafePython.h"
-#endif // PXR_PYTHON_SUPPORT_ENABLED
+#endif  // PXR_PYTHON_SUPPORT_ENABLED

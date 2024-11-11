@@ -9,18 +9,10 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-UsdPyEditContext::UsdPyEditContext(
-    const std::pair<UsdStagePtr, UsdEditTarget> &stageTarget)
-    : _stage(stageTarget.first)
-    , _editTarget(stageTarget.second)
-{
-}
+UsdPyEditContext::UsdPyEditContext(const std::pair<UsdStagePtr, UsdEditTarget>& stageTarget)
+    : _stage(stageTarget.first), _editTarget(stageTarget.second) {}
 
-UsdPyEditContext::UsdPyEditContext(
-    const UsdStagePtr &stage, const UsdEditTarget &editTarget)
-    : _stage(stage)
-    , _editTarget(editTarget)
-{
-}
+UsdPyEditContext::UsdPyEditContext(const UsdStagePtr& stage, const UsdEditTarget& editTarget)
+    : _stage(stage), _editTarget(editTarget) {}
 
 PXR_NAMESPACE_CLOSE_SCOPE

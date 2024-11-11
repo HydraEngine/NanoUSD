@@ -14,22 +14,15 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType)
-{
-    TfType::Define<UsdGeomGprim,
-        TfType::Bases< UsdGeomBoundable > >();
-    
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<UsdGeomGprim, TfType::Bases<UsdGeomBoundable>>();
 }
 
 /* virtual */
-UsdGeomGprim::~UsdGeomGprim()
-{
-}
+UsdGeomGprim::~UsdGeomGprim() {}
 
 /* static */
-UsdGeomGprim
-UsdGeomGprim::Get(const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdGeomGprim UsdGeomGprim::Get(const UsdStagePtr& stage, const SdfPath& path) {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdGeomGprim();
@@ -37,130 +30,84 @@ UsdGeomGprim::Get(const UsdStagePtr &stage, const SdfPath &path)
     return UsdGeomGprim(stage->GetPrimAtPath(path));
 }
 
-
 /* virtual */
-UsdSchemaKind UsdGeomGprim::_GetSchemaKind() const
-{
+UsdSchemaKind UsdGeomGprim::_GetSchemaKind() const {
     return UsdGeomGprim::schemaKind;
 }
 
 /* static */
-const TfType &
-UsdGeomGprim::_GetStaticTfType()
-{
+const TfType& UsdGeomGprim::_GetStaticTfType() {
     static TfType tfType = TfType::Find<UsdGeomGprim>();
     return tfType;
 }
 
 /* static */
-bool 
-UsdGeomGprim::_IsTypedSchema()
-{
+bool UsdGeomGprim::_IsTypedSchema() {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdGeomGprim::_GetTfType() const
-{
+const TfType& UsdGeomGprim::_GetTfType() const {
     return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdGeomGprim::GetDisplayColorAttr() const
-{
+UsdAttribute UsdGeomGprim::GetDisplayColorAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->primvarsDisplayColor);
 }
 
-UsdAttribute
-UsdGeomGprim::CreateDisplayColorAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->primvarsDisplayColor,
-                       SdfValueTypeNames->Color3fArray,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomGprim::CreateDisplayColorAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->primvarsDisplayColor, SdfValueTypeNames->Color3fArray,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomGprim::GetDisplayOpacityAttr() const
-{
+UsdAttribute UsdGeomGprim::GetDisplayOpacityAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->primvarsDisplayOpacity);
 }
 
-UsdAttribute
-UsdGeomGprim::CreateDisplayOpacityAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->primvarsDisplayOpacity,
-                       SdfValueTypeNames->FloatArray,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomGprim::CreateDisplayOpacityAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->primvarsDisplayOpacity, SdfValueTypeNames->FloatArray,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomGprim::GetDoubleSidedAttr() const
-{
+UsdAttribute UsdGeomGprim::GetDoubleSidedAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->doubleSided);
 }
 
-UsdAttribute
-UsdGeomGprim::CreateDoubleSidedAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->doubleSided,
-                       SdfValueTypeNames->Bool,
-                       /* custom = */ false,
-                       SdfVariabilityUniform,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomGprim::CreateDoubleSidedAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->doubleSided, SdfValueTypeNames->Bool,
+                                      /* custom = */ false, SdfVariabilityUniform, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdGeomGprim::GetOrientationAttr() const
-{
+UsdAttribute UsdGeomGprim::GetOrientationAttr() const {
     return GetPrim().GetAttribute(UsdGeomTokens->orientation);
 }
 
-UsdAttribute
-UsdGeomGprim::CreateOrientationAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->orientation,
-                       SdfValueTypeNames->Token,
-                       /* custom = */ false,
-                       SdfVariabilityUniform,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdGeomGprim::CreateOrientationAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdGeomTokens->orientation, SdfValueTypeNames->Token,
+                                      /* custom = */ false, SdfVariabilityUniform, defaultValue, writeSparsely);
 }
 
 namespace {
-static inline TfTokenVector
-_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
-{
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector& left, const TfTokenVector& right) {
     TfTokenVector result;
     result.reserve(left.size() + right.size());
     result.insert(result.end(), left.begin(), left.end());
     result.insert(result.end(), right.begin(), right.end());
     return result;
 }
-}
+}  // namespace
 
 /*static*/
-const TfTokenVector&
-UsdGeomGprim::GetSchemaAttributeNames(bool includeInherited)
-{
+const TfTokenVector& UsdGeomGprim::GetSchemaAttributeNames(bool includeInherited) {
     static TfTokenVector localNames = {
-        UsdGeomTokens->primvarsDisplayColor,
-        UsdGeomTokens->primvarsDisplayOpacity,
-        UsdGeomTokens->doubleSided,
-        UsdGeomTokens->orientation,
+            UsdGeomTokens->primvarsDisplayColor,
+            UsdGeomTokens->primvarsDisplayOpacity,
+            UsdGeomTokens->doubleSided,
+            UsdGeomTokens->orientation,
     };
     static TfTokenVector allNames =
-        _ConcatenateAttributeNames(
-            UsdGeomBoundable::GetSchemaAttributeNames(true),
-            localNames);
+            _ConcatenateAttributeNames(UsdGeomBoundable::GetSchemaAttributeNames(true), localNames);
 
     if (includeInherited)
         return allNames;
@@ -183,38 +130,22 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-UsdGeomPrimvar
-UsdGeomGprim::GetDisplayColorPrimvar() const
-{
+UsdGeomPrimvar UsdGeomGprim::GetDisplayColorPrimvar() const {
     return UsdGeomPrimvar(GetDisplayColorAttr());
 }
 
-UsdGeomPrimvar
-UsdGeomGprim::CreateDisplayColorPrimvar(const TfToken& interpolation,
-                                        int elementSize) const
-{
-    return UsdGeomPrimvarsAPI(GetPrim()).CreatePrimvar(
-        UsdGeomTokens->primvarsDisplayColor,
-        SdfValueTypeNames->Color3fArray,
-        interpolation,
-        elementSize);
+UsdGeomPrimvar UsdGeomGprim::CreateDisplayColorPrimvar(const TfToken& interpolation, int elementSize) const {
+    return UsdGeomPrimvarsAPI(GetPrim()).CreatePrimvar(UsdGeomTokens->primvarsDisplayColor,
+                                                       SdfValueTypeNames->Color3fArray, interpolation, elementSize);
 }
 
-UsdGeomPrimvar
-UsdGeomGprim::GetDisplayOpacityPrimvar() const
-{
+UsdGeomPrimvar UsdGeomGprim::GetDisplayOpacityPrimvar() const {
     return UsdGeomPrimvar(GetDisplayOpacityAttr());
 }
 
-UsdGeomPrimvar
-UsdGeomGprim::CreateDisplayOpacityPrimvar(const TfToken& interpolation,
-                                          int elementSize) const
-{
-    return UsdGeomPrimvarsAPI(GetPrim()).CreatePrimvar(
-        UsdGeomTokens->primvarsDisplayOpacity,
-        SdfValueTypeNames->FloatArray,
-        interpolation,
-        elementSize);
+UsdGeomPrimvar UsdGeomGprim::CreateDisplayOpacityPrimvar(const TfToken& interpolation, int elementSize) const {
+    return UsdGeomPrimvarsAPI(GetPrim()).CreatePrimvar(UsdGeomTokens->primvarsDisplayOpacity,
+                                                       SdfValueTypeNames->FloatArray, interpolation, elementSize);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

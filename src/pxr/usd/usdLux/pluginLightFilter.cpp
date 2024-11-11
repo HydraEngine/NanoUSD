@@ -14,11 +14,9 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType)
-{
-    TfType::Define<UsdLuxPluginLightFilter,
-        TfType::Bases< UsdLuxLightFilter > >();
-    
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<UsdLuxPluginLightFilter, TfType::Bases<UsdLuxLightFilter>>();
+
     // Register the usd prim typename as an alias under UsdSchemaBase. This
     // enables one to call
     // TfType::Find<UsdSchemaBase>().FindDerivedByName("PluginLightFilter")
@@ -28,14 +26,10 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdLuxPluginLightFilter::~UsdLuxPluginLightFilter()
-{
-}
+UsdLuxPluginLightFilter::~UsdLuxPluginLightFilter() {}
 
 /* static */
-UsdLuxPluginLightFilter
-UsdLuxPluginLightFilter::Get(const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdLuxPluginLightFilter UsdLuxPluginLightFilter::Get(const UsdStagePtr& stage, const SdfPath& path) {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdLuxPluginLightFilter();
@@ -44,55 +38,41 @@ UsdLuxPluginLightFilter::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdLuxPluginLightFilter
-UsdLuxPluginLightFilter::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdLuxPluginLightFilter UsdLuxPluginLightFilter::Define(const UsdStagePtr& stage, const SdfPath& path) {
     static TfToken usdPrimTypeName("PluginLightFilter");
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdLuxPluginLightFilter();
     }
-    return UsdLuxPluginLightFilter(
-        stage->DefinePrim(path, usdPrimTypeName));
+    return UsdLuxPluginLightFilter(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
-UsdSchemaKind UsdLuxPluginLightFilter::_GetSchemaKind() const
-{
+UsdSchemaKind UsdLuxPluginLightFilter::_GetSchemaKind() const {
     return UsdLuxPluginLightFilter::schemaKind;
 }
 
 /* static */
-const TfType &
-UsdLuxPluginLightFilter::_GetStaticTfType()
-{
+const TfType& UsdLuxPluginLightFilter::_GetStaticTfType() {
     static TfType tfType = TfType::Find<UsdLuxPluginLightFilter>();
     return tfType;
 }
 
 /* static */
-bool 
-UsdLuxPluginLightFilter::_IsTypedSchema()
-{
+bool UsdLuxPluginLightFilter::_IsTypedSchema() {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdLuxPluginLightFilter::_GetTfType() const
-{
+const TfType& UsdLuxPluginLightFilter::_GetTfType() const {
     return _GetStaticTfType();
 }
 
 /*static*/
-const TfTokenVector&
-UsdLuxPluginLightFilter::GetSchemaAttributeNames(bool includeInherited)
-{
+const TfTokenVector& UsdLuxPluginLightFilter::GetSchemaAttributeNames(bool includeInherited) {
     static TfTokenVector localNames;
-    static TfTokenVector allNames =
-        UsdLuxLightFilter::GetSchemaAttributeNames(true);
+    static TfTokenVector allNames = UsdLuxLightFilter::GetSchemaAttributeNames(true);
 
     if (includeInherited)
         return allNames;
@@ -113,9 +93,7 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-UsdShadeNodeDefAPI 
-UsdLuxPluginLightFilter::GetNodeDefAPI() const
-{
+UsdShadeNodeDefAPI UsdLuxPluginLightFilter::GetNodeDefAPI() const {
     return UsdShadeNodeDefAPI(GetPrim());
 }
 
