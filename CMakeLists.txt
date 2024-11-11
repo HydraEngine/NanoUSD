@@ -22,6 +22,7 @@ find_package(TBB REQUIRED)
 
 find_package(fmt CONFIG REQUIRED)
 find_package(Eigen3 CONFIG REQUIRED)
+find_package(MaterialX CONFIG REQUIRED)
 
 add_subdirectory(src)
 

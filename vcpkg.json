@@ -11,5 +11,8 @@
   }, {
     "name" : "gtest",
     "version>=" : "1.14.0#1"
+  }, {
+    "name" : "materialx",
+    "version>=" : "1.39.1#1"
   } ]
 }
