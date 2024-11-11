@@ -18,12 +18,10 @@
 #include <fstream>
 #include <vector>
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-
-bool UsdDraco_WriteDraco(const UsdGeomMesh &usdMesh,
-                         const std::string &fileName,
+bool UsdDraco_WriteDraco(const UsdGeomMesh& usdMesh,
+                         const std::string& fileName,
                          int qp,
                          int qt,
                          int qn,
@@ -33,11 +31,10 @@ bool UsdDraco_WriteDraco(const UsdGeomMesh &usdMesh,
                          int preserveHoles) {
     // Translate USD mesh to Draco mesh.
     draco::Mesh dracoMesh;
-    bool success = UsdDracoExportTranslator::Translate(
-        usdMesh, &dracoMesh,
-        UsdDracoFlag<bool>::MakeBooleanFlag(preservePolygons),
-        UsdDracoFlag<bool>::MakeBooleanFlag(preservePositionOrder),
-        UsdDracoFlag<bool>::MakeBooleanFlag(preserveHoles));
+    bool success = UsdDracoExportTranslator::Translate(usdMesh, &dracoMesh,
+                                                       UsdDracoFlag<bool>::MakeBooleanFlag(preservePolygons),
+                                                       UsdDracoFlag<bool>::MakeBooleanFlag(preservePositionOrder),
+                                                       UsdDracoFlag<bool>::MakeBooleanFlag(preserveHoles));
     if (!success) {
         std::cout << "Could not translate USD mesh to Draco mesh." << std::endl;
         return false;
@@ -47,15 +44,9 @@ bool UsdDraco_WriteDraco(const UsdGeomMesh &usdMesh,
     draco::EncoderBuffer buffer;
     draco::Encoder encoder;
     encoder.SetEncodingMethod(draco::MESH_EDGEBREAKER_ENCODING);
-    if (qp != 0)
-        encoder.SetAttributeQuantization(draco::GeometryAttribute::POSITION,
-                                         qp);
-    if (qt != 0)
-        encoder.SetAttributeQuantization(draco::GeometryAttribute::TEX_COORD,
-                                         qt);
-    if (qn != 0)
-        encoder.SetAttributeQuantization(draco::GeometryAttribute::NORMAL,
-                                         qn);
+    if (qp != 0) encoder.SetAttributeQuantization(draco::GeometryAttribute::POSITION, qp);
+    if (qt != 0) encoder.SetAttributeQuantization(draco::GeometryAttribute::TEX_COORD, qt);
+    if (qn != 0) encoder.SetAttributeQuantization(draco::GeometryAttribute::NORMAL, qn);
 
     const int speed = 10 - cl;
     encoder.SetSpeedOptions(speed, speed);
@@ -72,14 +63,11 @@ bool UsdDraco_WriteDraco(const UsdGeomMesh &usdMesh,
     }
     fout.write(buffer.data(), buffer.size());
     fout.close();
-  return true;
+    return true;
 }
 
-bool UsdDraco_PrimvarSupported(const UsdGeomPrimvar &primvar) {
-    return UsdDracoExportTranslator::CreateAttributeFrom(
-        primvar) != nullptr;
+bool UsdDraco_PrimvarSupported(const UsdGeomPrimvar& primvar) {
+    return UsdDracoExportTranslator::CreateAttributeFrom(primvar) != nullptr;
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

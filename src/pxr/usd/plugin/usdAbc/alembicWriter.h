@@ -30,8 +30,8 @@ TF_DECLARE_WEAK_AND_REF_PTRS(SdfAbstractData);
 class UsdAbc_AlembicDataWriter {
 public:
     UsdAbc_AlembicDataWriter();
-    UsdAbc_AlembicDataWriter (const UsdAbc_AlembicDataWriter&) = delete;
-    UsdAbc_AlembicDataWriter& operator= (const UsdAbc_AlembicDataWriter&) = delete;
+    UsdAbc_AlembicDataWriter(const UsdAbc_AlembicDataWriter&) = delete;
+    UsdAbc_AlembicDataWriter& operator=(const UsdAbc_AlembicDataWriter&) = delete;
     ~UsdAbc_AlembicDataWriter();
 
     bool Open(const std::string& filePath, const std::string& comment);

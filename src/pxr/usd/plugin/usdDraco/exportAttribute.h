@@ -19,9 +19,7 @@
 #include <draco/attributes/point_attribute.h>
 #include <draco/mesh/mesh.h>
 
-
 PXR_NAMESPACE_OPEN_SCOPE
-
 
 /// \class UsdDracoExportAttributeInterface
 ///
@@ -33,17 +31,14 @@ class UsdDracoExportAttributeInterface {
 public:
     virtual ~UsdDracoExportAttributeInterface() = default;
 
-    virtual const UsdDracoAttributeDescriptor &GetDescriptor() const = 0;
-    virtual void GetFromMesh(const UsdGeomMesh &usdMesh,
-                             size_t numPositions) = 0;
-    virtual void SetToMesh(draco::Mesh *dracoMesh) = 0;
-    virtual void SetPointMapEntry(draco::PointIndex pointIndex,
-                                  size_t positionIndex, size_t cornerIndex) = 0;
+    virtual const UsdDracoAttributeDescriptor& GetDescriptor() const = 0;
+    virtual void GetFromMesh(const UsdGeomMesh& usdMesh, size_t numPositions) = 0;
+    virtual void SetToMesh(draco::Mesh* dracoMesh) = 0;
+    virtual void SetPointMapEntry(draco::PointIndex pointIndex, size_t positionIndex, size_t cornerIndex) = 0;
     virtual size_t GetNumValues() const = 0;
     virtual size_t GetNumIndices() const = 0;
     virtual bool UsesPositionIndex() const = 0;
 };
-
 
 /// \class UsdDracoExportAttribute
 ///
@@ -52,26 +47,25 @@ public:
 template <class T>
 class UsdDracoExportAttribute : public UsdDracoExportAttributeInterface {
 public:
-    UsdDracoExportAttribute(const UsdDracoAttributeDescriptor &descriptor);
-    const UsdDracoAttributeDescriptor &GetDescriptor() const override;
+    UsdDracoExportAttribute(const UsdDracoAttributeDescriptor& descriptor);
+    const UsdDracoAttributeDescriptor& GetDescriptor() const override;
 
     // Populates member arrays with data from USD mesh based on descriptor.
-    void GetFromMesh(const UsdGeomMesh &usdMesh, size_t numPositions) override;
+    void GetFromMesh(const UsdGeomMesh& usdMesh, size_t numPositions) override;
 
     // Populates member values array with an ascending sequence (0, 1, 2, ...)
     // of a given size.
     void GetFromRange(size_t size);
 
     // Creates Draco mesh attribute, sets the values, and metadata.
-    void SetToMesh(draco::Mesh *dracoMesh) override;
+    void SetToMesh(draco::Mesh* dracoMesh) override;
 
     // Sets Draco mesh attribute point map entry.
     void SetPointMapEntry(draco::PointIndex pointIndex, size_t entryIndex);
 
     // Sets Draco mesh attribute point map entry using either position index or
     // corner index, depending on the USD attribute interpolation value.
-    void SetPointMapEntry(draco::PointIndex pointIndex,
-                          size_t positionIndex, size_t cornerIndex) override;
+    void SetPointMapEntry(draco::PointIndex pointIndex, size_t positionIndex, size_t cornerIndex) override;
     void Clear();
     size_t GetNumValues() const override;
     size_t GetNumIndices() const override;
@@ -80,48 +74,37 @@ public:
 
 private:
     template <class S>
-    static void _MakeRange(VtArray<S> *array, size_t size);
+    static void _MakeRange(VtArray<S>* array, size_t size);
     void _SetAttributeValue(draco::AttributeValueIndex avi, size_t index);
 
     // Specialization for arithmetic types.
-    template <class T_ = T,
-        typename std::enable_if<std::is_arithmetic<T_>::value>::type* = nullptr>
-    void _SetAttributeValueSpecialized(
-        draco::AttributeValueIndex avi, const T &value) {
+    template <class T_ = T, typename std::enable_if<std::is_arithmetic<T_>::value>::type* = nullptr>
+    void _SetAttributeValueSpecialized(draco::AttributeValueIndex avi, const T& value) {
         _pointAttribute->SetAttributeValue(avi, &value);
     }
 
     // Specialization for GfHalf type.
-    template <class T_ = T,
-        typename std::enable_if<
-            std::is_same<T_, GfHalf>::value>::type* = nullptr>
-    void _SetAttributeValueSpecialized(
-        draco::AttributeValueIndex avi, const T &value) {
+    template <class T_ = T, typename std::enable_if<std::is_same<T_, GfHalf>::value>::type* = nullptr>
+    void _SetAttributeValueSpecialized(draco::AttributeValueIndex avi, const T& value) {
         // USD halfs are stored as Draco 16-bit ints.
         _pointAttribute->SetAttributeValue(avi, &value);
     }
 
     // Specialization for vector types.
-    template <class T_ = T,
-        typename std::enable_if<GfIsGfVec<T_>::value>::type* = nullptr>
-    void _SetAttributeValueSpecialized(
-        draco::AttributeValueIndex avi, const T &value) {
+    template <class T_ = T, typename std::enable_if<GfIsGfVec<T_>::value>::type* = nullptr>
+    void _SetAttributeValueSpecialized(draco::AttributeValueIndex avi, const T& value) {
         _pointAttribute->SetAttributeValue(avi, value.data());
     }
 
     // Specialization for matrix types.
-    template <class T_ = T,
-        typename std::enable_if<GfIsGfMatrix<T_>::value>::type* = nullptr>
-    void _SetAttributeValueSpecialized(
-        draco::AttributeValueIndex avi, const T &value) {
+    template <class T_ = T, typename std::enable_if<GfIsGfMatrix<T_>::value>::type* = nullptr>
+    void _SetAttributeValueSpecialized(draco::AttributeValueIndex avi, const T& value) {
         _pointAttribute->SetAttributeValue(avi, value.data());
     }
 
     // Specialization for quaternion types.
-    template <class T_ = T,
-        typename std::enable_if<GfIsGfQuat<T_>::value>::type* = nullptr>
-    void _SetAttributeValueSpecialized(
-            draco::AttributeValueIndex avi, const T &value) {
+    template <class T_ = T, typename std::enable_if<GfIsGfQuat<T_>::value>::type* = nullptr>
+    void _SetAttributeValueSpecialized(draco::AttributeValueIndex avi, const T& value) {
         // Combine quaternion components into a length-four vector.
         // TODO: Write directly to data buffer of the point attribute.
         std::array<typename T::ScalarType, 4> quaternion;
@@ -134,37 +117,29 @@ private:
 
 private:
     UsdDracoAttributeDescriptor _descriptor;
-    draco::PointAttribute *_pointAttribute;
+    draco::PointAttribute* _pointAttribute;
     bool _usePositionIndex;
     VtArray<T> _values;
     VtArray<int> _indices;
 };
 
+template <class T>
+UsdDracoExportAttribute<T>::UsdDracoExportAttribute(const UsdDracoAttributeDescriptor& descriptor)
+    : _descriptor(descriptor), _pointAttribute(nullptr), _usePositionIndex(false) {}
 
 template <class T>
-UsdDracoExportAttribute<T>::UsdDracoExportAttribute(
-    const UsdDracoAttributeDescriptor &descriptor) :
-    _descriptor(descriptor),
-    _pointAttribute(nullptr),
-    _usePositionIndex(false) {}
-
-template <class T>
-const UsdDracoAttributeDescriptor &
-UsdDracoExportAttribute<T>::GetDescriptor() const {
+const UsdDracoAttributeDescriptor& UsdDracoExportAttribute<T>::GetDescriptor() const {
     return _descriptor;
 }
 
 template <class T>
-void UsdDracoExportAttribute<T>::GetFromMesh(
-        const UsdGeomMesh &usdMesh, size_t numPositions) {
-    if (_descriptor.GetStatus() != UsdDracoAttributeDescriptor::VALID)
-        return;
+void UsdDracoExportAttribute<T>::GetFromMesh(const UsdGeomMesh& usdMesh, size_t numPositions) {
+    if (_descriptor.GetStatus() != UsdDracoAttributeDescriptor::VALID) return;
     if (_descriptor.GetIsPrimvar()) {
         // Get data from a primvar.
         const UsdGeomPrimvarsAPI api = UsdGeomPrimvarsAPI(usdMesh.GetPrim());
         UsdGeomPrimvar primvar = api.GetPrimvar(_descriptor.GetName());
-        if (!primvar)
-            return;
+        if (!primvar) return;
         primvar.GetAttr().Get(&_values, _descriptor.GetValuesTime());
         primvar.GetIndices(&_indices, _descriptor.GetIndicesTime());
 
@@ -173,42 +148,30 @@ void UsdDracoExportAttribute<T>::GetFromMesh(
         // attributes associated with mesh vertices and may have implicit
         // indices.
         _usePositionIndex = primvar.GetInterpolation() == UsdGeomTokens->vertex;
-        if (_indices.empty() && _usePositionIndex &&
-            _values.size() == numPositions)
+        if (_indices.empty() && _usePositionIndex && _values.size() == numPositions)
             _MakeRange(&_indices, numPositions);
     } else {
         // Get data from an attribute.
-        UsdAttribute attribute =
-            usdMesh.GetPrim().GetAttribute(_descriptor.GetName());
-        if (attribute)
-            attribute.Get(&_values);
+        UsdAttribute attribute = usdMesh.GetPrim().GetAttribute(_descriptor.GetName());
+        if (attribute) attribute.Get(&_values);
     }
 }
 
 template <class T>
-void UsdDracoExportAttribute<T>::SetToMesh(draco::Mesh *dracoMesh) {
+void UsdDracoExportAttribute<T>::SetToMesh(draco::Mesh* dracoMesh) {
     // Optional attributes like normals may not be present.
-    if (_values.empty())
-        return;
+    if (_values.empty()) return;
 
     // Create Draco attribtue.
     draco::GeometryAttribute geometryAttr;
-    const size_t byteStride = _descriptor.GetNumComponents() *
-        draco::DataTypeLength(_descriptor.GetDataType());
-    geometryAttr.Init(_descriptor.GetAttributeType(),
-                      nullptr /* buffer */,
-                      _descriptor.GetNumComponents(),
-                      _descriptor.GetDataType(),
-                      false /* normalized */,
-                      byteStride,
-                      0 /* byteOffset */);
-    const int attributeId =
-        dracoMesh->AddAttribute(geometryAttr, false, _values.size());
+    const size_t byteStride = _descriptor.GetNumComponents() * draco::DataTypeLength(_descriptor.GetDataType());
+    geometryAttr.Init(_descriptor.GetAttributeType(), nullptr /* buffer */, _descriptor.GetNumComponents(),
+                      _descriptor.GetDataType(), false /* normalized */, byteStride, 0 /* byteOffset */);
+    const int attributeId = dracoMesh->AddAttribute(geometryAttr, false, _values.size());
     _pointAttribute = dracoMesh->attribute(attributeId);
 
     // Populate Draco attribute values.
-    for (size_t i = 0; i < _values.size(); i++)
-        _SetAttributeValue(draco::AttributeValueIndex(i), i);
+    for (size_t i = 0; i < _values.size(); i++) _SetAttributeValue(draco::AttributeValueIndex(i), i);
 
     // Set metadata for Draco attribute.
     dracoMesh->AddAttributeMetadata(attributeId, _descriptor.ToMetadata());
@@ -221,8 +184,7 @@ void UsdDracoExportAttribute<T>::GetFromRange(size_t size) {
 
 template <class T>
 template <class S>
-void UsdDracoExportAttribute<T>::_MakeRange(
-        VtArray<S> *array, size_t size) {
+void UsdDracoExportAttribute<T>::_MakeRange(VtArray<S>* array, size_t size) {
     (*array).resize(size);
     for (size_t i = 0; i < size; i++) {
         (*array)[i] = static_cast<S>(i);
@@ -230,26 +192,21 @@ void UsdDracoExportAttribute<T>::_MakeRange(
 }
 
 template <class T>
-inline void UsdDracoExportAttribute<T>::_SetAttributeValue(
-        draco::AttributeValueIndex avi, size_t index) {
+inline void UsdDracoExportAttribute<T>::_SetAttributeValue(draco::AttributeValueIndex avi, size_t index) {
     _SetAttributeValueSpecialized(avi, _values[index]);
 }
 
 template <class T>
-inline void UsdDracoExportAttribute<T>::SetPointMapEntry(
-        draco::PointIndex pointIndex, size_t entryIndex) {
-    if (_pointAttribute == nullptr)
-        return;
-    _pointAttribute->SetPointMapEntry(
-        pointIndex, draco::AttributeValueIndex(entryIndex));
+inline void UsdDracoExportAttribute<T>::SetPointMapEntry(draco::PointIndex pointIndex, size_t entryIndex) {
+    if (_pointAttribute == nullptr) return;
+    _pointAttribute->SetPointMapEntry(pointIndex, draco::AttributeValueIndex(entryIndex));
 }
 
 template <class T>
-inline void UsdDracoExportAttribute<T>::SetPointMapEntry(
-        draco::PointIndex pointIndex, size_t positionIndex,
-        size_t cornerIndex) {
-    if (_pointAttribute == nullptr)
-        return;
+inline void UsdDracoExportAttribute<T>::SetPointMapEntry(draco::PointIndex pointIndex,
+                                                         size_t positionIndex,
+                                                         size_t cornerIndex) {
+    if (_pointAttribute == nullptr) return;
     const size_t index = _usePositionIndex ? positionIndex : cornerIndex;
     const size_t entryIndex = _indices[index];
     SetPointMapEntry(pointIndex, entryIndex);
@@ -282,7 +239,6 @@ template <class T>
 inline bool UsdDracoExportAttribute<T>::HasPointAttribute() const {
     return _pointAttribute != nullptr;
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

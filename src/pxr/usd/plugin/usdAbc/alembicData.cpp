@@ -18,7 +18,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 // Note: The Alembic translator has a few major parts.  Here's a
 //       quick description.
 //
@@ -74,12 +73,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 using namespace UsdAbc_AlembicUtil;
 
-TF_DEFINE_ENV_SETTING(USD_ABC_EXPAND_INSTANCES, false,
-                      "Force Alembic instances to be expanded.");
-TF_DEFINE_ENV_SETTING(USD_ABC_DISABLE_INSTANCING, false,
-                      "Disable instancing on prototypes created from Alembic.");
-TF_DEFINE_ENV_SETTING(USD_ABC_PARENT_INSTANCES, true,
-                      "Make parent of instance source into prototype where possible.");
+TF_DEFINE_ENV_SETTING(USD_ABC_EXPAND_INSTANCES, false, "Force Alembic instances to be expanded.");
+TF_DEFINE_ENV_SETTING(USD_ABC_DISABLE_INSTANCING, false, "Disable instancing on prototypes created from Alembic.");
+TF_DEFINE_ENV_SETTING(USD_ABC_PARENT_INSTANCES, true, "Make parent of instance source into prototype where possible.");
 
 // The SdfAbstractData time samples type.
 // XXX: SdfAbstractData should typedef this.
@@ -91,25 +87,17 @@ typedef std::set<double> UsdAbc_TimeSamples;
 
 #define XXX_UNSUPPORTED(M) TF_RUNTIME_ERROR("Alembic file " #M "() not supported")
 
-UsdAbc_AlembicData::UsdAbc_AlembicData(SdfFileFormat::FileFormatArguments args)
-    : _arguments(std::move(args))
-{
-}
+UsdAbc_AlembicData::UsdAbc_AlembicData(SdfFileFormat::FileFormatArguments args) : _arguments(std::move(args)) {}
 
-UsdAbc_AlembicData::~UsdAbc_AlembicData()
-{
+UsdAbc_AlembicData::~UsdAbc_AlembicData() {
     // Do nothing
 }
 
-UsdAbc_AlembicDataRefPtr
-UsdAbc_AlembicData::New(SdfFileFormat::FileFormatArguments args)
-{
+UsdAbc_AlembicDataRefPtr UsdAbc_AlembicData::New(SdfFileFormat::FileFormatArguments args) {
     return TfCreateRefPtr(new UsdAbc_AlembicData(std::move(args)));
 }
 
-bool
-UsdAbc_AlembicData::Open(const std::string& filePath)
-{
+bool UsdAbc_AlembicData::Open(const std::string& filePath) {
     TfAutoMallocTag2 tag("UsdAbc_AlembicData", "UsdAbc_AlembicData::Open");
     TRACE_FUNCTION();
 
@@ -135,32 +123,24 @@ UsdAbc_AlembicData::Open(const std::string& filePath)
         return true;
     }
 
-    TF_RUNTIME_ERROR("Failed to open Alembic archive \"%s\": %s",
-                     filePath.c_str(),
-                     _reader->GetErrors().c_str());
+    TF_RUNTIME_ERROR("Failed to open Alembic archive \"%s\": %s", filePath.c_str(), _reader->GetErrors().c_str());
     Close();
     return false;
 }
 
-void
-UsdAbc_AlembicData::Close()
-{
+void UsdAbc_AlembicData::Close() {
     _reader.reset();
 }
 
-bool
-UsdAbc_AlembicData::Write(
-    const SdfAbstractDataConstPtr& data,
-    const std::string& filePath,
-    const std::string& comment)
-{
+bool UsdAbc_AlembicData::Write(const SdfAbstractDataConstPtr& data,
+                               const std::string& filePath,
+                               const std::string& comment) {
     TfAutoMallocTag2 tag("UsdAbc_AlembicData", "UsdAbc_AlembicData::Write");
     TRACE_FUNCTION();
 
     std::string finalComment = comment;
     if (data && finalComment.empty()) {
-        VtValue value = data->Get(
-            SdfPath::AbsoluteRootPath(), SdfFieldKeys->Comment);
+        VtValue value = data->Get(SdfPath::AbsoluteRootPath(), SdfFieldKeys->Comment);
         if (value.IsHolding<std::string>()) {
             finalComment = value.UncheckedGet<std::string>();
         }
@@ -168,7 +148,7 @@ UsdAbc_AlembicData::Write(
 
     // Prepare the writer.
     UsdAbc_AlembicDataWriter writer;
-    //writer.SetFlag(UsdAbc_AlembicContextFlagNames->verbose);
+    // writer.SetFlag(UsdAbc_AlembicContextFlagNames->verbose);
 
     // Write the archive.
     if (writer.Open(filePath, finalComment)) {
@@ -181,42 +161,27 @@ UsdAbc_AlembicData::Write(
     return false;
 }
 
-bool
-UsdAbc_AlembicData::StreamsData() const
-{
+bool UsdAbc_AlembicData::StreamsData() const {
     return true;
 }
 
-void
-UsdAbc_AlembicData::CreateSpec(const SdfPath &path, SdfSpecType specType)
-{
+void UsdAbc_AlembicData::CreateSpec(const SdfPath& path, SdfSpecType specType) {
     XXX_UNSUPPORTED(CreateSpec);
 }
 
-bool
-UsdAbc_AlembicData::HasSpec(const SdfPath& path) const
-{
-    return _reader ? _reader->HasSpec(path)
-                   : (path == SdfPath::AbsoluteRootPath());
+bool UsdAbc_AlembicData::HasSpec(const SdfPath& path) const {
+    return _reader ? _reader->HasSpec(path) : (path == SdfPath::AbsoluteRootPath());
 }
 
-void
-UsdAbc_AlembicData::EraseSpec(const SdfPath& path)
-{
+void UsdAbc_AlembicData::EraseSpec(const SdfPath& path) {
     XXX_UNSUPPORTED(EraseSpec);
 }
 
-void
-UsdAbc_AlembicData::MoveSpec(
-    const SdfPath& oldPath,
-    const SdfPath& newPath)
-{
+void UsdAbc_AlembicData::MoveSpec(const SdfPath& oldPath, const SdfPath& newPath) {
     XXX_UNSUPPORTED(MoveSpec);
 }
 
-SdfSpecType
-UsdAbc_AlembicData::GetSpecType(const SdfPath& path) const
-{
+SdfSpecType UsdAbc_AlembicData::GetSpecType(const SdfPath& path) const {
     if (_reader) {
         return _reader->GetSpecType(path);
     }
@@ -226,37 +191,21 @@ UsdAbc_AlembicData::GetSpecType(const SdfPath& path) const
     return SdfSpecTypeUnknown;
 }
 
-void
-UsdAbc_AlembicData::_VisitSpecs(SdfAbstractDataSpecVisitor* visitor) const
-{
+void UsdAbc_AlembicData::_VisitSpecs(SdfAbstractDataSpecVisitor* visitor) const {
     if (_reader) {
         _reader->VisitSpecs(*this, visitor);
     }
 }
 
-bool
-UsdAbc_AlembicData::Has(
-    const SdfPath& path,
-    const TfToken& fieldName,
-    SdfAbstractDataValue* value) const
-{
+bool UsdAbc_AlembicData::Has(const SdfPath& path, const TfToken& fieldName, SdfAbstractDataValue* value) const {
     return _reader ? _reader->HasField(path, fieldName, value) : false;
 }
 
-bool
-UsdAbc_AlembicData::Has(
-    const SdfPath& path,
-    const TfToken& fieldName,
-    VtValue* value) const
-{
+bool UsdAbc_AlembicData::Has(const SdfPath& path, const TfToken& fieldName, VtValue* value) const {
     return _reader ? _reader->HasField(path, fieldName, value) : false;
 }
 
-VtValue
-UsdAbc_AlembicData::Get(
-    const SdfPath& path,
-    const TfToken& fieldName) const
-{
+VtValue UsdAbc_AlembicData::Get(const SdfPath& path, const TfToken& fieldName) const {
     VtValue result;
     if (_reader) {
         _reader->HasField(path, fieldName, &result);
@@ -264,113 +213,63 @@ UsdAbc_AlembicData::Get(
     return result;
 }
 
-void
-UsdAbc_AlembicData::Set(
-    const SdfPath& path,
-    const TfToken& fieldName,
-    const VtValue& value)
-{
+void UsdAbc_AlembicData::Set(const SdfPath& path, const TfToken& fieldName, const VtValue& value) {
     XXX_UNSUPPORTED(Set);
 }
 
-void
-UsdAbc_AlembicData::Set(
-    const SdfPath& path,
-    const TfToken& fieldName,
-    const SdfAbstractDataConstValue& value)
-{
+void UsdAbc_AlembicData::Set(const SdfPath& path, const TfToken& fieldName, const SdfAbstractDataConstValue& value) {
     XXX_UNSUPPORTED(Set);
 }
 
-void
-UsdAbc_AlembicData::Erase(
-    const SdfPath& path,
-    const TfToken& fieldName)
-{
+void UsdAbc_AlembicData::Erase(const SdfPath& path, const TfToken& fieldName) {
     XXX_UNSUPPORTED(Erase);
 }
 
-std::vector<TfToken>
-UsdAbc_AlembicData::List(const SdfPath& path) const
-{
+std::vector<TfToken> UsdAbc_AlembicData::List(const SdfPath& path) const {
     return _reader ? _reader->List(path) : std::vector<TfToken>();
 }
 
-std::set<double>
-UsdAbc_AlembicData::ListAllTimeSamples() const
-{
+std::set<double> UsdAbc_AlembicData::ListAllTimeSamples() const {
     return _reader ? _reader->ListAllTimeSamples() : std::set<double>();
 }
 
-std::set<double>
-UsdAbc_AlembicData::ListTimeSamplesForPath(const SdfPath& path) const
-{
-    return _reader ? _reader->ListTimeSamplesForPath(path).GetTimes()
-                   : std::set<double>();
+std::set<double> UsdAbc_AlembicData::ListTimeSamplesForPath(const SdfPath& path) const {
+    return _reader ? _reader->ListTimeSamplesForPath(path).GetTimes() : std::set<double>();
 }
 
-bool
-UsdAbc_AlembicData::GetBracketingTimeSamples(
-    double time, double* tLower, double* tUpper) const
-{
+bool UsdAbc_AlembicData::GetBracketingTimeSamples(double time, double* tLower, double* tUpper) const {
     const std::set<double>& samples = _reader->ListAllTimeSamples();
-    return UsdAbc_AlembicDataReader::TimeSamples::Bracket(samples, time,
-                                                          tLower, tUpper);
+    return UsdAbc_AlembicDataReader::TimeSamples::Bracket(samples, time, tLower, tUpper);
 }
 
-size_t
-UsdAbc_AlembicData::GetNumTimeSamplesForPath(
-    const SdfPath& path) const
-{
+size_t UsdAbc_AlembicData::GetNumTimeSamplesForPath(const SdfPath& path) const {
     return _reader ? _reader->ListTimeSamplesForPath(path).GetSize() : 0u;
 }
 
-bool
-UsdAbc_AlembicData::GetBracketingTimeSamplesForPath(
-    const SdfPath& path,
-    double time, double* tLower, double* tUpper) const
-{
-    return _reader &&
-           _reader->ListTimeSamplesForPath(path).Bracket(time, tLower, tUpper);
+bool UsdAbc_AlembicData::GetBracketingTimeSamplesForPath(const SdfPath& path,
+                                                         double time,
+                                                         double* tLower,
+                                                         double* tUpper) const {
+    return _reader && _reader->ListTimeSamplesForPath(path).Bracket(time, tLower, tUpper);
 }
 
-bool
-UsdAbc_AlembicData::QueryTimeSample(
-    const SdfPath& path,
-    double time,
-    SdfAbstractDataValue* value) const
-{
+bool UsdAbc_AlembicData::QueryTimeSample(const SdfPath& path, double time, SdfAbstractDataValue* value) const {
     UsdAbc_AlembicDataReader::Index index;
-    return _reader &&
-           _reader->ListTimeSamplesForPath(path).FindIndex(time, &index) && 
+    return _reader && _reader->ListTimeSamplesForPath(path).FindIndex(time, &index) &&
            _reader->HasValue(path, index, value);
 }
 
-bool
-UsdAbc_AlembicData::QueryTimeSample(
-    const SdfPath& path,
-    double time,
-    VtValue* value) const
-{
+bool UsdAbc_AlembicData::QueryTimeSample(const SdfPath& path, double time, VtValue* value) const {
     UsdAbc_AlembicDataReader::Index index;
-    return _reader->ListTimeSamplesForPath(path).FindIndex(time, &index) && 
-           _reader->HasValue(path, index, value);
+    return _reader->ListTimeSamplesForPath(path).FindIndex(time, &index) && _reader->HasValue(path, index, value);
 }
 
-void
-UsdAbc_AlembicData::SetTimeSample(
-    const SdfPath& path,
-    double time,
-    const VtValue& value)
-{
+void UsdAbc_AlembicData::SetTimeSample(const SdfPath& path, double time, const VtValue& value) {
     XXX_UNSUPPORTED(SetTimeSample);
 }
 
-void
-UsdAbc_AlembicData::EraseTimeSample(const SdfPath& path, double time)
-{
+void UsdAbc_AlembicData::EraseTimeSample(const SdfPath& path, double time) {
     XXX_UNSUPPORTED(EraseTimeSample);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

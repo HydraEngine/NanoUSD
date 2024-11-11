@@ -18,9 +18,7 @@
 #include <draco/attributes/geometry_attribute.h>
 #include <draco/attributes/point_attribute.h>
 
-
 PXR_NAMESPACE_OPEN_SCOPE
-
 
 /// \class UsdDracoAttributeFactory
 ///
@@ -36,46 +34,43 @@ public:
     // of C++ type T. Used to create attributes of UsdDracoImportAttribute<T>
     // and UsdDracoExportAttribute<T> types.
     template <class InterfaceT, class CreatorT>
-    static std::unique_ptr<InterfaceT> CreateAttribute(
-        const UsdDracoAttributeDescriptor &descriptor,
-        const CreatorT &creator);
+    static std::unique_ptr<InterfaceT> CreateAttribute(const UsdDracoAttributeDescriptor& descriptor,
+                                                       const CreatorT& creator);
 
     // Returns SDF type name for a given attribute descriptor. Runtime error is
     // produced for unsupported attribute descriptors.
-    static SdfValueTypeName GetSdfValueTypeName(
-        const UsdDracoAttributeDescriptor &descriptor);
+    static SdfValueTypeName GetSdfValueTypeName(const UsdDracoAttributeDescriptor& descriptor);
 
     // Returns Draco data type corresponding to a given type info.
     // draco::DT_INVALID is returned for unsupported type infos.
-    static draco::DataType GetDracoDataType(const std::type_info &typeInfo);
+    static draco::DataType GetDracoDataType(const std::type_info& typeInfo);
 
     // Returns data shape corresponding to a given type info.
     // draco::DT_INVALID is returned for unsupported type infos.
-    static UsdDracoAttributeDescriptor::Shape GetShape(
-        const std::type_info &typeInfo);
+    static UsdDracoAttributeDescriptor::Shape GetShape(const std::type_info& typeInfo);
 
     // Returns a bool indicating whether a given type info corresponds to a
     // 16-bit floating point data type.
-    static bool IsHalf(const std::type_info &typeInfo);
+    static bool IsHalf(const std::type_info& typeInfo);
 };
 
-
 // Macros to make the switch cases below more compact.
-#define CASE_FOR_ATTRIBUTE_TYPE(dracoType, valueType) { \
-    case dracoType: \
-        return creator.template CreateAttribute<valueType>(descriptor); \
-}
-
-#define CASE_FOR_ATTRIBUTE_HALF(dracoType, valueType) { \
-    case dracoType: \
-        if (descriptor.GetIsHalf()) \
+#define CASE_FOR_ATTRIBUTE_TYPE(dracoType, valueType)                       \
+    {                                                                       \
+        case dracoType:                                                     \
             return creator.template CreateAttribute<valueType>(descriptor); \
-        break; \
-}
+    }
+
+#define CASE_FOR_ATTRIBUTE_HALF(dracoType, valueType)                                                   \
+    {                                                                                                   \
+        case dracoType:                                                                                 \
+            if (descriptor.GetIsHalf()) return creator.template CreateAttribute<valueType>(descriptor); \
+            break;                                                                                      \
+    }
 
 template <class InterfaceT, class CreatorT>
-std::unique_ptr<InterfaceT> UsdDracoAttributeFactory::CreateAttribute(
-    const UsdDracoAttributeDescriptor &descriptor, const CreatorT &creator) {
+std::unique_ptr<InterfaceT> UsdDracoAttributeFactory::CreateAttribute(const UsdDracoAttributeDescriptor& descriptor,
+                                                                      const CreatorT& creator) {
     // Create attribute from attribute descriptor.
     switch (descriptor.GetShape()) {
         case UsdDracoAttributeDescriptor::MATRIX:
@@ -106,8 +101,7 @@ std::unique_ptr<InterfaceT> UsdDracoAttributeFactory::CreateAttribute(
             }
             break;
         case UsdDracoAttributeDescriptor::QUATERNION:
-            if (descriptor.GetNumComponents() != 4)
-                break;
+            if (descriptor.GetNumComponents() != 4) break;
             switch (descriptor.GetDataType()) {
                 // USD halfs are stored as Draco 16-bit ints.
                 CASE_FOR_ATTRIBUTE_HALF(draco::DT_INT16, GfQuath);
@@ -173,7 +167,6 @@ std::unique_ptr<InterfaceT> UsdDracoAttributeFactory::CreateAttribute(
     }
     return nullptr;
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

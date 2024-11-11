@@ -17,9 +17,7 @@
 
 #include <draco/mesh/mesh.h>
 
-
 PXR_NAMESPACE_OPEN_SCOPE
-
 
 /// \class UsdDracoExportTranslator
 ///
@@ -28,8 +26,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 class UsdDracoExportTranslator {
 public:
     /// Translates USD mesh to Draco mesh and returns true on success.
-    static bool Translate(const UsdGeomMesh &usdMesh,
-                          draco::Mesh *dracoMesh,
+    static bool Translate(const UsdGeomMesh& usdMesh,
+                          draco::Mesh* dracoMesh,
                           UsdDracoFlag<bool> preservePolygons,
                           UsdDracoFlag<bool> preservePositionOrder,
                           UsdDracoFlag<bool> preserveHoles);
@@ -38,22 +36,19 @@ public:
     /// primvar cannot be exported to Draco. This method is called by translator
     /// as well as by Python script to check whether a primvar should be kept or
     /// deleted from USD mesh.
-    static std::unique_ptr<UsdDracoExportAttributeInterface>
-    CreateAttributeFrom(const UsdGeomPrimvar &primvar);
+    static std::unique_ptr<UsdDracoExportAttributeInterface> CreateAttributeFrom(const UsdGeomPrimvar& primvar);
 
 private:
-    UsdDracoExportTranslator(const UsdGeomMesh &usdMesh,
-                             draco::Mesh *dracoMesh);
+    UsdDracoExportTranslator(const UsdGeomMesh& usdMesh, draco::Mesh* dracoMesh);
     bool _Translate(UsdDracoFlag<bool> preservePolygons,
                     UsdDracoFlag<bool> preservePositionOrder,
                     UsdDracoFlag<bool> preserveHoles);
     bool _CheckDescriptors() const;
     void _GetAttributesFromMesh();
     void _GetConnectivityFromMesh();
-    void _CheckUnsupportedPrimvar(const UsdGeomPrimvar &primvar);
+    void _CheckUnsupportedPrimvar(const UsdGeomPrimvar& primvar);
     bool _CheckData() const;
-    bool _CheckPrimvarData(
-        const UsdDracoExportAttributeInterface &attribute) const;
+    bool _CheckPrimvarData(const UsdDracoExportAttributeInterface& attribute) const;
     void _ConfigureHelperAttributes(UsdDracoFlag<bool> preservePolygons,
                                     UsdDracoFlag<bool> preservePositionOrder,
                                     UsdDracoFlag<bool> preserveHoles);
@@ -68,8 +63,8 @@ private:
     static bool _IsNewEdge(size_t triCount, size_t triIndex, size_t triCorner);
 
 private:
-    const UsdGeomMesh &_usdMesh;
-    draco::Mesh *_dracoMesh;
+    const UsdGeomMesh& _usdMesh;
+    draco::Mesh* _dracoMesh;
 
     // Named attributes.
     UsdDracoExportAttribute<GfVec3f> _positions;
@@ -83,8 +78,7 @@ private:
     UsdDracoExportAttribute<int> _posOrder;
 
     // Generic attributes.
-    std::vector<std::unique_ptr<UsdDracoExportAttributeInterface>>
-        _genericAttributes;
+    std::vector<std::unique_ptr<UsdDracoExportAttributeInterface>> _genericAttributes;
 
     VtIntArray _faceVertexCounts;
     VtIntArray _faceVertexIndices;

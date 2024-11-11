@@ -1,66 +1,26 @@
-set(PXR_PREFIX pxr/usd)
-set(PXR_PACKAGE sdrOsl)
+#  Copyright (c) 2023 Feng Yang
+#
+#  I am making my contributions/submissions to this project solely in my
+#  personal capacity and am not conveying any rights to any intellectual
+#  property of any third parties.
 
-if(NOT PXR_ENABLE_OSL_SUPPORT)
-    return()
-endif()
+# create sample app project
+project(sdrOsl LANGUAGES C CXX)
 
-# Use the import targets set by Imath's package config
-if (Imath_FOUND)
-    set(__OSL_IMATH_LIBS "Imath::Imath")
-else()
-    set(__OSL_IMATH_INCLUDE ${OPENEXR_INCLUDE_DIRS})
-    set(__OSL_IMATH_LIBS ${OPENEXR_LIBRARIES})
-endif()
-
-pxr_plugin(sdrOsl
-    LIBRARIES
-        gf
-        tf
-        vt
-        ar
-        ndr
-        sdr
-        ${OSL_QUERY_LIBRARY}
-        ${OIIO_LIBRARIES}
-        ${__OSL_IMATH_LIBS}
-
-    INCLUDE_DIRS
-        ${OSL_INCLUDE_DIR}
-        ${OIIO_INCLUDE_DIRS}
-        ${__OSL_IMATH_INCLUDE}
-
-    PUBLIC_CLASSES
-        oslParser
-
-    PRIVATE_HEADERS
-        api.h
-
-    PYTHON_CPPFILES
-        moduleDeps.cpp
-
-    PYMODULE_CPPFILES
-        module.cpp
-        wrapOslParser.cpp
-
-    PYMODULE_FILES
-        __init__.py
-
-    RESOURCE_FILES
-        plugInfo.json
+set(SRC_FILES
+        oslParser.cpp
 )
 
-pxr_test_scripts(
-    testenv/testOslParser.py
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+        ${PXR_INCLUDE_PATH}
 )
 
-pxr_install_test_dir(
-    SRC testenv/testOslParser.testenv
-    DEST testOslParser
+target_link_libraries(${PROJECT_NAME} PUBLIC
+        fmt::fmt
+        Eigen3::Eigen
+        TBB::tbb
 )
 
-pxr_register_test(testOslParser
-    PYTHON
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testOslParser"
-    EXPECTED_RETURN_CODE 0
-)
+set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)

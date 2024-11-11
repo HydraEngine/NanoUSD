@@ -1,49 +1,31 @@
-set(PXR_PREFIX pxr/usd)
-set(PXR_PACKAGE usdDraco)
+#  Copyright (c) 2023 Feng Yang
+#
+#  I am making my contributions/submissions to this project solely in my
+#  personal capacity and am not conveying any rights to any intellectual
+#  property of any third parties.
 
-if(WIN32 AND NOT CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS)
-  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
-  set(USD_DRACO_SET_WINDOWS_EXPORT 1)
-endif()
+# create sample app project
+project(usdDraco LANGUAGES C CXX)
 
-pxr_plugin(${PXR_PACKAGE}
-    LIBRARIES
-        tf
-        gf
-        sdf
-        usd
-        usdGeom
-        ${DRACO_LIBRARY}
-
-    INCLUDE_DIRS
-        ${DRACO_INCLUDES}
-
-    CPPFILES
+set(SRC_FILES
         attributeDescriptor.cpp
-	attributeFactory.cpp
+        attributeFactory.cpp
         exportTranslator.cpp
         fileFormat.cpp
         importTranslator.cpp
         writer.cpp
-
-    PYTHON_CPPFILES
-        moduleDeps.cpp
-
-    PYMODULE_CPPFILES
-        module.cpp
-        wrapDraco.cpp
-
-    PYMODULE_FILES
-        __init__.py
-
-    RESOURCE_FILES
-        plugInfo.json
-
-    DOXYGEN_FILES
-        overview.dox
 )
 
-if(USD_DRACO_SET_WINDOWS_EXPORT)
-  unset(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS)
-endif()
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
 
+target_include_directories(${PROJECT_NAME} PUBLIC
+        ${PXR_INCLUDE_PATH}
+)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC
+        fmt::fmt
+        Eigen3::Eigen
+        TBB::tbb
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)

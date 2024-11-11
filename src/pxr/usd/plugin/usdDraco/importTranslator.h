@@ -17,9 +17,7 @@
 #include <draco/mesh/corner_table.h>
 #include <draco/mesh/mesh.h>
 
-
 PXR_NAMESPACE_OPEN_SCOPE
-
 
 /// \class UsdDracoImportTranslator
 ///
@@ -28,13 +26,13 @@ PXR_NAMESPACE_OPEN_SCOPE
 class UsdDracoImportTranslator {
 public:
     /// Translates Draco mesh to USD mesh and returns USD layer with mesh.
-    static SdfLayerRefPtr Translate(const draco::Mesh &dracoMesh);
+    static SdfLayerRefPtr Translate(const draco::Mesh& dracoMesh);
 
 private:
     typedef draco::AttributeValueIndex PositionIndex;
     typedef std::map<PositionIndex, draco::PointIndex> PolygonEdges;
 
-    UsdDracoImportTranslator(const draco::Mesh &dracoMesh);
+    UsdDracoImportTranslator(const draco::Mesh& dracoMesh);
     SdfLayerRefPtr _Translate();
     VtVec3fArray _ComputeExtent() const;
     bool _CheckDescriptors() const;
@@ -42,20 +40,19 @@ private:
     void _PopulateValuesFromMesh();
     void _PopulateIndicesFromMesh();
     void _SetIndices(size_t vertexIndex, draco::PointIndex pointIndex);
-    void _SetAttributesToMesh(UsdGeomMesh *usdMesh) const;
+    void _SetAttributesToMesh(UsdGeomMesh* usdMesh) const;
     bool _HasTrianglesOnly() const;
-    bool _SubdivisionRefersToPositions(const UsdGeomMesh &usdMesh) const;
-    bool _SubdivisionRefersToFaces(const UsdGeomMesh &usdMesh) const;
+    bool _SubdivisionRefersToPositions(const UsdGeomMesh& usdMesh) const;
+    bool _SubdivisionRefersToFaces(const UsdGeomMesh& usdMesh) const;
     void _FindOriginalFaceEdges(draco::FaceIndex faceIndex,
-                                const draco::CornerTable *cornerTable,
-                                std::vector<bool> &triangleVisited,
-                                PolygonEdges &polygonEdges);
-    std::unique_ptr<UsdDracoImportAttributeInterface>
-    CreateAttributeFrom(const draco::PointAttribute &attribute,
-                        const draco::AttributeMetadata &metadata);
+                                const draco::CornerTable* cornerTable,
+                                std::vector<bool>& triangleVisited,
+                                PolygonEdges& polygonEdges);
+    std::unique_ptr<UsdDracoImportAttributeInterface> CreateAttributeFrom(const draco::PointAttribute& attribute,
+                                                                          const draco::AttributeMetadata& metadata);
 
 private:
-    const draco::Mesh &_dracoMesh;
+    const draco::Mesh& _dracoMesh;
 
     // Named attributes.
     UsdDracoImportAttribute<GfVec3f> _positions;
@@ -66,14 +63,12 @@ private:
     UsdDracoImportAttribute<int> _posOrder;
 
     // Generic attributes.
-    std::vector<std::unique_ptr<UsdDracoImportAttributeInterface>>
-        _genericAttributes;
+    std::vector<std::unique_ptr<UsdDracoImportAttributeInterface>> _genericAttributes;
 
     VtIntArray _faceVertexCounts;
     VtIntArray _faceVertexIndices;
     VtIntArray _holeIndices;
 };
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

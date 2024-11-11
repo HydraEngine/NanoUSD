@@ -38,18 +38,12 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 // The name of this exporter, embedded in written Alembic files.
 static const char* writerName = "UsdAbc_AlembicData";
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
-    (transform)
-    ((xformOpTransform, "xformOp:transform"))
-);
+TF_DEFINE_PRIVATE_TOKENS(_tokens, (transform)((xformOpTransform, "xformOp:transform")));
 
-TF_DEFINE_ENV_SETTING(USD_ABC_READ_FLOAT2_AS_UV, true,
-        "Turn to false to disable reading float2 arrays as uv sets");
+TF_DEFINE_ENV_SETTING(USD_ABC_READ_FLOAT2_AS_UV, true, "Turn to false to disable reading float2 arrays as uv sets");
 
 namespace {
 
@@ -64,10 +58,7 @@ struct _Subtract {
     double operator()(double x, double y) const { return x - y; }
 };
 
-static
-GeometryScope
-_GetGeometryScope(const TfToken& interpolation)
-{
+static GeometryScope _GetGeometryScope(const TfToken& interpolation) {
     static const TfToken constant("constant");
     static const TfToken uniform("uniform");
     static const TfToken varying("varying");
@@ -109,9 +100,7 @@ public:
     /// zero.  If there's no default then return an empty set.
     ///
     /// This validates the samples to ensure they all have the same type.
-    UsdSamples(const SdfPath& primPath,
-               const TfToken& propertyName,
-               const SdfAbstractData& data);
+    UsdSamples(const SdfPath& primPath, const TfToken& propertyName, const SdfAbstractData& data);
 
     /// Returns a path.
     SdfPath GetPath() const;
@@ -159,79 +148,59 @@ private:
     SdfValueTypeName _typeName;
 };
 
-UsdSamples::UsdSamples(const SdfPath& primPath, const TfToken& propertyName) :
-    _propPath(primPath.AppendProperty(propertyName)),
-    _data(NULL)
-{
+UsdSamples::UsdSamples(const SdfPath& primPath, const TfToken& propertyName)
+    : _propPath(primPath.AppendProperty(propertyName)), _data(NULL) {
     _Clear();
 }
 
-UsdSamples::UsdSamples(
-    const SdfPath& primPath,
-    const TfToken& propertyName,
-    const SdfAbstractData& data) :
-    _propPath(primPath.AppendProperty(propertyName)),
-    _data(&data)
-{
+UsdSamples::UsdSamples(const SdfPath& primPath, const TfToken& propertyName, const SdfAbstractData& data)
+    : _propPath(primPath.AppendProperty(propertyName)), _data(&data) {
     VtValue value;
     if (data.Has(_propPath, SdfFieldKeys->TimeSamples, &value)) {
         if (TF_VERIFY(value.IsHolding<SdfTimeSampleMap>())) {
             _value.reset(new VtValue);
             _value->Swap(value);
-            _samples     = &_value->UncheckedGet<SdfTimeSampleMap>();
+            _samples = &_value->UncheckedGet<SdfTimeSampleMap>();
             _timeSampled = true;
-        }
-        else {
+        } else {
             _Clear();
             return;
         }
-    }
-    else if (data.Has(_propPath, SdfFieldKeys->Default, &value)) {
+    } else if (data.Has(_propPath, SdfFieldKeys->Default, &value)) {
         _local.reset(new SdfTimeSampleMap);
         (*_local)[0.0].Swap(value);
-        _samples       = _local.get();
-        _timeSampled   = false;
-    }
-    else {
+        _samples = _local.get();
+        _timeSampled = false;
+    } else {
         _Clear();
         return;
     }
-    if (TF_VERIFY(data.Has(_propPath, SdfFieldKeys->TypeName, &value),
-                  "No type name on <%s>", _propPath.GetText())) {
+    if (TF_VERIFY(data.Has(_propPath, SdfFieldKeys->TypeName, &value), "No type name on <%s>", _propPath.GetText())) {
         if (TF_VERIFY(value.IsHolding<TfToken>())) {
-            _typeName =
-                SdfSchema::GetInstance().
-                    FindType(value.UncheckedGet<TfToken>());
+            _typeName = SdfSchema::GetInstance().FindType(value.UncheckedGet<TfToken>());
             _Validate();
-        }
-        else {
+        } else {
             _Clear();
         }
-    }
-    else {
+    } else {
         _Clear();
     }
 }
 
-bool
-UsdSamples::_Validate()
-{
+bool UsdSamples::_Validate() {
     const TfType type = _typeName.GetType();
-    const TfType backupType =
-        (type == TfType::Find<float>()) ? TfType::Find<double>() : type;
+    const TfType backupType = (type == TfType::Find<float>()) ? TfType::Find<double>() : type;
 restart:
     for (const auto& v : *_samples) {
         if (v.second.GetType() != type) {
             if (!TF_VERIFY(v.second.GetType() == backupType,
-                              "Expected sample at <%s> time %f of type '%s', "
-                              "got '%s'",
-                              GetPath().GetText(),
-                              v.first, type.GetTypeName().c_str(),
-                              v.second.GetType().GetTypeName().c_str())) {
+                           "Expected sample at <%s> time %f of type '%s', "
+                           "got '%s'",
+                           GetPath().GetText(), v.first, type.GetTypeName().c_str(),
+                           v.second.GetType().GetTypeName().c_str())) {
                 _Clear();
                 return false;
-            }
-            else {
+            } else {
                 // Make sure we have a local copy.
                 if (!_local) {
                     _local.reset(new SdfTimeSampleMap(*_samples));
@@ -240,90 +209,66 @@ restart:
                 }
 
                 // Convert double to float.
-                (*_local)[v.first] =
-                    static_cast<float>(v.second.UncheckedGet<double>());
+                (*_local)[v.first] = static_cast<float>(v.second.UncheckedGet<double>());
             }
         }
     }
     return true;
 }
 
-void
-UsdSamples::_Clear()
-{
+void UsdSamples::_Clear() {
     _value.reset();
     _local.reset(new SdfTimeSampleMap);
-    _samples       = _local.get();
-    _timeSampled   = false;
-    _typeName      = SdfValueTypeName();
+    _samples = _local.get();
+    _timeSampled = false;
+    _typeName = SdfValueTypeName();
 }
 
-SdfPath
-UsdSamples::GetPath() const
-{
+SdfPath UsdSamples::GetPath() const {
     return _propPath;
 }
 
-bool
-UsdSamples::IsEmpty() const
-{
+bool UsdSamples::IsEmpty() const {
     return _samples->empty();
 }
 
-size_t
-UsdSamples::GetNumSamples() const
-{
+size_t UsdSamples::GetNumSamples() const {
     return _samples->size();
 }
 
-bool
-UsdSamples::IsTimeSampled() const
-{
+bool UsdSamples::IsTimeSampled() const {
     return _timeSampled;
 }
 
-const SdfValueTypeName&
-UsdSamples::GetTypeName() const
-{
+const SdfValueTypeName& UsdSamples::GetTypeName() const {
     return _typeName;
 }
 
-VtValue
-UsdSamples::GetField(const TfToken& name) const
-{
+VtValue UsdSamples::GetField(const TfToken& name) const {
     return _data->Get(_propPath, name);
 }
 
-const VtValue&
-UsdSamples::Get(double time) const
-{
+const VtValue& UsdSamples::Get(double time) const {
     if (IsEmpty()) {
         static const VtValue empty;
         return empty;
-    }
-    else {
+    } else {
         SdfTimeSampleMap::const_iterator i = _samples->lower_bound(time);
         return i == _samples->end() ? _samples->rbegin()->second : i->second;
     }
 }
 
-void
-UsdSamples::AddTimes(UsdAbc_TimeSamples* times) const
-{
+void UsdSamples::AddTimes(UsdAbc_TimeSamples* times) const {
     for (const auto& v : *_samples) {
         times->insert(v.first);
     }
 }
 
-const SdfTimeSampleMap&
-UsdSamples::GetSamples() const
-{
+const SdfTimeSampleMap& UsdSamples::GetSamples() const {
     return *_samples;
 }
 
-void
-UsdSamples::TakeSamples(SdfTimeSampleMap& samples)
-{
+void UsdSamples::TakeSamples(SdfTimeSampleMap& samples) {
     if (!_local) {
         _value.reset();
         _local.reset(new SdfTimeSampleMap);
@@ -350,27 +295,20 @@ UsdSamples::TakeSamples(SdfTimeSampleMap& samples)
 class _Parent {
 public:
     /// Construct invalid parent.
-    _Parent() : _object(new _Prim(shared_ptr<OObject>(new OObject))) { }
+    _Parent() : _object(new _Prim(shared_ptr<OObject>(new OObject))) {}
 
     /// Construct from an Alembic shared pointer to an OObject subclass.
     template <class T>
-    _Parent(const shared_ptr<T>& prim) :
-        _object(new _Prim(static_pointer_cast<OObject>(prim))) { }
+    _Parent(const shared_ptr<T>& prim) : _object(new _Prim(static_pointer_cast<OObject>(prim))) {}
 
     /// Construct from an Alembic shared pointer to a supported
     /// schema based OSchemaObject.
-    _Parent(const shared_ptr<OCamera>& prim):
-        _object(new _GeomPrim<OCamera>(prim)) { }
-    _Parent(const shared_ptr<OCurves>& prim):
-        _object(new _GeomPrim<OCurves>(prim)) { }
-    _Parent(const shared_ptr<OPoints>& prim):
-        _object(new _GeomPrim<OPoints>(prim)) { }
-    _Parent(const shared_ptr<OPolyMesh>& prim):
-        _object(new _GeomPrim<OPolyMesh>(prim)) { }
-    _Parent(const shared_ptr<OSubD>& prim):
-        _object(new _GeomPrim<OSubD>(prim)) { }
-    _Parent(const shared_ptr<OXform>& prim):
-        _object(new _GeomPrim<OXform>(prim)) { }
+    _Parent(const shared_ptr<OCamera>& prim) : _object(new _GeomPrim<OCamera>(prim)) {}
+    _Parent(const shared_ptr<OCurves>& prim) : _object(new _GeomPrim<OCurves>(prim)) {}
+    _Parent(const shared_ptr<OPoints>& prim) : _object(new _GeomPrim<OPoints>(prim)) {}
+    _Parent(const shared_ptr<OPolyMesh>& prim) : _object(new _GeomPrim<OPolyMesh>(prim)) {}
+    _Parent(const shared_ptr<OSubD>& prim) : _object(new _GeomPrim<OSubD>(prim)) {}
+    _Parent(const shared_ptr<OXform>& prim) : _object(new _GeomPrim<OXform>(prim)) {}
 
     /// Returns the OObject.
     operator OObject&() const;
@@ -392,7 +330,7 @@ public:
 private:
     class _Prim {
     public:
-        explicit _Prim(const shared_ptr<OObject>& object) : _object(object) { }
+        explicit _Prim(const shared_ptr<OObject>& object) : _object(object) {}
         virtual ~_Prim();
         const shared_ptr<OObject>& GetObjectPtr() const { return _object; }
         virtual OCompoundProperty GetSchema() const;
@@ -406,8 +344,8 @@ private:
     template <class T>
     class _GeomPrim : public _Prim {
     public:
-        explicit _GeomPrim(const shared_ptr<T>& object) : _Prim(object) { }
-        virtual ~_GeomPrim() { }
+        explicit _GeomPrim(const shared_ptr<T>& object) : _Prim(object) {}
+        virtual ~_GeomPrim() {}
         virtual OCompoundProperty GetSchema() const;
         virtual OCompoundProperty GetArbGeomParams() const;
         virtual OCompoundProperty GetUserProperties() const;
@@ -417,78 +355,54 @@ private:
     shared_ptr<_Prim> _object;
 };
 
-_Parent::_Prim::~_Prim()
-{
+_Parent::_Prim::~_Prim() {
     // Do nothing
 }
 
-OCompoundProperty
-_Parent::_Prim::GetSchema() const
-{
+OCompoundProperty _Parent::_Prim::GetSchema() const {
     return OCompoundProperty();
 }
 
-OCompoundProperty
-_Parent::_Prim::GetArbGeomParams() const
-{
+OCompoundProperty _Parent::_Prim::GetArbGeomParams() const {
     return OCompoundProperty();
 }
 
-OCompoundProperty
-_Parent::_Prim::GetUserProperties() const
-{
+OCompoundProperty _Parent::_Prim::GetUserProperties() const {
     return OCompoundProperty();
 }
 
 template <class T>
-OCompoundProperty
-_Parent::_GeomPrim<T>::GetSchema() const
-{
+OCompoundProperty _Parent::_GeomPrim<T>::GetSchema() const {
     return static_pointer_cast<T>(GetObjectPtr())->getSchema();
 }
 
 template <class T>
-OCompoundProperty
-_Parent::_GeomPrim<T>::GetArbGeomParams() const
-{
-    return
-        static_pointer_cast<T>(GetObjectPtr())->getSchema().getArbGeomParams();
+OCompoundProperty _Parent::_GeomPrim<T>::GetArbGeomParams() const {
+    return static_pointer_cast<T>(GetObjectPtr())->getSchema().getArbGeomParams();
 }
 
 template <class T>
-OCompoundProperty
-_Parent::_GeomPrim<T>::GetUserProperties() const
-{
-    return
-        static_pointer_cast<T>(GetObjectPtr())->getSchema().getUserProperties();
+OCompoundProperty _Parent::_GeomPrim<T>::GetUserProperties() const {
+    return static_pointer_cast<T>(GetObjectPtr())->getSchema().getUserProperties();
 }
 
-_Parent::operator OObject&() const
-{
+_Parent::operator OObject&() const {
     return *_object->GetObjectPtr();
 }
 
-OCompoundProperty
-_Parent::GetProperties() const
-{
+OCompoundProperty _Parent::GetProperties() const {
     return _object->GetObjectPtr()->getProperties();
 }
 
-OCompoundProperty
-_Parent::GetSchema() const
-{
+OCompoundProperty _Parent::GetSchema() const {
     return _object->GetSchema();
 }
 
-OCompoundProperty
-_Parent::GetArbGeomParams() const
-{
+OCompoundProperty _Parent::GetArbGeomParams() const {
     return _object->GetArbGeomParams();
 }
 
-OCompoundProperty
-_Parent::GetUserProperties() const
-{
+OCompoundProperty _Parent::GetUserProperties() const {
     return _object->GetUserProperties();
 }
 
@@ -506,7 +420,7 @@ class _PrimWriterContext;
 /// previous via a \c _PrimWriterContext.
 class _WriterSchema {
 public:
-    typedef std::function<void (_PrimWriterContext*)> PrimWriter;
+    typedef std::function<void(_PrimWriterContext*)> PrimWriter;
     typedef std::vector<PrimWriter> PrimWriterVector;
     typedef UsdAbc_AlembicDataConversion::FromUsdConverter Converter;
 
@@ -519,10 +433,9 @@ public:
     // Helper for defining types.
     class TypeRef {
     public:
-        TypeRef(PrimWriterVector* writers) : _writers(writers) { }
+        TypeRef(PrimWriterVector* writers) : _writers(writers) {}
 
-        TypeRef& AppendWriter(const PrimWriter& writer)
-        {
+        TypeRef& AppendWriter(const PrimWriter& writer) {
             _writers->push_back(writer);
             return *this;
         }
@@ -533,16 +446,12 @@ public:
 
     /// Adds a type and returns a helper for defining it.
     template <class T>
-    TypeRef AddType(T name)
-    {
+    TypeRef AddType(T name) {
         return TypeRef(&_writers[TfToken(name)]);
     }
 
     /// Adds the fallback type and returns a helper for defining it.
-    TypeRef AddFallbackType()
-    {
-        return AddType(TfToken());
-    }
+    TypeRef AddFallbackType() { return AddType(TfToken()); }
 
     /// Returns \c true iff the samples are valid.
     bool IsValid(const UsdSamples&) const;
@@ -571,14 +480,11 @@ private:
     _WriterMap _writers;
 };
 
-_WriterSchema::_WriterSchema()
-{
+_WriterSchema::_WriterSchema() {
     // Do nothing
 }
 
-const _WriterSchema::PrimWriterVector&
-_WriterSchema::GetPrimWriters(const TfToken& name) const
-{
+const _WriterSchema::PrimWriterVector& _WriterSchema::GetPrimWriters(const TfToken& name) const {
     _WriterMap::const_iterator i = _writers.find(name);
     if (i != _writers.end()) {
         return i->second;
@@ -591,39 +497,27 @@ _WriterSchema::GetPrimWriters(const TfToken& name) const
     return empty;
 }
 
-bool
-_WriterSchema::IsValid(const UsdSamples& samples) const
-{
+bool _WriterSchema::IsValid(const UsdSamples& samples) const {
     return GetConverter(samples.GetTypeName()) ? true : false;
 }
 
-bool
-_WriterSchema::IsShaped(const UsdSamples& samples) const
-{
+bool _WriterSchema::IsShaped(const UsdSamples& samples) const {
     return samples.GetTypeName().IsArray();
 }
 
-DataType
-_WriterSchema::GetDataType(const UsdSamples& samples) const
-{
+DataType _WriterSchema::GetDataType(const UsdSamples& samples) const {
     return FindConverter(samples.GetTypeName()).GetDataType();
 }
 
-SdfValueTypeName
-_WriterSchema::FindConverter(const UsdAbc_AlembicType& typeName) const
-{
+SdfValueTypeName _WriterSchema::FindConverter(const UsdAbc_AlembicType& typeName) const {
     return _conversions.data.FindConverter(typeName);
 }
 
-UsdAbc_AlembicType
-_WriterSchema::FindConverter(const SdfValueTypeName& typeName) const
-{
+UsdAbc_AlembicType _WriterSchema::FindConverter(const SdfValueTypeName& typeName) const {
     return _conversions.data.FindConverter(typeName);
 }
 
-const _WriterSchema::Converter&
-_WriterSchema::GetConverter(const SdfValueTypeName& typeName) const
-{
+const _WriterSchema::Converter& _WriterSchema::GetConverter(const SdfValueTypeName& typeName) const {
     return _conversions.data.GetConverter(typeName);
 }
 
@@ -653,11 +547,10 @@ public:
 
     /// Set the Usd data that we will translate.  Also resets _timeScale to
     /// data's timeCodesPerSecond
-    void SetData(const SdfAbstractDataConstPtr& data) { 
-        _data = data; 
+    void SetData(const SdfAbstractDataConstPtr& data) {
+        _data = data;
         VtValue tcps;
-        if (data->Has(SdfPath::AbsoluteRootPath(),
-                      SdfFieldKeys->TimeCodesPerSecond, &tcps)) {
+        if (data->Has(SdfPath::AbsoluteRootPath(), SdfFieldKeys->TimeCodesPerSecond, &tcps)) {
             if (tcps.IsHolding<double>()) {
                 _timeScale = tcps.UncheckedGet<double>();
             }
@@ -665,7 +558,7 @@ public:
     }
 
     /// Returns the Usd data.
-    const SdfAbstractData& GetData() const { return *get_pointer(_data);}
+    const SdfAbstractData& GetData() const { return *get_pointer(_data); }
 
     /// Sets or resets the flag named \p flagName.
     void SetFlag(const TfToken& flagName, bool set);
@@ -678,8 +571,8 @@ public:
 
 private:
     // Conversion options.
-    double _timeScale;              // Scale Alembic time by this factor.
-    double _timeOffset;             // Offset Alembic->Usd time (after scale).
+    double _timeScale;   // Scale Alembic time by this factor.
+    double _timeOffset;  // Offset Alembic->Usd time (after scale).
     std::set<TfToken, TfTokenFastArbitraryLessThan> _flags;
 
     // Output state.
@@ -696,41 +589,31 @@ private:
     std::map<UsdAbc_TimeSamples, uint32_t> _timeSamplings;
 };
 
-_WriterContext::_WriterContext() :
-    _timeScale(24.0),               // Usd is frames, Alembic is seconds.
-    _timeOffset(0.0),               // Time 0.0 to frame 0.
-    _schema(NULL)
-{
+_WriterContext::_WriterContext()
+    : _timeScale(24.0),  // Usd is frames, Alembic is seconds.
+      _timeOffset(0.0),  // Time 0.0 to frame 0.
+      _schema(NULL) {
     // Do nothing
 }
 
-void
-_WriterContext::SetArchive(const OArchive& archive)
-{
+void _WriterContext::SetArchive(const OArchive& archive) {
     _archive = archive;
     _timeSamplings.clear();
 }
 
-void
-_WriterContext::SetFlag(const TfToken& flagName, bool set)
-{
+void _WriterContext::SetFlag(const TfToken& flagName, bool set) {
     if (set) {
         _flags.insert(flagName);
-    }
-    else {
+    } else {
         _flags.erase(flagName);
     }
 }
 
-bool
-_WriterContext::IsFlagSet(const TfToken& flagName) const
-{
+bool _WriterContext::IsFlagSet(const TfToken& flagName) const {
     return _flags.count(flagName);
 }
 
-uint32_t
-_WriterContext::AddTimeSampling(const UsdAbc_TimeSamples& inSamples)
-{
+uint32_t _WriterContext::AddTimeSampling(const UsdAbc_TimeSamples& inSamples) {
     // Handle empty case.
     if (inSamples.empty()) {
         // No samples -> identity time sampling.
@@ -738,8 +621,7 @@ _WriterContext::AddTimeSampling(const UsdAbc_TimeSamples& inSamples)
     }
 
     // Get the cached index.  If not zero then we already have this one.
-    std::map<UsdAbc_TimeSamples, uint32_t>::const_iterator tsi =
-        _timeSamplings.find(inSamples);
+    std::map<UsdAbc_TimeSamples, uint32_t>::const_iterator tsi = _timeSamplings.find(inSamples);
     if (tsi != _timeSamplings.end()) {
         return tsi->second;
     }
@@ -769,8 +651,7 @@ _WriterContext::AddTimeSampling(const UsdAbc_TimeSamples& inSamples)
     if (samples.size() == 2) {
         // Two samples -> uniform.  Cyclic and acyclic would also work but
         // uniform is probably more likely to match an existing sampling.
-        return index =
-            _archive.addTimeSampling(TimeSampling(*j - *i, *i));
+        return index = _archive.addTimeSampling(TimeSampling(*j - *i, *i));
     }
 
     // Figure out if the samples are uniform (T0 + N * dT for integer N),
@@ -811,9 +692,7 @@ _WriterContext::AddTimeSampling(const UsdAbc_TimeSamples& inSamples)
     }
 
     // Cyclic or acyclic.
-    return index =
-        _archive.addTimeSampling(
-            TimeSampling(timeSamplingType, std::vector<chrono_t>(i, j)));
+    return index = _archive.addTimeSampling(TimeSampling(timeSamplingType, std::vector<chrono_t>(i, j)));
 }
 
 /// \class _PrimWriterContext
@@ -826,9 +705,7 @@ class _PrimWriterContext {
 public:
     typedef _Parent Parent;
 
-    _PrimWriterContext(_WriterContext&,
-                       const Parent& parent,
-                       const SdfPath& path);
+    _PrimWriterContext(_WriterContext&, const Parent& parent, const SdfPath& path);
 
     /// Return the path to this prim.
     SdfPath GetPath() const;
@@ -837,8 +714,7 @@ public:
     VtValue GetField(const TfToken& fieldName) const;
 
     /// Returns the Usd field from the named property.
-    VtValue GetPropertyField(const TfToken& propertyName,
-                             const TfToken& fieldName) const;
+    VtValue GetPropertyField(const TfToken& propertyName, const TfToken& fieldName) const;
 
     /// Returns the archive.
     OArchive& GetArchive();
@@ -886,11 +762,8 @@ public:
     /// samples object.  The property is extracted from the context so
     /// it cannot be extracted again.  The sample times union is updated
     /// to include the sample times from the returned object.
-    UsdSamples ExtractSamples(const TfToken& name)
-    {
-        return _ExtractSamples(name, {});
-    }
-    
+    UsdSamples ExtractSamples(const TfToken& name) { return _ExtractSamples(name, {}); }
+
     /// Returns the samples for a Usd property.  If the property doesn't
     /// exist or has already been extracted then this returns an empty
     /// samples object.  The property is extracted from the context so
@@ -899,9 +772,9 @@ public:
     /// verifies that the property is holding a value of either the given type
     //  or the alternative type;
     /// if not it returns an empty samples object.
-    UsdSamples ExtractSamples(const TfToken& name, const SdfValueTypeName& type,
-                              const SdfValueTypeName& alternativeType)
-    {
+    UsdSamples ExtractSamples(const TfToken& name,
+                              const SdfValueTypeName& type,
+                              const SdfValueTypeName& alternativeType) {
         return _ExtractSamples(name, {type, alternativeType});
     }
 
@@ -912,15 +785,13 @@ public:
     /// to include the sample times from the returned object.  This
     /// verifies that the property is holding a value of the given type;
     /// if not it returns an empty samples object.
-    UsdSamples ExtractSamples(const TfToken& name, const SdfValueTypeName& type)
-    {
+    UsdSamples ExtractSamples(const TfToken& name, const SdfValueTypeName& type) {
         return _ExtractSamples(name, {type});
     }
 
     /// Removes samples for a Usd property.  The property cannot be extracted
     /// after removal.
-    void RemoveSamples(const TfToken& name)
-    {
+    void RemoveSamples(const TfToken& name) {
         auto i = std::find(_unextracted.begin(), _unextracted.end(), name);
         if (i != _unextracted.end()) {
             _unextracted.erase(i);
@@ -936,18 +807,13 @@ public:
 
 private:
     UsdSamples _ExtractSamples(const TfToken& name);
-    
-    UsdSamples _ExtractSamples(const TfToken& name, 
-            const std::vector<SdfValueTypeName> &types)
-    {
+
+    UsdSamples _ExtractSamples(const TfToken& name, const std::vector<SdfValueTypeName>& types) {
         UsdSamples result = _ExtractSamples(name);
         if (!result.IsEmpty() && !types.empty()) {
             SdfValueTypeName resultTypeName = result.GetTypeName();
-            if (find(types.begin(), types.end(), resultTypeName) ==
-                types.end())
-            {
-                TF_WARN("Property '%s' did not have expected type (got '%s')",
-                        GetPath().AppendProperty(name).GetText(),
+            if (find(types.begin(), types.end(), resultTypeName) == types.end()) {
+                TF_WARN("Property '%s' did not have expected type (got '%s')", GetPath().AppendProperty(name).GetText(),
                         resultTypeName.GetAsToken().GetText());
                 return UsdSamples(GetPath(), name);
             }
@@ -967,103 +833,66 @@ private:
     TfTokenVector _unextracted;
 };
 
-_PrimWriterContext::_PrimWriterContext(
-    _WriterContext& context,
-    const Parent& parent,
-    const SdfPath& path) :
-    _context(context),
-    _parent(parent),
-    _path(path)
-{
+_PrimWriterContext::_PrimWriterContext(_WriterContext& context, const Parent& parent, const SdfPath& path)
+    : _context(context), _parent(parent), _path(path) {
     // Fill _unextracted with all of the property names.
     VtValue tmp;
-    if (_context.GetData().Has(
-            _path, SdfChildrenKeys->PropertyChildren, &tmp)) {
+    if (_context.GetData().Has(_path, SdfChildrenKeys->PropertyChildren, &tmp)) {
         if (tmp.IsHolding<TfTokenVector>()) {
             _unextracted = tmp.UncheckedGet<TfTokenVector>();
         }
     }
 }
 
-SdfPath
-_PrimWriterContext::GetPath() const
-{
+SdfPath _PrimWriterContext::GetPath() const {
     return _path.IsPropertyPath() ? _path.GetParentPath() : _path;
 }
 
-VtValue
-_PrimWriterContext::GetField(const TfToken& fieldName) const
-{
+VtValue _PrimWriterContext::GetField(const TfToken& fieldName) const {
     return _context.GetData().Get(_path, fieldName);
 }
 
-VtValue
-_PrimWriterContext::GetPropertyField(
-    const TfToken& propertyName,
-    const TfToken& fieldName) const
-{
-    return _context.GetData().Get(
-        GetPath().AppendProperty(propertyName), fieldName);
+VtValue _PrimWriterContext::GetPropertyField(const TfToken& propertyName, const TfToken& fieldName) const {
+    return _context.GetData().Get(GetPath().AppendProperty(propertyName), fieldName);
 }
 
-OArchive&
-_PrimWriterContext::GetArchive()
-{
+OArchive& _PrimWriterContext::GetArchive() {
     return _context.GetArchive();
 }
 
-const _WriterSchema&
-_PrimWriterContext::GetSchema() const
-{
+const _WriterSchema& _PrimWriterContext::GetSchema() const {
     return _context.GetSchema();
 }
 
-const SdfAbstractData&
-_PrimWriterContext::GetData() const
-{
+const SdfAbstractData& _PrimWriterContext::GetData() const {
     return _context.GetData();
 }
 
-SdfSpecType
-_PrimWriterContext::GetSpecType(const TfToken& propertyName) const
-{
-    return _context.GetData().GetSpecType(
-        GetPath().AppendProperty(propertyName));
+SdfSpecType _PrimWriterContext::GetSpecType(const TfToken& propertyName) const {
+    return _context.GetData().GetSpecType(GetPath().AppendProperty(propertyName));
 }
 
-bool
-_PrimWriterContext::IsFlagSet(const TfToken& flagName) const
-{
+bool _PrimWriterContext::IsFlagSet(const TfToken& flagName) const {
     return _context.IsFlagSet(flagName);
 }
 
-uint32_t
-_PrimWriterContext::AddTimeSampling(const UsdAbc_TimeSamples& samples)
-{
+uint32_t _PrimWriterContext::AddTimeSampling(const UsdAbc_TimeSamples& samples) {
     return _context.AddTimeSampling(samples);
 }
 
-const _PrimWriterContext::Parent&
-_PrimWriterContext::GetParent() const
-{
+const _PrimWriterContext::Parent& _PrimWriterContext::GetParent() const {
     return _parent;
 }
 
-void
-_PrimWriterContext::SetParent(const Parent& parent)
-{
+void _PrimWriterContext::SetParent(const Parent& parent) {
     _parent = parent;
 }
 
-void
-_PrimWriterContext::PushSuffix(const std::string& suffix)
-{
+void _PrimWriterContext::PushSuffix(const std::string& suffix) {
     _suffix += suffix;
 }
 
-std::string
-_PrimWriterContext::GetAlembicPrimName() const
-{
+std::string _PrimWriterContext::GetAlembicPrimName() const {
     // Valid Alembic prim name set is a superset of valid Usd prim names.
     // XXX: Should verify this name is not in use, however we know
     //      we're not given how we use it (we only add a suffix to
@@ -1071,31 +900,22 @@ _PrimWriterContext::GetAlembicPrimName() const
     return GetPath().GetName() + _suffix;
 }
 
-std::string
-_PrimWriterContext::GetAlembicPropertyName(const TfToken& name) const
-{
+std::string _PrimWriterContext::GetAlembicPropertyName(const TfToken& name) const {
     // Valid Alembic property name set is a superset of valid Usd property
     // names.  Alembic accepts the Usd namespace delimiter as-is.
     return name.GetString();
 }
 
-void
-_PrimWriterContext::SetSampleTimesUnion(const UsdAbc_TimeSamples& samples)
-{   
+void _PrimWriterContext::SetSampleTimesUnion(const UsdAbc_TimeSamples& samples) {
     _sampleTimes = samples;
 }
 
-const UsdAbc_TimeSamples&
-_PrimWriterContext::GetSampleTimesUnion() const
-{
+const UsdAbc_TimeSamples& _PrimWriterContext::GetSampleTimesUnion() const {
     return _sampleTimes;
 }
 
-UsdSamples
-_PrimWriterContext::_ExtractSamples(const TfToken& name)
-{
-    TfTokenVector::iterator i =
-        std::find(_unextracted.begin(), _unextracted.end(), name);
+UsdSamples _PrimWriterContext::_ExtractSamples(const TfToken& name) {
+    TfTokenVector::iterator i = std::find(_unextracted.begin(), _unextracted.end(), name);
     if (i != _unextracted.end()) {
         _unextracted.erase(i);
         return UsdSamples(GetPath(), name, GetData());
@@ -1103,15 +923,11 @@ _PrimWriterContext::_ExtractSamples(const TfToken& name)
     return UsdSamples(GetPath(), name);
 }
 
-TfTokenVector
-_PrimWriterContext::GetUnextractedNames() const
-{
+TfTokenVector _PrimWriterContext::GetUnextractedNames() const {
     return _unextracted;
 }
 
-_WriterContext&
-_PrimWriterContext::GetWriterContext() const
-{
+_WriterContext& _PrimWriterContext::GetWriterContext() const {
     return _context;
 }
 
@@ -1122,32 +938,22 @@ _PrimWriterContext::GetWriterContext() const
 //
 
 /// Returns the Alembic metadata name for a Usd metadata field name.
-static
-std::string
-_AmdName(const std::string& name)
-{
+static std::string _AmdName(const std::string& name) {
     return "Usd:" + name;
 }
 
-static
-bool
-_IsOver(const _PrimWriterContext& context)
-{
+static bool _IsOver(const _PrimWriterContext& context) {
     if (context.GetField(SdfFieldKeys->TypeName).IsEmpty()) {
         return true;
     }
     const VtValue value = context.GetField(SdfFieldKeys->Specifier);
-    return ! value.IsHolding<SdfSpecifier>() ||
-               value.UncheckedGet<SdfSpecifier>() == SdfSpecifierOver;
+    return !value.IsHolding<SdfSpecifier>() || value.UncheckedGet<SdfSpecifier>() == SdfSpecifierOver;
 }
 
 // Reverse the order of the subsequences in \p valuesMap where the subsequence
 // lengths are given by \p counts.
 template <class T>
-static
-void
-_ReverseWindingOrder(UsdSamples* valuesMap, const UsdSamples& countsMap)
-{
+static void _ReverseWindingOrder(UsdSamples* valuesMap, const UsdSamples& countsMap) {
     typedef VtArray<T> ValueArray;
     typedef VtArray<int> CountArray;
 
@@ -1155,15 +961,15 @@ _ReverseWindingOrder(UsdSamples* valuesMap, const UsdSamples& countsMap)
     for (const auto& v : valuesMap->GetSamples()) {
         const VtValue& valuesValue = v.second;
         const VtValue& countsValue = countsMap.Get(v.first);
-        if (! TF_VERIFY(valuesValue.IsHolding<ValueArray>())) {
+        if (!TF_VERIFY(valuesValue.IsHolding<ValueArray>())) {
             continue;
         }
-        if (! TF_VERIFY(countsValue.IsHolding<CountArray>())) {
+        if (!TF_VERIFY(countsValue.IsHolding<CountArray>())) {
             continue;
         }
-        ValueArray values        = valuesValue.UncheckedGet<ValueArray>();
+        ValueArray values = valuesValue.UncheckedGet<ValueArray>();
         const CountArray& counts = countsValue.UncheckedGet<CountArray>();
-        if (! UsdAbc_ReverseOrderImpl(values, counts)) {
+        if (!UsdAbc_ReverseOrderImpl(values, counts)) {
             continue;
         }
         result[v.first].Swap(values);
@@ -1172,30 +978,20 @@ _ReverseWindingOrder(UsdSamples* valuesMap, const UsdSamples& countsMap)
 }
 
 // Adjust faceVertexIndices for winding order if orientation is right-handed.
-static
-void
-_ReverseWindingOrder(
-    const _PrimWriterContext* context,
-    UsdSamples* faceVertexIndices,
-    const UsdSamples& faceVertexCounts)
-{
+static void _ReverseWindingOrder(const _PrimWriterContext* context,
+                                 UsdSamples* faceVertexIndices,
+                                 const UsdSamples& faceVertexCounts) {
     // Get property value.  We must reverse the winding order if it's
     // right-handed in Usd.  (Alembic is always left-handed.)
     // XXX: Should probably check time samples, too, but we expect
     //      this to be uniform.
-    const VtValue value =
-        context->GetPropertyField(UsdGeomTokens->orientation,
-                                  SdfFieldKeys->Default);
-    if (! value.IsHolding<TfToken>() ||
-            value.UncheckedGet<TfToken>() != UsdGeomTokens->leftHanded) {
+    const VtValue value = context->GetPropertyField(UsdGeomTokens->orientation, SdfFieldKeys->Default);
+    if (!value.IsHolding<TfToken>() || value.UncheckedGet<TfToken>() != UsdGeomTokens->leftHanded) {
         _ReverseWindingOrder<int>(faceVertexIndices, faceVertexCounts);
     }
 }
 
-static
-std::string
-_GetInterpretation(const SdfValueTypeName& typeName)
-{
+static std::string _GetInterpretation(const SdfValueTypeName& typeName) {
     const TfToken& roleName = typeName.GetRole();
     if (roleName == SdfValueRoleNames->Point) {
         return "point";
@@ -1207,8 +1003,7 @@ _GetInterpretation(const SdfValueTypeName& typeName)
         return "vector";
     }
     if (roleName == SdfValueRoleNames->Color) {
-        if (typeName == SdfValueTypeNames->Float4 ||
-            typeName == SdfValueTypeNames->Double4) {
+        if (typeName == SdfValueTypeNames->Float4 || typeName == SdfValueTypeNames->Double4) {
             return "rgba";
         }
         return "rgb";
@@ -1216,21 +1011,16 @@ _GetInterpretation(const SdfValueTypeName& typeName)
     if (roleName == SdfValueRoleNames->Transform) {
         return "matrix";
     }
-    if (typeName == SdfValueTypeNames->Quatd ||
-        typeName == SdfValueTypeNames->Quatf) {
+    if (typeName == SdfValueTypeNames->Quatd || typeName == SdfValueTypeNames->Quatf) {
         return "quat";
     }
     return std::string();
 }
 
-static
-std::string
-_Stringify(const DataType& type)
-{
+static std::string _Stringify(const DataType& type) {
     if (type.getExtent() > 1) {
-        return TfStringPrintf("%s[%d]",PODName(type.getPod()),type.getExtent());
-    }
-    else {
+        return TfStringPrintf("%s[%d]", PODName(type.getPod()), type.getExtent());
+    } else {
         return PODName(type.getPod());
     }
 }
@@ -1240,15 +1030,12 @@ _Stringify(const DataType& type)
 //
 // Note:  This is the one and only place we invoke a converter to create a
 // _SampleForAlembic.
-static _SampleForAlembic
-_MakeSample(
-    const _WriterSchema& schema,
-    const _WriterSchema::Converter& converter,
-    const SdfValueTypeName& usdType,
-    const VtValue& usdValue,
-    const DataType& expectedAlembicType,
-    bool skipAlembicTypeCheck = false)
-{
+static _SampleForAlembic _MakeSample(const _WriterSchema& schema,
+                                     const _WriterSchema::Converter& converter,
+                                     const SdfValueTypeName& usdType,
+                                     const VtValue& usdValue,
+                                     const DataType& expectedAlembicType,
+                                     bool skipAlembicTypeCheck = false) {
     TRACE_SCOPE("UsdAbc_AlembicDataWriter:_MakeSample");
 
     // Done if there is no value.
@@ -1258,21 +1045,18 @@ _MakeSample(
 
     // This catches when the programmer fails to supply a conversion function
     // for the conversion.
-    if (! converter) {
-        return _ErrorSampleForAlembic(TfStringPrintf(
-                    "No conversion for '%s'",
-                    usdType.GetAsToken().GetText()));
+    if (!converter) {
+        return _ErrorSampleForAlembic(TfStringPrintf("No conversion for '%s'", usdType.GetAsToken().GetText()));
     }
 
     // This catches when the programmer supplies a conversion that doesn't
     // yield the correct Alembic type.  This should never happen.
-    if (! skipAlembicTypeCheck) {
+    if (!skipAlembicTypeCheck) {
         const UsdAbc_AlembicType actualAlembicType = schema.FindConverter(usdType);
         if (actualAlembicType.GetDataType() != expectedAlembicType) {
-            return _ErrorSampleForAlembic(TfStringPrintf(
-                        "Internal error: trying to convert '%s' to '%s'",
-                        usdType.GetAsToken().GetText(),
-                        _Stringify(expectedAlembicType).c_str()));
+            return _ErrorSampleForAlembic(TfStringPrintf("Internal error: trying to convert '%s' to '%s'",
+                                                         usdType.GetAsToken().GetText(),
+                                                         _Stringify(expectedAlembicType).c_str()));
         }
     }
 
@@ -1280,17 +1064,15 @@ _MakeSample(
     // This should never happen because we check properties for the
     // expected type when we extract samples from the _PrimWriterContext,
     // or we choose our conversion based on the type of the samples.
-    const SdfValueTypeName actualUsdType =
-        SdfSchema::GetInstance().FindType(usdValue);
+    const SdfValueTypeName actualUsdType = SdfSchema::GetInstance().FindType(usdValue);
     if (actualUsdType != usdType) {
         // Handle role types.  These have a different name but the same
         // value type.
         if (usdType.GetType() != actualUsdType.GetType()) {
-            return _ErrorSampleForAlembic(TfStringPrintf(
-                        "Internal error: Trying to use conversion for '%s' to "
-                        "convert from '%s'",
-                        usdType.GetAsToken().GetText(),
-                        actualUsdType.GetAsToken().GetText()));
+            return _ErrorSampleForAlembic(
+                    TfStringPrintf("Internal error: Trying to use conversion for '%s' to "
+                                   "convert from '%s'",
+                                   usdType.GetAsToken().GetText(), actualUsdType.GetAsToken().GetText()));
         }
     }
 
@@ -1300,11 +1082,11 @@ _MakeSample(
     // Check extent.
     if (expectedAlembicType.getExtent() != 1) {
         if (result.GetCount() % expectedAlembicType.getExtent() != 0) {
-            return _ErrorSampleForAlembic(TfStringPrintf(
-                        "Internal error: didn't get a multiple of the extent "
-                        "(%zd %% %d = %zd)",
-                        result.GetCount(), expectedAlembicType.getExtent(),
-                        result.GetCount() % expectedAlembicType.getExtent()));
+            return _ErrorSampleForAlembic(
+                    TfStringPrintf("Internal error: didn't get a multiple of the extent "
+                                   "(%zd %% %d = %zd)",
+                                   result.GetCount(), expectedAlembicType.getExtent(),
+                                   result.GetCount() % expectedAlembicType.getExtent()));
         }
     }
 
@@ -1324,44 +1106,28 @@ struct PodEnum<T, typename std::enable_if<std::is_enum<T>::value>::type> {
 // Make a sample, converting the Usd value to the given data type, T.
 // If the given conversion doesn't perform that conversion then fail.
 template <class T>
-static _SampleForAlembic
-_MakeSample(
-    const _WriterSchema& schema,
-    const _WriterSchema::Converter& converter,
-    const SdfValueTypeName& usdType,
-    const VtValue& usdValue,
-    bool skipAlembicTypeCheck = false)
-{
-    return _MakeSample(schema, converter, usdType, usdValue,
-                       DataType(PodEnum<T>::pod_enum),
-                       skipAlembicTypeCheck);
+static _SampleForAlembic _MakeSample(const _WriterSchema& schema,
+                                     const _WriterSchema::Converter& converter,
+                                     const SdfValueTypeName& usdType,
+                                     const VtValue& usdValue,
+                                     bool skipAlembicTypeCheck = false) {
+    return _MakeSample(schema, converter, usdType, usdValue, DataType(PodEnum<T>::pod_enum), skipAlembicTypeCheck);
 }
 
 template <class T, int N>
-static _SampleForAlembic
-_MakeSample(
-    const _WriterSchema& schema,
-    const _WriterSchema::Converter& converter,
-    const SdfValueTypeName& usdType,
-    const VtValue& usdValue,
-    bool skipAlembicTypeCheck = false)
-{
-    return _MakeSample(schema, converter, usdType, usdValue,
-                       DataType(PODTraitsFromType<T>::pod_enum, N),
+static _SampleForAlembic _MakeSample(const _WriterSchema& schema,
+                                     const _WriterSchema::Converter& converter,
+                                     const SdfValueTypeName& usdType,
+                                     const VtValue& usdValue,
+                                     bool skipAlembicTypeCheck = false) {
+    return _MakeSample(schema, converter, usdType, usdValue, DataType(PODTraitsFromType<T>::pod_enum, N),
                        skipAlembicTypeCheck);
 }
 
-static bool
-_CheckSample(
-    const _SampleForAlembic& sample,
-    const UsdSamples& samples,
-    const SdfValueTypeName& usdType)
-{
+static bool _CheckSample(const _SampleForAlembic& sample, const UsdSamples& samples, const SdfValueTypeName& usdType) {
     std::string message;
     if (sample.IsError(&message)) {
-        TF_WARN("Can't convert from '%s' on <%s>: %s",
-                usdType.GetAsToken().GetText(),
-                samples.GetPath().GetText(),
+        TF_WARN("Can't convert from '%s' on <%s>: %s", usdType.GetAsToken().GetText(), samples.GetPath().GetText(),
                 message.c_str());
         return false;
     }
@@ -1371,26 +1137,21 @@ _CheckSample(
 // An object we can use for mapping in _MakeIndexed.  It holds a pointer to
 // its data.  It's not local to _MakeIndexed because we use it as a template
 // argument.
-template<class POD, size_t extent>
+template <class POD, size_t extent>
 struct _MakeIndexedValue {
     const POD* value;
-    _MakeIndexedValue(const POD* value_) : value(value_) { }
+    _MakeIndexedValue(const POD* value_) : value(value_) {}
 
     // Copy value to \p dst.
-    void CopyTo(POD* dst) const
-    {
-        std::copy(value, value + extent, dst);
-    }
+    void CopyTo(POD* dst) const { std::copy(value, value + extent, dst); }
 
     // Compare for equality.
-    bool operator==(const _MakeIndexedValue<POD, extent>& rhs) const
-    {
+    bool operator==(const _MakeIndexedValue<POD, extent>& rhs) const {
         return std::equal(value, value + extent, rhs.value);
     }
 
     // Compare for less-than.
-    bool operator<(const _MakeIndexedValue<POD, extent>& rhs) const
-    {
+    bool operator<(const _MakeIndexedValue<POD, extent>& rhs) const {
         for (size_t i = 0; i != extent; ++i) {
             if (value[i] < rhs.value[i]) {
                 return true;
@@ -1406,11 +1167,8 @@ struct _MakeIndexedValue {
 /// Make the values indexed.  This stores only unique values and makes
 /// an index vector with an element for each original value indexing the
 /// unique value.
-template<class POD, size_t extent>
-static
-void
-_MakeIndexed(_SampleForAlembic* values)
-{
+template <class POD, size_t extent>
+static void _MakeIndexed(_SampleForAlembic* values) {
     // A map of values to an index.
     typedef _MakeIndexedValue<POD, extent> Value;
     typedef std::map<Value, uint32_t> IndexMap;
@@ -1429,8 +1187,7 @@ _MakeIndexed(_SampleForAlembic* values)
     std::vector<Value> unique;
     const POD* ptr = values->GetDataAs<POD>();
     for (size_t i = 0; i != n; ptr += extent, ++i) {
-        const IndexMapResult result =
-            indexMap.insert(std::make_pair(Value(ptr), index));
+        const IndexMapResult result = indexMap.insert(std::make_pair(Value(ptr), index));
         if (result.second) {
             // Found a unique value.
             unique.push_back(result.first->first);
@@ -1440,8 +1197,7 @@ _MakeIndexed(_SampleForAlembic* values)
     }
 
     // If there are enough duplicates use indexing otherwise don't.
-    if (n * sizeof(POD[extent]) <=
-            unique.size() * sizeof(POD[extent]) + n * sizeof(uint32_t)) {
+    if (n * sizeof(POD[extent]) <= unique.size() * sizeof(POD[extent]) + n * sizeof(uint32_t)) {
         return;
     }
 
@@ -1466,25 +1222,15 @@ _MakeIndexed(_SampleForAlembic* values)
 
 // Copy to a T.
 template <class DST, class R, class T>
-void
-_Copy(
-    const _WriterSchema& schema,
-    double time,
-    const UsdSamples& samples,
-    DST* dst,
-    R (DST::*method)(T))
-{
-    typedef std::remove_const_t<
-                std::remove_reference_t<T>> SampleValueType;
+void _Copy(const _WriterSchema& schema, double time, const UsdSamples& samples, DST* dst, R (DST::* method)(T)) {
+    typedef std::remove_const_t<std::remove_reference_t<T>> SampleValueType;
 
     const SdfValueTypeName& usdType = samples.GetTypeName();
     const _WriterSchema::Converter& converter = schema.GetConverter(usdType);
 
     // Make a sample holding a value of type SampleValueType.
-    _SampleForAlembic sample =
-        _MakeSample<SampleValueType>(schema, converter,
-                                     usdType, samples.Get(time));
-    if (! _CheckSample(sample, samples, usdType)) {
+    _SampleForAlembic sample = _MakeSample<SampleValueType>(schema, converter, usdType, samples.Get(time));
+    if (!_CheckSample(sample, samples, usdType)) {
         return;
     }
 
@@ -1494,27 +1240,21 @@ _Copy(
 
 // Copy to a T with explicit converter.
 template <class DST, class R, class T>
-void
-_Copy(
-    const _WriterSchema& schema,
-    const _WriterSchema::Converter& converter,
-    double time,
-    const UsdSamples& samples,
-    DST* dst,
-    R (DST::*method)(T))
-{
-    typedef std::remove_const_t<
-                std::remove_reference_t<T>> SampleValueType;
+void _Copy(const _WriterSchema& schema,
+           const _WriterSchema::Converter& converter,
+           double time,
+           const UsdSamples& samples,
+           DST* dst,
+           R (DST::* method)(T)) {
+    typedef std::remove_const_t<std::remove_reference_t<T>> SampleValueType;
 
     const SdfValueTypeName& usdType = samples.GetTypeName();
 
     // Make a sample holding a value of type SampleValueType.
     static const bool skipAlembicTypeCheck = true;
     _SampleForAlembic sample =
-        _MakeSample<SampleValueType>(schema, converter,
-                                     usdType, samples.Get(time),
-                                     skipAlembicTypeCheck);
-    if (! _CheckSample(sample, samples, usdType)) {
+            _MakeSample<SampleValueType>(schema, converter, usdType, samples.Get(time), skipAlembicTypeCheck);
+    if (!_CheckSample(sample, samples, usdType)) {
         return;
     }
 
@@ -1525,40 +1265,33 @@ _Copy(
 // Copy to a TypedArraySample<T>.  The client *must* hold the returned
 // _SampleForAlembic until the sample is finally consumed.
 template <class DST, class R, class T>
-_SampleForAlembic
-_Copy(
-    const _WriterSchema& schema,
-    const _WriterSchema::Converter& converter,
-    double time,
-    const UsdSamples& samples,
-    DST* dst,
-    R (DST::*method)(const TypedArraySample<T>&),
-    bool skipAlembicTypeCheck = true)
-{
+_SampleForAlembic _Copy(const _WriterSchema& schema,
+                        const _WriterSchema::Converter& converter,
+                        double time,
+                        const UsdSamples& samples,
+                        DST* dst,
+                        R (DST::* method)(const TypedArraySample<T>&),
+                        bool skipAlembicTypeCheck = true) {
     typedef T SampleValueTraits;
     typedef typename SampleValueTraits::value_type Type;
     typedef TypedArraySample<SampleValueTraits> AlembicSample;
 
     // The property is ultimately an array of this type where each element
     // has length extent.
-    typedef typename PODTraitsFromEnum<
-                        SampleValueTraits::pod_enum>::value_type PodType;
+    typedef typename PODTraitsFromEnum<SampleValueTraits::pod_enum>::value_type PodType;
     static const int extent = SampleValueTraits::extent;
 
     const SdfValueTypeName& usdType = samples.GetTypeName();
 
     // Make a sample holding an array of type PodType.
     _SampleForAlembic sample =
-        _MakeSample<PodType, extent>(schema, converter,
-                                     usdType, samples.Get(time),
-                                     skipAlembicTypeCheck);
-    if (! _CheckSample(sample, samples, usdType)) {
+            _MakeSample<PodType, extent>(schema, converter, usdType, samples.Get(time), skipAlembicTypeCheck);
+    if (!_CheckSample(sample, samples, usdType)) {
         return sample;
     }
 
     // Write to dst.
-    (dst->*method)(AlembicSample(sample.GetDataAs<Type>(),
-                                 sample.GetCount() / extent));
+    (dst->*method)(AlembicSample(sample.GetDataAs<Type>(), sample.GetCount() / extent));
 
     return sample;
 }
@@ -1566,17 +1299,13 @@ _Copy(
 // Copy to a TypedArraySample<T>.  The client *must* hold the returned
 // _SampleForAlembic until the sample is finally consumed.
 template <class DST, class R, class T>
-_SampleForAlembic
-_Copy(
-    const _WriterSchema& schema,
-    double time,
-    const UsdSamples& samples,
-    DST* dst,
-    R (DST::*method)(const TypedArraySample<T>&))
-{
+_SampleForAlembic _Copy(const _WriterSchema& schema,
+                        double time,
+                        const UsdSamples& samples,
+                        DST* dst,
+                        R (DST::* method)(const TypedArraySample<T>&)) {
     static const bool skipAlembicTypeCheck = true;
-    return _Copy(schema, schema.GetConverter(samples.GetTypeName()),
-                 time, samples, dst, method, !skipAlembicTypeCheck);
+    return _Copy(schema, schema.GetConverter(samples.GetTypeName()), time, samples, dst, method, !skipAlembicTypeCheck);
 }
 
 // Copy to a OTypedGeomParam<T>::Sample.  The client *must* hold the returned
@@ -1584,14 +1313,11 @@ _Copy(
 // XXX: For some reason the compiler can't deduce the type T so clients
 //      are forced to provide it.
 template <class T, class DST, class R>
-_SampleForAlembic
-_Copy(
-    const _WriterSchema& schema,
-    double time,
-    const UsdSamples& valueSamples,
-    DST* sample,
-    R (DST::*method)(const typename OTypedGeomParam<T>::Sample&))
-{
+_SampleForAlembic _Copy(const _WriterSchema& schema,
+                        double time,
+                        const UsdSamples& valueSamples,
+                        DST* sample,
+                        R (DST::* method)(const typename OTypedGeomParam<T>::Sample&)) {
     typedef T SampleValueTraits;
     typedef typename SampleValueTraits::value_type Type;
     typedef typename OTypedGeomParam<SampleValueTraits>::Sample AlembicSample;
@@ -1599,27 +1325,22 @@ _Copy(
 
     // The property is ultimately an array of this type where each element
     // has length extent.
-    typedef typename PODTraitsFromEnum<
-                        SampleValueTraits::pod_enum>::value_type PodType;
+    typedef typename PODTraitsFromEnum<SampleValueTraits::pod_enum>::value_type PodType;
     static const int extent = SampleValueTraits::extent;
 
     const SdfValueTypeName& usdType = valueSamples.GetTypeName();
     const _WriterSchema::Converter& converter = schema.GetConverter(usdType);
 
     // Make a sample holding an array of type PodType.
-    _SampleForAlembic vals =
-        _MakeSample<PodType, extent>(schema, converter,
-                                     usdType, valueSamples.Get(time));
-    if (! _CheckSample(vals, valueSamples, usdType)) {
+    _SampleForAlembic vals = _MakeSample<PodType, extent>(schema, converter, usdType, valueSamples.Get(time));
+    if (!_CheckSample(vals, valueSamples, usdType)) {
         return vals;
     }
 
     // Get the interpolation.
     VtValue value = valueSamples.GetField(UsdGeomTokens->interpolation);
     const GeometryScope geoScope =
-        value.IsHolding<TfToken>()
-            ? _GetGeometryScope(value.UncheckedGet<TfToken>())
-            : kUnknownScope;
+            value.IsHolding<TfToken>() ? _GetGeometryScope(value.UncheckedGet<TfToken>()) : kUnknownScope;
 
     // Make the values indexed if desired.
     _MakeIndexed<PodType, extent>(&vals);
@@ -1629,44 +1350,30 @@ _Copy(
         // Note that the indices pointer is valid so long as vals is valid.
         const _SampleForAlembic::IndexArray& indices = *indicesPtr;
         UInt32ArraySample indicesSample(&indices[0], indices.size());
+        (sample->*method)(AlembicSample(AlembicValueSample(vals.GetDataAs<Type>(), vals.GetCount() / extent),
+                                        indicesSample, geoScope));
+    } else {
         (sample->*method)(
-            AlembicSample(
-                AlembicValueSample(vals.GetDataAs<Type>(),
-                                   vals.GetCount() / extent),
-                indicesSample,
-                geoScope));
-    }
-    else {
-        (sample->*method)(
-            AlembicSample(
-                AlembicValueSample(vals.GetDataAs<Type>(),
-                                   vals.GetCount() / extent),
-                geoScope));
+                AlembicSample(AlembicValueSample(vals.GetDataAs<Type>(), vals.GetCount() / extent), geoScope));
     }
 
     return vals;
 }
 
 // Copy to a scalar property.
-static
-void
-_Copy(
-    const _WriterSchema& schema,
-    const _WriterSchema::Converter& converter,
-    double time,
-    const UsdSamples& samples,
-    OScalarProperty* property)
-{
+static void _Copy(const _WriterSchema& schema,
+                  const _WriterSchema::Converter& converter,
+                  double time,
+                  const UsdSamples& samples,
+                  OScalarProperty* property) {
     const SdfValueTypeName& usdType = samples.GetTypeName();
     const DataType& dataType = property->getDataType();
 
     // Make a sample holding a value of the type expected by the property.
     static const bool skipAlembicTypeCheck = true;
     _SampleForAlembic sample =
-        _MakeSample(schema, converter, usdType,
-                    samples.Get(time), dataType,
-                    skipAlembicTypeCheck);
-    if (! _CheckSample(sample, samples, usdType)) {
+            _MakeSample(schema, converter, usdType, samples.Get(time), dataType, skipAlembicTypeCheck);
+    if (!_CheckSample(sample, samples, usdType)) {
         return;
     }
 
@@ -1675,25 +1382,19 @@ _Copy(
 }
 
 // Copy to an array property.
-static
-void
-_Copy(
-    const _WriterSchema& schema,
-    const _WriterSchema::Converter& converter,
-    double time,
-    const UsdSamples& samples,
-    OArrayProperty* property)
-{
+static void _Copy(const _WriterSchema& schema,
+                  const _WriterSchema::Converter& converter,
+                  double time,
+                  const UsdSamples& samples,
+                  OArrayProperty* property) {
     const SdfValueTypeName& usdType = samples.GetTypeName();
     const DataType& dataType = property->getDataType();
 
     // Make a sample holding an array of the type expected by the property.
     static const bool skipAlembicTypeCheck = true;
     _SampleForAlembic sample =
-        _MakeSample(schema, converter, usdType,
-                    samples.Get(time), dataType,
-                    skipAlembicTypeCheck);
-    if (! _CheckSample(sample, samples, usdType)) {
+            _MakeSample(schema, converter, usdType, samples.Get(time), dataType, skipAlembicTypeCheck);
+    if (!_CheckSample(sample, samples, usdType)) {
         return;
     }
 
@@ -1702,51 +1403,30 @@ _Copy(
     property->set(ArraySample(sample.GetData(), dataType, count));
 }
 
-static
-void
-_CopyXform(
-    double time,
-    const UsdSamples& samples,
-    XformSample* sample)
-{
+static void _CopyXform(double time, const UsdSamples& samples, XformSample* sample) {
     const VtValue value = samples.Get(time);
     if (value.IsHolding<GfMatrix4d>()) {
         const GfMatrix4d& transform = value.UncheckedGet<GfMatrix4d>();
-        sample->addOp(
-            XformOp(kMatrixOperation, kMatrixHint),
-            M44d(reinterpret_cast<const double(*)[4]>(transform.GetArray())));
-    }
-    else {
-        TF_WARN("Expected type 'GfMatrix4d', got '%s'",
-                ArchGetDemangled(value.GetTypeName()).c_str());
+        sample->addOp(XformOp(kMatrixOperation, kMatrixHint),
+                      M44d(reinterpret_cast<const double(*)[4]>(transform.GetArray())));
+    } else {
+        TF_WARN("Expected type 'GfMatrix4d', got '%s'", ArchGetDemangled(value.GetTypeName()).c_str());
     }
 }
 
-template <class DST> 
-static
-void
-_CopySelfBounds(
-    double time,
-    const UsdSamples& samples,
-    DST* sample)
-{
+template <class DST>
+static void _CopySelfBounds(double time, const UsdSamples& samples, DST* sample) {
     const VtValue value = samples.Get(time);
-    if (value.IsHolding<VtArray<GfVec3f> >()) {
-        const VtArray<GfVec3f>& a = value.UncheckedGet<VtArray<GfVec3f> >();
-        Box3d box(V3d(a[0][0], a[0][1], a[0][2]),
-                  V3d(a[1][0], a[1][1], a[1][2]));
+    if (value.IsHolding<VtArray<GfVec3f>>()) {
+        const VtArray<GfVec3f>& a = value.UncheckedGet<VtArray<GfVec3f>>();
+        Box3d box(V3d(a[0][0], a[0][1], a[0][2]), V3d(a[1][0], a[1][1], a[1][2]));
         sample->setSelfBounds(box);
-    }
-    else {
-        TF_WARN("Expected type 'VtArray<GfVec3f>', got '%s'",
-                ArchGetDemangled(value.GetTypeName()).c_str());
+    } else {
+        TF_WARN("Expected type 'VtArray<GfVec3f>', got '%s'", ArchGetDemangled(value.GetTypeName()).c_str());
     }
 }
 
-static
-_SampleForAlembic
-_CopyVisibility(const VtValue& src)
-{
+static _SampleForAlembic _CopyVisibility(const VtValue& src) {
     const TfToken& value = src.UncheckedGet<TfToken>();
     if (value.IsEmpty() || value == UsdGeomTokens->inherited) {
         return _SampleForAlembic(int8_t(kVisibilityDeferred));
@@ -1754,15 +1434,10 @@ _CopyVisibility(const VtValue& src)
     if (value == UsdGeomTokens->invisible) {
         return _SampleForAlembic(int8_t(kVisibilityHidden));
     }
-    return _ErrorSampleForAlembic(TfStringPrintf(
-                            "Unsupported invisibility '%s'",
-                            value.GetText()));
+    return _ErrorSampleForAlembic(TfStringPrintf("Unsupported invisibility '%s'", value.GetText()));
 }
 
-static
-_SampleForAlembic
-_CopySubdivisionScheme(const VtValue& src)
-{
+static _SampleForAlembic _CopySubdivisionScheme(const VtValue& src) {
     const TfToken& value = src.UncheckedGet<TfToken>();
     if (value.IsEmpty() || value == UsdGeomTokens->catmullClark) {
         return _SampleForAlembic(std::string("catmull-clark"));
@@ -1773,15 +1448,10 @@ _CopySubdivisionScheme(const VtValue& src)
     if (value == UsdGeomTokens->bilinear) {
         return _SampleForAlembic(std::string("bilinear"));
     }
-    return _ErrorSampleForAlembic(TfStringPrintf(
-                            "Unsupported subdivisionScheme '%s'",
-                            value.GetText()));
+    return _ErrorSampleForAlembic(TfStringPrintf("Unsupported subdivisionScheme '%s'", value.GetText()));
 }
 
-static
-_SampleForAlembic
-_CopyInterpolateBoundary(const VtValue& src)
-{
+static _SampleForAlembic _CopyInterpolateBoundary(const VtValue& src) {
     const TfToken& value = src.UncheckedGet<TfToken>();
     if (value.IsEmpty() || value == UsdGeomTokens->edgeAndCorner) {
         return _SampleForAlembic(int32_t(1));
@@ -1792,18 +1462,12 @@ _CopyInterpolateBoundary(const VtValue& src)
     if (value == UsdGeomTokens->edgeOnly) {
         return _SampleForAlembic(int32_t(2));
     }
-    return _ErrorSampleForAlembic(TfStringPrintf(
-                            "Unsupported interpolateBoundary '%s'",
-                            value.GetText()));
+    return _ErrorSampleForAlembic(TfStringPrintf("Unsupported interpolateBoundary '%s'", value.GetText()));
 }
 
-static
-_SampleForAlembic
-_CopyFaceVaryingInterpolateBoundary(const VtValue& src)
-{
+static _SampleForAlembic _CopyFaceVaryingInterpolateBoundary(const VtValue& src) {
     const TfToken& value = src.UncheckedGet<TfToken>();
-    if (value.IsEmpty() || value == UsdGeomTokens->cornersPlus1 ||
-        value == UsdGeomTokens->cornersOnly ||
+    if (value.IsEmpty() || value == UsdGeomTokens->cornersPlus1 || value == UsdGeomTokens->cornersOnly ||
         value == UsdGeomTokens->cornersPlus2) {
         return _SampleForAlembic(int32_t(1));
     }
@@ -1816,26 +1480,18 @@ _CopyFaceVaryingInterpolateBoundary(const VtValue& src)
     if (value == UsdGeomTokens->boundaries) {
         return _SampleForAlembic(int32_t(3));
     }
-    return _ErrorSampleForAlembic(TfStringPrintf(
-                            "Unsupported faceVaryingLinearInterpolation '%s'",
-                            value.GetText()));
+    return _ErrorSampleForAlembic(TfStringPrintf("Unsupported faceVaryingLinearInterpolation '%s'", value.GetText()));
 }
 
-static
-_SampleForAlembic
-_CopyAdskColor(const VtValue& src)
-{
-    const VtArray<GfVec3f>& color = src.UncheckedGet<VtArray<GfVec3f> >();
+static _SampleForAlembic _CopyAdskColor(const VtValue& src) {
+    const VtArray<GfVec3f>& color = src.UncheckedGet<VtArray<GfVec3f>>();
     std::unique_ptr<float[]> result(new float[4]);
     std::copy(color[0].GetArray(), color[0].GetArray() + 3, result.get());
     result[3] = 1.0;
     return _SampleForAlembic(std::move(result), 4);
 }
 
-static
-_SampleForAlembic
-_CopyCurveBasis(const VtValue& src)
-{
+static _SampleForAlembic _CopyCurveBasis(const VtValue& src) {
     const TfToken& value = src.UncheckedGet<TfToken>();
     if (value.IsEmpty() || value == UsdGeomTokens->none) {
         return _SampleForAlembic(kNoBasis);
@@ -1849,15 +1505,10 @@ _CopyCurveBasis(const VtValue& src)
     if (value == UsdGeomTokens->catmullRom) {
         return _SampleForAlembic(kCatmullromBasis);
     }
-    return _ErrorSampleForAlembic(TfStringPrintf(
-                            "Unsupported curve basis '%s'",
-                            value.GetText()));
+    return _ErrorSampleForAlembic(TfStringPrintf("Unsupported curve basis '%s'", value.GetText()));
 }
 
-static
-_SampleForAlembic
-_CopyCurveType(const VtValue& src)
-{
+static _SampleForAlembic _CopyCurveType(const VtValue& src) {
     const TfToken& value = src.UncheckedGet<TfToken>();
     if (value.IsEmpty() || value == UsdGeomTokens->none) {
         return _SampleForAlembic(kCubic);
@@ -1868,15 +1519,10 @@ _CopyCurveType(const VtValue& src)
     if (value == UsdGeomTokens->cubic) {
         return _SampleForAlembic(kCubic);
     }
-    return _ErrorSampleForAlembic(TfStringPrintf(
-                            "Unsupported curve type '%s'",
-                            value.GetText()));
+    return _ErrorSampleForAlembic(TfStringPrintf("Unsupported curve type '%s'", value.GetText()));
 }
 
-static
-_SampleForAlembic
-_CopyCurveWrap(const VtValue& src)
-{
+static _SampleForAlembic _CopyCurveWrap(const VtValue& src) {
     const TfToken& value = src.UncheckedGet<TfToken>();
     if (value.IsEmpty() || value == UsdGeomTokens->none) {
         return _SampleForAlembic(kNonPeriodic);
@@ -1887,31 +1533,20 @@ _CopyCurveWrap(const VtValue& src)
     if (value == UsdGeomTokens->periodic) {
         return _SampleForAlembic(kPeriodic);
     }
-    return _ErrorSampleForAlembic(TfStringPrintf(
-                            "Unsupported curve wrap '%s'",
-                            value.GetText()));
+    return _ErrorSampleForAlembic(TfStringPrintf("Unsupported curve wrap '%s'", value.GetText()));
 }
 
-static
-_SampleForAlembic
-_CopyKnots(const VtValue& src)
-{
+static _SampleForAlembic _CopyKnots(const VtValue& src) {
     const VtDoubleArray& value = src.UncheckedGet<VtDoubleArray>();
     return _SampleForAlembic(std::vector<float>(value.begin(), value.end()));
 }
 
-static
-_SampleForAlembic
-_CopyOrder(const VtValue& src)
-{
+static _SampleForAlembic _CopyOrder(const VtValue& src) {
     const VtIntArray& value = src.UncheckedGet<VtIntArray>();
     return _SampleForAlembic(std::vector<uint8_t>(value.begin(), value.end()));
 }
 
-static
-_SampleForAlembic
-_CopyPointIds(const VtValue& src)
-{
+static _SampleForAlembic _CopyPointIds(const VtValue& src) {
     const VtInt64Array& value = src.UncheckedGet<VtInt64Array>();
     return _SampleForAlembic(std::vector<uint64_t>(value.begin(), value.end()));
 }
@@ -1922,87 +1557,59 @@ _CopyPointIds(const VtValue& src)
 // Property writers
 //
 
-static
-VtValue
-_GetField(
-    const _PrimWriterContext& context,
-    const TfToken& field,
-    const TfToken& usdName)
-{
-    return usdName.IsEmpty() ? context.GetField(field)
-                             : context.GetPropertyField(usdName, field);
+static VtValue _GetField(const _PrimWriterContext& context, const TfToken& field, const TfToken& usdName) {
+    return usdName.IsEmpty() ? context.GetField(field) : context.GetPropertyField(usdName, field);
 }
 
-static
-void
-_SetBoolMetadata(
-    MetaData* metadata,
-    const _PrimWriterContext& context,
-    const TfToken& field,
-    const TfToken& usdName = TfToken())
-{
+static void _SetBoolMetadata(MetaData* metadata,
+                             const _PrimWriterContext& context,
+                             const TfToken& field,
+                             const TfToken& usdName = TfToken()) {
     VtValue value = _GetField(context, field, usdName);
     if (value.IsHolding<bool>()) {
-        metadata->set(_AmdName(field),
-                      value.UncheckedGet<bool>() ? "true" : "false");
+        metadata->set(_AmdName(field), value.UncheckedGet<bool>() ? "true" : "false");
     }
 }
 
-static
-void
-_SetStringMetadata(
-    MetaData* metadata,
-    const _PrimWriterContext& context,
-    const TfToken& field,
-    const TfToken& usdName = TfToken())
-{
+static void _SetStringMetadata(MetaData* metadata,
+                               const _PrimWriterContext& context,
+                               const TfToken& field,
+                               const TfToken& usdName = TfToken()) {
     VtValue value = _GetField(context, field, usdName);
     if (value.IsHolding<std::string>()) {
         const std::string& tmp = value.UncheckedGet<std::string>();
-        if (! tmp.empty()) {
+        if (!tmp.empty()) {
             metadata->set(_AmdName(field), tmp);
         }
     }
 }
 
-static
-void
-_SetTokenMetadata(
-    MetaData* metadata,
-    const _PrimWriterContext& context,
-    const TfToken& field,
-    const TfToken& usdName = TfToken())
-{
+static void _SetTokenMetadata(MetaData* metadata,
+                              const _PrimWriterContext& context,
+                              const TfToken& field,
+                              const TfToken& usdName = TfToken()) {
     VtValue value = _GetField(context, field, usdName);
     if (value.IsHolding<TfToken>()) {
         const TfToken& tmp = value.UncheckedGet<TfToken>();
-        if (! tmp.IsEmpty()) {
+        if (!tmp.IsEmpty()) {
             metadata->set(_AmdName(field), tmp);
         }
     }
 }
 
-static
-void
-_SetDoubleMetadata(
-    MetaData* metadata,
-    const _PrimWriterContext& context,
-    const TfToken& field,
-    const TfToken& usdName = TfToken())
-{
+static void _SetDoubleMetadata(MetaData* metadata,
+                               const _PrimWriterContext& context,
+                               const TfToken& field,
+                               const TfToken& usdName = TfToken()) {
     VtValue value = _GetField(context, field, usdName);
     if (value.IsHolding<double>()) {
         metadata->set(_AmdName(field), TfStringify(value));
     }
 }
 
-static
-MetaData
-_GetPropertyMetadata(
-    const _PrimWriterContext& context,
-    const TfToken& usdName,
-    const UsdSamples& samples)
-{
+static MetaData _GetPropertyMetadata(const _PrimWriterContext& context,
+                                     const TfToken& usdName,
+                                     const UsdSamples& samples) {
     MetaData metadata;
 
     VtValue value;
@@ -2013,13 +1620,10 @@ _GetPropertyMetadata(
     // Write the usd type for exact reverse conversion if we can't deduce it
     // when reading the Alembic.
     value = context.GetPropertyField(usdName, SdfFieldKeys->TypeName);
-    const TfToken typeNameToken =
-        value.IsHolding<TfToken>() ? value.UncheckedGet<TfToken>() : TfToken();
-    const SdfValueTypeName typeName =
-        SdfSchema::GetInstance().FindType(typeNameToken);
+    const TfToken typeNameToken = value.IsHolding<TfToken>() ? value.UncheckedGet<TfToken>() : TfToken();
+    const SdfValueTypeName typeName = SdfSchema::GetInstance().FindType(typeNameToken);
     const SdfValueTypeName roundTripTypeName =
-        context.GetSchema().FindConverter(
-            context.GetSchema().FindConverter(typeName));
+            context.GetSchema().FindConverter(context.GetSchema().FindConverter(typeName));
     if (typeName != roundTripTypeName) {
         metadata.set(_AmdName(SdfFieldKeys->TypeName), typeNameToken);
     }
@@ -2027,58 +1631,45 @@ _GetPropertyMetadata(
     // Note a "winning" Default as a single alembic sample that should come
     // back into USD as a Default
     if (!samples.IsTimeSampled() && samples.GetNumSamples() == 1) {
-        metadata.set(_AmdName(UsdAbcCustomMetadata->singleSampleAsDefault), 
-                     "true");
+        metadata.set(_AmdName(UsdAbcCustomMetadata->singleSampleAsDefault), "true");
     }
 
     // Set the interpretation if there is one.
     const std::string interpretation = _GetInterpretation(typeName);
-    if (! interpretation.empty()) {
+    if (!interpretation.empty()) {
         metadata.set("interpretation", interpretation);
     }
 
     // Other Sdf metadata.
     _SetStringMetadata(&metadata, context, SdfFieldKeys->DisplayGroup, usdName);
-    _SetStringMetadata(&metadata, context, SdfFieldKeys->Documentation,usdName);
+    _SetStringMetadata(&metadata, context, SdfFieldKeys->Documentation, usdName);
     _SetBoolMetadata(&metadata, context, SdfFieldKeys->Hidden, usdName);
     value = context.GetPropertyField(usdName, SdfFieldKeys->Variability);
-    if (value.IsHolding<SdfVariability>() && 
-            value.UncheckedGet<SdfVariability>() ==
-                SdfVariabilityUniform) {
+    if (value.IsHolding<SdfVariability>() && value.UncheckedGet<SdfVariability>() == SdfVariabilityUniform) {
         metadata.set(_AmdName(SdfFieldKeys->Variability), "uniform");
     }
     value = context.GetPropertyField(usdName, UsdGeomTokens->interpolation);
     if (value.IsHolding<TfToken>()) {
-        SetGeometryScope(metadata,
-                         _GetGeometryScope(value.UncheckedGet<TfToken>()));
+        SetGeometryScope(metadata, _GetGeometryScope(value.UncheckedGet<TfToken>()));
     }
 
     // Custom metadata.
-    _SetStringMetadata(&metadata, context, 
-                       UsdAbcCustomMetadata->riName, usdName);
-    _SetStringMetadata(&metadata, context, 
-                       UsdAbcCustomMetadata->riType, usdName);
-    _SetBoolMetadata(&metadata, context,
-                     UsdAbcCustomMetadata->gprimDataRender, usdName);
+    _SetStringMetadata(&metadata, context, UsdAbcCustomMetadata->riName, usdName);
+    _SetStringMetadata(&metadata, context, UsdAbcCustomMetadata->riType, usdName);
+    _SetBoolMetadata(&metadata, context, UsdAbcCustomMetadata->gprimDataRender, usdName);
 
     return metadata;
 }
 
-static
-bool
-_WriteOutOfSchemaProperty(
-    _PrimWriterContext* context,
-    OCompoundProperty parent,
-    const TfToken& usdName,
-    const std::string& alembicName)
-{
+static bool _WriteOutOfSchemaProperty(_PrimWriterContext* context,
+                                      OCompoundProperty parent,
+                                      const TfToken& usdName,
+                                      const std::string& alembicName) {
     // Ignore non-attributes.
     if (context->GetSpecType(usdName) != SdfSpecTypeAttribute) {
         if (context->IsFlagSet(UsdAbc_AlembicContextFlagNames->verbose)) {
-            TF_WARN("No conversion for <%s> with spec type '%s'",
-                    context->GetPath().AppendProperty(usdName).GetText(),
-                    TfEnum::GetDisplayName(
-                        context->GetSpecType(usdName)).c_str());
+            TF_WARN("No conversion for <%s> with spec type '%s'", context->GetPath().AppendProperty(usdName).GetText(),
+                    TfEnum::GetDisplayName(context->GetSpecType(usdName)).c_str());
         }
         return false;
     }
@@ -2087,75 +1678,54 @@ _WriteOutOfSchemaProperty(
     UsdSamples samples = context->ExtractSamples(usdName);
     if (context->GetSchema().IsValid(samples)) {
         const SdfValueTypeName& usdType = samples.GetTypeName();
-        const _WriterSchema::Converter& converter =
-            context->GetSchema().GetConverter(usdType);
+        const _WriterSchema::Converter& converter = context->GetSchema().GetConverter(usdType);
         if (context->GetSchema().IsShaped(samples)) {
-            OArrayProperty property(parent, alembicName,
-                                    context->GetSchema().GetDataType(samples),
-                                    _GetPropertyMetadata(*context, usdName,
-                                                         samples));
+            OArrayProperty property(parent, alembicName, context->GetSchema().GetDataType(samples),
+                                    _GetPropertyMetadata(*context, usdName, samples));
             for (double time : context->GetSampleTimesUnion()) {
-                _Copy(context->GetSchema(), converter, time, samples,&property);
+                _Copy(context->GetSchema(), converter, time, samples, &property);
             }
-            property.setTimeSampling(
-                context->AddTimeSampling(context->GetSampleTimesUnion()));
-        }
-        else {
-            OScalarProperty property(parent, alembicName,
-                                     context->GetSchema().GetDataType(samples),
-                                     _GetPropertyMetadata(*context, usdName,
-                                                          samples));
+            property.setTimeSampling(context->AddTimeSampling(context->GetSampleTimesUnion()));
+        } else {
+            OScalarProperty property(parent, alembicName, context->GetSchema().GetDataType(samples),
+                                     _GetPropertyMetadata(*context, usdName, samples));
             for (double time : context->GetSampleTimesUnion()) {
-                _Copy(context->GetSchema(), converter, time, samples,&property);
+                _Copy(context->GetSchema(), converter, time, samples, &property);
             }
-            property.setTimeSampling(
-                context->AddTimeSampling(context->GetSampleTimesUnion()));
+            property.setTimeSampling(context->AddTimeSampling(context->GetSampleTimesUnion()));
         }
         return true;
-    }
-    else {
+    } else {
         return false;
     }
 }
 
 template <class T>
-static
-void
-_WriteGenericProperty(
-    _PrimWriterContext* context,
-    OCompoundProperty parent,
-    const _WriterSchema::Converter& converter,
-    const DataType& alembicDataType,
-    const TfToken& usdName,
-    const std::string& alembicName)
-{
+static void _WriteGenericProperty(_PrimWriterContext* context,
+                                  OCompoundProperty parent,
+                                  const _WriterSchema::Converter& converter,
+                                  const DataType& alembicDataType,
+                                  const TfToken& usdName,
+                                  const std::string& alembicName) {
     // Collect the properties we need.
     context->SetSampleTimesUnion(UsdAbc_TimeSamples());
     UsdSamples samples = context->ExtractSamples(usdName);
     if (context->GetSchema().IsValid(samples)) {
-        T property(parent, alembicName, alembicDataType,
-                   _GetPropertyMetadata(*context, usdName, samples));
+        T property(parent, alembicName, alembicDataType, _GetPropertyMetadata(*context, usdName, samples));
         for (double time : context->GetSampleTimesUnion()) {
             _Copy(context->GetSchema(), converter, time, samples, &property);
         }
-        property.setTimeSampling(
-            context->AddTimeSampling(context->GetSampleTimesUnion()));
+        property.setTimeSampling(context->AddTimeSampling(context->GetSampleTimesUnion()));
     }
 }
 
-static
-void
-_WriteGenericScalar(
-    _PrimWriterContext* context,
-    const _WriterSchema::Converter& converter,
-    const DataType& alembicDataType,
-    const TfToken& usdName,
-    const std::string& alembicName)
-{
-    _WriteGenericProperty<OScalarProperty>(context,
-                                           context->GetParent().GetProperties(),
-                                           converter, alembicDataType, usdName,
-                                           alembicName);
+static void _WriteGenericScalar(_PrimWriterContext* context,
+                                const _WriterSchema::Converter& converter,
+                                const DataType& alembicDataType,
+                                const TfToken& usdName,
+                                const std::string& alembicName) {
+    _WriteGenericProperty<OScalarProperty>(context, context->GetParent().GetProperties(), converter, alembicDataType,
+                                           usdName, alembicName);
 }
 
 /* Not currently used.
@@ -2182,10 +1752,7 @@ _WriteGenericArray(
 // OCompoundProperty.
 class _CompoundPropertyTable {
 public:
-    _CompoundPropertyTable(OCompoundProperty root)
-{
-        _table[TfTokenVector()] = root;
-    }
+    _CompoundPropertyTable(OCompoundProperty root) { _table[TfTokenVector()] = root; }
 
     OCompoundProperty FindOrCreate(const TfTokenVector& names);
 
@@ -2196,24 +1763,19 @@ private:
     std::map<TfTokenVector, OCompoundProperty> _table;
 };
 
-OCompoundProperty
-_CompoundPropertyTable::FindOrCreate(const TfTokenVector& names)
-{
+OCompoundProperty _CompoundPropertyTable::FindOrCreate(const TfTokenVector& names) {
     OCompoundProperty result = _table[names];
-    if (! result.valid()) {
+    if (!result.valid()) {
         TfTokenVector tmpNames = names;
         return _FindOrCreate(tmpNames);
-    }
-    else {
+    } else {
         return result;
     }
 }
 
-OCompoundProperty
-_CompoundPropertyTable::_FindOrCreate(TfTokenVector& names)
-{
+OCompoundProperty _CompoundPropertyTable::_FindOrCreate(TfTokenVector& names) {
     OCompoundProperty& result = _table[names];
-    if (! result.valid()) {
+    if (!result.valid()) {
         // We don't have an entry for this path.  Recursively get parent
         // and add the child.
         TfToken name = names.back();
@@ -2224,13 +1786,9 @@ _CompoundPropertyTable::_FindOrCreate(TfTokenVector& names)
     return result;
 }
 
-static
-void
-_WriteNamespacedPropertyGroup(
-    _PrimWriterContext* context,
-    const TfToken& namespaceName,
-    const std::function<OCompoundProperty()>& getParentProperty)
-{
+static void _WriteNamespacedPropertyGroup(_PrimWriterContext* context,
+                                          const TfToken& namespaceName,
+                                          const std::function<OCompoundProperty()>& getParentProperty) {
     // First check if there are any properties to convert.  We only ask
     // for that property if so, because asking for it will create it on
     // demand and we don't want to create it if unnecessary.  Note,
@@ -2261,11 +1819,9 @@ _WriteNamespacedPropertyGroup(
         // Convert each property.
         // We have to remap primvars:st:indices to primvars:uv:indices.
         for (const auto& name : context->GetUnextractedNames()) {
-            TfTokenVector names = 
-                name == UsdAbcPropertyNames->stIndices ?
-                    SdfPath::TokenizeIdentifierAsTokens(
-                        UsdAbcPropertyNames->uvIndices) :
-                    SdfPath::TokenizeIdentifierAsTokens(name);
+            TfTokenVector names = name == UsdAbcPropertyNames->stIndices
+                                          ? SdfPath::TokenizeIdentifierAsTokens(UsdAbcPropertyNames->uvIndices)
+                                          : SdfPath::TokenizeIdentifierAsTokens(name);
             if (names.size() >= 2 && names[0] == namespaceName) {
                 // Remove the namespace prefix.
                 names.erase(names.begin());
@@ -2284,66 +1840,44 @@ _WriteNamespacedPropertyGroup(
     }
 }
 
-static
-void
-_WriteArbGeomParams(_PrimWriterContext* context)
-{
+static void _WriteArbGeomParams(_PrimWriterContext* context) {
     // Convert everything in the primvars namespace to the getArbGeomParams()
     // compound property.
     const _Parent& parent = context->GetParent();
-    _WriteNamespacedPropertyGroup(context,
-                                  UsdAbcPropertyNames->primvars,
-                                  std::bind(&_Parent::GetArbGeomParams,
-                                            std::cref(parent)));
+    _WriteNamespacedPropertyGroup(context, UsdAbcPropertyNames->primvars,
+                                  std::bind(&_Parent::GetArbGeomParams, std::cref(parent)));
 }
 
-static
-void
-_WriteUserProperties(_PrimWriterContext* context)
-{
+static void _WriteUserProperties(_PrimWriterContext* context) {
     // Convert everything in the userProperties namespace to the
     // getUserProperties() compound property.
     const _Parent& parent = context->GetParent();
-    _WriteNamespacedPropertyGroup(context,
-                                  UsdAbcPropertyNames->userProperties,
-                                  std::bind(&_Parent::GetUserProperties,
-                                            std::cref(parent)));
-    }
+    _WriteNamespacedPropertyGroup(context, UsdAbcPropertyNames->userProperties,
+                                  std::bind(&_Parent::GetUserProperties, std::cref(parent)));
+}
 
-static
-void
-_WriteGprim(_PrimWriterContext* context)
-{
+static void _WriteGprim(_PrimWriterContext* context) {
     // extent is handled by GeomBase subclasses automatically.
 
     // Write the orientation.
-    _WriteOutOfSchemaProperty(context, context->GetParent().GetProperties(),
-                              UsdGeomTokens->orientation,
+    _WriteOutOfSchemaProperty(context, context->GetParent().GetProperties(), UsdGeomTokens->orientation,
                               _AmdName(UsdGeomTokens->orientation));
 }
 
-static
-void
-_WriteMayaColor(_PrimWriterContext* context)
-{
+static void _WriteMayaColor(_PrimWriterContext* context) {
     static const TfToken displayColor("primvars:displayColor");
     static const TfToken name("adskDiffuseColor");
 
     UsdSamples color(context->GetPath(), displayColor);
-    if (context->GetData().HasSpec(
-            context->GetPath().AppendProperty(displayColor))) {
-        color =
-            UsdSamples(context->GetPath(), displayColor, context->GetData());
+    if (context->GetData().HasSpec(context->GetPath().AppendProperty(displayColor))) {
+        color = UsdSamples(context->GetPath(), displayColor, context->GetData());
     }
     if (color.IsEmpty()) {
         // Copy existing Maya color.
-        if (! _WriteOutOfSchemaProperty(context,
-                                        context->GetParent().GetSchema(),
-                                        name, name)) {
+        if (!_WriteOutOfSchemaProperty(context, context->GetParent().GetSchema(), name, name)) {
             return;
         }
-    }
-    else {
+    } else {
         // Use displayColor.
         UsdAbc_TimeSamples sampleTimes;
         color.AddTimes(&sampleTimes);
@@ -2351,12 +1885,9 @@ _WriteMayaColor(_PrimWriterContext* context)
         MetaData metadata;
         metadata.set("interpretation", "rgba");
 
-        OScalarProperty property(context->GetParent().GetSchema(),
-                                 name,
-                                 DataType(kFloat32POD, 4),
-                                 metadata);
+        OScalarProperty property(context->GetParent().GetSchema(), name, DataType(kFloat32POD, 4), metadata);
         for (double time : sampleTimes) {
-            _Copy(context->GetSchema(), _CopyAdskColor, time, color,&property);
+            _Copy(context->GetSchema(), _CopyAdskColor, time, color, &property);
         }
         property.setTimeSampling(context->AddTimeSampling(sampleTimes));
 
@@ -2365,34 +1896,24 @@ _WriteMayaColor(_PrimWriterContext* context)
     }
 }
 
-static
-void
-_WriteUnknownMayaColor(_PrimWriterContext* context)
-{
+static void _WriteUnknownMayaColor(_PrimWriterContext* context) {
     // XXX -- Write the Maya color to a .geom OCompoundProperty.
 }
 
-static
-void
-_WriteImageable(_PrimWriterContext* context)
-{
-    _WriteGenericScalar(context, _CopyVisibility, DataType(kInt8POD),
-                        UsdGeomTokens->visibility, kVisibilityPropertyName);
+static void _WriteImageable(_PrimWriterContext* context) {
+    _WriteGenericScalar(context, _CopyVisibility, DataType(kInt8POD), UsdGeomTokens->visibility,
+                        kVisibilityPropertyName);
 }
 
-static
-void
-_WriteOther(_PrimWriterContext* context)
-{
+static void _WriteOther(_PrimWriterContext* context) {
     // Write every unextracted property to Alembic using default converters.
     // This handles any property we don't have specific rules for.  Any
     // Usd name with namespaces is written to Alembic with the namespaces
     // embedded in the name.
     //
     for (const auto& name : context->GetUnextractedNames()) {
-        _WriteOutOfSchemaProperty(context,
-                                  context->GetParent().GetProperties(),
-                                  name, context->GetAlembicPropertyName(name));
+        _WriteOutOfSchemaProperty(context, context->GetParent().GetProperties(), name,
+                                  context->GetAlembicPropertyName(name));
     }
 }
 
@@ -2400,17 +1921,14 @@ _WriteOther(_PrimWriterContext* context)
 // Object writers -- these create an OObject.
 //
 
-void
-_AddOrderingMetadata(
-    const _PrimWriterContext& context,
-    const TfToken& fieldName,
-    const std::string& metadataName,
-    MetaData* metadata)
-{
+void _AddOrderingMetadata(const _PrimWriterContext& context,
+                          const TfToken& fieldName,
+                          const std::string& metadataName,
+                          MetaData* metadata) {
     VtValue value = context.GetField(fieldName);
     if (value.IsHolding<TfTokenVector>()) {
         const TfTokenVector& order = value.UncheckedGet<TfTokenVector>();
-        if (! order.empty()) {
+        if (!order.empty()) {
             // Write as space separated names all surrounded by square
             // brackets.
             metadata->set(metadataName, TfStringify(order));
@@ -2418,10 +1936,7 @@ _AddOrderingMetadata(
     }
 }
 
-static
-MetaData
-_GetPrimMetadata(const _PrimWriterContext& context)
-{
+static MetaData _GetPrimMetadata(const _PrimWriterContext& context) {
     MetaData metadata;
 
     // Add "over".
@@ -2436,20 +1951,15 @@ _GetPrimMetadata(const _PrimWriterContext& context)
     _SetTokenMetadata(&metadata, context, SdfFieldKeys->Kind);
 
     // Add name children ordering.
-    _AddOrderingMetadata(context, SdfFieldKeys->PrimOrder,
-                         _AmdName(SdfFieldKeys->PrimOrder), &metadata);
+    _AddOrderingMetadata(context, SdfFieldKeys->PrimOrder, _AmdName(SdfFieldKeys->PrimOrder), &metadata);
 
     // Add property ordering.
-    _AddOrderingMetadata(context, SdfFieldKeys->PropertyOrder,
-                         _AmdName(SdfFieldKeys->PropertyOrder), &metadata);
+    _AddOrderingMetadata(context, SdfFieldKeys->PropertyOrder, _AmdName(SdfFieldKeys->PropertyOrder), &metadata);
 
     return metadata;
 }
 
-static
-void
-_WriteRoot(_PrimWriterContext* context)
-{
+static void _WriteRoot(_PrimWriterContext* context) {
     // Create the Alembic root.
     shared_ptr<OObject> root(new OObject(context->GetArchive(), kTop));
     context->SetParent(root);
@@ -2459,22 +1969,18 @@ _WriteRoot(_PrimWriterContext* context)
     _SetDoubleMetadata(&metadata, *context, SdfFieldKeys->StartTimeCode);
     _SetDoubleMetadata(&metadata, *context, SdfFieldKeys->EndTimeCode);
 
-    // Always author a value for timeCodesPerSecond and framesPerSecond 
+    // Always author a value for timeCodesPerSecond and framesPerSecond
     // to preserve proper round-tripping from USD->alembic->USD.
-    // 
-    // First, set them to the corresponding fallback values, then overwrite them 
+    //
+    // First, set them to the corresponding fallback values, then overwrite them
     // with the values from the input layer.
-    // 
-    const SdfSchema &sdfSchema = SdfSchema::GetInstance();
-    double fallbackTimeCodesPerSecond = sdfSchema.GetFallback(
-        SdfFieldKeys->TimeCodesPerSecond).Get<double>();
-    double fallbackFramesPerSecond = sdfSchema.GetFallback(
-        SdfFieldKeys->FramesPerSecond).Get<double>();
+    //
+    const SdfSchema& sdfSchema = SdfSchema::GetInstance();
+    double fallbackTimeCodesPerSecond = sdfSchema.GetFallback(SdfFieldKeys->TimeCodesPerSecond).Get<double>();
+    double fallbackFramesPerSecond = sdfSchema.GetFallback(SdfFieldKeys->FramesPerSecond).Get<double>();
 
-    metadata.set(_AmdName(SdfFieldKeys->TimeCodesPerSecond), 
-                  TfStringify(fallbackTimeCodesPerSecond));
-    metadata.set(_AmdName(SdfFieldKeys->FramesPerSecond), 
-                  TfStringify(fallbackFramesPerSecond));
+    metadata.set(_AmdName(SdfFieldKeys->TimeCodesPerSecond), TfStringify(fallbackTimeCodesPerSecond));
+    metadata.set(_AmdName(SdfFieldKeys->FramesPerSecond), TfStringify(fallbackFramesPerSecond));
 
     _SetDoubleMetadata(&metadata, *context, SdfFieldKeys->TimeCodesPerSecond);
     _SetDoubleMetadata(&metadata, *context, SdfFieldKeys->FramesPerSecond);
@@ -2494,73 +2000,52 @@ _WriteRoot(_PrimWriterContext* context)
 }
 
 template <class T>
-static 
-bool _ExtractWithFallback(UsdSamples const &samples, double time,
-                          const UsdPrimDefinition *primDef, 
-                          TfToken const &propertyName,
-                          T *val)
-{
-    if (samples.IsEmpty()){
+static bool _ExtractWithFallback(
+        UsdSamples const& samples, double time, const UsdPrimDefinition* primDef, TfToken const& propertyName, T* val) {
+    if (samples.IsEmpty()) {
         if (!primDef) {
             return false;
         }
         return primDef->GetAttributeFallbackValue(propertyName, val);
     }
-    
+
     const VtValue value = samples.Get(time);
-    
+
     if (value.IsHolding<T>()) {
         *val = value.UncheckedGet<T>();
         return true;
     } else {
-        TF_WARN("Expected type '%s', but found '%s' for %s",
-                ArchGetDemangled(typeid(T)).c_str(),
-                ArchGetDemangled(value.GetTypeName()).c_str(),
-                propertyName.GetText());
+        TF_WARN("Expected type '%s', but found '%s' for %s", ArchGetDemangled(typeid(T)).c_str(),
+                ArchGetDemangled(value.GetTypeName()).c_str(), propertyName.GetText());
         return false;
     }
 }
 
-static
-void
-_WriteCameraParameters(_PrimWriterContext* context)
-{
+static void _WriteCameraParameters(_PrimWriterContext* context) {
     typedef OCamera Type;
 
     // Create the object and make it the parent.
-    shared_ptr<Type> object(new Type(context->GetParent(),
-                                     context->GetAlembicPrimName(),
-                                     _GetPrimMetadata(*context)));
+    shared_ptr<Type> object(new Type(context->GetParent(), context->GetAlembicPrimName(), _GetPrimMetadata(*context)));
     context->SetParent(object);
 
     // Should be OK doing a VtValue::Get here, as the only way we should have
     // been able to get here is by dispatching on prim typeName.
     TfToken primType = context->GetField(SdfFieldKeys->TypeName).Get<TfToken>();
-    
+
     // Collect the properties we need to compute the frustum.
     context->SetSampleTimesUnion(UsdAbc_TimeSamples());
-    UsdSamples focalLength =
-        context->ExtractSamples(UsdGeomTokens->focalLength,
-                                SdfValueTypeNames->Float);
+    UsdSamples focalLength = context->ExtractSamples(UsdGeomTokens->focalLength, SdfValueTypeNames->Float);
     UsdSamples horizontalAperture =
-        context->ExtractSamples(UsdGeomTokens->horizontalAperture,
-                                SdfValueTypeNames->Float);
-    UsdSamples verticalAperture =
-        context->ExtractSamples(UsdGeomTokens->verticalAperture,
-                                SdfValueTypeNames->Float);
+            context->ExtractSamples(UsdGeomTokens->horizontalAperture, SdfValueTypeNames->Float);
+    UsdSamples verticalAperture = context->ExtractSamples(UsdGeomTokens->verticalAperture, SdfValueTypeNames->Float);
     UsdSamples horizontalApertureOffset =
-        context->ExtractSamples(UsdGeomTokens->horizontalApertureOffset,
-                                SdfValueTypeNames->Float);
+            context->ExtractSamples(UsdGeomTokens->horizontalApertureOffset, SdfValueTypeNames->Float);
     UsdSamples verticalApertureOffset =
-        context->ExtractSamples(UsdGeomTokens->verticalApertureOffset,
-                                SdfValueTypeNames->Float);
+            context->ExtractSamples(UsdGeomTokens->verticalApertureOffset, SdfValueTypeNames->Float);
 
-    UsdSamples clippingRange =
-        context->ExtractSamples(UsdGeomTokens->clippingRange,
-                                SdfValueTypeNames->Float2);
+    UsdSamples clippingRange = context->ExtractSamples(UsdGeomTokens->clippingRange, SdfValueTypeNames->Float2);
 
-    const UsdPrimDefinition *primDef =
-        UsdSchemaRegistry::GetInstance().FindConcretePrimDefinition(primType);
+    const UsdPrimDefinition* primDef = UsdSchemaRegistry::GetInstance().FindConcretePrimDefinition(primType);
 
     // Copy all the samples to set up alembic camera frustum.
     typedef CameraSample SampleT;
@@ -2571,10 +2056,7 @@ _WriteCameraParameters(_PrimWriterContext* context)
         {
             // Horizontal aperture is in cm in ABC, but mm in USD
             float value;
-            if (_ExtractWithFallback(horizontalAperture, time, 
-                                     primDef, 
-                                     UsdGeomTokens->horizontalAperture,
-                                     &value)){
+            if (_ExtractWithFallback(horizontalAperture, time, primDef, UsdGeomTokens->horizontalAperture, &value)) {
                 sample.setHorizontalAperture(value / 10.0);
             }
         }
@@ -2582,9 +2064,7 @@ _WriteCameraParameters(_PrimWriterContext* context)
         {
             // Vertical aperture is in cm in ABC, but mm in USD
             float value;
-            if (_ExtractWithFallback(verticalAperture, time, 
-                                     primDef, UsdGeomTokens->verticalAperture,
-                                     &value)){
+            if (_ExtractWithFallback(verticalAperture, time, primDef, UsdGeomTokens->verticalAperture, &value)) {
                 sample.setVerticalAperture(value / 10.0);
             }
         }
@@ -2592,10 +2072,8 @@ _WriteCameraParameters(_PrimWriterContext* context)
         {
             // Horizontal aperture is in cm in ABC, but mm in USD
             float value;
-            if (_ExtractWithFallback(horizontalApertureOffset, time, 
-                                     primDef, 
-                                     UsdGeomTokens->horizontalApertureOffset,
-                                     &value)){
+            if (_ExtractWithFallback(horizontalApertureOffset, time, primDef, UsdGeomTokens->horizontalApertureOffset,
+                                     &value)) {
                 sample.setHorizontalFilmOffset(value / 10.0);
             }
         }
@@ -2603,10 +2081,8 @@ _WriteCameraParameters(_PrimWriterContext* context)
         {
             // Vertical aperture is in cm in ABC, but mm in USD
             float value;
-            if (_ExtractWithFallback(verticalApertureOffset, time, 
-                                     primDef, 
-                                     UsdGeomTokens->verticalApertureOffset,
-                                     &value)){
+            if (_ExtractWithFallback(verticalApertureOffset, time, primDef, UsdGeomTokens->verticalApertureOffset,
+                                     &value)) {
                 sample.setVerticalFilmOffset(value / 10.0);
             }
         }
@@ -2614,18 +2090,14 @@ _WriteCameraParameters(_PrimWriterContext* context)
         {
             // Focal length in USD and ABC is both in mm
             float value;
-            if (_ExtractWithFallback(focalLength, time, 
-                                     primDef, UsdGeomTokens->focalLength,
-                                     &value)){
+            if (_ExtractWithFallback(focalLength, time, primDef, UsdGeomTokens->focalLength, &value)) {
                 sample.setFocalLength(value);
             }
         }
-    
+
         {
             GfVec2f value;
-            if (_ExtractWithFallback(clippingRange, time, 
-                                     primDef, UsdGeomTokens->clippingRange,
-                                     &value)){
+            if (_ExtractWithFallback(clippingRange, time, primDef, UsdGeomTokens->clippingRange, &value)) {
                 sample.setNearClippingPlane(value[0]);
                 sample.setFarClippingPlane(value[1]);
             }
@@ -2634,16 +2106,12 @@ _WriteCameraParameters(_PrimWriterContext* context)
         // Write the sample.
         object->getSchema().set(sample);
     }
-    
+
     // Set the time sampling.
-    object->getSchema().setTimeSampling(
-        context->AddTimeSampling(context->GetSampleTimesUnion()));
+    object->getSchema().setTimeSampling(context->AddTimeSampling(context->GetSampleTimesUnion()));
 }
 
-static
-void
-_WriteUnknown(_PrimWriterContext* context)
-{
+static void _WriteUnknown(_PrimWriterContext* context) {
     typedef OObject Type;
 
     // Get the standard metadata and add the Usd prim type, if any.
@@ -2651,67 +2119,60 @@ _WriteUnknown(_PrimWriterContext* context)
     const VtValue value = context->GetField(SdfFieldKeys->TypeName);
     if (value.IsHolding<TfToken>()) {
         const TfToken& typeName = value.UncheckedGet<TfToken>();
-        if (! typeName.IsEmpty()) {
+        if (!typeName.IsEmpty()) {
             metadata.set(_AmdName(SdfFieldKeys->TypeName), typeName);
         }
     }
 
     // Create the object and make it the parent.
-    shared_ptr<Type> object(new Type(context->GetParent(),
-                                     context->GetAlembicPrimName(),
-                                     metadata));
+    shared_ptr<Type> object(new Type(context->GetParent(), context->GetAlembicPrimName(), metadata));
     context->SetParent(object);
 }
 
-static
-void
-_WriteXform(_PrimWriterContext* context)
-{
+static void _WriteXform(_PrimWriterContext* context) {
     // Collect the properties we need.  We'll need these to compute the
     // metadata.
     context->SetSampleTimesUnion(UsdAbc_TimeSamples());
 
-    UsdSamples xformOpOrder = context->ExtractSamples(
-        UsdGeomTokens->xformOpOrder, SdfValueTypeNames->TokenArray);
+    UsdSamples xformOpOrder = context->ExtractSamples(UsdGeomTokens->xformOpOrder, SdfValueTypeNames->TokenArray);
 
-    bool hasXformOpOrder = (context->GetSampleTimesUnion().size()>0);
+    bool hasXformOpOrder = (context->GetSampleTimesUnion().size() > 0);
 
     // Clear samples from xformOpOrder.
     context->SetSampleTimesUnion(UsdAbc_TimeSamples());
 
     // XXX: NOTE
     // We can't use the GetLocalTranformation API available in UsdGeomXformable
-    // here, as there is no UsdPrim (or UsdStage) from which we can construct a 
-    // UsdGeomXformable schema object. Hence, for now, if xformOpOrder has a 
-    // value, then assuming that the custom "xformOp:transform" attribute will 
+    // here, as there is no UsdPrim (or UsdStage) from which we can construct a
+    // UsdGeomXformable schema object. Hence, for now, if xformOpOrder has a
+    // value, then assuming that the custom "xformOp:transform" attribute will
     // have the composed local transformation in it.
-    // 
+    //
     // If xformOpOrder has no authored value, then fallback to reading the
     // old-style transform attribute.
-    // 
-    const TfToken &transformAttrName = hasXformOpOrder ? 
-        _tokens->xformOpTransform : _tokens->transform;
-    const SdfValueTypeName &transformValueType = hasXformOpOrder ? 
-        SdfValueTypeNames->Matrix4d : SdfValueTypeNames->Matrix4d;
+    //
+    const TfToken& transformAttrName = hasXformOpOrder ? _tokens->xformOpTransform : _tokens->transform;
+    const SdfValueTypeName& transformValueType =
+            hasXformOpOrder ? SdfValueTypeNames->Matrix4d : SdfValueTypeNames->Matrix4d;
 
     if (hasXformOpOrder) {
-        // Extract and clear samples from the old-style transform attribute, if 
+        // Extract and clear samples from the old-style transform attribute, if
         // it exists, so it doesn't get written out as blind data.
-        context->ExtractSamples(_tokens->transform, 
-                                SdfValueTypeNames->Matrix4d);                                                   
+        context->ExtractSamples(_tokens->transform, SdfValueTypeNames->Matrix4d);
         context->SetSampleTimesUnion(UsdAbc_TimeSamples());
     }
 
-    UsdSamples transform = context->ExtractSamples(transformAttrName, 
-                                                   transformValueType);
+    UsdSamples transform = context->ExtractSamples(transformAttrName, transformValueType);
 
     // At this point, all transform related attributes (including all xformOps)
-    // should have been extracted. Validate here to make sure there aren't 
-    // any unextracted xformOp attributes. 
+    // should have been extracted. Validate here to make sure there aren't
+    // any unextracted xformOp attributes.
     for (const auto& name : context->GetUnextractedNames()) {
         if (UsdGeomXformOp::IsXformOp(name)) {
-            TF_RUNTIME_ERROR("Found unextracted property '%s' in xformOp "
-                "namespace.", name.GetText());
+            TF_RUNTIME_ERROR(
+                    "Found unextracted property '%s' in xformOp "
+                    "namespace.",
+                    name.GetText());
         }
     }
 
@@ -2721,23 +2182,19 @@ _WriteXform(_PrimWriterContext* context)
     MetaData metadata = _GetPrimMetadata(*context);
     {
         // Get the transform property metadata.
-        MetaData transformMetadata =
-            _GetPropertyMetadata(*context, transformAttrName, transform);
+        MetaData transformMetadata = _GetPropertyMetadata(*context, transformAttrName, transform);
 
         // Merge the property metadata into the prim metadata in a way we
         // can extract later for round-tripping.
-        for (MetaData::const_iterator i  = transformMetadata.begin();
-                                      i != transformMetadata.end(); ++i) {
-            if (! i->second.empty()) {
+        for (MetaData::const_iterator i = transformMetadata.begin(); i != transformMetadata.end(); ++i) {
+            if (!i->second.empty()) {
                 metadata.set("Usd.transform:" + i->first, i->second);
             }
         }
     }
 
     // Create the object and make it the parent.
-    OXformPtr object(new OXform(context->GetParent(),
-                                context->GetAlembicPrimName(),
-                                metadata));
+    OXformPtr object(new OXform(context->GetParent(), context->GetAlembicPrimName(), metadata));
     context->SetParent(object);
 
     // Copy all the samples.
@@ -2754,14 +2211,10 @@ _WriteXform(_PrimWriterContext* context)
     }
 
     // Set the time sampling.
-    object->getSchema().setTimeSampling(
-        context->AddTimeSampling(context->GetSampleTimesUnion()));
+    object->getSchema().setTimeSampling(context->AddTimeSampling(context->GetSampleTimesUnion()));
 }
 
-static
-void
-_WriteXformParent(_PrimWriterContext* context)
-{
+static void _WriteXformParent(_PrimWriterContext* context) {
     // Used to split transform into a parent object.
     _WriteXform(context);
 
@@ -2769,59 +2222,39 @@ _WriteXformParent(_PrimWriterContext* context)
     context->PushSuffix("Shape");
 }
 
-static
-void
-_WritePolyMesh(_PrimWriterContext* context)
-{
+static void _WritePolyMesh(_PrimWriterContext* context) {
     typedef OPolyMesh Type;
 
     const _WriterSchema& schema = context->GetSchema();
 
     // Create the object and make it the parent.
-    shared_ptr<Type> object(new Type(context->GetParent(),
-                                     context->GetAlembicPrimName(),
-                                     _GetPrimMetadata(*context)));
+    shared_ptr<Type> object(new Type(context->GetParent(), context->GetAlembicPrimName(), _GetPrimMetadata(*context)));
     context->SetParent(object);
 
     // Collect the properties we need.
     context->SetSampleTimesUnion(UsdAbc_TimeSamples());
-    UsdSamples extent =
-        context->ExtractSamples(UsdGeomTokens->extent,
-                                SdfValueTypeNames->Float3Array);
-    UsdSamples points =
-        context->ExtractSamples(UsdGeomTokens->points,
-                                SdfValueTypeNames->Point3fArray);
-    UsdSamples velocities =
-        context->ExtractSamples(UsdGeomTokens->velocities,
-                                SdfValueTypeNames->Vector3fArray);
+    UsdSamples extent = context->ExtractSamples(UsdGeomTokens->extent, SdfValueTypeNames->Float3Array);
+    UsdSamples points = context->ExtractSamples(UsdGeomTokens->points, SdfValueTypeNames->Point3fArray);
+    UsdSamples velocities = context->ExtractSamples(UsdGeomTokens->velocities, SdfValueTypeNames->Vector3fArray);
     UsdSamples faceVertexIndices =
-        context->ExtractSamples(UsdGeomTokens->faceVertexIndices,
-                                SdfValueTypeNames->IntArray);
-    UsdSamples faceVertexCounts =
-        context->ExtractSamples(UsdGeomTokens->faceVertexCounts,
-                                SdfValueTypeNames->IntArray);
-    UsdSamples normals =
-        context->ExtractSamples(UsdGeomTokens->normals,
-                                SdfValueTypeNames->Normal3fArray);
-    
+            context->ExtractSamples(UsdGeomTokens->faceVertexIndices, SdfValueTypeNames->IntArray);
+    UsdSamples faceVertexCounts = context->ExtractSamples(UsdGeomTokens->faceVertexCounts, SdfValueTypeNames->IntArray);
+    UsdSamples normals = context->ExtractSamples(UsdGeomTokens->normals, SdfValueTypeNames->Normal3fArray);
+
     // Default to look for primvars:st with type TexCoord2fArray or Float2Array
-    UsdSamples uv = (TfGetEnvSetting(USD_ABC_READ_FLOAT2_AS_UV))?
-                        (context->ExtractSamples(UsdAbcPropertyNames->st,
-                                    SdfValueTypeNames->TexCoord2fArray,
-                                    SdfValueTypeNames->Float2Array)) :
-                        (context->ExtractSamples(UsdAbcPropertyNames->st,
-                                    SdfValueTypeNames->TexCoord2fArray));
-   
-    // At this point if matching uv set has not been found, 
+    UsdSamples uv = (TfGetEnvSetting(USD_ABC_READ_FLOAT2_AS_UV))
+                            ? (context->ExtractSamples(UsdAbcPropertyNames->st, SdfValueTypeNames->TexCoord2fArray,
+                                                       SdfValueTypeNames->Float2Array))
+                            : (context->ExtractSamples(UsdAbcPropertyNames->st, SdfValueTypeNames->TexCoord2fArray));
+
+    // At this point if matching uv set has not been found,
     // look for primvars:uv with type TexCoord2fArray or Float2Array
     if (uv.IsEmpty()) {
-        uv = (TfGetEnvSetting(USD_ABC_READ_FLOAT2_AS_UV))?
-                 (context->ExtractSamples(UsdAbcPropertyNames->uv,
-                                     SdfValueTypeNames->TexCoord2fArray,
-                                     SdfValueTypeNames->Float2Array)) :
-                 (context->ExtractSamples(UsdAbcPropertyNames->uv,
-                                     SdfValueTypeNames->TexCoord2fArray));
-        
+        uv = (TfGetEnvSetting(USD_ABC_READ_FLOAT2_AS_UV))
+                     ? (context->ExtractSamples(UsdAbcPropertyNames->uv, SdfValueTypeNames->TexCoord2fArray,
+                                                SdfValueTypeNames->Float2Array))
+                     : (context->ExtractSamples(UsdAbcPropertyNames->uv, SdfValueTypeNames->TexCoord2fArray));
+
         context->RemoveSamples(UsdAbcPropertyNames->stIndices);
     } else {
         // We found a primvars:st, so remove samples with name "primvars:uv"
@@ -2839,30 +2272,15 @@ _WritePolyMesh(_PrimWriterContext* context)
         // Build the sample.
         sample.reset();
         _CopySelfBounds(time, extent, &sample);
-        _SampleForAlembic alembicPoints =
-        _Copy(schema,
-              time, points,
-              &sample, &SampleT::setPositions);
-        _SampleForAlembic alembicVelocities =
-        _Copy(schema,
-              time, velocities,
-              &sample, &SampleT::setVelocities);
+        _SampleForAlembic alembicPoints = _Copy(schema, time, points, &sample, &SampleT::setPositions);
+        _SampleForAlembic alembicVelocities = _Copy(schema, time, velocities, &sample, &SampleT::setVelocities);
         _SampleForAlembic alembicFaceIndices =
-        _Copy(schema,
-              time, faceVertexIndices,
-              &sample, &SampleT::setFaceIndices);
-        _SampleForAlembic alembicFaceCounts =
-        _Copy(schema,
-              time, faceVertexCounts,
-              &sample, &SampleT::setFaceCounts);
+                _Copy(schema, time, faceVertexIndices, &sample, &SampleT::setFaceIndices);
+        _SampleForAlembic alembicFaceCounts = _Copy(schema, time, faceVertexCounts, &sample, &SampleT::setFaceCounts);
         _SampleForAlembic alembicNormals =
-        _Copy<ON3fGeomParam::prop_type::traits_type>(schema,
-              time, normals,
-              &sample, &SampleT::setNormals);
+                _Copy<ON3fGeomParam::prop_type::traits_type>(schema, time, normals, &sample, &SampleT::setNormals);
         _SampleForAlembic alembicUVs =
-        _Copy<OV2fGeomParam::prop_type::traits_type>(schema,
-              time, uv,
-              &sample, &SampleT::setUVs);
+                _Copy<OV2fGeomParam::prop_type::traits_type>(schema, time, uv, &sample, &SampleT::setUVs);
 
         // Write the sample.
         object->getSchema().set(sample);
@@ -2872,41 +2290,30 @@ _WritePolyMesh(_PrimWriterContext* context)
     context->ExtractSamples(UsdGeomTokens->subdivisionScheme);
 
     // Set the time sampling.
-    object->getSchema().setTimeSampling(
-        context->AddTimeSampling(context->GetSampleTimesUnion()));
+    object->getSchema().setTimeSampling(context->AddTimeSampling(context->GetSampleTimesUnion()));
 }
 
-static
-void
-_WriteFaceSet(_PrimWriterContext* context)
-{
+static void _WriteFaceSet(_PrimWriterContext* context) {
     typedef OFaceSet Type;
 
     const _WriterSchema& schema = context->GetSchema();
 
     // Create the object and make it the parent.
-    shared_ptr<Type> object(new Type(context->GetParent(),
-                                     context->GetAlembicPrimName(),
-                                     _GetPrimMetadata(*context)));
+    shared_ptr<Type> object(new Type(context->GetParent(), context->GetAlembicPrimName(), _GetPrimMetadata(*context)));
     context->SetParent(object);
 
     // Collect the properties we need.
     context->SetSampleTimesUnion(UsdAbc_TimeSamples());
 
-    UsdSamples indices =
-        context->ExtractSamples(UsdGeomTokens->indices,
-                                SdfValueTypeNames->IntArray);
+    UsdSamples indices = context->ExtractSamples(UsdGeomTokens->indices, SdfValueTypeNames->IntArray);
 
-    // The familyType is contained in the parent prim, so we 
+    // The familyType is contained in the parent prim, so we
     // contruct a new _PrimWriterContext to access it.
     SdfPath parentPath = context->GetPath().GetParentPath();
-    _PrimWriterContext parentPrimContext(context->GetWriterContext(),
-                                         context->GetParent(),
-                                         parentPath);
+    _PrimWriterContext parentPrimContext(context->GetWriterContext(), context->GetParent(), parentPath);
 
-    UsdSamples familyType = parentPrimContext.ExtractSamples(
-        UsdAbcPropertyNames->defaultFamilyTypeAttributeName,
-        SdfValueTypeNames->Token);
+    UsdSamples familyType = parentPrimContext.ExtractSamples(UsdAbcPropertyNames->defaultFamilyTypeAttributeName,
+                                                             SdfValueTypeNames->Token);
 
     // Copy all the samples.
     typedef Type::schema_type::Sample SampleT;
@@ -2915,36 +2322,29 @@ _WriteFaceSet(_PrimWriterContext* context)
     for (double time : context->GetSampleTimesUnion()) {
         // Build the sample.
         sample.reset();
-        _SampleForAlembic alembicFaces =
-        _Copy(schema,
-              time, indices,
-              &sample, &SampleT::setFaces);
+        _SampleForAlembic alembicFaces = _Copy(schema, time, indices, &sample, &SampleT::setFaces);
 
         // Write the sample.
         object->getSchema().set(sample);
     }
 
-    // It's possible that our default family name "materialBind", is not 
+    // It's possible that our default family name "materialBind", is not
     // set on the prim. In that case, use kFaceSetNonExclusive.
     FaceSetExclusivity faceSetExclusivity = kFaceSetNonExclusive;
-    if (!familyType.IsEmpty())
-    {
+    if (!familyType.IsEmpty()) {
         double time = UsdTimeCode::EarliestTime().GetValue();
         const TfToken& value = familyType.Get(time).UncheckedGet<TfToken>();
-        if (!value.IsEmpty() && 
-            (value == UsdGeomTokens->partition || 
-             value == UsdGeomTokens->nonOverlapping)) {
+        if (!value.IsEmpty() && (value == UsdGeomTokens->partition || value == UsdGeomTokens->nonOverlapping)) {
             faceSetExclusivity = kFaceSetExclusive;
         }
     }
 
-    // Face set exclusivity is not a property of the sample. Instead, it's set 
+    // Face set exclusivity is not a property of the sample. Instead, it's set
     // on the object schema and not time sampled.
     object->getSchema().setFaceExclusivity(faceSetExclusivity);
 
     // Set the time sampling.
-    object->getSchema().setTimeSampling(
-        context->AddTimeSampling(context->GetSampleTimesUnion()));
+    object->getSchema().setTimeSampling(context->AddTimeSampling(context->GetSampleTimesUnion()));
 }
 
 // As of Alembic-1.5.1, OSubD::schema_type::Sample has a bug:
@@ -2953,87 +2353,54 @@ _WriteFaceSet(_PrimWriterContext* context)
 // XXX: Remove this when Alembic is fixed.
 class MyOSubDSample : public OSubD::schema_type::Sample {
 public:
-    void setHoles( const Abc::Int32ArraySample &iHoles )
-    { m_holes = iHoles; }
+    void setHoles(const Abc::Int32ArraySample& iHoles) { m_holes = iHoles; }
 };
 
-static
-void
-_WriteSubD(_PrimWriterContext* context)
-{
+static void _WriteSubD(_PrimWriterContext* context) {
     typedef OSubD Type;
 
     const _WriterSchema& schema = context->GetSchema();
 
     // Create the object and make it the parent.
-    shared_ptr<Type> object(new Type(context->GetParent(),
-                                     context->GetAlembicPrimName(),
-                                     _GetPrimMetadata(*context)));
+    shared_ptr<Type> object(new Type(context->GetParent(), context->GetAlembicPrimName(), _GetPrimMetadata(*context)));
     context->SetParent(object);
 
     // Collect the properties we need.
     context->SetSampleTimesUnion(UsdAbc_TimeSamples());
-    UsdSamples extent =
-        context->ExtractSamples(UsdGeomTokens->extent,
-                                SdfValueTypeNames->Float3Array);
-    UsdSamples points =
-        context->ExtractSamples(UsdGeomTokens->points,
-                                SdfValueTypeNames->Point3fArray);
-    UsdSamples velocities =
-        context->ExtractSamples(UsdGeomTokens->velocities,
-                                SdfValueTypeNames->Vector3fArray);
+    UsdSamples extent = context->ExtractSamples(UsdGeomTokens->extent, SdfValueTypeNames->Float3Array);
+    UsdSamples points = context->ExtractSamples(UsdGeomTokens->points, SdfValueTypeNames->Point3fArray);
+    UsdSamples velocities = context->ExtractSamples(UsdGeomTokens->velocities, SdfValueTypeNames->Vector3fArray);
     UsdSamples faceVertexIndices =
-        context->ExtractSamples(UsdGeomTokens->faceVertexIndices,
-                                SdfValueTypeNames->IntArray);
-    UsdSamples faceVertexCounts =
-        context->ExtractSamples(UsdGeomTokens->faceVertexCounts,
-                                SdfValueTypeNames->IntArray);
-    UsdSamples subdivisionScheme =
-        context->ExtractSamples(UsdGeomTokens->subdivisionScheme,
-                                SdfValueTypeNames->Token);
+            context->ExtractSamples(UsdGeomTokens->faceVertexIndices, SdfValueTypeNames->IntArray);
+    UsdSamples faceVertexCounts = context->ExtractSamples(UsdGeomTokens->faceVertexCounts, SdfValueTypeNames->IntArray);
+    UsdSamples subdivisionScheme = context->ExtractSamples(UsdGeomTokens->subdivisionScheme, SdfValueTypeNames->Token);
     UsdSamples interpolateBoundary =
-        context->ExtractSamples(UsdGeomTokens->interpolateBoundary,
-                                SdfValueTypeNames->Token);
+            context->ExtractSamples(UsdGeomTokens->interpolateBoundary, SdfValueTypeNames->Token);
     UsdSamples faceVaryingLinearInterpolation =
-        context->ExtractSamples(UsdGeomTokens->faceVaryingLinearInterpolation,
-                                SdfValueTypeNames->Token);
-    UsdSamples holeIndices =
-        context->ExtractSamples(UsdGeomTokens->holeIndices,
-                                SdfValueTypeNames->IntArray);
-    UsdSamples cornerIndices =
-        context->ExtractSamples(UsdGeomTokens->cornerIndices,
-                                SdfValueTypeNames->IntArray);
+            context->ExtractSamples(UsdGeomTokens->faceVaryingLinearInterpolation, SdfValueTypeNames->Token);
+    UsdSamples holeIndices = context->ExtractSamples(UsdGeomTokens->holeIndices, SdfValueTypeNames->IntArray);
+    UsdSamples cornerIndices = context->ExtractSamples(UsdGeomTokens->cornerIndices, SdfValueTypeNames->IntArray);
     UsdSamples cornerSharpnesses =
-        context->ExtractSamples(UsdGeomTokens->cornerSharpnesses,
-                                SdfValueTypeNames->FloatArray);
-    UsdSamples creaseIndices =
-        context->ExtractSamples(UsdGeomTokens->creaseIndices,
-                                SdfValueTypeNames->IntArray);
-    UsdSamples creaseLengths =
-        context->ExtractSamples(UsdGeomTokens->creaseLengths,
-                                SdfValueTypeNames->IntArray);
+            context->ExtractSamples(UsdGeomTokens->cornerSharpnesses, SdfValueTypeNames->FloatArray);
+    UsdSamples creaseIndices = context->ExtractSamples(UsdGeomTokens->creaseIndices, SdfValueTypeNames->IntArray);
+    UsdSamples creaseLengths = context->ExtractSamples(UsdGeomTokens->creaseLengths, SdfValueTypeNames->IntArray);
     UsdSamples creaseSharpnesses =
-        context->ExtractSamples(UsdGeomTokens->creaseSharpnesses,
-                                SdfValueTypeNames->FloatArray);
-    
+            context->ExtractSamples(UsdGeomTokens->creaseSharpnesses, SdfValueTypeNames->FloatArray);
+
     // Default to look for primvars:st with type TexCoord2fArray or Float2Array
-    UsdSamples uv = (TfGetEnvSetting(USD_ABC_READ_FLOAT2_AS_UV))?
-                        (context->ExtractSamples(UsdAbcPropertyNames->st,
-                                    SdfValueTypeNames->TexCoord2fArray,
-                                    SdfValueTypeNames->Float2Array)) :
-                        (context->ExtractSamples(UsdAbcPropertyNames->st,
-                                    SdfValueTypeNames->TexCoord2fArray));
-   
-    // At this point if matching uv set has not been found, 
+    UsdSamples uv = (TfGetEnvSetting(USD_ABC_READ_FLOAT2_AS_UV))
+                            ? (context->ExtractSamples(UsdAbcPropertyNames->st, SdfValueTypeNames->TexCoord2fArray,
+                                                       SdfValueTypeNames->Float2Array))
+                            : (context->ExtractSamples(UsdAbcPropertyNames->st, SdfValueTypeNames->TexCoord2fArray));
+
+    // At this point if matching uv set has not been found,
     // look for primvars:uv with type TexCoord2fArray or Float2Array
     if (uv.IsEmpty()) {
-        uv = (TfGetEnvSetting(USD_ABC_READ_FLOAT2_AS_UV))?
-                 (context->ExtractSamples(UsdAbcPropertyNames->uv,
-                                     SdfValueTypeNames->TexCoord2fArray,
-                                     SdfValueTypeNames->Float2Array)) :
-                 (context->ExtractSamples(UsdAbcPropertyNames->uv,
-                                     SdfValueTypeNames->TexCoord2fArray));
-        
+        uv = (TfGetEnvSetting(USD_ABC_READ_FLOAT2_AS_UV))
+                     ? (context->ExtractSamples(UsdAbcPropertyNames->uv, SdfValueTypeNames->TexCoord2fArray,
+                                                SdfValueTypeNames->Float2Array))
+                     : (context->ExtractSamples(UsdAbcPropertyNames->uv, SdfValueTypeNames->TexCoord2fArray));
+
         context->RemoveSamples(UsdAbcPropertyNames->stIndices);
     } else {
         // We found a primvars:st, so remove samples with name "primvars:uv"
@@ -3061,112 +2428,57 @@ _WriteSubD(_PrimWriterContext* context)
         sample.setFaceVaryingInterpolateBoundary(1);
 
         _CopySelfBounds(time, extent, &sample);
-        _SampleForAlembic alembicPositions =
-        _Copy(schema,
-              time, points,
-              &sample, &SampleT::setPositions);
-        _SampleForAlembic alembicVelocities =
-        _Copy(schema,
-              time, velocities,
-              &sample, &SampleT::setVelocities);
+        _SampleForAlembic alembicPositions = _Copy(schema, time, points, &sample, &SampleT::setPositions);
+        _SampleForAlembic alembicVelocities = _Copy(schema, time, velocities, &sample, &SampleT::setVelocities);
         _SampleForAlembic alembicFaceIndices =
-        _Copy(schema,
-              time, faceVertexIndices,
-              &sample, &SampleT::setFaceIndices);
-        _SampleForAlembic alembicFaceCounts =
-        _Copy(schema,
-              time, faceVertexCounts,
-              &sample, &SampleT::setFaceCounts);
-        _Copy(schema,
-              _CopySubdivisionScheme,
-              time, subdivisionScheme,
-              &sample, &SampleT::setSubdivisionScheme);
-        _Copy(schema,
-              _CopyInterpolateBoundary,
-              time, interpolateBoundary,
-              &sample, &SampleT::setInterpolateBoundary);
-        _Copy(schema,
-              _CopyFaceVaryingInterpolateBoundary,
-              time, faceVaryingLinearInterpolation,
-              &sample, &SampleT::setFaceVaryingInterpolateBoundary);
-        _SampleForAlembic alembicHoles =
-        _Copy(schema,
-              time, holeIndices,
-              &mySample, &MySampleT::setHoles);
+                _Copy(schema, time, faceVertexIndices, &sample, &SampleT::setFaceIndices);
+        _SampleForAlembic alembicFaceCounts = _Copy(schema, time, faceVertexCounts, &sample, &SampleT::setFaceCounts);
+        _Copy(schema, _CopySubdivisionScheme, time, subdivisionScheme, &sample, &SampleT::setSubdivisionScheme);
+        _Copy(schema, _CopyInterpolateBoundary, time, interpolateBoundary, &sample, &SampleT::setInterpolateBoundary);
+        _Copy(schema, _CopyFaceVaryingInterpolateBoundary, time, faceVaryingLinearInterpolation, &sample,
+              &SampleT::setFaceVaryingInterpolateBoundary);
+        _SampleForAlembic alembicHoles = _Copy(schema, time, holeIndices, &mySample, &MySampleT::setHoles);
         _SampleForAlembic alembicCornerIndices =
-        _Copy(schema,
-              time, cornerIndices,
-              &sample, &SampleT::setCornerIndices);
+                _Copy(schema, time, cornerIndices, &sample, &SampleT::setCornerIndices);
         _SampleForAlembic alembicCornerSharpnesses =
-        _Copy(schema,
-              time, cornerSharpnesses,
-              &sample, &SampleT::setCornerSharpnesses);
+                _Copy(schema, time, cornerSharpnesses, &sample, &SampleT::setCornerSharpnesses);
         _SampleForAlembic alembicCreaseIndices =
-        _Copy(schema,
-              time, creaseIndices,
-              &sample, &SampleT::setCreaseIndices);
+                _Copy(schema, time, creaseIndices, &sample, &SampleT::setCreaseIndices);
         _SampleForAlembic alembicCreaseLengths =
-        _Copy(schema,
-              time, creaseLengths,
-              &sample, &SampleT::setCreaseLengths);
+                _Copy(schema, time, creaseLengths, &sample, &SampleT::setCreaseLengths);
         _SampleForAlembic alembicCreaseSharpnesses =
-        _Copy(schema,
-              time, creaseSharpnesses,
-              &sample, &SampleT::setCreaseSharpnesses);
+                _Copy(schema, time, creaseSharpnesses, &sample, &SampleT::setCreaseSharpnesses);
         _SampleForAlembic alembicUVs =
-        _Copy<OV2fGeomParam::prop_type::traits_type>(schema,
-              time, uv,
-              &sample, &SampleT::setUVs);
+                _Copy<OV2fGeomParam::prop_type::traits_type>(schema, time, uv, &sample, &SampleT::setUVs);
 
         // Write the sample.
         object->getSchema().set(sample);
     }
 
     // Set the time sampling.
-    object->getSchema().setTimeSampling(
-        context->AddTimeSampling(context->GetSampleTimesUnion()));
+    object->getSchema().setTimeSampling(context->AddTimeSampling(context->GetSampleTimesUnion()));
 }
 
-static
-void
-_WriteNurbsCurves(_PrimWriterContext* context)
-{
+static void _WriteNurbsCurves(_PrimWriterContext* context) {
     typedef OCurves Type;
 
     const _WriterSchema& schema = context->GetSchema();
 
     // Create the object and make it the parent.
-    shared_ptr<Type> object(new Type(context->GetParent(),
-                                     context->GetAlembicPrimName(),
-                                     _GetPrimMetadata(*context)));
+    shared_ptr<Type> object(new Type(context->GetParent(), context->GetAlembicPrimName(), _GetPrimMetadata(*context)));
     context->SetParent(object);
 
     // Collect the properties we need.
     context->SetSampleTimesUnion(UsdAbc_TimeSamples());
-    UsdSamples extent =
-        context->ExtractSamples(UsdGeomTokens->extent,
-                                SdfValueTypeNames->Float3Array);
-    UsdSamples points =
-        context->ExtractSamples(UsdGeomTokens->points,
-                                SdfValueTypeNames->Point3fArray);
-    UsdSamples velocities =
-        context->ExtractSamples(UsdGeomTokens->velocities,
-                                SdfValueTypeNames->Vector3fArray);
-    UsdSamples normals =
-        context->ExtractSamples(UsdGeomTokens->normals,
-                                SdfValueTypeNames->Normal3fArray);
+    UsdSamples extent = context->ExtractSamples(UsdGeomTokens->extent, SdfValueTypeNames->Float3Array);
+    UsdSamples points = context->ExtractSamples(UsdGeomTokens->points, SdfValueTypeNames->Point3fArray);
+    UsdSamples velocities = context->ExtractSamples(UsdGeomTokens->velocities, SdfValueTypeNames->Vector3fArray);
+    UsdSamples normals = context->ExtractSamples(UsdGeomTokens->normals, SdfValueTypeNames->Normal3fArray);
     UsdSamples curveVertexCounts =
-        context->ExtractSamples(UsdGeomTokens->curveVertexCounts,
-                                SdfValueTypeNames->IntArray);
-    UsdSamples widths =
-        context->ExtractSamples(UsdGeomTokens->widths,
-                                SdfValueTypeNames->FloatArray);
-    UsdSamples knots =
-        context->ExtractSamples(UsdGeomTokens->knots,
-                                SdfValueTypeNames->DoubleArray);
-    UsdSamples order =
-        context->ExtractSamples(UsdGeomTokens->order,
-                                SdfValueTypeNames->IntArray);
+            context->ExtractSamples(UsdGeomTokens->curveVertexCounts, SdfValueTypeNames->IntArray);
+    UsdSamples widths = context->ExtractSamples(UsdGeomTokens->widths, SdfValueTypeNames->FloatArray);
+    UsdSamples knots = context->ExtractSamples(UsdGeomTokens->knots, SdfValueTypeNames->DoubleArray);
+    UsdSamples order = context->ExtractSamples(UsdGeomTokens->order, SdfValueTypeNames->IntArray);
 
     // Copy all the samples.
     typedef Type::schema_type::Sample SampleT;
@@ -3175,36 +2487,16 @@ _WriteNurbsCurves(_PrimWriterContext* context)
         // Build the sample.
         sample.reset();
         _CopySelfBounds(time, extent, &sample);
-        _SampleForAlembic alembicPositions =
-        _Copy(schema,
-              time, points,
-              &sample, &SampleT::setPositions);
-        _SampleForAlembic alembicVelocities =
-        _Copy(schema,
-              time, velocities,
-              &sample, &SampleT::setVelocities);
+        _SampleForAlembic alembicPositions = _Copy(schema, time, points, &sample, &SampleT::setPositions);
+        _SampleForAlembic alembicVelocities = _Copy(schema, time, velocities, &sample, &SampleT::setVelocities);
         _SampleForAlembic alembicNormals =
-        _Copy<ON3fGeomParam::prop_type::traits_type>(schema,
-              time, normals,
-              &sample, &SampleT::setNormals);
+                _Copy<ON3fGeomParam::prop_type::traits_type>(schema, time, normals, &sample, &SampleT::setNormals);
         _SampleForAlembic alembicCurveVertexCounts =
-        _Copy(schema,
-              time, curveVertexCounts,
-              &sample, &SampleT::setCurvesNumVertices);
+                _Copy(schema, time, curveVertexCounts, &sample, &SampleT::setCurvesNumVertices);
         _SampleForAlembic alembicWidths =
-        _Copy<OFloatGeomParam::prop_type::traits_type>(schema,
-              time, widths,
-              &sample, &SampleT::setWidths);
-        _SampleForAlembic alembicKnots =
-        _Copy(schema,
-              _CopyKnots,
-              time, knots,
-              &sample, &SampleT::setKnots);
-        _SampleForAlembic alembicOrders =
-        _Copy(schema,
-              _CopyOrder,
-              time, order,
-              &sample, &SampleT::setOrders);
+                _Copy<OFloatGeomParam::prop_type::traits_type>(schema, time, widths, &sample, &SampleT::setWidths);
+        _SampleForAlembic alembicKnots = _Copy(schema, _CopyKnots, time, knots, &sample, &SampleT::setKnots);
+        _SampleForAlembic alembicOrders = _Copy(schema, _CopyOrder, time, order, &sample, &SampleT::setOrders);
 
         // This is how Alembic knows it's a NURBS curve.
         sample.setType(kVariableOrder);
@@ -3214,53 +2506,30 @@ _WriteNurbsCurves(_PrimWriterContext* context)
     }
 
     // Set the time sampling.
-    object->getSchema().setTimeSampling(
-        context->AddTimeSampling(context->GetSampleTimesUnion()));
+    object->getSchema().setTimeSampling(context->AddTimeSampling(context->GetSampleTimesUnion()));
 }
 
-static
-void
-_WriteBasisCurves(_PrimWriterContext* context)
-{
+static void _WriteBasisCurves(_PrimWriterContext* context) {
     typedef OCurves Type;
 
     const _WriterSchema& schema = context->GetSchema();
 
     // Create the object and make it the parent.
-    shared_ptr<Type> object(new Type(context->GetParent(),
-                                     context->GetAlembicPrimName(),
-                                     _GetPrimMetadata(*context)));
+    shared_ptr<Type> object(new Type(context->GetParent(), context->GetAlembicPrimName(), _GetPrimMetadata(*context)));
     context->SetParent(object);
 
     // Collect the properties we need.
     context->SetSampleTimesUnion(UsdAbc_TimeSamples());
-    UsdSamples extent =
-        context->ExtractSamples(UsdGeomTokens->extent,
-                                SdfValueTypeNames->Float3Array);
-    UsdSamples points =
-        context->ExtractSamples(UsdGeomTokens->points,
-                                SdfValueTypeNames->Point3fArray);
-    UsdSamples velocities =
-        context->ExtractSamples(UsdGeomTokens->velocities,
-                                SdfValueTypeNames->Vector3fArray);
-    UsdSamples normals =
-        context->ExtractSamples(UsdGeomTokens->normals,
-                                SdfValueTypeNames->Normal3fArray);
+    UsdSamples extent = context->ExtractSamples(UsdGeomTokens->extent, SdfValueTypeNames->Float3Array);
+    UsdSamples points = context->ExtractSamples(UsdGeomTokens->points, SdfValueTypeNames->Point3fArray);
+    UsdSamples velocities = context->ExtractSamples(UsdGeomTokens->velocities, SdfValueTypeNames->Vector3fArray);
+    UsdSamples normals = context->ExtractSamples(UsdGeomTokens->normals, SdfValueTypeNames->Normal3fArray);
     UsdSamples curveVertexCounts =
-        context->ExtractSamples(UsdGeomTokens->curveVertexCounts,
-                                SdfValueTypeNames->IntArray);
-    UsdSamples widths =
-        context->ExtractSamples(UsdGeomTokens->widths,
-                                SdfValueTypeNames->FloatArray);
-    UsdSamples basis =
-        context->ExtractSamples(UsdGeomTokens->basis,
-                                SdfValueTypeNames->Token);
-    UsdSamples type =
-        context->ExtractSamples(UsdGeomTokens->type,
-                                SdfValueTypeNames->Token);
-    UsdSamples wrap =
-        context->ExtractSamples(UsdGeomTokens->wrap,
-                                SdfValueTypeNames->Token);
+            context->ExtractSamples(UsdGeomTokens->curveVertexCounts, SdfValueTypeNames->IntArray);
+    UsdSamples widths = context->ExtractSamples(UsdGeomTokens->widths, SdfValueTypeNames->FloatArray);
+    UsdSamples basis = context->ExtractSamples(UsdGeomTokens->basis, SdfValueTypeNames->Token);
+    UsdSamples type = context->ExtractSamples(UsdGeomTokens->type, SdfValueTypeNames->Token);
+    UsdSamples wrap = context->ExtractSamples(UsdGeomTokens->wrap, SdfValueTypeNames->Token);
 
     // Copy all the samples.
     typedef Type::schema_type::Sample SampleT;
@@ -3269,85 +2538,45 @@ _WriteBasisCurves(_PrimWriterContext* context)
         // Build the sample.
         sample.reset();
         _CopySelfBounds(time, extent, &sample);
-        _SampleForAlembic alembicPositions =
-        _Copy(schema,
-              time, points,
-              &sample, &SampleT::setPositions);
-        _SampleForAlembic alembicVelocities =
-        _Copy(schema,
-              time, velocities,
-              &sample, &SampleT::setVelocities);
+        _SampleForAlembic alembicPositions = _Copy(schema, time, points, &sample, &SampleT::setPositions);
+        _SampleForAlembic alembicVelocities = _Copy(schema, time, velocities, &sample, &SampleT::setVelocities);
         _SampleForAlembic alembicNormals =
-        _Copy<ON3fGeomParam::prop_type::traits_type>(schema,
-              time, normals,
-              &sample, &SampleT::setNormals);
+                _Copy<ON3fGeomParam::prop_type::traits_type>(schema, time, normals, &sample, &SampleT::setNormals);
         _SampleForAlembic alembicCurveVertexCounts =
-        _Copy(schema,
-              time, curveVertexCounts,
-              &sample, &SampleT::setCurvesNumVertices);
+                _Copy(schema, time, curveVertexCounts, &sample, &SampleT::setCurvesNumVertices);
         _SampleForAlembic alembicWidths =
-        _Copy<OFloatGeomParam::prop_type::traits_type>(schema,
-              time, widths,
-              &sample, &SampleT::setWidths);
-        _Copy(schema,
-              _CopyCurveBasis,
-              time, basis,
-              &sample, &SampleT::setBasis);
-        _Copy(schema,
-              _CopyCurveType,
-              time, type,
-              &sample, &SampleT::setType);
-        _Copy(schema,
-              _CopyCurveWrap,
-              time, wrap,
-              &sample, &SampleT::setWrap);
+                _Copy<OFloatGeomParam::prop_type::traits_type>(schema, time, widths, &sample, &SampleT::setWidths);
+        _Copy(schema, _CopyCurveBasis, time, basis, &sample, &SampleT::setBasis);
+        _Copy(schema, _CopyCurveType, time, type, &sample, &SampleT::setType);
+        _Copy(schema, _CopyCurveWrap, time, wrap, &sample, &SampleT::setWrap);
 
         // Write the sample.
         object->getSchema().set(sample);
     }
 
     // Set the time sampling.
-    object->getSchema().setTimeSampling(
-        context->AddTimeSampling(context->GetSampleTimesUnion()));
+    object->getSchema().setTimeSampling(context->AddTimeSampling(context->GetSampleTimesUnion()));
 }
 
-static
-void
-_WriteHermiteCurves(_PrimWriterContext* context)
-{
+static void _WriteHermiteCurves(_PrimWriterContext* context) {
     typedef OCurves Type;
 
     const _WriterSchema& schema = context->GetSchema();
 
     // Create the object and make it the parent.
-    shared_ptr<Type> object(new Type(context->GetParent(),
-                                     context->GetAlembicPrimName(),
-                                     _GetPrimMetadata(*context)));
+    shared_ptr<Type> object(new Type(context->GetParent(), context->GetAlembicPrimName(), _GetPrimMetadata(*context)));
     context->SetParent(object);
 
     // Collect the properties we need.
     context->SetSampleTimesUnion(UsdAbc_TimeSamples());
-    UsdSamples extent =
-        context->ExtractSamples(UsdGeomTokens->extent,
-                                SdfValueTypeNames->Float3Array);
-    UsdSamples points =
-        context->ExtractSamples(UsdGeomTokens->points,
-                                SdfValueTypeNames->Point3fArray);
-    UsdSamples tangents =
-        context->ExtractSamples(UsdGeomTokens->tangents,
-                                SdfValueTypeNames->Vector3fArray);
-    UsdSamples velocities =
-        context->ExtractSamples(UsdGeomTokens->velocities,
-                                SdfValueTypeNames->Vector3fArray);
-    UsdSamples normals =
-        context->ExtractSamples(UsdGeomTokens->normals,
-                                SdfValueTypeNames->Normal3fArray);
+    UsdSamples extent = context->ExtractSamples(UsdGeomTokens->extent, SdfValueTypeNames->Float3Array);
+    UsdSamples points = context->ExtractSamples(UsdGeomTokens->points, SdfValueTypeNames->Point3fArray);
+    UsdSamples tangents = context->ExtractSamples(UsdGeomTokens->tangents, SdfValueTypeNames->Vector3fArray);
+    UsdSamples velocities = context->ExtractSamples(UsdGeomTokens->velocities, SdfValueTypeNames->Vector3fArray);
+    UsdSamples normals = context->ExtractSamples(UsdGeomTokens->normals, SdfValueTypeNames->Normal3fArray);
     UsdSamples curveVertexCounts =
-        context->ExtractSamples(UsdGeomTokens->curveVertexCounts,
-                                SdfValueTypeNames->IntArray);
-    UsdSamples widths =
-        context->ExtractSamples(UsdGeomTokens->widths,
-                                SdfValueTypeNames->FloatArray);
+            context->ExtractSamples(UsdGeomTokens->curveVertexCounts, SdfValueTypeNames->IntArray);
+    UsdSamples widths = context->ExtractSamples(UsdGeomTokens->widths, SdfValueTypeNames->FloatArray);
     if (!velocities.IsEmpty()) {
         // Velocities has the same shape as points / positions.
         // In Abc positions encodes both points and tangents but in Usd, they
@@ -3355,10 +2584,9 @@ _WriteHermiteCurves(_PrimWriterContext* context)
         // tangentVelocities to the USD schema or provide alembic with
         // 0 valued velocities for the tangent elements. Let's identify
         // some use cases before figuring out how to handle this.
-        TF_WARN(
-            "Writing '%s' from HermiteCurves to AbcGeom::OCurvesSchema is "
-            "undefined.",
-            velocities.GetPath().GetText());
+        TF_WARN("Writing '%s' from HermiteCurves to AbcGeom::OCurvesSchema is "
+                "undefined.",
+                velocities.GetPath().GetText());
     }
 
     // Copy all the samples.
@@ -3374,42 +2602,29 @@ _WriteHermiteCurves(_PrimWriterContext* context)
         VtValue pointsValue = points.Get(time);
         VtValue tangentsValue = tangents.Get(time);
         _SampleForAlembic alembicPoints;
-        if (auto pointsAndTangents =
-                UsdGeomHermiteCurves::PointAndTangentArrays(
-                    pointsValue.Get<VtVec3fArray>(),
-                    tangentsValue.Get<VtVec3fArray>())) {
+        if (auto pointsAndTangents = UsdGeomHermiteCurves::PointAndTangentArrays(pointsValue.Get<VtVec3fArray>(),
+                                                                                 tangentsValue.Get<VtVec3fArray>())) {
             // This is a copy of _Copy
             static const int extent = P3fArraySample::traits_type::extent;
-            typedef PODTraitsFromEnum<
-                P3fArraySample::traits_type::pod_enum>::value_type P3fPodType;
-            typedef TypedArraySample<P3fArraySample::traits_type>
-                P3fAlembicSample;
+            typedef PODTraitsFromEnum<P3fArraySample::traits_type::pod_enum>::value_type P3fPodType;
+            typedef TypedArraySample<P3fArraySample::traits_type> P3fAlembicSample;
             typedef P3fArraySample::traits_type::value_type P3fValueType;
             VtVec3fArray interleaved = pointsAndTangents.Interleave();
             const SdfValueTypeName& usdType = SdfValueTypeNames->Point3fArray;
-            const _WriterSchema::Converter& converter =
-                schema.GetConverter(usdType);
-            alembicPoints = _MakeSample<P3fPodType, extent>(
-                schema, converter, usdType, VtValue(interleaved), false);
+            const _WriterSchema::Converter& converter = schema.GetConverter(usdType);
+            alembicPoints = _MakeSample<P3fPodType, extent>(schema, converter, usdType, VtValue(interleaved), false);
 
             if (_CheckSample(alembicPoints, points, usdType)) {
                 sample.setPositions(
-                    P3fAlembicSample(alembicPoints.GetDataAs<P3fValueType>(),
-                                     alembicPoints.GetCount() / extent));
+                        P3fAlembicSample(alembicPoints.GetDataAs<P3fValueType>(), alembicPoints.GetCount() / extent));
             }
         }
         _SampleForAlembic alembicNormals =
-        _Copy<ON3fGeomParam::prop_type::traits_type>(schema,
-              time, normals,
-              &sample, &SampleT::setNormals);
+                _Copy<ON3fGeomParam::prop_type::traits_type>(schema, time, normals, &sample, &SampleT::setNormals);
         _SampleForAlembic alembicCurveVertexCounts =
-        _Copy(schema,
-              time, curveVertexCounts,
-              &sample, &SampleT::setCurvesNumVertices);
+                _Copy(schema, time, curveVertexCounts, &sample, &SampleT::setCurvesNumVertices);
         _SampleForAlembic alembicWidths =
-        _Copy<OFloatGeomParam::prop_type::traits_type>(schema,
-              time, widths,
-              &sample, &SampleT::setWidths);
+                _Copy<OFloatGeomParam::prop_type::traits_type>(schema, time, widths, &sample, &SampleT::setWidths);
         sample.setBasis(kHermiteBasis);
         sample.setType(kCubic);
         sample.setWrap(kNonPeriodic);
@@ -3418,41 +2633,25 @@ _WriteHermiteCurves(_PrimWriterContext* context)
     }
 
     // Set the time sampling.
-    object->getSchema().setTimeSampling(
-        context->AddTimeSampling(context->GetSampleTimesUnion()));
+    object->getSchema().setTimeSampling(context->AddTimeSampling(context->GetSampleTimesUnion()));
 }
 
-static
-void
-_WritePoints(_PrimWriterContext* context)
-{
+static void _WritePoints(_PrimWriterContext* context) {
     typedef OPoints Type;
 
     const _WriterSchema& schema = context->GetSchema();
 
     // Create the object and make it the parent.
-    shared_ptr<Type> object(new Type(context->GetParent(),
-                                     context->GetAlembicPrimName(),
-                                     _GetPrimMetadata(*context)));
+    shared_ptr<Type> object(new Type(context->GetParent(), context->GetAlembicPrimName(), _GetPrimMetadata(*context)));
     context->SetParent(object);
 
     // Collect the properties we need.
     context->SetSampleTimesUnion(UsdAbc_TimeSamples());
-    UsdSamples extent =
-        context->ExtractSamples(UsdGeomTokens->extent,
-                                SdfValueTypeNames->Float3Array);
-    UsdSamples points =
-        context->ExtractSamples(UsdGeomTokens->points,
-                                SdfValueTypeNames->Point3fArray);
-    UsdSamples velocities =
-        context->ExtractSamples(UsdGeomTokens->velocities,
-                                SdfValueTypeNames->Vector3fArray);
-    UsdSamples widths =
-        context->ExtractSamples(UsdGeomTokens->widths,
-                                SdfValueTypeNames->FloatArray);
-    UsdSamples ids =
-        context->ExtractSamples(UsdGeomTokens->ids,
-                                SdfValueTypeNames->Int64Array);
+    UsdSamples extent = context->ExtractSamples(UsdGeomTokens->extent, SdfValueTypeNames->Float3Array);
+    UsdSamples points = context->ExtractSamples(UsdGeomTokens->points, SdfValueTypeNames->Point3fArray);
+    UsdSamples velocities = context->ExtractSamples(UsdGeomTokens->velocities, SdfValueTypeNames->Vector3fArray);
+    UsdSamples widths = context->ExtractSamples(UsdGeomTokens->widths, SdfValueTypeNames->FloatArray);
+    UsdSamples ids = context->ExtractSamples(UsdGeomTokens->ids, SdfValueTypeNames->Int64Array);
 
     // Copy all the samples.
     typedef Type::schema_type::Sample SampleT;
@@ -3462,23 +2661,11 @@ _WritePoints(_PrimWriterContext* context)
         // Build the sample.
         sample.reset();
         _CopySelfBounds(time, extent, &sample);
-        _SampleForAlembic alembicPoints =
-        _Copy(schema,
-              time, points,
-              &sample, &SampleT::setPositions);
-        _SampleForAlembic alembicVelocities =
-        _Copy(schema,
-              time, velocities,
-              &sample, &SampleT::setVelocities);
+        _SampleForAlembic alembicPoints = _Copy(schema, time, points, &sample, &SampleT::setPositions);
+        _SampleForAlembic alembicVelocities = _Copy(schema, time, velocities, &sample, &SampleT::setVelocities);
         _SampleForAlembic alembicWidths =
-        _Copy<OFloatGeomParam::prop_type::traits_type>(schema,
-              time, widths,
-              &sample, &SampleT::setWidths);
-        _SampleForAlembic alembicIds =
-        _Copy(schema,
-              _CopyPointIds,
-              time, ids,
-              &sample, &SampleT::setIds);
+                _Copy<OFloatGeomParam::prop_type::traits_type>(schema, time, widths, &sample, &SampleT::setWidths);
+        _SampleForAlembic alembicIds = _Copy(schema, _CopyPointIds, time, ids, &sample, &SampleT::setIds);
 
         // Alembic requires ids.  We only need to write one and it'll
         // be reused for all the other samples.  We also use a valid
@@ -3494,16 +2681,10 @@ _WritePoints(_PrimWriterContext* context)
     }
 
     // Set the time sampling.
-    object->getSchema().setTimeSampling(
-        context->AddTimeSampling(context->GetSampleTimesUnion()));
+    object->getSchema().setTimeSampling(context->AddTimeSampling(context->GetSampleTimesUnion()));
 }
 
-static
-TfToken
-_ComputeTypeName(
-    const _WriterContext& context,
-    const SdfPath& path)
-{
+static TfToken _ComputeTypeName(const _WriterContext& context, const SdfPath& path) {
     // Special case.
     if (path == SdfPath::AbsoluteRootPath()) {
         return UsdAbcPrimTypeNames->PseudoRoot;
@@ -3511,19 +2692,16 @@ _ComputeTypeName(
 
     // General case.
     VtValue value = context.GetData().Get(path, SdfFieldKeys->TypeName);
-    if (! value.IsHolding<TfToken>()) {
+    if (!value.IsHolding<TfToken>()) {
         return TfToken();
     }
     TfToken typeName = value.UncheckedGet<TfToken>();
 
     // Special cases.
     if (typeName == UsdAbcPrimTypeNames->Mesh) {
-        
-        SdfPath propPath(path.GetPrimPath().AppendProperty(
-                             UsdGeomTokens->subdivisionScheme));
+        SdfPath propPath(path.GetPrimPath().AppendProperty(UsdGeomTokens->subdivisionScheme));
         value = context.GetData().Get(propPath, SdfFieldKeys->Default);
-        if (value.IsHolding<TfToken>() && 
-                value.UncheckedGet<TfToken>() == "none") {
+        if (value.IsHolding<TfToken>() && value.UncheckedGet<TfToken>() == "none") {
             typeName = UsdAbcPrimTypeNames->PolyMesh;
         }
     }
@@ -3531,13 +2709,7 @@ _ComputeTypeName(
     return typeName;
 }
 
-static
-void
-_WritePrim(
-    _WriterContext& context,
-    const _Parent& parent,
-    const SdfPath& path)
-{
+static void _WritePrim(_WriterContext& context, const _Parent& parent, const SdfPath& path) {
     _Parent prim;
     {
         // Compute the type name.
@@ -3545,8 +2717,7 @@ _WritePrim(
 
         // Write the properties.
         _PrimWriterContext primContext(context, parent, path);
-        for (const auto& writer :
-                 context.GetSchema().GetPrimWriters(typeName)) {
+        for (const auto& writer : context.GetSchema().GetPrimWriters(typeName)) {
             TRACE_SCOPE("UsdAbc_AlembicDataWriter:_WritePrim");
             writer(&primContext);
         }
@@ -3554,11 +2725,9 @@ _WritePrim(
     }
 
     // Write the name children.
-    const VtValue childrenNames =
-        context.GetData().Get(path, SdfChildrenKeys->PrimChildren);
+    const VtValue childrenNames = context.GetData().Get(path, SdfChildrenKeys->PrimChildren);
     if (childrenNames.IsHolding<TfTokenVector>()) {
-        for (const auto& childName :
-                 childrenNames.UncheckedGet<TfTokenVector>()) {
+        for (const auto& childName : childrenNames.UncheckedGet<TfTokenVector>()) {
             _WritePrim(context, prim, path.AppendChild(childName));
         }
     }
@@ -3576,116 +2745,98 @@ struct _WriterSchemaBuilder {
     _WriterSchemaBuilder();
 };
 
-_WriterSchemaBuilder::_WriterSchemaBuilder()
-{
+_WriterSchemaBuilder::_WriterSchemaBuilder() {
     schema.AddType(UsdAbcPrimTypeNames->Scope)
-        .AppendWriter(_WriteUnknown)
-        .AppendWriter(_WriteImageable)
-        .AppendWriter(_WriteArbGeomParams)
-        .AppendWriter(_WriteUserProperties)
-        .AppendWriter(_WriteOther)
-        ;
+            .AppendWriter(_WriteUnknown)
+            .AppendWriter(_WriteImageable)
+            .AppendWriter(_WriteArbGeomParams)
+            .AppendWriter(_WriteUserProperties)
+            .AppendWriter(_WriteOther);
     schema.AddType(UsdAbcPrimTypeNames->Xform)
-        .AppendWriter(_WriteXform)
-        .AppendWriter(_WriteImageable)
-        .AppendWriter(_WriteArbGeomParams)
-        .AppendWriter(_WriteUserProperties)
-        .AppendWriter(_WriteOther)
-        ;
+            .AppendWriter(_WriteXform)
+            .AppendWriter(_WriteImageable)
+            .AppendWriter(_WriteArbGeomParams)
+            .AppendWriter(_WriteUserProperties)
+            .AppendWriter(_WriteOther);
     schema.AddType(UsdAbcPrimTypeNames->Mesh)
-        .AppendWriter(_WriteXformParent)
-        .AppendWriter(_WriteSubD)
-        .AppendWriter(_WriteMayaColor)
-        .AppendWriter(_WriteGprim)
-        .AppendWriter(_WriteImageable)
-        .AppendWriter(_WriteArbGeomParams)
-        .AppendWriter(_WriteUserProperties)
-        .AppendWriter(_WriteOther)
-        ;
+            .AppendWriter(_WriteXformParent)
+            .AppendWriter(_WriteSubD)
+            .AppendWriter(_WriteMayaColor)
+            .AppendWriter(_WriteGprim)
+            .AppendWriter(_WriteImageable)
+            .AppendWriter(_WriteArbGeomParams)
+            .AppendWriter(_WriteUserProperties)
+            .AppendWriter(_WriteOther);
     schema.AddType(UsdAbcPrimTypeNames->PolyMesh)
-        .AppendWriter(_WriteXformParent)
-        .AppendWriter(_WritePolyMesh)
-        .AppendWriter(_WriteMayaColor)
-        .AppendWriter(_WriteGprim)
-        .AppendWriter(_WriteImageable)
-        .AppendWriter(_WriteArbGeomParams)
-        .AppendWriter(_WriteUserProperties)
-        .AppendWriter(_WriteOther)
-        ;
+            .AppendWriter(_WriteXformParent)
+            .AppendWriter(_WritePolyMesh)
+            .AppendWriter(_WriteMayaColor)
+            .AppendWriter(_WriteGprim)
+            .AppendWriter(_WriteImageable)
+            .AppendWriter(_WriteArbGeomParams)
+            .AppendWriter(_WriteUserProperties)
+            .AppendWriter(_WriteOther);
     schema.AddType(UsdAbcPrimTypeNames->NurbsCurves)
-        .AppendWriter(_WriteXformParent)
-        .AppendWriter(_WriteNurbsCurves)
-        .AppendWriter(_WriteMayaColor)
-        .AppendWriter(_WriteGprim)
-        .AppendWriter(_WriteImageable)
-        .AppendWriter(_WriteArbGeomParams)
-        .AppendWriter(_WriteUserProperties)
-        .AppendWriter(_WriteOther)
-        ;
+            .AppendWriter(_WriteXformParent)
+            .AppendWriter(_WriteNurbsCurves)
+            .AppendWriter(_WriteMayaColor)
+            .AppendWriter(_WriteGprim)
+            .AppendWriter(_WriteImageable)
+            .AppendWriter(_WriteArbGeomParams)
+            .AppendWriter(_WriteUserProperties)
+            .AppendWriter(_WriteOther);
     schema.AddType(UsdAbcPrimTypeNames->BasisCurves)
-        .AppendWriter(_WriteXformParent)
-        .AppendWriter(_WriteBasisCurves)
-        .AppendWriter(_WriteMayaColor)
-        .AppendWriter(_WriteGprim)
-        .AppendWriter(_WriteImageable)
-        .AppendWriter(_WriteArbGeomParams)
-        .AppendWriter(_WriteUserProperties)
-        .AppendWriter(_WriteOther)
-        ;
+            .AppendWriter(_WriteXformParent)
+            .AppendWriter(_WriteBasisCurves)
+            .AppendWriter(_WriteMayaColor)
+            .AppendWriter(_WriteGprim)
+            .AppendWriter(_WriteImageable)
+            .AppendWriter(_WriteArbGeomParams)
+            .AppendWriter(_WriteUserProperties)
+            .AppendWriter(_WriteOther);
     schema.AddType(UsdAbcPrimTypeNames->HermiteCurves)
-        .AppendWriter(_WriteXformParent)
-        .AppendWriter(_WriteHermiteCurves)
-        .AppendWriter(_WriteMayaColor)
-        .AppendWriter(_WriteGprim)
-        .AppendWriter(_WriteImageable)
-        .AppendWriter(_WriteArbGeomParams)
-        .AppendWriter(_WriteUserProperties)
-        .AppendWriter(_WriteOther)
-        ;
+            .AppendWriter(_WriteXformParent)
+            .AppendWriter(_WriteHermiteCurves)
+            .AppendWriter(_WriteMayaColor)
+            .AppendWriter(_WriteGprim)
+            .AppendWriter(_WriteImageable)
+            .AppendWriter(_WriteArbGeomParams)
+            .AppendWriter(_WriteUserProperties)
+            .AppendWriter(_WriteOther);
     schema.AddType(UsdAbcPrimTypeNames->Points)
-        .AppendWriter(_WriteXformParent)
-        .AppendWriter(_WritePoints)
-        .AppendWriter(_WriteMayaColor)
-        .AppendWriter(_WriteGprim)
-        .AppendWriter(_WriteImageable)
-        .AppendWriter(_WriteArbGeomParams)
-        .AppendWriter(_WriteUserProperties)
-        .AppendWriter(_WriteOther)
-        ;
+            .AppendWriter(_WriteXformParent)
+            .AppendWriter(_WritePoints)
+            .AppendWriter(_WriteMayaColor)
+            .AppendWriter(_WriteGprim)
+            .AppendWriter(_WriteImageable)
+            .AppendWriter(_WriteArbGeomParams)
+            .AppendWriter(_WriteUserProperties)
+            .AppendWriter(_WriteOther);
     schema.AddType(UsdAbcPrimTypeNames->Camera)
-        .AppendWriter(_WriteXformParent)
-        .AppendWriter(_WriteCameraParameters)
-        .AppendWriter(_WriteArbGeomParams)
-        .AppendWriter(_WriteUserProperties)
-        .AppendWriter(_WriteOther)
-        ;
-    schema.AddType(UsdAbcPrimTypeNames->GeomSubset)
-        .AppendWriter(_WriteFaceSet)
-        ;
+            .AppendWriter(_WriteXformParent)
+            .AppendWriter(_WriteCameraParameters)
+            .AppendWriter(_WriteArbGeomParams)
+            .AppendWriter(_WriteUserProperties)
+            .AppendWriter(_WriteOther);
+    schema.AddType(UsdAbcPrimTypeNames->GeomSubset).AppendWriter(_WriteFaceSet);
 
     // This handles the root.
-    schema.AddType(UsdAbcPrimTypeNames->PseudoRoot)
-        .AppendWriter(_WriteRoot)
-        ;
+    schema.AddType(UsdAbcPrimTypeNames->PseudoRoot).AppendWriter(_WriteRoot);
 
     // This handles overs with no type and any unknown prim type.
     schema.AddFallbackType()
-        .AppendWriter(_WriteUnknown)
-        .AppendWriter(_WriteUnknownMayaColor)
-        .AppendWriter(_WriteGprim)
-        .AppendWriter(_WriteImageable)
-        .AppendWriter(_WriteArbGeomParams)
-        .AppendWriter(_WriteUserProperties)
-        .AppendWriter(_WriteOther)
-        ;
+            .AppendWriter(_WriteUnknown)
+            .AppendWriter(_WriteUnknownMayaColor)
+            .AppendWriter(_WriteGprim)
+            .AppendWriter(_WriteImageable)
+            .AppendWriter(_WriteArbGeomParams)
+            .AppendWriter(_WriteUserProperties)
+            .AppendWriter(_WriteOther);
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-static
-const _WriterSchema&
-_GetSchema()
-{
+static const _WriterSchema& _GetSchema() {
     static _WriterSchemaBuilder builder;
     return builder.schema;
 }
@@ -3694,24 +2845,17 @@ _GetSchema()
 // UsdAbc_AlembicDataWriter
 //
 
-class UsdAbc_AlembicDataWriterImpl : public _WriterContext { };
+class UsdAbc_AlembicDataWriterImpl : public _WriterContext {};
 
-UsdAbc_AlembicDataWriter::UsdAbc_AlembicDataWriter() :
-    _impl(new UsdAbc_AlembicDataWriterImpl)
-{
+UsdAbc_AlembicDataWriter::UsdAbc_AlembicDataWriter() : _impl(new UsdAbc_AlembicDataWriterImpl) {
     // Do nothing
 }
 
-UsdAbc_AlembicDataWriter::~UsdAbc_AlembicDataWriter()
-{
+UsdAbc_AlembicDataWriter::~UsdAbc_AlembicDataWriter() {
     Close();
 }
 
-bool
-UsdAbc_AlembicDataWriter::Open(
-    const std::string& filePath,
-    const std::string& comment)
-{
+bool UsdAbc_AlembicDataWriter::Open(const std::string& filePath, const std::string& comment) {
     TRACE_FUNCTION();
 
     _errorLog.clear();
@@ -3723,21 +2867,16 @@ UsdAbc_AlembicDataWriter::Open(
     }
 
     try {
-        _impl->SetArchive(
-            CreateArchiveWithInfo(Alembic::AbcCoreOgawa::WriteArchive(),
-                                  filePath, writerName, comment));
+        _impl->SetArchive(CreateArchiveWithInfo(Alembic::AbcCoreOgawa::WriteArchive(), filePath, writerName, comment));
         return true;
-    }
-    catch (std::exception& e) {
+    } catch (std::exception& e) {
         _errorLog.append(e.what());
         _errorLog.append("\n");
         return false;
     }
 }
 
-bool
-UsdAbc_AlembicDataWriter::Write(const SdfAbstractDataConstPtr& data)
-{
+bool UsdAbc_AlembicDataWriter::Write(const SdfAbstractDataConstPtr& data) {
     TRACE_FUNCTION();
 
     try {
@@ -3748,17 +2887,14 @@ UsdAbc_AlembicDataWriter::Write(const SdfAbstractDataConstPtr& data)
             _WritePrim(*_impl, _Parent(), SdfPath::AbsoluteRootPath());
         }
         return true;
-    }
-    catch (std::exception& e) {
+    } catch (std::exception& e) {
         _errorLog.append(e.what());
         _errorLog.append("\n");
         return false;
     }
 }
 
-bool
-UsdAbc_AlembicDataWriter::Close()
-{
+bool UsdAbc_AlembicDataWriter::Close() {
     TRACE_FUNCTION();
 
     // Alembic does not appear to be robust when closing an archive.
@@ -3772,17 +2908,12 @@ UsdAbc_AlembicDataWriter::Close()
     return true;
 }
 
-std::string
-UsdAbc_AlembicDataWriter::GetErrors() const
-{
+std::string UsdAbc_AlembicDataWriter::GetErrors() const {
     return _errorLog;
 }
 
-void
-UsdAbc_AlembicDataWriter::SetFlag(const TfToken& flagName, bool set)
-{
+void UsdAbc_AlembicDataWriter::SetFlag(const TfToken& flagName, bool set) {
     _impl->SetFlag(flagName, set);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

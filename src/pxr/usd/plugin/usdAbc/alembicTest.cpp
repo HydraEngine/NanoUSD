@@ -16,12 +16,10 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 template <class T>
-static bool _Truncate(VtValue& v, size_t max = 5)
-{
-    if (v.IsHolding<VtArray<T> >()) {
-        const VtArray<T> array = v.UncheckedGet<VtArray<T> >();
+static bool _Truncate(VtValue& v, size_t max = 5) {
+    if (v.IsHolding<VtArray<T>>()) {
+        const VtArray<T> array = v.UncheckedGet<VtArray<T>>();
         if (array.size() > max) {
             VtArray<T> newArray(max);
             std::copy(array.begin(), array.begin() + max, newArray.begin());
@@ -35,15 +33,12 @@ static bool _Truncate(VtValue& v, size_t max = 5)
 // Wraps another visitor, feeding it specs in lexicographic order.
 class UsdAbc_SortedDataSpecVisitor : public SdfAbstractDataSpecVisitor {
 public:
-    explicit UsdAbc_SortedDataSpecVisitor(SdfAbstractDataSpecVisitor* wrapped)
-        : _visitor(wrapped) {}
+    explicit UsdAbc_SortedDataSpecVisitor(SdfAbstractDataSpecVisitor* wrapped) : _visitor(wrapped) {}
     virtual ~UsdAbc_SortedDataSpecVisitor() {}
 
     // SdfAbstractDataSpecVisitor overrids
-    virtual bool VisitSpec(const SdfAbstractData& data,
-                           const SdfPath& path) {
-        if (_visitor)
-            _paths.push_back(path);
+    virtual bool VisitSpec(const SdfAbstractData& data, const SdfPath& path) {
+        if (_visitor) _paths.push_back(path);
         return true;
     }
 
@@ -51,7 +46,7 @@ public:
         if (_visitor) {
             // Sort ids.
             std::sort(_paths.begin(), _paths.end());
-            
+
             // Pass ids to the wrapped visitor.
             for (const auto& path : _paths) {
                 if (_Pass(data, path)) {
@@ -60,7 +55,7 @@ public:
                     }
                 }
             }
-            
+
             // Finish up.
             _visitor->Done(data);
             _paths.clear();
@@ -70,10 +65,7 @@ public:
 protected:
     /// Iff this returns \c true, \p id is passed to the wrapped visitor.
     /// The default returns \c true.
-    virtual bool _Pass(const SdfAbstractData& data,
-                       const SdfPath& id) {
-        return true;
-    }        
+    virtual bool _Pass(const SdfAbstractData& data, const SdfPath& id) { return true; }
 
 private:
     SdfAbstractDataSpecVisitor* _visitor;
@@ -82,33 +74,25 @@ private:
     _Paths _paths;
 };
 
-
-
 // Note that this works because the Alembic data visits in hierarchy order.
 struct UsdAbc_AlembicWriteVisitor : public SdfAbstractDataSpecVisitor {
-    virtual bool VisitSpec(const SdfAbstractData& data, 
-                           const SdfPath& path)
-    {
+    virtual bool VisitSpec(const SdfAbstractData& data, const SdfPath& path) {
         if (path == SdfPath::AbsoluteRootPath()) {
             // Ignore.
-        }
-        else {
-            fprintf(stdout, "%*s", 2*int(path.GetPathElementCount()-1), "");
+        } else {
+            fprintf(stdout, "%*s", 2 * int(path.GetPathElementCount() - 1), "");
             if (path.IsPropertyPath()) {
                 VtValue custom = data.Get(path, SdfFieldKeys->Custom);
                 if (custom.IsHolding<bool>()) {
-                    fprintf(stdout, "%s",
-                            custom.UncheckedGet<bool>() ? "custom " : "");
-                }
-                else if (!custom.IsEmpty()) {
+                    fprintf(stdout, "%s", custom.UncheckedGet<bool>() ? "custom " : "");
+                } else if (!custom.IsEmpty()) {
                     fprintf(stdout, "!BAD_CUSTOM ");
                 }
 
                 VtValue typeName = data.Get(path, SdfFieldKeys->TypeName);
                 if (typeName.IsHolding<TfToken>()) {
                     fprintf(stdout, "%s ", TfStringify(typeName).c_str());
-                }
-                else if (!typeName.IsEmpty()) {
+                } else if (!typeName.IsEmpty()) {
                     fprintf(stdout, "!BAD_TYPE ");
                 }
 
@@ -119,25 +103,13 @@ struct UsdAbc_AlembicWriteVisitor : public SdfAbstractDataSpecVisitor {
                     // Truncate shaped types to not dump too much data.
                     const char* trailing = NULL;
                     if (value.IsArrayValued()) {
-                        if (_Truncate<bool>(value) ||
-                            _Truncate<double>(value) ||
-                            _Truncate<float>(value) ||
-                            _Truncate<GfMatrix2d>(value) ||
-                            _Truncate<GfMatrix3d>(value) ||
-                            _Truncate<GfMatrix4d>(value) ||
-                            _Truncate<GfVec2d>(value) ||
-                            _Truncate<GfVec2f>(value) ||
-                            _Truncate<GfVec2i>(value) ||
-                            _Truncate<GfVec3d>(value) ||
-                            _Truncate<GfVec3f>(value) ||
-                            _Truncate<GfVec3i>(value) ||
-                            _Truncate<GfVec4d>(value) ||
-                            _Truncate<GfVec4f>(value) ||
-                            _Truncate<GfVec4i>(value) ||
-                            _Truncate<int>(value) ||
-                            _Truncate<SdfAssetPath>(value) ||
-                            _Truncate<std::string>(value) ||
-                            _Truncate<TfToken>(value)) {
+                        if (_Truncate<bool>(value) || _Truncate<double>(value) || _Truncate<float>(value) ||
+                            _Truncate<GfMatrix2d>(value) || _Truncate<GfMatrix3d>(value) ||
+                            _Truncate<GfMatrix4d>(value) || _Truncate<GfVec2d>(value) || _Truncate<GfVec2f>(value) ||
+                            _Truncate<GfVec2i>(value) || _Truncate<GfVec3d>(value) || _Truncate<GfVec3f>(value) ||
+                            _Truncate<GfVec3i>(value) || _Truncate<GfVec4d>(value) || _Truncate<GfVec4f>(value) ||
+                            _Truncate<GfVec4i>(value) || _Truncate<int>(value) || _Truncate<SdfAssetPath>(value) ||
+                            _Truncate<std::string>(value) || _Truncate<TfToken>(value)) {
                             trailing = "...";
                         }
                     }
@@ -156,39 +128,30 @@ struct UsdAbc_AlembicWriteVisitor : public SdfAbstractDataSpecVisitor {
                 if (samples.IsEmpty()) {
                     if (times.size() <= 1) {
                         // Expected.
+                    } else {
+                        fprintf(stdout, "%*s", 2 * int(path.GetPathElementCount() - 1), "");
+                        fprintf(stdout, "!NO_SAMPLES, want %zd\n", times.size());
                     }
-                    else {
-                        fprintf(stdout, "%*s",
-                                2*int(path.GetPathElementCount()-1), "");
-                        fprintf(stdout, "!NO_SAMPLES, want %zd\n",
-                                times.size());
-                    }
-                }
-                else if (samples.IsHolding<SdfTimeSampleMap>()) {
-                    const SdfTimeSampleMap& samplesMap =
-                        samples.UncheckedGet<SdfTimeSampleMap>();
+                } else if (samples.IsHolding<SdfTimeSampleMap>()) {
+                    const SdfTimeSampleMap& samplesMap = samples.UncheckedGet<SdfTimeSampleMap>();
                     if (times.size() != samplesMap.size()) {
-                        fprintf(stdout, "%*s",
-                                2*int(path.GetPathElementCount()-1), "");
-                        fprintf(stdout, "!SAMPLES_MISMATCH, "
+                        fprintf(stdout, "%*s", 2 * int(path.GetPathElementCount() - 1), "");
+                        fprintf(stdout,
+                                "!SAMPLES_MISMATCH, "
                                 "have %zd vs want %zd\n",
                                 samplesMap.size(), times.size());
-                    }
-                    else {
+                    } else {
                         // XXX: Should compare times in samplesMap and
                         //      times.
-                        fprintf(stdout, "%*s",
-                                2*int(path.GetPathElementCount()-1), "");
+                        fprintf(stdout, "%*s", 2 * int(path.GetPathElementCount() - 1), "");
                         fprintf(stdout, "samples_at=[ ");
                         for (double t : times) {
                             fprintf(stdout, "%g ", t);
                         }
                         fprintf(stdout, "]\n");
                     }
-                }
-                else {
-                    fprintf(stdout, "%*s",
-                            2*int(path.GetPathElementCount()-1), "");
+                } else {
+                    fprintf(stdout, "%*s", 2 * int(path.GetPathElementCount() - 1), "");
                     fprintf(stdout, "!BAD_SAMPLES\n");
                 }
 
@@ -203,29 +166,23 @@ struct UsdAbc_AlembicWriteVisitor : public SdfAbstractDataSpecVisitor {
                 for (const auto& field : tokens) {
                     const VtValue value = data.Get(path, field);
                     if (value != schema.GetFallback(field)) {
-                        fprintf(stdout, "%*s# %s = %s\n",
-                                2*int(path.GetPathElementCount()-1), "",
-                                field.GetText(),
+                        fprintf(stdout, "%*s# %s = %s\n", 2 * int(path.GetPathElementCount() - 1), "", field.GetText(),
                                 TfStringify(value).c_str());
                     }
                 }
-            }
-            else {
+            } else {
                 VtValue specifier = data.Get(path, SdfFieldKeys->Specifier);
                 if (specifier.IsHolding<SdfSpecifier>()) {
-                    static const char* spec[] = { "def", "over", "class" };
-                    fprintf(stdout, "%s ",
-                            spec[specifier.UncheckedGet<SdfSpecifier>()]);
-                }
-                else {
+                    static const char* spec[] = {"def", "over", "class"};
+                    fprintf(stdout, "%s ", spec[specifier.UncheckedGet<SdfSpecifier>()]);
+                } else {
                     fprintf(stdout, "!BAD_SPEC ");
                 }
 
                 VtValue typeName = data.Get(path, SdfFieldKeys->TypeName);
                 if (typeName.IsHolding<TfToken>()) {
                     fprintf(stdout, "%s ", TfStringify(typeName).c_str());
-                }
-                else if (!typeName.IsEmpty()) {
+                } else if (!typeName.IsEmpty()) {
                     fprintf(stdout, "!BAD_TYPE ");
                 }
 
@@ -235,14 +192,12 @@ struct UsdAbc_AlembicWriteVisitor : public SdfAbstractDataSpecVisitor {
         return true;
     }
 
-    virtual void Done(const SdfAbstractData&)
-    {
+    virtual void Done(const SdfAbstractData&) {
         // Do nothing
     }
 };
 
-static void UsdAbc_PrintTimes(const char* msg, const std::set<double>& times)
-{
+static void UsdAbc_PrintTimes(const char* msg, const std::set<double>& times) {
     fprintf(stdout, "%s: [", msg);
     for (double t : times) {
         fprintf(stdout, " %f", t);
@@ -251,25 +206,19 @@ static void UsdAbc_PrintTimes(const char* msg, const std::set<double>& times)
 }
 
 struct UsdAbc_AlembicTimeVisitor : public SdfAbstractDataSpecVisitor {
-    virtual bool VisitSpec(const SdfAbstractData& data, 
-                           const SdfPath& path)
-    {
+    virtual bool VisitSpec(const SdfAbstractData& data, const SdfPath& path) {
         if (path.IsPropertyPath()) {
-            UsdAbc_PrintTimes(path.GetText(),
-                              data.ListTimeSamplesForPath(path));
+            UsdAbc_PrintTimes(path.GetText(), data.ListTimeSamplesForPath(path));
         }
         return true;
     }
 
-    virtual void Done(const SdfAbstractData&)
-    {
+    virtual void Done(const SdfAbstractData&) {
         // Do nothing
     }
 };
 
-bool
-UsdAbc_TestAlembic(const std::string& pathname)
-{
+bool UsdAbc_TestAlembic(const std::string& pathname) {
     if (UsdAbc_AlembicDataRefPtr data = UsdAbc_AlembicData::New()) {
         if (data->Open(pathname)) {
             // Dump prims and properties.
@@ -278,14 +227,14 @@ UsdAbc_TestAlembic(const std::string& pathname)
             UsdAbc_SortedDataSpecVisitor sortWrite(&writeVisitor);
             data->VisitSpecs(&sortWrite);
 
-/*
-            // Time samples.
-            fprintf(stdout, "\nTime samples:\n");
-            UsdAbc_AlembicTimeVisitor timeVisitor;
-            UsdAbc_SortedDataSpecVisitor sortTime(&timeVisitor);
-            data->VisitSpecs(&sortTime);
-            UsdAbc_PrintTimes("all", data->ListAllTimeSamples());
-*/
+            /*
+                        // Time samples.
+                        fprintf(stdout, "\nTime samples:\n");
+                        UsdAbc_AlembicTimeVisitor timeVisitor;
+                        UsdAbc_SortedDataSpecVisitor sortTime(&timeVisitor);
+                        data->VisitSpecs(&sortTime);
+                        UsdAbc_PrintTimes("all", data->ListAllTimeSamples());
+            */
 
             // Dump all time samples of a particular property.  This is
             // intended for the standard Alembic octopus file.
@@ -296,17 +245,15 @@ UsdAbc_TestAlembic(const std::string& pathname)
                 for (double t : times) {
                     VtValue value;
                     if (data->QueryTimeSample(path, t, &value)) {
-                        fprintf(stdout, "  %f: %s\n",
-                                t, TfStringify(value).c_str());
-                    }
-                    else {
+                        fprintf(stdout, "  %f: %s\n", t, TfStringify(value).c_str());
+                    } else {
                         fprintf(stdout, "  %f: <no value>\n", t);
                     }
                 }
 
                 // Verify no samples at times not listed.
                 if (times.size() > 1) {
-                    double t      = floor(*times.begin());
+                    double t = floor(*times.begin());
                     double tUpper = ceil(*times.rbegin());
                     for (; t <= tUpper; t += 1.0) {
                         if (times.find(t) == times.end()) {
@@ -319,20 +266,16 @@ UsdAbc_TestAlembic(const std::string& pathname)
             }
 
             return true;
-        }
-        else {
+        } else {
             fprintf(stderr, "Can't open Alembic file \"%s\"\n", pathname.c_str());
         }
-    }
-    else {
+    } else {
         fprintf(stderr, "Can't create Alembic data\n");
     }
     return false;
 }
 
-bool
-UsdAbc_WriteAlembic(const std::string& srcPathname, const std::string& dstPathname)
-{
+bool UsdAbc_WriteAlembic(const std::string& srcPathname, const std::string& dstPathname) {
     SdfLayerRefPtr layer = SdfLayer::OpenAsAnonymous(srcPathname);
     if (!layer) {
         fprintf(stderr, "Can't open '%s'\n", srcPathname.c_str());
@@ -340,10 +283,7 @@ UsdAbc_WriteAlembic(const std::string& srcPathname, const std::string& dstPathna
     }
 
     // Write the file back out in the cwd.
-    return
-        SdfFileFormat::FindByExtension(".abc")->
-            WriteToFile(*get_pointer(layer), dstPathname);
+    return SdfFileFormat::FindByExtension(".abc")->WriteToFile(*get_pointer(layer), dstPathname);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
