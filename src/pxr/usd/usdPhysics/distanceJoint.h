@@ -38,8 +38,7 @@ class SdfAssetPath;
 /// Predefined distance joint type (Distance between rigid bodies
 /// may be limited to given minimum or maximum distance.)
 ///
-class UsdPhysicsDistanceJoint : public UsdPhysicsJoint
-{
+class UsdPhysicsDistanceJoint : public UsdPhysicsJoint {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -50,18 +49,12 @@ public:
     /// Equivalent to UsdPhysicsDistanceJoint::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdPhysicsDistanceJoint(const UsdPrim& prim=UsdPrim())
-        : UsdPhysicsJoint(prim)
-    {
-    }
+    explicit UsdPhysicsDistanceJoint(const UsdPrim& prim = UsdPrim()) : UsdPhysicsJoint(prim) {}
 
     /// Construct a UsdPhysicsDistanceJoint on the prim held by \p schemaObj .
     /// Should be preferred over UsdPhysicsDistanceJoint(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdPhysicsDistanceJoint(const UsdSchemaBase& schemaObj)
-        : UsdPhysicsJoint(schemaObj)
-    {
-    }
+    explicit UsdPhysicsDistanceJoint(const UsdSchemaBase& schemaObj) : UsdPhysicsJoint(schemaObj) {}
 
     /// Destructor.
     USDPHYSICS_API
@@ -71,8 +64,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDPHYSICS_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdPhysicsDistanceJoint holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -84,8 +76,7 @@ public:
     /// \endcode
     ///
     USDPHYSICS_API
-    static UsdPhysicsDistanceJoint
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdPhysicsDistanceJoint Get(const UsdStagePtr& stage, const SdfPath& path);
 
     /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
     /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -110,8 +101,7 @@ public:
     /// the opinion at the current EditTarget.
     ///
     USDPHYSICS_API
-    static UsdPhysicsDistanceJoint
-    Define(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdPhysicsDistanceJoint Define(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -124,19 +114,19 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDPHYSICS_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDPHYSICS_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // MINDISTANCE 
+    // MINDISTANCE
     // --------------------------------------------------------------------- //
-    /// Minimum distance. If attribute is negative, the joint is not 
+    /// Minimum distance. If attribute is negative, the joint is not
     /// limited. Units: distance.
     ///
     /// | ||
@@ -147,19 +137,19 @@ public:
     USDPHYSICS_API
     UsdAttribute GetMinDistanceAttr() const;
 
-    /// See GetMinDistanceAttr(), and also 
+    /// See GetMinDistanceAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateMinDistanceAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateMinDistanceAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // MAXDISTANCE 
+    // MAXDISTANCE
     // --------------------------------------------------------------------- //
-    /// Maximum distance. If attribute is negative, the joint is not 
+    /// Maximum distance. If attribute is negative, the joint is not
     /// limited. Units: distance.
     ///
     /// | ||
@@ -170,21 +160,21 @@ public:
     USDPHYSICS_API
     UsdAttribute GetMaxDistanceAttr() const;
 
-    /// See GetMaxDistanceAttr(), and also 
+    /// See GetMaxDistanceAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateMaxDistanceAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateMaxDistanceAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //

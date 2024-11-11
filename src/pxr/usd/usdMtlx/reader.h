@@ -6,7 +6,7 @@
 //
 #ifndef PXR_USD_USDMTLX_READER_H
 #define PXR_USD_USDMTLX_READER_H
- 
+
 #include "pxr/pxr.h"
 #include "pxr/usd/usdMtlx/api.h"
 #include "pxr/usd/sdf/path.h"
@@ -44,4 +44,4 @@ void UsdMtlxReadNodeGraphs(const MaterialX::ConstDocumentPtr& mtlx,
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USDMTLX_READER_H
+#endif  // PXR_USD_USDMTLX_READER_H

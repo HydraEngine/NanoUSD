@@ -43,55 +43,49 @@ namespace {
 
 using DocumentCache = std::map<std::string, mx::DocumentPtr>;
 
-static
-DocumentCache&
-_GetCache()
-{
+static DocumentCache& _GetCache() {
     static DocumentCache cache;
     return cache;
 }
 
-VtValue
-_GetUsdValue(const std::string& valueString, const std::string& type)
-{
+VtValue _GetUsdValue(const std::string& valueString, const std::string& type) {
     static const std::string filename("filename");
     static const std::string geomname("geomname");
 
-#define CAST(Type, Cast) \
-        if (value->isA<Type>()) { \
-            return VtValue(static_cast<Cast>(value->asA<Type>())); \
-        }
-#define CASTV(Type, Cast) \
-        if (value->isA<Type>()) { \
-            auto&& vec = value->asA<Type>(); \
-            Cast result; \
-            for (size_t i = 0, n = vec.numElements(); i != n; ++i) { \
-                result[i] = static_cast<Cast::ScalarType>(vec[i]); \
-            } \
-            return VtValue(result); \
-        }
-#define CASTM(Type, Cast) \
-        if (value->isA<Type>()) { \
-            auto&& mtx = value->asA<Type>(); \
-            Cast result; \
-            for (size_t j = 0, n = mtx.numRows(); j != n; ++j) { \
-                for (size_t i = 0, m = mtx.numColumns(); i != m; ++i) { \
-                    result.GetArray()[i + j * m] = \
-                        static_cast<Cast::ScalarType>(mtx[j][i]); \
-                } \
-            } \
-            return VtValue(result); \
-        }
-#define CASTA(Type, Cast) \
-        if (value->isA<std::vector<Type>>()) { \
-            auto&& vec = value->asA<std::vector<Type>>(); \
-            VtArray<Cast> result; \
-            result.reserve(vec.size()); \
-            for (auto&& v: vec) { \
-                result.push_back(static_cast<Cast>(v)); \
-            } \
-            return VtValue(result); \
-        }
+#define CAST(Type, Cast)                                       \
+    if (value->isA<Type>()) {                                  \
+        return VtValue(static_cast<Cast>(value->asA<Type>())); \
+    }
+#define CASTV(Type, Cast)                                        \
+    if (value->isA<Type>()) {                                    \
+        auto&& vec = value->asA<Type>();                         \
+        Cast result;                                             \
+        for (size_t i = 0, n = vec.numElements(); i != n; ++i) { \
+            result[i] = static_cast<Cast::ScalarType>(vec[i]);   \
+        }                                                        \
+        return VtValue(result);                                  \
+    }
+#define CASTM(Type, Cast)                                                                \
+    if (value->isA<Type>()) {                                                            \
+        auto&& mtx = value->asA<Type>();                                                 \
+        Cast result;                                                                     \
+        for (size_t j = 0, n = mtx.numRows(); j != n; ++j) {                             \
+            for (size_t i = 0, m = mtx.numColumns(); i != m; ++i) {                      \
+                result.GetArray()[i + j * m] = static_cast<Cast::ScalarType>(mtx[j][i]); \
+            }                                                                            \
+        }                                                                                \
+        return VtValue(result);                                                          \
+    }
+#define CASTA(Type, Cast)                             \
+    if (value->isA<std::vector<Type>>()) {            \
+        auto&& vec = value->asA<std::vector<Type>>(); \
+        VtArray<Cast> result;                         \
+        result.reserve(vec.size());                   \
+        for (auto&& v : vec) {                        \
+            result.push_back(static_cast<Cast>(v));   \
+        }                                             \
+        return VtValue(result);                       \
+    }
 
     if (valueString.empty()) {
         return VtValue();
@@ -145,138 +139,105 @@ _GetUsdValue(const std::string& valueString, const std::string& type)
 #undef CASTA
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
 // Return the contents of a search path environment variable
 // as a vector of strings.  The path is split on the platform's
 // native path list separator.
-static const NdrStringVec
-_GetSearchPathsFromEnvVar(const char* name)
-{
+static const NdrStringVec _GetSearchPathsFromEnvVar(const char* name) {
     const std::string paths = TfGetenv(name);
-    return !paths.empty() 
-                ? TfStringSplit(paths, ARCH_PATH_LIST_SEP) 
-                : NdrStringVec();
+    return !paths.empty() ? TfStringSplit(paths, ARCH_PATH_LIST_SEP) : NdrStringVec();
 }
 
 // Combines two search path lists.
-static const NdrStringVec
-_MergeSearchPaths(const NdrStringVec& stronger, const NdrStringVec& weaker)
-{
+static const NdrStringVec _MergeSearchPaths(const NdrStringVec& stronger, const NdrStringVec& weaker) {
     NdrStringVec result = stronger;
     result.insert(result.end(), weaker.begin(), weaker.end());
     return result;
 }
 
-static const NdrStringVec
-_ComputeStdlibSearchPaths()
-{
+static const NdrStringVec _ComputeStdlibSearchPaths() {
     // Get the MaterialX/libraries path(s)
-    // This is used to indicate the location of the MaterialX/libraries folder 
+    // This is used to indicate the location of the MaterialX/libraries folder
     // if moved/changed from the path initialized in PXR_MATERIALX_STDLIB_DIR.
-    NdrStringVec stdlibSearchPaths =
-        _GetSearchPathsFromEnvVar("PXR_MTLX_STDLIB_SEARCH_PATHS");
+    NdrStringVec stdlibSearchPaths = _GetSearchPathsFromEnvVar("PXR_MTLX_STDLIB_SEARCH_PATHS");
 
     // Add path to the MaterialX standard library discovered at build time.
 #ifdef PXR_MATERIALX_STDLIB_DIR
-    stdlibSearchPaths =
-        _MergeSearchPaths(stdlibSearchPaths, { PXR_MATERIALX_STDLIB_DIR });
+    stdlibSearchPaths = _MergeSearchPaths(stdlibSearchPaths, {PXR_MATERIALX_STDLIB_DIR});
 #endif
     return stdlibSearchPaths;
 }
 
-const NdrStringVec&
-UsdMtlxStandardLibraryPaths()
-{
+const NdrStringVec& UsdMtlxStandardLibraryPaths() {
     static const auto materialxLibraryPaths = _ComputeStdlibSearchPaths();
     return materialxLibraryPaths;
 }
 
-const NdrStringVec&
-UsdMtlxCustomSearchPaths()
-{
-    // Get the location of any additional custom mtlx files outside 
+const NdrStringVec& UsdMtlxCustomSearchPaths() {
+    // Get the location of any additional custom mtlx files outside
     // of the standard library files.
-    static const auto materialxCustomSearchPaths =
-        _GetSearchPathsFromEnvVar("PXR_MTLX_PLUGIN_SEARCH_PATHS");
+    static const auto materialxCustomSearchPaths = _GetSearchPathsFromEnvVar("PXR_MTLX_PLUGIN_SEARCH_PATHS");
     return materialxCustomSearchPaths;
 }
 
-const NdrStringVec&
-UsdMtlxSearchPaths()
-{
-    static const auto materialxSearchPaths = 
-        _MergeSearchPaths(
-            UsdMtlxCustomSearchPaths(), UsdMtlxStandardLibraryPaths());
+const NdrStringVec& UsdMtlxSearchPaths() {
+    static const auto materialxSearchPaths =
+            _MergeSearchPaths(UsdMtlxCustomSearchPaths(), UsdMtlxStandardLibraryPaths());
     return materialxSearchPaths;
 }
 
-NdrStringVec
-UsdMtlxStandardFileExtensions()
-{
-    static const auto extensions = NdrStringVec{ "mtlx" };
+NdrStringVec UsdMtlxStandardFileExtensions() {
+    static const auto extensions = NdrStringVec{"mtlx"};
     return extensions;
 }
 
-static void
-_ReadFromAsset(mx::DocumentPtr doc, const ArResolvedPath& resolvedPath,
-               const mx::FileSearchPath& searchPath = mx::FileSearchPath(),
-               const mx::XmlReadOptions* readOptionsIn = nullptr);
+static void _ReadFromAsset(mx::DocumentPtr doc,
+                           const ArResolvedPath& resolvedPath,
+                           const mx::FileSearchPath& searchPath = mx::FileSearchPath(),
+                           const mx::XmlReadOptions* readOptionsIn = nullptr);
 
-static void
-_ReadFromString(mx::DocumentPtr doc, const std::string& s,
-                const ArResolvedPath& resolvedPath = ArResolvedPath(),
-                const mx::FileSearchPath& searchPath = mx::FileSearchPath(),
-                const mx::XmlReadOptions* readOptionsIn = nullptr)
-{
+static void _ReadFromString(mx::DocumentPtr doc,
+                            const std::string& s,
+                            const ArResolvedPath& resolvedPath = ArResolvedPath(),
+                            const mx::FileSearchPath& searchPath = mx::FileSearchPath(),
+                            const mx::XmlReadOptions* readOptionsIn = nullptr) {
     // Set up an XmlReadOptions with a callback to this function so that we
     // can also handle any XInclude paths using the ArAsset API.
-    mx::XmlReadOptions readOptions =
-        readOptionsIn ? *readOptionsIn : mx::XmlReadOptions();
-    readOptions.readXIncludeFunction = 
-        [&resolvedPath](mx::DocumentPtr newDoc, 
-                        const mx::FilePath& newFilename,
-                        const mx::FileSearchPath& newSearchPath, 
-                        const mx::XmlReadOptions* newReadOptions)
-        {
-            // MaterialX does not anchor XInclude'd file paths to the source
-            // document's path, so we need to do that ourselves to pass to Ar.
-            std::string newFilePath;
+    mx::XmlReadOptions readOptions = readOptionsIn ? *readOptionsIn : mx::XmlReadOptions();
+    readOptions.readXIncludeFunction = [&resolvedPath](mx::DocumentPtr newDoc, const mx::FilePath& newFilename,
+                                                       const mx::FileSearchPath& newSearchPath,
+                                                       const mx::XmlReadOptions* newReadOptions) {
+        // MaterialX does not anchor XInclude'd file paths to the source
+        // document's path, so we need to do that ourselves to pass to Ar.
+        std::string newFilePath;
 
-            if (ArIsPackageRelativePath(resolvedPath)) {
-                // If the source file is a package like foo.usdz[a/b/doc.mx],
-                // we want to anchor the new filename to the packaged path, so
-                // we'd wind up with foo.usdz[a/b/included.mx].
-                std::string packagePath, packagedPath;
-                std::tie(packagePath, packagedPath) = 
-                    ArSplitPackageRelativePathInner(resolvedPath);
+        if (ArIsPackageRelativePath(resolvedPath)) {
+            // If the source file is a package like foo.usdz[a/b/doc.mx],
+            // we want to anchor the new filename to the packaged path, so
+            // we'd wind up with foo.usdz[a/b/included.mx].
+            std::string packagePath, packagedPath;
+            std::tie(packagePath, packagedPath) = ArSplitPackageRelativePathInner(resolvedPath);
 
-                std::string newPackagedPath = TfGetPathName(packagedPath);
-                newPackagedPath = TfNormPath(newPackagedPath.empty() ? 
-                    newFilename.asString() : 
-                    TfStringCatPaths(newPackagedPath, newFilename));
+            std::string newPackagedPath = TfGetPathName(packagedPath);
+            newPackagedPath = TfNormPath(newPackagedPath.empty() ? newFilename.asString()
+                                                                 : TfStringCatPaths(newPackagedPath, newFilename));
 
-                newFilePath = ArJoinPackageRelativePath(
-                    packagePath, newPackagedPath);
-            }
-            else {
-                // Otherwise use ArResolver to anchor newFilename to the
-                // source file.
-                newFilePath = ArGetResolver().CreateIdentifier(
-                    newFilename, resolvedPath);
-            }
+            newFilePath = ArJoinPackageRelativePath(packagePath, newPackagedPath);
+        } else {
+            // Otherwise use ArResolver to anchor newFilename to the
+            // source file.
+            newFilePath = ArGetResolver().CreateIdentifier(newFilename, resolvedPath);
+        }
 
-            const ArResolvedPath newResolvedPath = ArGetResolver().Resolve(
-                newFilePath);
-            if (!newResolvedPath) {
-                TF_RUNTIME_ERROR("Unable to open MaterialX document '%s'",
-                                 newFilePath.c_str());
-                return;
-            }
+        const ArResolvedPath newResolvedPath = ArGetResolver().Resolve(newFilePath);
+        if (!newResolvedPath) {
+            TF_RUNTIME_ERROR("Unable to open MaterialX document '%s'", newFilePath.c_str());
+            return;
+        }
 
-            _ReadFromAsset(newDoc, newResolvedPath, newSearchPath,
-                           newReadOptions);
-        };
+        _ReadFromAsset(newDoc, newResolvedPath, newSearchPath, newReadOptions);
+    };
 
     mx::readFromXmlString(doc, s, searchPath, &readOptions);
 
@@ -284,27 +245,24 @@ _ReadFromString(mx::DocumentPtr doc, const std::string& s,
     mx::flattenFilenames(doc);
 }
 
-static void
-_ReadFromAsset(mx::DocumentPtr doc, const ArResolvedPath& resolvedPath,
-               const mx::FileSearchPath& searchPath,
-               const mx::XmlReadOptions* readOptionsIn)
-{
+static void _ReadFromAsset(mx::DocumentPtr doc,
+                           const ArResolvedPath& resolvedPath,
+                           const mx::FileSearchPath& searchPath,
+                           const mx::XmlReadOptions* readOptionsIn) {
     std::shared_ptr<const char> buffer;
     size_t bufferSize = 0;
 
-    if (std::shared_ptr<ArAsset> const asset = 
-                                ArGetResolver().OpenAsset(resolvedPath)) {
+    if (std::shared_ptr<ArAsset> const asset = ArGetResolver().OpenAsset(resolvedPath)) {
         buffer = asset->GetBuffer();
         bufferSize = asset->GetSize();
     }
 
     if (!buffer) {
-        TF_RUNTIME_ERROR("Unable to open MaterialX document '%s'",
-                         resolvedPath.GetPathString().c_str());
+        TF_RUNTIME_ERROR("Unable to open MaterialX document '%s'", resolvedPath.GetPathString().c_str());
         return;
     }
 
-    // Copy contents of file into a string to pass to MaterialX. 
+    // Copy contents of file into a string to pass to MaterialX.
     // MaterialX does have a std::istream-based API so we could try to use that
     // if the string copy becomes a burden.
     const std::string s(buffer.get(), bufferSize);
@@ -312,9 +270,7 @@ _ReadFromAsset(mx::DocumentPtr doc, const ArResolvedPath& resolvedPath,
     _ReadFromString(doc, s, resolvedPath, searchPath, readOptionsIn);
 }
 
-mx::DocumentPtr
-UsdMtlxReadDocument(const std::string& resolvedPath)
-{
+mx::DocumentPtr UsdMtlxReadDocument(const std::string& resolvedPath) {
     try {
         mx::DocumentPtr doc = mx::createDocument();
 
@@ -328,59 +284,45 @@ UsdMtlxReadDocument(const std::string& resolvedPath)
             mx::flattenFilenames(doc);
 
             return doc;
-        }
-        else {
+        } else {
             TfErrorMark m;
             _ReadFromAsset(doc, ArResolvedPath(resolvedPath));
             if (m.IsClean()) {
                 return doc;
             }
         }
-    }
-    catch (mx::ExceptionFoundCycle& x) {
-        TF_RUNTIME_ERROR("MaterialX cycle found reading '%s': %s", 
-                         resolvedPath.c_str(), x.what());
+    } catch (mx::ExceptionFoundCycle& x) {
+        TF_RUNTIME_ERROR("MaterialX cycle found reading '%s': %s", resolvedPath.c_str(), x.what());
         return nullptr;
-    }
-    catch (mx::Exception& x) {
-        TF_RUNTIME_ERROR("MaterialX error reading '%s': %s",
-                         resolvedPath.c_str(), x.what());
+    } catch (mx::Exception& x) {
+        TF_RUNTIME_ERROR("MaterialX error reading '%s': %s", resolvedPath.c_str(), x.what());
         return nullptr;
     }
 
     return nullptr;
 }
 
-mx::ConstDocumentPtr 
-UsdMtlxGetDocumentFromString(const std::string &mtlxXml)
-{
-    const std::string hashStr =
-        std::to_string(std::hash<std::string>{}(mtlxXml));
+mx::ConstDocumentPtr UsdMtlxGetDocumentFromString(const std::string& mtlxXml) {
+    const std::string hashStr = std::to_string(std::hash<std::string>{}(mtlxXml));
     // Look up in the cache, inserting a null document if missing.
     auto insertResult = _GetCache().emplace(hashStr, nullptr);
     auto& document = insertResult.first->second;
-    if (insertResult.second) {       
+    if (insertResult.second) {
         // cache miss
         try {
             auto doc = mx::createDocument();
             _ReadFromString(doc, mtlxXml);
             document = doc;
-        }
-        catch (mx::Exception& x) {
-            TF_DEBUG(NDR_PARSING).Msg("MaterialX error reading source XML: %s",
-                                    x.what());
+        } catch (mx::Exception& x) {
+            TF_DEBUG(NDR_PARSING).Msg("MaterialX error reading source XML: %s", x.what());
         }
     }
 
     return document;
 }
 
-static void
-_ImportLibraries(const NdrStringVec& searchPaths, mx::Document* document)
-{
-    for (auto&& fileResult : NdrFsHelpersDiscoverFiles(searchPaths,
-                                UsdMtlxStandardFileExtensions(), false)) {
-
+static void _ImportLibraries(const NdrStringVec& searchPaths, mx::Document* document) {
+    for (auto&& fileResult : NdrFsHelpersDiscoverFiles(searchPaths, UsdMtlxStandardFileExtensions(), false)) {
         // Read the file. If this fails due to an exception, a runtime
         // error will be raised so we can just skip to the next file.
         auto doc = UsdMtlxReadDocument(fileResult.resolvedUri);
@@ -390,21 +332,16 @@ _ImportLibraries(const NdrStringVec& searchPaths, mx::Document* document)
 
         try {
             // Merge this document into the global library
-            // This properly sets the attributes on the destination 
+            // This properly sets the attributes on the destination
             // elements, like source URI and namespace
             document->importLibrary(doc);
-        }
-        catch (mx::Exception& x) {
-            TF_RUNTIME_ERROR("MaterialX error reading '%s': %s",
-                                fileResult.resolvedUri.c_str(),
-                                x.what());
+        } catch (mx::Exception& x) {
+            TF_RUNTIME_ERROR("MaterialX error reading '%s': %s", fileResult.resolvedUri.c_str(), x.what());
         }
     }
 }
 
-mx::ConstDocumentPtr
-UsdMtlxGetDocument(const std::string& resolvedUri)
-{
+mx::ConstDocumentPtr UsdMtlxGetDocument(const std::string& resolvedUri) {
     // Look up in the cache, inserting a null document if missing.
     auto insertResult = _GetCache().emplace(resolvedUri, nullptr);
     auto& document = insertResult.first->second;
@@ -420,8 +357,7 @@ UsdMtlxGetDocument(const std::string& resolvedUri)
         document = mx::createDocument();
         _ImportLibraries(UsdMtlxStandardLibraryPaths(), document.get());
         _ImportLibraries(UsdMtlxCustomSearchPaths(), document.get());
-    }
-    else {
+    } else {
         document = UsdMtlxReadDocument(resolvedUri);
     }
 
@@ -435,10 +371,7 @@ UsdMtlxGetDocument(const std::string& resolvedUri)
     return document;
 }
 
-NdrVersion
-UsdMtlxGetVersion(
-    const mx::ConstInterfaceElementPtr& mtlx, bool* implicitDefault)
-{
+NdrVersion UsdMtlxGetVersion(const mx::ConstInterfaceElementPtr& mtlx, bool* implicitDefault) {
     TfErrorMark mark;
 
     // Use the default invalid version by default.
@@ -448,12 +381,10 @@ UsdMtlxGetVersion(
     std::string versionString = mtlx->getVersionString();
     if (versionString.empty()) {
         // No version specified.  Use the default.
-    }
-    else {
+    } else {
         if (auto tmp = NdrVersion(versionString)) {
             version = tmp;
-        }
-        else {
+        } else {
             // Invalid version.  Use the default instead of failing.
         }
     }
@@ -464,8 +395,7 @@ UsdMtlxGetVersion(
         if (isdefault) {
             *implicitDefault = false;
             version = version.GetAsDefault();
-        }
-        else {
+        } else {
             // No opinion means implicitly a (potential) default.
             *implicitDefault = true;
         }
@@ -475,9 +405,7 @@ UsdMtlxGetVersion(
     return version;
 }
 
-const std::string&
-UsdMtlxGetSourceURI(const mx::ConstElementPtr& element)
-{
+const std::string& UsdMtlxGetSourceURI(const mx::ConstElementPtr& element) {
     for (auto scan = element; scan; scan = scan->getParent()) {
         const auto& uri = scan->getSourceUri();
         if (!uri.empty()) {
@@ -493,48 +421,41 @@ UsdMtlxGetSourceURI(const mx::ConstElementPtr& element)
 // UsdMtlxGetUsdValue().
 //
 
-UsdMtlxUsdTypeInfo
-UsdMtlxGetUsdType(const std::string& mtlxTypeName)
-{
-#define TUPLE3(sdf, exact, sdr) \
-    UsdMtlxUsdTypeInfo(SdfValueTypeNames->sdf, exact, SdrPropertyTypes->sdr)
-#define TUPLEN(sdf, exact, sdr, sz) \
-    UsdMtlxUsdTypeInfo(SdfValueTypeNames->sdf, exact, SdrPropertyTypes->sdr, sz)
-#define TUPLEX(sdf, exact, sdr) \
-    UsdMtlxUsdTypeInfo(SdfValueTypeNames->sdf, exact, sdr)
+UsdMtlxUsdTypeInfo UsdMtlxGetUsdType(const std::string& mtlxTypeName) {
+#define TUPLE3(sdf, exact, sdr) UsdMtlxUsdTypeInfo(SdfValueTypeNames->sdf, exact, SdrPropertyTypes->sdr)
+#define TUPLEN(sdf, exact, sdr, sz) UsdMtlxUsdTypeInfo(SdfValueTypeNames->sdf, exact, SdrPropertyTypes->sdr, sz)
+#define TUPLEX(sdf, exact, sdr) UsdMtlxUsdTypeInfo(SdfValueTypeNames->sdf, exact, sdr)
 
     static const auto noMatch = TfToken();
-    static const auto notFound =
-        UsdMtlxUsdTypeInfo(SdfValueTypeName(), false, noMatch);
+    static const auto notFound = UsdMtlxUsdTypeInfo(SdfValueTypeName(), false, noMatch);
 
-    static const auto table =
-        std::unordered_map<std::string, UsdMtlxUsdTypeInfo>{
-           { "boolean",       TUPLEX(Bool,          true,  noMatch) },
-           { "color2array",   TUPLEX(Float2Array,   false, noMatch) },
-           { "color2",        TUPLEN(Float2,        false, Float, 2)},
-           { "color3array",   TUPLE3(Color3fArray,  true,  Color)   },
-           { "color3",        TUPLE3(Color3f,       true,  Color)   },
-           { "color4array",   TUPLE3(Color4fArray,  true,  Color4)  },
-           { "color4",        TUPLE3(Color4f,       true,  Color4)  },
-           { "filename",      TUPLE3(Asset,         true,  String)  },
-           { "floatarray",    TUPLE3(FloatArray,    true,  Float)   },
-           { "float",         TUPLE3(Float,         true,  Float)   },
-           { "geomnamearray", TUPLEX(StringArray,   false, noMatch) },
-           { "geomname",      TUPLEX(String,        false, noMatch) },
-           { "integerarray",  TUPLE3(IntArray,      true,  Int)     },
-           { "integer",       TUPLE3(Int,           true,  Int)     },
-           { "matrix33",      TUPLEX(Matrix3d,      true,  noMatch) },
-           { "matrix44",      TUPLE3(Matrix4d,      true,  Matrix)  },
-           { "stringarray",   TUPLE3(StringArray,   true,  String)  },
-           { "string",        TUPLE3(String,        true,  String)  },
-           { "surfaceshader", TUPLE3(Token,         true,  Terminal)},
-           { "vector2array",  TUPLEX(Float2Array,   true,  noMatch) },
-           { "vector2",       TUPLEN(Float2,        true,  Float, 2)},
-           { "vector3array",  TUPLEX(Float3Array,   true,  noMatch) },
-           { "vector3",       TUPLEN(Float3,        true,  Float, 3)},
-           { "vector4array",  TUPLEX(Float4Array,   true,  noMatch) },
-           { "vector4",       TUPLEN(Float4,        true,  Float, 4)},
-        };
+    static const auto table = std::unordered_map<std::string, UsdMtlxUsdTypeInfo>{
+            {"boolean", TUPLEX(Bool, true, noMatch)},
+            {"color2array", TUPLEX(Float2Array, false, noMatch)},
+            {"color2", TUPLEN(Float2, false, Float, 2)},
+            {"color3array", TUPLE3(Color3fArray, true, Color)},
+            {"color3", TUPLE3(Color3f, true, Color)},
+            {"color4array", TUPLE3(Color4fArray, true, Color4)},
+            {"color4", TUPLE3(Color4f, true, Color4)},
+            {"filename", TUPLE3(Asset, true, String)},
+            {"floatarray", TUPLE3(FloatArray, true, Float)},
+            {"float", TUPLE3(Float, true, Float)},
+            {"geomnamearray", TUPLEX(StringArray, false, noMatch)},
+            {"geomname", TUPLEX(String, false, noMatch)},
+            {"integerarray", TUPLE3(IntArray, true, Int)},
+            {"integer", TUPLE3(Int, true, Int)},
+            {"matrix33", TUPLEX(Matrix3d, true, noMatch)},
+            {"matrix44", TUPLE3(Matrix4d, true, Matrix)},
+            {"stringarray", TUPLE3(StringArray, true, String)},
+            {"string", TUPLE3(String, true, String)},
+            {"surfaceshader", TUPLE3(Token, true, Terminal)},
+            {"vector2array", TUPLEX(Float2Array, true, noMatch)},
+            {"vector2", TUPLEN(Float2, true, Float, 2)},
+            {"vector3array", TUPLEX(Float3Array, true, noMatch)},
+            {"vector3", TUPLEN(Float3, true, Float, 3)},
+            {"vector4array", TUPLEX(Float4Array, true, noMatch)},
+            {"vector4", TUPLEN(Float4, true, Float, 4)},
+    };
 #undef TUPLE3
 #undef TUPLEX
 
@@ -542,11 +463,7 @@ UsdMtlxGetUsdType(const std::string& mtlxTypeName)
     return i == table.end() ? notFound : i->second;
 }
 
-VtValue
-UsdMtlxGetUsdValue(
-    const mx::ConstElementPtr& mtlx,
-    bool getDefaultValue)
-{
+VtValue UsdMtlxGetUsdValue(const mx::ConstElementPtr& mtlx, bool getDefaultValue) {
     static const std::string defaultAttr("default");
     static const std::string typeAttr = mx::TypedElement::TYPE_ATTRIBUTE;
     static const std::string valueAttr = mx::ValueElement::VALUE_ATTRIBUTE;
@@ -557,17 +474,13 @@ UsdMtlxGetUsdValue(
     }
 
     // Get the value string.
-    auto&& valueString =
-        getDefaultValue ? mtlx->getAttribute(defaultAttr)
-                        : mtlx->getAttribute(valueAttr);
+    auto&& valueString = getDefaultValue ? mtlx->getAttribute(defaultAttr) : mtlx->getAttribute(valueAttr);
 
     // Get the value.
     return _GetUsdValue(valueString, mtlx->getAttribute(typeAttr));
 }
 
-std::vector<VtValue>
-UsdMtlxGetPackedUsdValues(const std::string& values, const std::string& type)
-{
+std::vector<VtValue> UsdMtlxGetPackedUsdValues(const std::string& values, const std::string& type) {
     std::vector<VtValue> result;
 
     // It's impossible to parse packed arrays.  This is a MaterialX bug.
@@ -576,7 +489,7 @@ UsdMtlxGetPackedUsdValues(const std::string& values, const std::string& type)
     }
 
     // Split on commas and convert each value separately.
-    for (auto element: TfStringSplit(values, ",")) {
+    for (auto element : TfStringSplit(values, ",")) {
         auto typeErased = _GetUsdValue(TfStringTrim(element), type);
         if (typeErased.IsEmpty()) {
             result.clear();
@@ -587,12 +500,10 @@ UsdMtlxGetPackedUsdValues(const std::string& values, const std::string& type)
     return result;
 }
 
-std::vector<std::string>
-UsdMtlxSplitStringArray(const std::string& s)
-{
+std::vector<std::string> UsdMtlxSplitStringArray(const std::string& s) {
     static const std::string _CommaSeparator = ",";
     std::vector<std::string> strs = mx::splitString(s, _CommaSeparator);
-    for (std::string &str : strs) {
+    for (std::string& str : strs) {
         str = mx::trimSpaces(str);
     }
     return strs;

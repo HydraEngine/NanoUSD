@@ -35,7 +35,7 @@ class SdfAssetPath;
 
 /// \class UsdPhysicsPrismaticJoint
 ///
-/// Predefined prismatic joint type (translation along prismatic 
+/// Predefined prismatic joint type (translation along prismatic
 /// joint axis is permitted.)
 ///
 /// For any described attribute \em Fallback \em Value or \em Allowed \em Values below
@@ -43,8 +43,7 @@ class SdfAssetPath;
 /// So to set an attribute to the value "rightHanded", use UsdPhysicsTokens->rightHanded
 /// as the value.
 ///
-class UsdPhysicsPrismaticJoint : public UsdPhysicsJoint
-{
+class UsdPhysicsPrismaticJoint : public UsdPhysicsJoint {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -55,18 +54,12 @@ public:
     /// Equivalent to UsdPhysicsPrismaticJoint::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdPhysicsPrismaticJoint(const UsdPrim& prim=UsdPrim())
-        : UsdPhysicsJoint(prim)
-    {
-    }
+    explicit UsdPhysicsPrismaticJoint(const UsdPrim& prim = UsdPrim()) : UsdPhysicsJoint(prim) {}
 
     /// Construct a UsdPhysicsPrismaticJoint on the prim held by \p schemaObj .
     /// Should be preferred over UsdPhysicsPrismaticJoint(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdPhysicsPrismaticJoint(const UsdSchemaBase& schemaObj)
-        : UsdPhysicsJoint(schemaObj)
-    {
-    }
+    explicit UsdPhysicsPrismaticJoint(const UsdSchemaBase& schemaObj) : UsdPhysicsJoint(schemaObj) {}
 
     /// Destructor.
     USDPHYSICS_API
@@ -76,8 +69,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDPHYSICS_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdPhysicsPrismaticJoint holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -89,8 +81,7 @@ public:
     /// \endcode
     ///
     USDPHYSICS_API
-    static UsdPhysicsPrismaticJoint
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdPhysicsPrismaticJoint Get(const UsdStagePtr& stage, const SdfPath& path);
 
     /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
     /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -115,8 +106,7 @@ public:
     /// the opinion at the current EditTarget.
     ///
     USDPHYSICS_API
-    static UsdPhysicsPrismaticJoint
-    Define(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdPhysicsPrismaticJoint Define(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -129,17 +119,17 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDPHYSICS_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDPHYSICS_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // AXIS 
+    // AXIS
     // --------------------------------------------------------------------- //
     /// Joint axis.
     ///
@@ -153,19 +143,19 @@ public:
     USDPHYSICS_API
     UsdAttribute GetAxisAttr() const;
 
-    /// See GetAxisAttr(), and also 
+    /// See GetAxisAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateAxisAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateAxisAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // LOWERLIMIT 
+    // LOWERLIMIT
     // --------------------------------------------------------------------- //
-    /// Lower limit. Units: distance. -inf means not limited in 
+    /// Lower limit. Units: distance. -inf means not limited in
     /// negative direction.
     ///
     /// | ||
@@ -176,19 +166,19 @@ public:
     USDPHYSICS_API
     UsdAttribute GetLowerLimitAttr() const;
 
-    /// See GetLowerLimitAttr(), and also 
+    /// See GetLowerLimitAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateLowerLimitAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateLowerLimitAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // UPPERLIMIT 
+    // UPPERLIMIT
     // --------------------------------------------------------------------- //
-    /// Upper limit. Units: distance. inf means not limited in 
+    /// Upper limit. Units: distance. inf means not limited in
     /// positive direction.
     ///
     /// | ||
@@ -199,21 +189,21 @@ public:
     USDPHYSICS_API
     UsdAttribute GetUpperLimitAttr() const;
 
-    /// See GetUpperLimitAttr(), and also 
+    /// See GetUpperLimitAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateUpperLimitAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateUpperLimitAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //

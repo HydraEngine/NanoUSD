@@ -35,12 +35,11 @@ class SdfAssetPath;
 
 /// \class UsdPhysicsMaterialAPI
 ///
-/// Adds simulation material properties to a Material. All collisions 
-/// that have a relationship to this material will have their collision response 
+/// Adds simulation material properties to a Material. All collisions
+/// that have a relationship to this material will have their collision response
 /// defined through this material.
 ///
-class UsdPhysicsMaterialAPI : public UsdAPISchemaBase
-{
+class UsdPhysicsMaterialAPI : public UsdAPISchemaBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -51,18 +50,12 @@ public:
     /// Equivalent to UsdPhysicsMaterialAPI::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdPhysicsMaterialAPI(const UsdPrim& prim=UsdPrim())
-        : UsdAPISchemaBase(prim)
-    {
-    }
+    explicit UsdPhysicsMaterialAPI(const UsdPrim& prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
     /// Construct a UsdPhysicsMaterialAPI on the prim held by \p schemaObj .
     /// Should be preferred over UsdPhysicsMaterialAPI(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdPhysicsMaterialAPI(const UsdSchemaBase& schemaObj)
-        : UsdAPISchemaBase(schemaObj)
-    {
-    }
+    explicit UsdPhysicsMaterialAPI(const UsdSchemaBase& schemaObj) : UsdAPISchemaBase(schemaObj) {}
 
     /// Destructor.
     USDPHYSICS_API
@@ -72,8 +65,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDPHYSICS_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdPhysicsMaterialAPI holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -85,20 +77,18 @@ public:
     /// \endcode
     ///
     USDPHYSICS_API
-    static UsdPhysicsMaterialAPI
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdPhysicsMaterialAPI Get(const UsdStagePtr& stage, const SdfPath& path);
 
-
-    /// Returns true if this <b>single-apply</b> API schema can be applied to 
-    /// the given \p prim. If this schema can not be a applied to the prim, 
-    /// this returns false and, if provided, populates \p whyNot with the 
+    /// Returns true if this <b>single-apply</b> API schema can be applied to
+    /// the given \p prim. If this schema can not be a applied to the prim,
+    /// this returns false and, if provided, populates \p whyNot with the
     /// reason it can not be applied.
-    /// 
+    ///
     /// Note that if CanApply returns false, that does not necessarily imply
     /// that calling Apply will fail. Callers are expected to call CanApply
-    /// before calling Apply if they want to ensure that it is valid to 
+    /// before calling Apply if they want to ensure that it is valid to
     /// apply a schema.
-    /// 
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -106,18 +96,17 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDPHYSICS_API
-    static bool 
-    CanApply(const UsdPrim &prim, std::string *whyNot=nullptr);
+    static bool CanApply(const UsdPrim& prim, std::string* whyNot = nullptr);
 
     /// Applies this <b>single-apply</b> API schema to the given \p prim.
-    /// This information is stored by adding "PhysicsMaterialAPI" to the 
+    /// This information is stored by adding "PhysicsMaterialAPI" to the
     /// token-valued, listOp metadata \em apiSchemas on the prim.
-    /// 
-    /// \return A valid UsdPhysicsMaterialAPI object is returned upon success. 
-    /// An invalid (or empty) UsdPhysicsMaterialAPI object is returned upon 
-    /// failure. See \ref UsdPrim::ApplyAPI() for conditions 
-    /// resulting in failure. 
-    /// 
+    ///
+    /// \return A valid UsdPhysicsMaterialAPI object is returned upon success.
+    /// An invalid (or empty) UsdPhysicsMaterialAPI object is returned upon
+    /// failure. See \ref UsdPrim::ApplyAPI() for conditions
+    /// resulting in failure.
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -125,8 +114,7 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDPHYSICS_API
-    static UsdPhysicsMaterialAPI 
-    Apply(const UsdPrim &prim);
+    static UsdPhysicsMaterialAPI Apply(const UsdPrim& prim);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -139,17 +127,17 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDPHYSICS_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDPHYSICS_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // DYNAMICFRICTION 
+    // DYNAMICFRICTION
     // --------------------------------------------------------------------- //
     /// Dynamic friction coefficient. Unitless.
     ///
@@ -161,17 +149,17 @@ public:
     USDPHYSICS_API
     UsdAttribute GetDynamicFrictionAttr() const;
 
-    /// See GetDynamicFrictionAttr(), and also 
+    /// See GetDynamicFrictionAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateDynamicFrictionAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateDynamicFrictionAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // STATICFRICTION 
+    // STATICFRICTION
     // --------------------------------------------------------------------- //
     /// Static friction coefficient. Unitless.
     ///
@@ -183,17 +171,17 @@ public:
     USDPHYSICS_API
     UsdAttribute GetStaticFrictionAttr() const;
 
-    /// See GetStaticFrictionAttr(), and also 
+    /// See GetStaticFrictionAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateStaticFrictionAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateStaticFrictionAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // RESTITUTION 
+    // RESTITUTION
     // --------------------------------------------------------------------- //
     /// Restitution coefficient. Unitless.
     ///
@@ -205,21 +193,21 @@ public:
     USDPHYSICS_API
     UsdAttribute GetRestitutionAttr() const;
 
-    /// See GetRestitutionAttr(), and also 
+    /// See GetRestitutionAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateRestitutionAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateRestitutionAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // DENSITY 
+    // DENSITY
     // --------------------------------------------------------------------- //
     /// If non-zero, defines the density of the material. This can be
     /// used for body mass computation, see PhysicsMassAPI.
-    /// Note that if the density is 0.0 it is ignored. 
+    /// Note that if the density is 0.0 it is ignored.
     /// Units: mass/distance/distance/distance.
     ///
     /// | ||
@@ -230,21 +218,21 @@ public:
     USDPHYSICS_API
     UsdAttribute GetDensityAttr() const;
 
-    /// See GetDensityAttr(), and also 
+    /// See GetDensityAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateDensityAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateDensityAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //

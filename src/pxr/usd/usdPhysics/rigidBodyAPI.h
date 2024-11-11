@@ -17,7 +17,7 @@
 #include "pxr/usd/usdPhysics/tokens.h"
 
 #include "pxr/base/gf/matrix3f.h"
-#include "pxr/base/gf/quatf.h" 
+#include "pxr/base/gf/quatf.h"
 
 #include "pxr/base/vt/value.h"
 
@@ -40,11 +40,10 @@ class SdfAssetPath;
 ///
 /// Applies physics body attributes to any UsdGeomXformable prim and
 /// marks that prim to be driven by a simulation. If a simulation is running
-/// it will update this prim's pose. All prims in the hierarchy below this 
+/// it will update this prim's pose. All prims in the hierarchy below this
 /// prim should move accordingly.
 ///
-class UsdPhysicsRigidBodyAPI : public UsdAPISchemaBase
-{
+class UsdPhysicsRigidBodyAPI : public UsdAPISchemaBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -55,18 +54,12 @@ public:
     /// Equivalent to UsdPhysicsRigidBodyAPI::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdPhysicsRigidBodyAPI(const UsdPrim& prim=UsdPrim())
-        : UsdAPISchemaBase(prim)
-    {
-    }
+    explicit UsdPhysicsRigidBodyAPI(const UsdPrim& prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
     /// Construct a UsdPhysicsRigidBodyAPI on the prim held by \p schemaObj .
     /// Should be preferred over UsdPhysicsRigidBodyAPI(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdPhysicsRigidBodyAPI(const UsdSchemaBase& schemaObj)
-        : UsdAPISchemaBase(schemaObj)
-    {
-    }
+    explicit UsdPhysicsRigidBodyAPI(const UsdSchemaBase& schemaObj) : UsdAPISchemaBase(schemaObj) {}
 
     /// Destructor.
     USDPHYSICS_API
@@ -76,8 +69,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDPHYSICS_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdPhysicsRigidBodyAPI holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -89,20 +81,18 @@ public:
     /// \endcode
     ///
     USDPHYSICS_API
-    static UsdPhysicsRigidBodyAPI
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdPhysicsRigidBodyAPI Get(const UsdStagePtr& stage, const SdfPath& path);
 
-
-    /// Returns true if this <b>single-apply</b> API schema can be applied to 
-    /// the given \p prim. If this schema can not be a applied to the prim, 
-    /// this returns false and, if provided, populates \p whyNot with the 
+    /// Returns true if this <b>single-apply</b> API schema can be applied to
+    /// the given \p prim. If this schema can not be a applied to the prim,
+    /// this returns false and, if provided, populates \p whyNot with the
     /// reason it can not be applied.
-    /// 
+    ///
     /// Note that if CanApply returns false, that does not necessarily imply
     /// that calling Apply will fail. Callers are expected to call CanApply
-    /// before calling Apply if they want to ensure that it is valid to 
+    /// before calling Apply if they want to ensure that it is valid to
     /// apply a schema.
-    /// 
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -110,18 +100,17 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDPHYSICS_API
-    static bool 
-    CanApply(const UsdPrim &prim, std::string *whyNot=nullptr);
+    static bool CanApply(const UsdPrim& prim, std::string* whyNot = nullptr);
 
     /// Applies this <b>single-apply</b> API schema to the given \p prim.
-    /// This information is stored by adding "PhysicsRigidBodyAPI" to the 
+    /// This information is stored by adding "PhysicsRigidBodyAPI" to the
     /// token-valued, listOp metadata \em apiSchemas on the prim.
-    /// 
-    /// \return A valid UsdPhysicsRigidBodyAPI object is returned upon success. 
-    /// An invalid (or empty) UsdPhysicsRigidBodyAPI object is returned upon 
-    /// failure. See \ref UsdPrim::ApplyAPI() for conditions 
-    /// resulting in failure. 
-    /// 
+    ///
+    /// \return A valid UsdPhysicsRigidBodyAPI object is returned upon success.
+    /// An invalid (or empty) UsdPhysicsRigidBodyAPI object is returned upon
+    /// failure. See \ref UsdPrim::ApplyAPI() for conditions
+    /// resulting in failure.
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -129,8 +118,7 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDPHYSICS_API
-    static UsdPhysicsRigidBodyAPI 
-    Apply(const UsdPrim &prim);
+    static UsdPhysicsRigidBodyAPI Apply(const UsdPrim& prim);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -143,17 +131,17 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDPHYSICS_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDPHYSICS_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // RIGIDBODYENABLED 
+    // RIGIDBODYENABLED
     // --------------------------------------------------------------------- //
     /// Determines if this PhysicsRigidBodyAPI is enabled.
     ///
@@ -165,20 +153,20 @@ public:
     USDPHYSICS_API
     UsdAttribute GetRigidBodyEnabledAttr() const;
 
-    /// See GetRigidBodyEnabledAttr(), and also 
+    /// See GetRigidBodyEnabledAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateRigidBodyEnabledAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateRigidBodyEnabledAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // KINEMATICENABLED 
+    // KINEMATICENABLED
     // --------------------------------------------------------------------- //
-    /// Determines whether the body is kinematic or not. A kinematic 
-    /// body is a body that is moved through animated poses or through 
+    /// Determines whether the body is kinematic or not. A kinematic
+    /// body is a body that is moved through animated poses or through
     /// user defined poses. The simulation derives velocities for the
     /// kinematic body based on the external motion. When a continuous motion
     /// is not desired, this kinematic flag should be set to false.
@@ -191,17 +179,17 @@ public:
     USDPHYSICS_API
     UsdAttribute GetKinematicEnabledAttr() const;
 
-    /// See GetKinematicEnabledAttr(), and also 
+    /// See GetKinematicEnabledAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateKinematicEnabledAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateKinematicEnabledAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // STARTSASLEEP 
+    // STARTSASLEEP
     // --------------------------------------------------------------------- //
     /// Determines if the body is asleep when the simulation starts.
     ///
@@ -214,19 +202,19 @@ public:
     USDPHYSICS_API
     UsdAttribute GetStartsAsleepAttr() const;
 
-    /// See GetStartsAsleepAttr(), and also 
+    /// See GetStartsAsleepAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateStartsAsleepAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateStartsAsleepAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // VELOCITY 
+    // VELOCITY
     // --------------------------------------------------------------------- //
-    /// Linear velocity in the same space as the node's xform. 
+    /// Linear velocity in the same space as the node's xform.
     /// Units: distance/second.
     ///
     /// | ||
@@ -237,19 +225,19 @@ public:
     USDPHYSICS_API
     UsdAttribute GetVelocityAttr() const;
 
-    /// See GetVelocityAttr(), and also 
+    /// See GetVelocityAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateVelocityAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateVelocityAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // ANGULARVELOCITY 
+    // ANGULARVELOCITY
     // --------------------------------------------------------------------- //
-    /// Angular velocity in the same space as the node's xform. 
+    /// Angular velocity in the same space as the node's xform.
     /// Units: degrees/second.
     ///
     /// | ||
@@ -260,54 +248,53 @@ public:
     USDPHYSICS_API
     UsdAttribute GetAngularVelocityAttr() const;
 
-    /// See GetAngularVelocityAttr(), and also 
+    /// See GetAngularVelocityAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateAngularVelocityAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateAngularVelocityAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // SIMULATIONOWNER 
+    // SIMULATIONOWNER
     // --------------------------------------------------------------------- //
-    /// Single PhysicsScene that will simulate this body. By 
-    /// default this is the first PhysicsScene found in the stage using 
+    /// Single PhysicsScene that will simulate this body. By
+    /// default this is the first PhysicsScene found in the stage using
     /// UsdStage::Traverse().
     ///
     USDPHYSICS_API
     UsdRelationship GetSimulationOwnerRel() const;
 
-    /// See GetSimulationOwnerRel(), and also 
+    /// See GetSimulationOwnerRel(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create
     USDPHYSICS_API
     UsdRelationship CreateSimulationOwnerRel() const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
     // --(BEGIN CUSTOM CODE)--
 
     /// Mass information for a collision, used in ComputeMassProperties MassInformationFn callback
-    struct MassInformation
-    {
-        float volume;           //< Collision volume
-        GfMatrix3f inertia;     //< Collision inertia
-        GfVec3f centerOfMass;   //< Collision center of mass
-        GfVec3f localPos;       //< Collision local position with respect to the rigid body
-        GfQuatf localRot;       //< Collision local rotation with respect to the rigid body
+    struct MassInformation {
+        float volume;          //< Collision volume
+        GfMatrix3f inertia;    //< Collision inertia
+        GfVec3f centerOfMass;  //< Collision center of mass
+        GfVec3f localPos;      //< Collision local position with respect to the rigid body
+        GfQuatf localRot;      //< Collision local rotation with respect to the rigid body
     };
 
     /// Mass information function signature, for given UsdPrim gather MassInformation
-    typedef MassInformation MassInformationFnSig(const UsdPrim&);    
+    typedef MassInformation MassInformationFnSig(const UsdPrim&);
     typedef std::function<MassInformationFnSig> MassInformationFn;
 
     /// Compute mass properties of the rigid body
@@ -317,9 +304,10 @@ public:
     /// \p massInfoFn Callback function to get collision mass information.
     /// \return Computed mass of the rigid body
     USDPHYSICS_API
-    float ComputeMassProperties(GfVec3f* diagonalInertia, GfVec3f* com, GfQuatf* principalAxes, 
-        const MassInformationFn& massInfoFn) const;
-
+    float ComputeMassProperties(GfVec3f* diagonalInertia,
+                                GfVec3f* com,
+                                GfQuatf* principalAxes,
+                                const MassInformationFn& massInfoFn) const;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -36,15 +36,14 @@ class SdfAssetPath;
 /// \class UsdPhysicsLimitAPI
 ///
 /// The PhysicsLimitAPI can be applied to a PhysicsJoint and will
-/// restrict the movement along an axis. PhysicsLimitAPI is a multipleApply 
-/// schema: The PhysicsJoint can be restricted along "transX", "transY", 
-/// "transZ", "rotX", "rotY", "rotZ", "distance". Setting these as a 
+/// restrict the movement along an axis. PhysicsLimitAPI is a multipleApply
+/// schema: The PhysicsJoint can be restricted along "transX", "transY",
+/// "transZ", "rotX", "rotY", "rotZ", "distance". Setting these as a
 /// multipleApply schema TfToken name will define the degree of freedom the
-/// PhysicsLimitAPI is applied to. Note that if the low limit is higher than 
+/// PhysicsLimitAPI is applied to. Note that if the low limit is higher than
 /// the high limit, motion along this axis is considered locked.
 ///
-class UsdPhysicsLimitAPI : public UsdAPISchemaBase
-{
+class UsdPhysicsLimitAPI : public UsdAPISchemaBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -60,19 +59,15 @@ public:
     ///
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdPhysicsLimitAPI(
-        const UsdPrim& prim=UsdPrim(), const TfToken &name=TfToken())
-        : UsdAPISchemaBase(prim, /*instanceName*/ name)
-    { }
+    explicit UsdPhysicsLimitAPI(const UsdPrim& prim = UsdPrim(), const TfToken& name = TfToken())
+        : UsdAPISchemaBase(prim, /*instanceName*/ name) {}
 
     /// Construct a UsdPhysicsLimitAPI on the prim held by \p schemaObj with
     /// name \p name.  Should be preferred over
     /// UsdPhysicsLimitAPI(schemaObj.GetPrim(), name), as it preserves
     /// SchemaBase state.
-    explicit UsdPhysicsLimitAPI(
-        const UsdSchemaBase& schemaObj, const TfToken &name)
-        : UsdAPISchemaBase(schemaObj, /*instanceName*/ name)
-    { }
+    explicit UsdPhysicsLimitAPI(const UsdSchemaBase& schemaObj, const TfToken& name)
+        : UsdAPISchemaBase(schemaObj, /*instanceName*/ name) {}
 
     /// Destructor.
     USDPHYSICS_API
@@ -82,8 +77,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDPHYSICS_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a vector of names of all pre-declared attributes for this schema
     /// class and all its ancestor classes for a given instance name.  Does not
@@ -91,13 +85,10 @@ public:
     /// the schemas involved. The names returned will have the proper namespace
     /// prefix.
     USDPHYSICS_API
-    static TfTokenVector
-    GetSchemaAttributeNames(bool includeInherited, const TfToken &instanceName);
+    static TfTokenVector GetSchemaAttributeNames(bool includeInherited, const TfToken& instanceName);
 
     /// Returns the name of this multiple-apply schema instance
-    TfToken GetName() const {
-        return _GetInstanceName();
-    }
+    TfToken GetName() const { return _GetInstanceName(); }
 
     /// Return a UsdPhysicsLimitAPI holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -114,44 +105,39 @@ public:
     /// \endcode
     ///
     USDPHYSICS_API
-    static UsdPhysicsLimitAPI
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdPhysicsLimitAPI Get(const UsdStagePtr& stage, const SdfPath& path);
 
     /// Return a UsdPhysicsLimitAPI with name \p name holding the
     /// prim \p prim. Shorthand for UsdPhysicsLimitAPI(prim, name);
     USDPHYSICS_API
-    static UsdPhysicsLimitAPI
-    Get(const UsdPrim &prim, const TfToken &name);
+    static UsdPhysicsLimitAPI Get(const UsdPrim& prim, const TfToken& name);
 
-    /// Return a vector of all named instances of UsdPhysicsLimitAPI on the 
+    /// Return a vector of all named instances of UsdPhysicsLimitAPI on the
     /// given \p prim.
     USDPHYSICS_API
-    static std::vector<UsdPhysicsLimitAPI>
-    GetAll(const UsdPrim &prim);
+    static std::vector<UsdPhysicsLimitAPI> GetAll(const UsdPrim& prim);
 
     /// Checks if the given name \p baseName is the base name of a property
     /// of PhysicsLimitAPI.
     USDPHYSICS_API
-    static bool
-    IsSchemaPropertyBaseName(const TfToken &baseName);
+    static bool IsSchemaPropertyBaseName(const TfToken& baseName);
 
     /// Checks if the given path \p path is of an API schema of type
     /// PhysicsLimitAPI. If so, it stores the instance name of
     /// the schema in \p name and returns true. Otherwise, it returns false.
     USDPHYSICS_API
-    static bool
-    IsPhysicsLimitAPIPath(const SdfPath &path, TfToken *name);
+    static bool IsPhysicsLimitAPIPath(const SdfPath& path, TfToken* name);
 
     /// Returns true if this <b>multiple-apply</b> API schema can be applied,
-    /// with the given instance name, \p name, to the given \p prim. If this 
-    /// schema can not be a applied the prim, this returns false and, if 
+    /// with the given instance name, \p name, to the given \p prim. If this
+    /// schema can not be a applied the prim, this returns false and, if
     /// provided, populates \p whyNot with the reason it can not be applied.
-    /// 
+    ///
     /// Note that if CanApply returns false, that does not necessarily imply
     /// that calling Apply will fail. Callers are expected to call CanApply
-    /// before calling Apply if they want to ensure that it is valid to 
+    /// before calling Apply if they want to ensure that it is valid to
     /// apply a schema.
-    /// 
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -159,23 +145,21 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDPHYSICS_API
-    static bool 
-    CanApply(const UsdPrim &prim, const TfToken &name, 
-             std::string *whyNot=nullptr);
+    static bool CanApply(const UsdPrim& prim, const TfToken& name, std::string* whyNot = nullptr);
 
-    /// Applies this <b>multiple-apply</b> API schema to the given \p prim 
-    /// along with the given instance name, \p name. 
-    /// 
-    /// This information is stored by adding "PhysicsLimitAPI:<i>name</i>" 
+    /// Applies this <b>multiple-apply</b> API schema to the given \p prim
+    /// along with the given instance name, \p name.
+    ///
+    /// This information is stored by adding "PhysicsLimitAPI:<i>name</i>"
     /// to the token-valued, listOp metadata \em apiSchemas on the prim.
-    /// For example, if \p name is 'instance1', the token 
+    /// For example, if \p name is 'instance1', the token
     /// 'PhysicsLimitAPI:instance1' is added to 'apiSchemas'.
-    /// 
-    /// \return A valid UsdPhysicsLimitAPI object is returned upon success. 
-    /// An invalid (or empty) UsdPhysicsLimitAPI object is returned upon 
-    /// failure. See \ref UsdPrim::ApplyAPI() for 
-    /// conditions resulting in failure. 
-    /// 
+    ///
+    /// \return A valid UsdPhysicsLimitAPI object is returned upon success.
+    /// An invalid (or empty) UsdPhysicsLimitAPI object is returned upon
+    /// failure. See \ref UsdPrim::ApplyAPI() for
+    /// conditions resulting in failure.
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -183,8 +167,7 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDPHYSICS_API
-    static UsdPhysicsLimitAPI 
-    Apply(const UsdPrim &prim, const TfToken &name);
+    static UsdPhysicsLimitAPI Apply(const UsdPrim& prim, const TfToken& name);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -197,17 +180,17 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDPHYSICS_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDPHYSICS_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // LOW 
+    // LOW
     // --------------------------------------------------------------------- //
     /// Lower limit. Units: degrees or distance depending on trans or
     /// rot axis applied to. -inf means not limited in negative direction.
@@ -220,19 +203,19 @@ public:
     USDPHYSICS_API
     UsdAttribute GetLowAttr() const;
 
-    /// See GetLowAttr(), and also 
+    /// See GetLowAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateLowAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateLowAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // HIGH 
+    // HIGH
     // --------------------------------------------------------------------- //
-    /// Upper limit. Units: degrees or distance depending on trans or 
+    /// Upper limit. Units: degrees or distance depending on trans or
     /// rot axis applied to. inf means not limited in positive direction.
     ///
     /// | ||
@@ -243,21 +226,21 @@ public:
     USDPHYSICS_API
     UsdAttribute GetHighAttr() const;
 
-    /// See GetHighAttr(), and also 
+    /// See GetHighAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateHighAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateHighAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //

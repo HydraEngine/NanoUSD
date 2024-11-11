@@ -34,16 +34,15 @@ class SdfAssetPath;
 
 /// \class UsdPhysicsArticulationRootAPI
 ///
-/// PhysicsArticulationRootAPI can be applied to a scene graph node, 
-/// and marks the subtree rooted here for inclusion in one or more reduced 
+/// PhysicsArticulationRootAPI can be applied to a scene graph node,
+/// and marks the subtree rooted here for inclusion in one or more reduced
 /// coordinate articulations. For floating articulations, this should be on
-/// the root body. For fixed articulations (robotics jargon for e.g. a robot 
-/// arm for welding that is bolted to the floor), this API can be on a direct 
-/// or indirect parent of the root joint which is connected to the world, or 
+/// the root body. For fixed articulations (robotics jargon for e.g. a robot
+/// arm for welding that is bolted to the floor), this API can be on a direct
+/// or indirect parent of the root joint which is connected to the world, or
 /// on the joint itself..
 ///
-class UsdPhysicsArticulationRootAPI : public UsdAPISchemaBase
-{
+class UsdPhysicsArticulationRootAPI : public UsdAPISchemaBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -54,18 +53,12 @@ public:
     /// Equivalent to UsdPhysicsArticulationRootAPI::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdPhysicsArticulationRootAPI(const UsdPrim& prim=UsdPrim())
-        : UsdAPISchemaBase(prim)
-    {
-    }
+    explicit UsdPhysicsArticulationRootAPI(const UsdPrim& prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
     /// Construct a UsdPhysicsArticulationRootAPI on the prim held by \p schemaObj .
     /// Should be preferred over UsdPhysicsArticulationRootAPI(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdPhysicsArticulationRootAPI(const UsdSchemaBase& schemaObj)
-        : UsdAPISchemaBase(schemaObj)
-    {
-    }
+    explicit UsdPhysicsArticulationRootAPI(const UsdSchemaBase& schemaObj) : UsdAPISchemaBase(schemaObj) {}
 
     /// Destructor.
     USDPHYSICS_API
@@ -75,8 +68,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDPHYSICS_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdPhysicsArticulationRootAPI holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -88,20 +80,18 @@ public:
     /// \endcode
     ///
     USDPHYSICS_API
-    static UsdPhysicsArticulationRootAPI
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdPhysicsArticulationRootAPI Get(const UsdStagePtr& stage, const SdfPath& path);
 
-
-    /// Returns true if this <b>single-apply</b> API schema can be applied to 
-    /// the given \p prim. If this schema can not be a applied to the prim, 
-    /// this returns false and, if provided, populates \p whyNot with the 
+    /// Returns true if this <b>single-apply</b> API schema can be applied to
+    /// the given \p prim. If this schema can not be a applied to the prim,
+    /// this returns false and, if provided, populates \p whyNot with the
     /// reason it can not be applied.
-    /// 
+    ///
     /// Note that if CanApply returns false, that does not necessarily imply
     /// that calling Apply will fail. Callers are expected to call CanApply
-    /// before calling Apply if they want to ensure that it is valid to 
+    /// before calling Apply if they want to ensure that it is valid to
     /// apply a schema.
-    /// 
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -109,18 +99,17 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDPHYSICS_API
-    static bool 
-    CanApply(const UsdPrim &prim, std::string *whyNot=nullptr);
+    static bool CanApply(const UsdPrim& prim, std::string* whyNot = nullptr);
 
     /// Applies this <b>single-apply</b> API schema to the given \p prim.
-    /// This information is stored by adding "PhysicsArticulationRootAPI" to the 
+    /// This information is stored by adding "PhysicsArticulationRootAPI" to the
     /// token-valued, listOp metadata \em apiSchemas on the prim.
-    /// 
-    /// \return A valid UsdPhysicsArticulationRootAPI object is returned upon success. 
-    /// An invalid (or empty) UsdPhysicsArticulationRootAPI object is returned upon 
-    /// failure. See \ref UsdPrim::ApplyAPI() for conditions 
-    /// resulting in failure. 
-    /// 
+    ///
+    /// \return A valid UsdPhysicsArticulationRootAPI object is returned upon success.
+    /// An invalid (or empty) UsdPhysicsArticulationRootAPI object is returned upon
+    /// failure. See \ref UsdPrim::ApplyAPI() for conditions
+    /// resulting in failure.
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -128,8 +117,7 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDPHYSICS_API
-    static UsdPhysicsArticulationRootAPI 
-    Apply(const UsdPrim &prim);
+    static UsdPhysicsArticulationRootAPI Apply(const UsdPrim& prim);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -142,21 +130,21 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDPHYSICS_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDPHYSICS_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //

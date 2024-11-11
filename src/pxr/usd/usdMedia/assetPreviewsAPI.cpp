@@ -14,22 +14,15 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType)
-{
-    TfType::Define<UsdMediaAssetPreviewsAPI,
-        TfType::Bases< UsdAPISchemaBase > >();
-    
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<UsdMediaAssetPreviewsAPI, TfType::Bases<UsdAPISchemaBase>>();
 }
 
 /* virtual */
-UsdMediaAssetPreviewsAPI::~UsdMediaAssetPreviewsAPI()
-{
-}
+UsdMediaAssetPreviewsAPI::~UsdMediaAssetPreviewsAPI() {}
 
 /* static */
-UsdMediaAssetPreviewsAPI
-UsdMediaAssetPreviewsAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdMediaAssetPreviewsAPI UsdMediaAssetPreviewsAPI::Get(const UsdStagePtr& stage, const SdfPath& path) {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdMediaAssetPreviewsAPI();
@@ -37,25 +30,18 @@ UsdMediaAssetPreviewsAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
     return UsdMediaAssetPreviewsAPI(stage->GetPrimAtPath(path));
 }
 
-
 /* virtual */
-UsdSchemaKind UsdMediaAssetPreviewsAPI::_GetSchemaKind() const
-{
+UsdSchemaKind UsdMediaAssetPreviewsAPI::_GetSchemaKind() const {
     return UsdMediaAssetPreviewsAPI::schemaKind;
 }
 
 /* static */
-bool
-UsdMediaAssetPreviewsAPI::CanApply(
-    const UsdPrim &prim, std::string *whyNot)
-{
+bool UsdMediaAssetPreviewsAPI::CanApply(const UsdPrim& prim, std::string* whyNot) {
     return prim.CanApplyAPI<UsdMediaAssetPreviewsAPI>(whyNot);
 }
 
 /* static */
-UsdMediaAssetPreviewsAPI
-UsdMediaAssetPreviewsAPI::Apply(const UsdPrim &prim)
-{
+UsdMediaAssetPreviewsAPI UsdMediaAssetPreviewsAPI::Apply(const UsdPrim& prim) {
     if (prim.ApplyAPI<UsdMediaAssetPreviewsAPI>()) {
         return UsdMediaAssetPreviewsAPI(prim);
     }
@@ -63,35 +49,26 @@ UsdMediaAssetPreviewsAPI::Apply(const UsdPrim &prim)
 }
 
 /* static */
-const TfType &
-UsdMediaAssetPreviewsAPI::_GetStaticTfType()
-{
+const TfType& UsdMediaAssetPreviewsAPI::_GetStaticTfType() {
     static TfType tfType = TfType::Find<UsdMediaAssetPreviewsAPI>();
     return tfType;
 }
 
 /* static */
-bool 
-UsdMediaAssetPreviewsAPI::_IsTypedSchema()
-{
+bool UsdMediaAssetPreviewsAPI::_IsTypedSchema() {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdMediaAssetPreviewsAPI::_GetTfType() const
-{
+const TfType& UsdMediaAssetPreviewsAPI::_GetTfType() const {
     return _GetStaticTfType();
 }
 
 /*static*/
-const TfTokenVector&
-UsdMediaAssetPreviewsAPI::GetSchemaAttributeNames(bool includeInherited)
-{
+const TfTokenVector& UsdMediaAssetPreviewsAPI::GetSchemaAttributeNames(bool includeInherited) {
     static TfTokenVector localNames;
-    static TfTokenVector allNames =
-        UsdAPISchemaBase::GetSchemaAttributeNames(true);
+    static TfTokenVector allNames = UsdAPISchemaBase::GetSchemaAttributeNames(true);
 
     if (includeInherited)
         return allNames;
@@ -115,40 +92,30 @@ PXR_NAMESPACE_CLOSE_SCOPE
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-UsdMediaAssetPreviewsAPI::Thumbnails::Thumbnails(
-    const SdfAssetPath &defaultImage)
-    : defaultImage(defaultImage)
-{
-}
+UsdMediaAssetPreviewsAPI::Thumbnails::Thumbnails(const SdfAssetPath& defaultImage) : defaultImage(defaultImage) {}
 
-bool 
-UsdMediaAssetPreviewsAPI::GetDefaultThumbnails(
-    Thumbnails *defaultThumbnails) const
-{
-    if (!defaultThumbnails){
-        TF_CODING_ERROR("Failed to provide valid out-parameter "
-                        "`defaultThumbnails`");
+bool UsdMediaAssetPreviewsAPI::GetDefaultThumbnails(Thumbnails* defaultThumbnails) const {
+    if (!defaultThumbnails) {
+        TF_CODING_ERROR(
+                "Failed to provide valid out-parameter "
+                "`defaultThumbnails`");
         return false;
     }
 
     UsdPrim prim = GetPrim();
 
-    if (!prim.HasAPI<UsdMediaAssetPreviewsAPI>()){
+    if (!prim.HasAPI<UsdMediaAssetPreviewsAPI>()) {
         return false;
     }
 
-    VtValue thumbnailsVal = 
-        prim.GetAssetInfoByKey(UsdMediaTokens->previewThumbnailsDefault);
+    VtValue thumbnailsVal = prim.GetAssetInfoByKey(UsdMediaTokens->previewThumbnailsDefault);
 
-    if (thumbnailsVal.IsHolding<VtDictionary>()){
-        const VtDictionary &thumbnailsDict = 
-            thumbnailsVal.UncheckedGet<VtDictionary>();
+    if (thumbnailsVal.IsHolding<VtDictionary>()) {
+        const VtDictionary& thumbnailsDict = thumbnailsVal.UncheckedGet<VtDictionary>();
         // currently only care about the one key
-        if (VtDictionaryIsHolding<SdfAssetPath>(thumbnailsDict, 
-                                                UsdMediaTokens->defaultImage)){
+        if (VtDictionaryIsHolding<SdfAssetPath>(thumbnailsDict, UsdMediaTokens->defaultImage)) {
             defaultThumbnails->defaultImage =
-                thumbnailsDict.GetValueAtPath(UsdMediaTokens->defaultImage)->
-                UncheckedGet<SdfAssetPath>();
+                    thumbnailsDict.GetValueAtPath(UsdMediaTokens->defaultImage)->UncheckedGet<SdfAssetPath>();
             return true;
         }
     }
@@ -156,54 +123,43 @@ UsdMediaAssetPreviewsAPI::GetDefaultThumbnails(
     return false;
 }
 
-
-void 
-UsdMediaAssetPreviewsAPI::SetDefaultThumbnails(
-    const Thumbnails &defaultThumbnails) const
-{
+void UsdMediaAssetPreviewsAPI::SetDefaultThumbnails(const Thumbnails& defaultThumbnails) const {
     UsdPrim prim = GetPrim();
 
-    VtDictionary  thumbnails;
-    
+    VtDictionary thumbnails;
+
     thumbnails[UsdMediaTokens->defaultImage] = defaultThumbnails.defaultImage;
-    prim.SetAssetInfoByKey(UsdMediaTokens->previewThumbnailsDefault, 
-                           VtValue(thumbnails));
+    prim.SetAssetInfoByKey(UsdMediaTokens->previewThumbnailsDefault, VtValue(thumbnails));
 }
-    
-void 
-UsdMediaAssetPreviewsAPI::ClearDefaultThumbnails() const
-{
+
+void UsdMediaAssetPreviewsAPI::ClearDefaultThumbnails() const {
     UsdPrim prim = GetPrim();
 
     prim.ClearAssetInfoByKey(UsdMediaTokens->previewThumbnailsDefault);
 }
-    
+
 /* static */
-UsdMediaAssetPreviewsAPI 
-UsdMediaAssetPreviewsAPI::GetAssetDefaultPreviews(const std::string &layerPath)
-{
+UsdMediaAssetPreviewsAPI UsdMediaAssetPreviewsAPI::GetAssetDefaultPreviews(const std::string& layerPath) {
     return GetAssetDefaultPreviews(SdfLayer::FindOrOpen(layerPath));
 }
-    
+
 /* static */
-UsdMediaAssetPreviewsAPI 
-UsdMediaAssetPreviewsAPI::GetAssetDefaultPreviews(const SdfLayerHandle &layer)
-{
+UsdMediaAssetPreviewsAPI UsdMediaAssetPreviewsAPI::GetAssetDefaultPreviews(const SdfLayerHandle& layer) {
     if (!layer) {
         return UsdMediaAssetPreviewsAPI();
     }
-    
+
     SdfPath defaultPrimPath = layer->GetDefaultPrimAsPath();
     if (defaultPrimPath.IsEmpty()) {
         return UsdMediaAssetPreviewsAPI();
     }
-    
+
     static const TfToken noSuchPrim("__No_Such_Prim__");
     // Technique to limit population to a maximum depth
     SdfPath maskPath = defaultPrimPath.AppendChild(noSuchPrim);
-    UsdStagePopulationMask   mask({ maskPath });
+    UsdStagePopulationMask mask({maskPath});
 
-    if (UsdStageRefPtr minimalStage = UsdStage::OpenMasked(layer, mask)){
+    if (UsdStageRefPtr minimalStage = UsdStage::OpenMasked(layer, mask)) {
         UsdPrim defaultPrim = minimalStage->GetDefaultPrim();
         UsdMediaAssetPreviewsAPI ap(defaultPrim);
         // Hold the stage in the schema object so that it will stay

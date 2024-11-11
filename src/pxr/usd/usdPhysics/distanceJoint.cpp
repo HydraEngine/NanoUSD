@@ -14,11 +14,9 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType)
-{
-    TfType::Define<UsdPhysicsDistanceJoint,
-        TfType::Bases< UsdPhysicsJoint > >();
-    
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<UsdPhysicsDistanceJoint, TfType::Bases<UsdPhysicsJoint>>();
+
     // Register the usd prim typename as an alias under UsdSchemaBase. This
     // enables one to call
     // TfType::Find<UsdSchemaBase>().FindDerivedByName("PhysicsDistanceJoint")
@@ -28,14 +26,10 @@ TF_REGISTRY_FUNCTION(TfType)
 }
 
 /* virtual */
-UsdPhysicsDistanceJoint::~UsdPhysicsDistanceJoint()
-{
-}
+UsdPhysicsDistanceJoint::~UsdPhysicsDistanceJoint() {}
 
 /* static */
-UsdPhysicsDistanceJoint
-UsdPhysicsDistanceJoint::Get(const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdPhysicsDistanceJoint UsdPhysicsDistanceJoint::Get(const UsdStagePtr& stage, const SdfPath& path) {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdPhysicsDistanceJoint();
@@ -44,106 +38,73 @@ UsdPhysicsDistanceJoint::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 /* static */
-UsdPhysicsDistanceJoint
-UsdPhysicsDistanceJoint::Define(
-    const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdPhysicsDistanceJoint UsdPhysicsDistanceJoint::Define(const UsdStagePtr& stage, const SdfPath& path) {
     static TfToken usdPrimTypeName("PhysicsDistanceJoint");
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdPhysicsDistanceJoint();
     }
-    return UsdPhysicsDistanceJoint(
-        stage->DefinePrim(path, usdPrimTypeName));
+    return UsdPhysicsDistanceJoint(stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* virtual */
-UsdSchemaKind UsdPhysicsDistanceJoint::_GetSchemaKind() const
-{
+UsdSchemaKind UsdPhysicsDistanceJoint::_GetSchemaKind() const {
     return UsdPhysicsDistanceJoint::schemaKind;
 }
 
 /* static */
-const TfType &
-UsdPhysicsDistanceJoint::_GetStaticTfType()
-{
+const TfType& UsdPhysicsDistanceJoint::_GetStaticTfType() {
     static TfType tfType = TfType::Find<UsdPhysicsDistanceJoint>();
     return tfType;
 }
 
 /* static */
-bool 
-UsdPhysicsDistanceJoint::_IsTypedSchema()
-{
+bool UsdPhysicsDistanceJoint::_IsTypedSchema() {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdPhysicsDistanceJoint::_GetTfType() const
-{
+const TfType& UsdPhysicsDistanceJoint::_GetTfType() const {
     return _GetStaticTfType();
 }
 
-UsdAttribute
-UsdPhysicsDistanceJoint::GetMinDistanceAttr() const
-{
+UsdAttribute UsdPhysicsDistanceJoint::GetMinDistanceAttr() const {
     return GetPrim().GetAttribute(UsdPhysicsTokens->physicsMinDistance);
 }
 
-UsdAttribute
-UsdPhysicsDistanceJoint::CreateMinDistanceAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsMinDistance,
-                       SdfValueTypeNames->Float,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdPhysicsDistanceJoint::CreateMinDistanceAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsMinDistance, SdfValueTypeNames->Float,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
-UsdAttribute
-UsdPhysicsDistanceJoint::GetMaxDistanceAttr() const
-{
+UsdAttribute UsdPhysicsDistanceJoint::GetMaxDistanceAttr() const {
     return GetPrim().GetAttribute(UsdPhysicsTokens->physicsMaxDistance);
 }
 
-UsdAttribute
-UsdPhysicsDistanceJoint::CreateMaxDistanceAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsMaxDistance,
-                       SdfValueTypeNames->Float,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
+UsdAttribute UsdPhysicsDistanceJoint::CreateMaxDistanceAttr(VtValue const& defaultValue, bool writeSparsely) const {
+    return UsdSchemaBase::_CreateAttr(UsdPhysicsTokens->physicsMaxDistance, SdfValueTypeNames->Float,
+                                      /* custom = */ false, SdfVariabilityVarying, defaultValue, writeSparsely);
 }
 
 namespace {
-static inline TfTokenVector
-_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
-{
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector& left, const TfTokenVector& right) {
     TfTokenVector result;
     result.reserve(left.size() + right.size());
     result.insert(result.end(), left.begin(), left.end());
     result.insert(result.end(), right.begin(), right.end());
     return result;
 }
-}
+}  // namespace
 
 /*static*/
-const TfTokenVector&
-UsdPhysicsDistanceJoint::GetSchemaAttributeNames(bool includeInherited)
-{
+const TfTokenVector& UsdPhysicsDistanceJoint::GetSchemaAttributeNames(bool includeInherited) {
     static TfTokenVector localNames = {
-        UsdPhysicsTokens->physicsMinDistance,
-        UsdPhysicsTokens->physicsMaxDistance,
+            UsdPhysicsTokens->physicsMinDistance,
+            UsdPhysicsTokens->physicsMaxDistance,
     };
     static TfTokenVector allNames =
-        _ConcatenateAttributeNames(
-            UsdPhysicsJoint::GetSchemaAttributeNames(true),
-            localNames);
+            _ConcatenateAttributeNames(UsdPhysicsJoint::GetSchemaAttributeNames(true), localNames);
 
     if (includeInherited)
         return allNames;

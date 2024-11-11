@@ -16,7 +16,7 @@
 #include "pxr/usd/usd/stage.h"
 #include "pxr/usd/usdPhysics/tokens.h"
 
-#include "pxr/usd/usd/collectionAPI.h" 
+#include "pxr/usd/usd/collectionAPI.h"
 
 #include "pxr/base/vt/value.h"
 
@@ -37,17 +37,16 @@ class SdfAssetPath;
 
 /// \class UsdPhysicsCollisionGroup
 ///
-/// Defines a collision group for coarse filtering. When a collision 
+/// Defines a collision group for coarse filtering. When a collision
 /// occurs between two objects that have a PhysicsCollisionGroup assigned,
-/// they will collide with each other unless this PhysicsCollisionGroup pair 
+/// they will collide with each other unless this PhysicsCollisionGroup pair
 /// is filtered. See filteredGroups attribute.
-/// 
-/// A CollectionAPI:colliders maintains a list of PhysicsCollisionAPI rel-s that 
-/// defines the members of this Collisiongroup.
-/// 
 ///
-class UsdPhysicsCollisionGroup : public UsdTyped
-{
+/// A CollectionAPI:colliders maintains a list of PhysicsCollisionAPI rel-s that
+/// defines the members of this Collisiongroup.
+///
+///
+class UsdPhysicsCollisionGroup : public UsdTyped {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -58,18 +57,12 @@ public:
     /// Equivalent to UsdPhysicsCollisionGroup::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdPhysicsCollisionGroup(const UsdPrim& prim=UsdPrim())
-        : UsdTyped(prim)
-    {
-    }
+    explicit UsdPhysicsCollisionGroup(const UsdPrim& prim = UsdPrim()) : UsdTyped(prim) {}
 
     /// Construct a UsdPhysicsCollisionGroup on the prim held by \p schemaObj .
     /// Should be preferred over UsdPhysicsCollisionGroup(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdPhysicsCollisionGroup(const UsdSchemaBase& schemaObj)
-        : UsdTyped(schemaObj)
-    {
-    }
+    explicit UsdPhysicsCollisionGroup(const UsdSchemaBase& schemaObj) : UsdTyped(schemaObj) {}
 
     /// Destructor.
     USDPHYSICS_API
@@ -79,8 +72,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDPHYSICS_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdPhysicsCollisionGroup holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -92,8 +84,7 @@ public:
     /// \endcode
     ///
     USDPHYSICS_API
-    static UsdPhysicsCollisionGroup
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdPhysicsCollisionGroup Get(const UsdStagePtr& stage, const SdfPath& path);
 
     /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
     /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -118,8 +109,7 @@ public:
     /// the opinion at the current EditTarget.
     ///
     USDPHYSICS_API
-    static UsdPhysicsCollisionGroup
-    Define(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdPhysicsCollisionGroup Define(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -132,17 +122,17 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDPHYSICS_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDPHYSICS_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // MERGEGROUPNAME 
+    // MERGEGROUPNAME
     // --------------------------------------------------------------------- //
     /// If non-empty, any collision groups in a stage with a matching
     /// mergeGroup should be considered to refer to the same collection. Matching
@@ -157,17 +147,17 @@ public:
     USDPHYSICS_API
     UsdAttribute GetMergeGroupNameAttr() const;
 
-    /// See GetMergeGroupNameAttr(), and also 
+    /// See GetMergeGroupNameAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateMergeGroupNameAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateMergeGroupNameAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // INVERTFILTEREDGROUPS 
+    // INVERTFILTEREDGROUPS
     // --------------------------------------------------------------------- //
     /// Normally, the filter will disable collisions against the selected
     /// filter groups. However, if this option is set, the filter will disable
@@ -182,36 +172,37 @@ public:
     USDPHYSICS_API
     UsdAttribute GetInvertFilteredGroupsAttr() const;
 
-    /// See GetInvertFilteredGroupsAttr(), and also 
+    /// See GetInvertFilteredGroupsAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateInvertFilteredGroupsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateInvertFilteredGroupsAttr(VtValue const& defaultValue = VtValue(),
+                                                bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // FILTEREDGROUPS 
+    // FILTEREDGROUPS
     // --------------------------------------------------------------------- //
-    /// References a list of PhysicsCollisionGroups with which 
+    /// References a list of PhysicsCollisionGroups with which
     /// collisions should be ignored.
     ///
     USDPHYSICS_API
     UsdRelationship GetFilteredGroupsRel() const;
 
-    /// See GetFilteredGroupsRel(), and also 
+    /// See GetFilteredGroupsRel(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create
     USDPHYSICS_API
     UsdRelationship CreateFilteredGroupsRel() const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
@@ -220,43 +211,39 @@ public:
     /// Return the UsdCollectionAPI interface used for defining
     /// what colliders belong to the CollisionGroup.
     USDPHYSICS_API
-    UsdCollectionAPI GetCollidersCollectionAPI() const;    
+    UsdCollectionAPI GetCollidersCollectionAPI() const;
 
-    /// Utility structure generated by ComputeCollisionGroupTable(); contains a 
-    /// table describing which pairs of collision groups have collisions 
+    /// Utility structure generated by ComputeCollisionGroupTable(); contains a
+    /// table describing which pairs of collision groups have collisions
     /// enabled/disabled by the filtering rules.
-    struct CollisionGroupTable
-    {
-        /// Return the set of all UsdPhysicsCollisionGroup which this table 
+    struct CollisionGroupTable {
+        /// Return the set of all UsdPhysicsCollisionGroup which this table
         /// contains
         USDPHYSICS_API
         const SdfPathVector& GetCollisionGroups() const;
 
         /// Return true if the groups at indices \a idxA and \a idxB collide
         USDPHYSICS_API
-        bool IsCollisionEnabled(const unsigned int idxA, 
-                const unsigned int idxB) const;
+        bool IsCollisionEnabled(const unsigned int idxA, const unsigned int idxB) const;
 
         /// Return true if the groups \a primA and \a primB collide
         USDPHYSICS_API
-        bool IsCollisionEnabled(const SdfPath& primA, 
-                const SdfPath& primB) const;
+        bool IsCollisionEnabled(const SdfPath& primA, const SdfPath& primB) const;
 
     protected:
         friend class UsdPhysicsCollisionGroup;
         // < All collision groups known to this table
-        SdfPathVector _groups; 
-        // < 2D table, with one element per collision-group-pair. Entry is false 
+        SdfPathVector _groups;
+        // < 2D table, with one element per collision-group-pair. Entry is false
         // if collision is disabled by a filtering rule.
-        std::vector<bool> _enabled; 
+        std::vector<bool> _enabled;
     };
 
-    /// Compute a table encoding all the collision groups filter rules for a 
-    /// stage. This can be used as a reference to validate an implementation of 
-    /// the collision groups filters. The returned table is diagonally 
+    /// Compute a table encoding all the collision groups filter rules for a
+    /// stage. This can be used as a reference to validate an implementation of
+    /// the collision groups filters. The returned table is diagonally
     /// symmetric.
-    static USDPHYSICS_API
-    CollisionGroupTable ComputeCollisionGroupTable(const UsdStage& stage);
+    static USDPHYSICS_API CollisionGroupTable ComputeCollisionGroupTable(const UsdStage& stage);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

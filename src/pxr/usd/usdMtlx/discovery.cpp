@@ -24,19 +24,14 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 namespace {
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
-    ((discoveryType, "mtlx"))
-);
+TF_DEFINE_PRIVATE_TOKENS(_tokens, ((discoveryType, "mtlx")));
 
 // Maps a nodedef name to its NdrNode name.
 using _NameMapping = std::map<std::string, std::string>;
 
 // Fill the name mapping with the shortest name found in the inheritance
 // hierarchy:
-void
-_MapNodeNamesToBaseForVersioning(mx::ConstElementPtr mtlx, _NameMapping* mapping)
-{
+void _MapNodeNamesToBaseForVersioning(mx::ConstElementPtr mtlx, _NameMapping* mapping) {
     TRACE_FUNCTION();
 
     static const std::string inheritAttr("inherit");
@@ -54,8 +49,7 @@ _MapNodeNamesToBaseForVersioning(mx::ConstElementPtr mtlx, _NameMapping* mapping
             if (current->getName().size() < shortestName->size()) {
                 shortestName = &current->getName();
             }
-        }
-        else {
+        } else {
             break;
         }
     }
@@ -78,22 +72,19 @@ _MapNodeNamesToBaseForVersioning(mx::ConstElementPtr mtlx, _NameMapping* mapping
             if (!r.second && shortestName->size() < r.first->second.size()) {
                 r.first->second = *shortestName;
             }
-        }
-        else {
+        } else {
             break;
         }
     }
 }
 
 // Choose an Ndr name based on compatible MaterialX nodedef names.
-_NameMapping
-_ComputeNameMapping(const mx::ConstDocumentPtr& doc)
-{
+_NameMapping _ComputeNameMapping(const mx::ConstDocumentPtr& doc) {
     TRACE_FUNCTION();
 
     _NameMapping result;
 
-    // For each nodeDef with an inheritance chain, we populate the 
+    // For each nodeDef with an inheritance chain, we populate the
     // _NameMapping with the shortest name found in the inheritance
     // hierarchy
     //
@@ -110,7 +101,7 @@ _ComputeNameMapping(const mx::ConstDocumentPtr& doc)
     //
     // So we need to traverse the hierarchy, and at each point pick the
     // shortest name.
-    for (auto&& mtlxNodeDef: doc->getNodeDefs()) {
+    for (auto&& mtlxNodeDef : doc->getNodeDefs()) {
         if (mtlxNodeDef->hasInheritString()) {
             _MapNodeNamesToBaseForVersioning(mtlxNodeDef, &result);
         }
@@ -120,44 +111,31 @@ _ComputeNameMapping(const mx::ConstDocumentPtr& doc)
 }
 
 // Return the Ndr name for a nodedef name.
-std::string
-_ChooseName(const std::string& nodeDefName, const _NameMapping& nameMapping)
-{
+std::string _ChooseName(const std::string& nodeDefName, const _NameMapping& nameMapping) {
     TRACE_FUNCTION();
 
     auto i = nameMapping.find(nodeDefName);
     return i == nameMapping.end() ? nodeDefName : i->second;
 }
 
-static
-void
-_DiscoverNodes(
-    NdrNodeDiscoveryResultVec* result,
-    const mx::ConstDocumentPtr& doc,
-    const NdrDiscoveryUri& fileResult,
-    const _NameMapping& nameMapping)
-{
+static void _DiscoverNodes(NdrNodeDiscoveryResultVec* result,
+                           const mx::ConstDocumentPtr& doc,
+                           const NdrDiscoveryUri& fileResult,
+                           const _NameMapping& nameMapping) {
     TRACE_FUNCTION();
 
     static const TfToken family = TfToken();
 
     // Get the node definitions
-    for (auto&& nodeDef: doc->getNodeDefs()) {
+    for (auto&& nodeDef : doc->getNodeDefs()) {
         bool implicitDefault;
-        result->emplace_back(
-            NdrIdentifier(nodeDef->getName()),
-            UsdMtlxGetVersion(nodeDef, &implicitDefault),
-            _ChooseName(nodeDef->getName(), nameMapping),
-            TfToken(nodeDef->getNodeString()),
-            _tokens->discoveryType,
-            _tokens->discoveryType,
-            fileResult.uri,
-            fileResult.resolvedUri
-        );
+        result->emplace_back(NdrIdentifier(nodeDef->getName()), UsdMtlxGetVersion(nodeDef, &implicitDefault),
+                             _ChooseName(nodeDef->getName(), nameMapping), TfToken(nodeDef->getNodeString()),
+                             _tokens->discoveryType, _tokens->discoveryType, fileResult.uri, fileResult.resolvedUri);
     }
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
 /// Discovers nodes in MaterialX files.
 class UsdMtlxDiscoveryPlugin : public NdrDiscoveryPlugin {
@@ -178,17 +156,14 @@ private:
     NdrStringVec _allSearchPaths;
 };
 
-UsdMtlxDiscoveryPlugin::UsdMtlxDiscoveryPlugin()
-{
+UsdMtlxDiscoveryPlugin::UsdMtlxDiscoveryPlugin() {
     TRACE_FUNCTION();
 
     _customSearchPaths = UsdMtlxCustomSearchPaths();
     _allSearchPaths = UsdMtlxSearchPaths();
 }
 
-NdrNodeDiscoveryResultVec
-UsdMtlxDiscoveryPlugin::DiscoverNodes(const Context& context)
-{
+NdrNodeDiscoveryResultVec UsdMtlxDiscoveryPlugin::DiscoverNodes(const Context& context) {
     TRACE_FUNCTION();
 
     NdrNodeDiscoveryResultVec result;
@@ -201,28 +176,21 @@ UsdMtlxDiscoveryPlugin::DiscoverNodes(const Context& context)
     // read each document separately and merge them.
     if (auto document = UsdMtlxGetDocument("")) {
         // Identify as the standard library
-        _DiscoverNodes(&result, document, {"mtlx", "mtlx"},
-                       _ComputeNameMapping(document));
+        _DiscoverNodes(&result, document, {"mtlx", "mtlx"}, _ComputeNameMapping(document));
     }
 
     // Find the mtlx files from other search paths.
-    for (auto&& fileResult:
-            NdrFsHelpersDiscoverFiles(
-                _customSearchPaths,
-                UsdMtlxStandardFileExtensions(),
-                TfGetenvBool("USDMTLX_PLUGIN_FOLLOW_SYMLINKS", false))) {
+    for (auto&& fileResult : NdrFsHelpersDiscoverFiles(_customSearchPaths, UsdMtlxStandardFileExtensions(),
+                                                       TfGetenvBool("USDMTLX_PLUGIN_FOLLOW_SYMLINKS", false))) {
         if (auto document = UsdMtlxGetDocument(fileResult.resolvedUri)) {
-            _DiscoverNodes(&result, document, fileResult,
-                           _ComputeNameMapping(document));
+            _DiscoverNodes(&result, document, fileResult, _ComputeNameMapping(document));
         }
     }
 
     return result;
 }
 
-const NdrStringVec&
-UsdMtlxDiscoveryPlugin::GetSearchURIs() const
-{
+const NdrStringVec& UsdMtlxDiscoveryPlugin::GetSearchURIs() const {
     TRACE_FUNCTION();
 
     return _allSearchPaths;

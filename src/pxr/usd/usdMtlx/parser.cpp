@@ -29,39 +29,19 @@ PXR_NAMESPACE_OPEN_SCOPE
 namespace {
 
 TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
+        _tokens,
 
-    ((discoveryType, "mtlx"))
-    ((sourceType, ""))
+        ((discoveryType, "mtlx"))((sourceType, ""))
 
-    (defaultgeomprop)
-    (defaultinput)
-    (doc)
-    ((enum_, "enum"))
-    (enumvalues)
-    (nodecategory)
-    (nodegroup)
-    (target)
-    (uifolder)
-    (uimax)
-    (uimin)
-    (uiname)
-    (uisoftmax)
-    (uisoftmin)
-    (uistep)
-    (unit)
-    (unittype)
-    (UV0)
-);
+                (defaultgeomprop)(defaultinput)(doc)((enum_, "enum"))(
+                        enumvalues)(nodecategory)(nodegroup)(target)(uifolder)(uimax)(uimin)(uiname)(uisoftmax)(uisoftmin)(uistep)(unit)(unittype)(UV0));
 
 // This environment variable lets users override the name of the primary
 // UV set that MaterialX should look for.  If it's empty, it uses the USD
 // default, "st".
-TF_DEFINE_ENV_SETTING(USDMTLX_PRIMARY_UV_NAME, "",
-    "The name usdMtlx should use to reference the primary UV set.");
+TF_DEFINE_ENV_SETTING(USDMTLX_PRIMARY_UV_NAME, "", "The name usdMtlx should use to reference the primary UV set.");
 
-static const std::string _GetPrimaryUvSetName()
-{
+static const std::string _GetPrimaryUvSetName() {
     TRACE_FUNCTION();
 
     static const std::string env = TfGetEnvSetting(USDMTLX_PRIMARY_UV_NAME);
@@ -77,38 +57,26 @@ static const std::string _GetPrimaryUvSetName()
 struct ShaderBuilder {
 public:
     ShaderBuilder(const NdrNodeDiscoveryResult& discoveryResult)
-        : discoveryResult(discoveryResult)
-        , valid(true) 
-        , metadata(discoveryResult.metadata) { }
+        : discoveryResult(discoveryResult), valid(true), metadata(discoveryResult.metadata) {}
 
-    void SetInvalid()              { valid = false; }
+    void SetInvalid() { valid = false; }
     explicit operator bool() const { return valid; }
-    bool operator !() const        { return !valid; }
+    bool operator!() const { return !valid; }
 
-    NdrNodeUniquePtr Build()
-    {
+    NdrNodeUniquePtr Build() {
         TRACE_FUNCTION();
 
         if (!*this) {
             return NdrParserPlugin::GetInvalidNode(discoveryResult);
         }
 
-        return NdrNodeUniquePtr(
-                new SdrShaderNode(discoveryResult.identifier,
-                                  discoveryResult.version,
-                                  discoveryResult.name,
-                                  discoveryResult.family,
-                                  context,
-                                  discoveryResult.sourceType,
-                                  definitionURI,
-                                  implementationURI,
-                                  std::move(properties),
-                                  std::move(metadata)));
+        return NdrNodeUniquePtr(new SdrShaderNode(discoveryResult.identifier, discoveryResult.version,
+                                                  discoveryResult.name, discoveryResult.family, context,
+                                                  discoveryResult.sourceType, definitionURI, implementationURI,
+                                                  std::move(properties), std::move(metadata)));
     }
 
-    void AddPropertyNameRemapping(const std::string& from,
-                                  const std::string& to)
-    {
+    void AddPropertyNameRemapping(const std::string& from, const std::string& to) {
         TRACE_FUNCTION();
 
         if (from != to) {
@@ -117,8 +85,9 @@ public:
     }
 
     void AddProperty(const mx::ConstTypedElementPtr& element,
-                     bool isOutput, NdrStringVec *primvars, 
-                     bool addedTexcoordPrimvar=false);
+                     bool isOutput,
+                     NdrStringVec* primvars,
+                     bool addedTexcoordPrimvar = false);
 
 public:
     const NdrNodeDiscoveryResult& discoveryResult;
@@ -134,14 +103,10 @@ private:
     std::map<std::string, std::string> _propertyNameRemapping;
 };
 
-static
-void
-ParseMetadata(
-    NdrTokenMap& metadata,
-    const TfToken& key,
-    const mx::ConstElementPtr& element,
-    const std::string& attribute)
-{
+static void ParseMetadata(NdrTokenMap& metadata,
+                          const TfToken& key,
+                          const mx::ConstElementPtr& element,
+                          const std::string& attribute) {
     TRACE_FUNCTION();
 
     const auto& value = element->getAttribute(attribute);
@@ -150,13 +115,7 @@ ParseMetadata(
     }
 }
 
-static
-void
-ParseMetadata(
-    NdrTokenMap& metadata,
-    const TfToken& key,
-    const mx::ConstElementPtr& element)
-{
+static void ParseMetadata(NdrTokenMap& metadata, const TfToken& key, const mx::ConstElementPtr& element) {
     TRACE_FUNCTION();
 
     const auto& value = element->getAttribute(key);
@@ -165,13 +124,7 @@ ParseMetadata(
     }
 }
 
-static
-void
-ParseOptions(
-    NdrOptionVec& options,
-    const mx::ConstElementPtr& element
-)
-{
+static void ParseOptions(NdrOptionVec& options, const mx::ConstElementPtr& element) {
     TRACE_FUNCTION();
 
     const auto& enumLabels = element->getAttribute(_tokens->enum_);
@@ -186,9 +139,7 @@ ParseOptions(
     if (!allValues.empty() && allValues.size() != allLabels.size()) {
         // An array of vector2 values will produce twice the expected number of
         // elements. We can fix that by regrouping them.
-        if (allValues.size() > allLabels.size() &&
-            allValues.size() % allLabels.size() == 0) {
-
+        if (allValues.size() > allLabels.size() && allValues.size() % allLabels.size() == 0) {
             size_t stride = allValues.size() / allLabels.size();
             std::vector<std::string> rebuiltValues;
             std::string currentValue;
@@ -197,7 +148,7 @@ ParseOptions(
                     currentValue += mx::ARRAY_PREFERRED_SEPARATOR;
                 }
                 currentValue += allValues[i];
-                if ((i+1) % stride == 0) {
+                if ((i + 1) % stride == 0) {
                     rebuiltValues.push_back(currentValue);
                     currentValue = "";
                 }
@@ -220,11 +171,10 @@ ParseOptions(
     }
 }
 
-void
-ShaderBuilder::AddProperty(
-    const mx::ConstTypedElementPtr& element,
-    bool isOutput, NdrStringVec *primvars, bool addedTexcoordPrimvar)
-{
+void ShaderBuilder::AddProperty(const mx::ConstTypedElementPtr& element,
+                                bool isOutput,
+                                NdrStringVec* primvars,
+                                bool addedTexcoordPrimvar) {
     TRACE_FUNCTION();
 
     TfToken type;
@@ -242,23 +192,19 @@ ShaderBuilder::AddProperty(
             // Do not use GetAsToken for comparison as recommended in the API
             if (converted.valueTypeName == SdfValueTypeNames->Bool ||
                 converted.valueTypeName == SdfValueTypeNames->Matrix3d) {
-                 defaultValue = UsdMtlxGetUsdValue(element, isOutput);
-                 metadata.emplace(SdrPropertyMetadata->SdrUsdDefinitionType,
-                    converted.valueTypeName.GetAliasesAsTokens().front());
+                defaultValue = UsdMtlxGetUsdValue(element, isOutput);
+                metadata.emplace(SdrPropertyMetadata->SdrUsdDefinitionType,
+                                 converted.valueTypeName.GetAliasesAsTokens().front());
             }
-        }
-        else {
+        } else {
             type = TfToken(mtlxType);
 
             // This could be a custom type.  Check the document.
             if (!element->getDocument()->getTypeDef(mtlxType)) {
-                TF_WARN("MaterialX unrecognized type %s on %s",
-                        mtlxType.c_str(),
-                        element->getNamePath().c_str());
+                TF_WARN("MaterialX unrecognized type %s on %s", mtlxType.c_str(), element->getNamePath().c_str());
             }
         }
-    }
-    else {
+    } else {
         // Get the sdr type.
         type = converted.shaderPropertyType;
         if (converted.valueTypeName.IsArray() && converted.arraySize == 0) {
@@ -294,8 +240,7 @@ ShaderBuilder::AddProperty(
     // Record the colorspace on inputs and outputs.
     if (isOutput || element->isA<mx::Input>()) {
         const auto& colorspace = element->getColorSpace();
-        if (!colorspace.empty() &&
-                colorspace != element->getParent()->getActiveColorSpace()) {
+        if (!colorspace.empty() && colorspace != element->getParent()->getActiveColorSpace()) {
             metadata.emplace(SdrPropertyMetadata->Colorspace, colorspace);
         }
     }
@@ -305,7 +250,6 @@ ShaderBuilder::AddProperty(
 
     // Record builtin primvar references for this node's inputs.
     if (!isOutput && primvars != nullptr) {
-
         // If an input has "defaultgeomprop", that means it reads from the
         // primvar specified unless connected. We mark these in Sdr as
         // always-required primvars; note that this means we might overestimate
@@ -351,12 +295,9 @@ ShaderBuilder::AddProperty(
         ParseMetadata(metadata, _tokens->unittype, element);
         ParseMetadata(metadata, _tokens->defaultgeomprop, element);
 
-        if (!metadata.count(SdrPropertyMetadata->Help) &&
-             metadata.count(_tokens->unit)) {
+        if (!metadata.count(SdrPropertyMetadata->Help) && metadata.count(_tokens->unit)) {
             // The unit can be helpful if there is no documentation.
-            metadata.emplace(SdrPropertyMetadata->Help,
-                             TfStringPrintf("Unit is %s.",
-                                            metadata[_tokens->unit].c_str()));
+            metadata.emplace(SdrPropertyMetadata->Help, TfStringPrintf("Unit is %s.", metadata[_tokens->unit].c_str()));
         }
 
         for (const auto& pair : metadata) {
@@ -364,8 +305,7 @@ ShaderBuilder::AddProperty(
             const std::string attrValue = pair.second;
 
             const auto& allTokens = SdrPropertyMetadata->allTokens;
-            if (std::find(allTokens.begin(), allTokens.end(), attrName) !=
-                allTokens.end()) {
+            if (std::find(allTokens.begin(), allTokens.end(), attrName) != allTokens.end()) {
                 continue;
             }
 
@@ -377,46 +317,29 @@ ShaderBuilder::AddProperty(
     }
 
     // Add the property.
-    properties.push_back(
-        SdrShaderPropertyUniquePtr(
-            new SdrShaderProperty(TfToken(name),
-                                  type,
-                                  defaultValue,
-                                  isOutput,
-                                  converted.arraySize,
-                                  metadata,
-                                  hints,
-                                  options)));
+    properties.push_back(SdrShaderPropertyUniquePtr(new SdrShaderProperty(
+            TfToken(name), type, defaultValue, isOutput, converted.arraySize, metadata, hints, options)));
 }
 
-static
-void
-ParseMetadata(
-    ShaderBuilder* builder,
-    const TfToken& key,
-    const mx::ConstElementPtr& element,
-    const std::string& attribute)
-{
+static void ParseMetadata(ShaderBuilder* builder,
+                          const TfToken& key,
+                          const mx::ConstElementPtr& element,
+                          const std::string& attribute) {
     TRACE_FUNCTION();
 
     const auto& value = element->getAttribute(attribute);
     if (!value.empty()) {
-        // Change the 'texture2d' and 'texture3d' roles for stdlib MaterialX 
+        // Change the 'texture2d' and 'texture3d' roles for stdlib MaterialX
         // Texture nodes to 'texture' for Sdr.
-        if (key == SdrNodeMetadata->Role && 
-            (value == "texture2d" || value == "texture3d")) {
+        if (key == SdrNodeMetadata->Role && (value == "texture2d" || value == "texture3d")) {
             builder->metadata[key] = "texture";
-        }
-        else {
+        } else {
             builder->metadata[key] = value;
         }
     }
 }
 
-static
-TfToken
-GetContext(const mx::ConstDocumentPtr& doc, const std::string& type)
-{
+static TfToken GetContext(const mx::ConstDocumentPtr& doc, const std::string& type) {
     TRACE_FUNCTION();
 
     if (doc) {
@@ -430,10 +353,7 @@ GetContext(const mx::ConstDocumentPtr& doc, const std::string& type)
     return TfToken();
 }
 
-static
-void
-ParseElement(ShaderBuilder* builder, const mx::ConstNodeDefPtr& nodeDef)
-{
+static void ParseElement(ShaderBuilder* builder, const mx::ConstNodeDefPtr& nodeDef) {
     TRACE_FUNCTION();
 
     if (!TF_VERIFY(nodeDef)) {
@@ -454,8 +374,8 @@ ParseElement(ShaderBuilder* builder, const mx::ConstNodeDefPtr& nodeDef)
 
     // Build the basic shader node info. We are filling in implementationURI
     // as a placeholder - it should get set to a more acccurate value by caller.
-    builder->context           = context;
-    builder->definitionURI     = UsdMtlxGetSourceURI(nodeDef);
+    builder->context = context;
+    builder->definitionURI = UsdMtlxGetSourceURI(nodeDef);
     builder->implementationURI = builder->definitionURI;
 
     // Metadata
@@ -474,22 +394,22 @@ ParseElement(ShaderBuilder* builder, const mx::ConstNodeDefPtr& nodeDef)
     if (TfStringStartsWith(nodeDef->getName(), "ND_geompropvalue")) {
         primvars.push_back("$geomprop");
     }
-    // If the nodeDef name is ND_texcoord_vector2, it is using texture 
-    // coordinates and we want to add the default texturecoordinate name 
+    // If the nodeDef name is ND_texcoord_vector2, it is using texture
+    // coordinates and we want to add the default texturecoordinate name
     // to the list of referenced primvars.
     if (nodeDef->getName() == "ND_texcoord_vector2") {
         primvars.push_back(_GetPrimaryUvSetName());
     }
     // For custom nodes that use textures or texcoords, look through the
-    // implementation nodegraph to find the texcoord, geompropvalue, 
-    // or stdlib image/tiledimage node and add the appropriate primvar to  
+    // implementation nodegraph to find the texcoord, geompropvalue,
+    // or stdlib image/tiledimage node and add the appropriate primvar to
     // the list of referenced primvars.
     bool addedTexcoordPrimvar = false;
     const mx::InterfaceElementPtr& impl = nodeDef->getImplementation();
     if (impl && impl->isA<mx::NodeGraph>()) {
         // Add primvar name for geompropvalue nodes.
-        // XXX Using '$geomprop' here does not get replaced with the 
-        // appropriate primvar name. 
+        // XXX Using '$geomprop' here does not get replaced with the
+        // appropriate primvar name.
         const mx::NodeGraphPtr ng = impl->asA<mx::NodeGraph>();
         for (const mx::NodePtr& geompropNode : ng->getNodes("geompropvalue")) {
             if (const mx::InputPtr& input = geompropNode->getInput("geomprop")) {
@@ -506,11 +426,10 @@ ParseElement(ShaderBuilder* builder, const mx::ConstNodeDefPtr& nodeDef)
             primvars.push_back(_GetPrimaryUvSetName());
             addedTexcoordPrimvar = true;
         }
-        // Add the default texture coordinate name with an image/tiledimage 
-        // node if we have not yet added a texcoordPrimvar name. 
+        // Add the default texture coordinate name with an image/tiledimage
+        // node if we have not yet added a texcoordPrimvar name.
         if (!addedTexcoordPrimvar) {
-            if (ng->getNodes("tiledimage").size() != 0 ||
-                ng->getNodes("image").size() != 0) {
+            if (ng->getNodes("tiledimage").size() != 0 || ng->getNodes("image").size() != 0) {
                 primvars.push_back(_GetPrimaryUvSetName());
                 addedTexcoordPrimvar = true;
             }
@@ -521,8 +440,7 @@ ParseElement(ShaderBuilder* builder, const mx::ConstNodeDefPtr& nodeDef)
     static const std::string internalgeompropsName("internalgeomprops");
     const auto& internalgeomprops = nodeDef->getAttribute(internalgeompropsName);
     if (!internalgeomprops.empty()) {
-        std::vector<std::string> split =
-            UsdMtlxSplitStringArray(internalgeomprops);
+        std::vector<std::string> split = UsdMtlxSplitStringArray(internalgeomprops);
         // Note: MaterialX uses a default texcoord of "UV0", which we
         // inline replace with the configured default.
         for (auto& name : split) {
@@ -534,19 +452,18 @@ ParseElement(ShaderBuilder* builder, const mx::ConstNodeDefPtr& nodeDef)
     }
 
     // Properties
-    for (const auto& mtlxInput: nodeDef->getActiveInputs()) {
+    for (const auto& mtlxInput : nodeDef->getActiveInputs()) {
         builder->AddProperty(mtlxInput, false, &primvars, addedTexcoordPrimvar);
     }
 
-    for (const auto& mtlxOutput: nodeDef->getActiveOutputs()) {
+    for (const auto& mtlxOutput : nodeDef->getActiveOutputs()) {
         builder->AddProperty(mtlxOutput, true, nullptr);
     }
 
-    builder->metadata[SdrNodeMetadata->Primvars] =
-        TfStringJoin(primvars.begin(), primvars.end(), "|");
+    builder->metadata[SdrNodeMetadata->Primvars] = TfStringJoin(primvars.begin(), primvars.end(), "|");
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
 /// Parses nodes in MaterialX files.
 class UsdMtlxParserPlugin : public NdrParserPlugin {
@@ -554,23 +471,18 @@ public:
     UsdMtlxParserPlugin() = default;
     ~UsdMtlxParserPlugin() override = default;
 
-    NdrNodeUniquePtr Parse(
-        const NdrNodeDiscoveryResult& discoveryResult) override;
+    NdrNodeUniquePtr Parse(const NdrNodeDiscoveryResult& discoveryResult) override;
     const NdrTokenVec& GetDiscoveryTypes() const override;
     const TfToken& GetSourceType() const override;
 };
 
-NdrNodeUniquePtr
-UsdMtlxParserPlugin::Parse(const NdrNodeDiscoveryResult& discoveryResult)
-{
+NdrNodeUniquePtr UsdMtlxParserPlugin::Parse(const NdrNodeDiscoveryResult& discoveryResult) {
     TRACE_FUNCTION();
 
     MaterialX::ConstDocumentPtr document = nullptr;
     // Get the MaterialX document.
     if (!discoveryResult.resolvedUri.empty()) {
-        document =
-            UsdMtlxGetDocument(discoveryResult.resolvedUri == "mtlx"
-                            ? "" : discoveryResult.resolvedUri);
+        document = UsdMtlxGetDocument(discoveryResult.resolvedUri == "mtlx" ? "" : discoveryResult.resolvedUri);
         if (!TF_VERIFY(document)) {
             return GetInvalidNode(discoveryResult);
         }
@@ -582,15 +494,14 @@ UsdMtlxParserPlugin::Parse(const NdrNodeDiscoveryResult& discoveryResult)
         }
     } else {
         TF_WARN("Invalid NdrNodeDiscoveryResult for identifier '%s': both "
-            "resolvedUri and sourceCode fields are empty.", 
-            discoveryResult.identifier.GetText());
+                "resolvedUri and sourceCode fields are empty.",
+                discoveryResult.identifier.GetText());
         return GetInvalidNode(discoveryResult);
     }
 
     auto nodeDef = document->getNodeDef(discoveryResult.identifier);
     if (!nodeDef) {
-        TF_WARN("Invalid MaterialX NodeDef; unknown node name ' %s '",
-            discoveryResult.identifier.GetText());
+        TF_WARN("Invalid MaterialX NodeDef; unknown node name ' %s '", discoveryResult.identifier.GetText());
         return GetInvalidNode(discoveryResult);
     }
 
@@ -600,20 +511,14 @@ UsdMtlxParserPlugin::Parse(const NdrNodeDiscoveryResult& discoveryResult)
     return builder.Build();
 }
 
-const NdrTokenVec&
-UsdMtlxParserPlugin::GetDiscoveryTypes() const
-{
+const NdrTokenVec& UsdMtlxParserPlugin::GetDiscoveryTypes() const {
     TRACE_FUNCTION();
 
-    static const NdrTokenVec discoveryTypes = {
-        _tokens->discoveryType
-    };
+    static const NdrTokenVec discoveryTypes = {_tokens->discoveryType};
     return discoveryTypes;
 }
 
-const TfToken&
-UsdMtlxParserPlugin::GetSourceType() const
-{
+const TfToken& UsdMtlxParserPlugin::GetSourceType() const {
     TRACE_FUNCTION();
 
     return _tokens->sourceType;

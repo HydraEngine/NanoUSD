@@ -19,23 +19,22 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 /// Return *stage*'s authored *kilogramsPerUnit*, or 1.0 if unauthored.
 USDPHYSICS_API
-double UsdPhysicsGetStageKilogramsPerUnit(const UsdStageWeakPtr &stage);
+double UsdPhysicsGetStageKilogramsPerUnit(const UsdStageWeakPtr& stage);
 
 /// Return whether *stage* has an authored *kilogramsPerUnit*.
 USDPHYSICS_API
-bool UsdPhysicsStageHasAuthoredKilogramsPerUnit(const UsdStageWeakPtr &stage);
+bool UsdPhysicsStageHasAuthoredKilogramsPerUnit(const UsdStageWeakPtr& stage);
 
 /// Author *stage*'s *kilogramsPerUnit*.
 ///
 /// \return true if kilogramsPerUnit was successfully set.  The stage's
 /// UsdEditTarget must be either its root layer or session layer.
 USDPHYSICS_API
-bool UsdPhysicsSetStageKilogramsPerUnit(const UsdStageWeakPtr &stage,
-                                       double kilogramsPerUnit);
+bool UsdPhysicsSetStageKilogramsPerUnit(const UsdStageWeakPtr& stage, double kilogramsPerUnit);
 
 /// Return *true* if the two given metrics are within the provided
 /// relative *epsilon* of each other, when you need to know an absolute
-/// metric rather than a scaling factor.  
+/// metric rather than a scaling factor.
 ///
 /// Use like so:
 /// \code
@@ -50,8 +49,7 @@ bool UsdPhysicsSetStageKilogramsPerUnit(const UsdStageWeakPtr &stage,
 /// \return *false* if either input is zero or negative, otherwise relative
 /// floating-point comparison between the two inputs.
 USDPHYSICS_API
-bool UsdPhysicsMassUnitsAre(double authoredUnits, double standardUnits,
-                              double epsilon = 1e-5);
+bool UsdPhysicsMassUnitsAre(double authoredUnits, double standardUnits, double epsilon = 1e-5);
 
 /// \class UsdPhysicsMassUnits
 /// Container class for static double-precision symbols representing common
@@ -65,4 +63,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_PHYSICS_METRICS_H
+#endif  // PXR_USD_USD_PHYSICS_METRICS_H

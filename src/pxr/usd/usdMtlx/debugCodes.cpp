@@ -12,11 +12,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfDebug)
-{
-    TF_DEBUG_ENVIRONMENT_SYMBOL(USDMTLX_READER, 
-                                "UsdMtlx reader details");
+TF_REGISTRY_FUNCTION(TfDebug) {
+    TF_DEBUG_ENVIRONMENT_SYMBOL(USDMTLX_READER, "UsdMtlx reader details");
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-

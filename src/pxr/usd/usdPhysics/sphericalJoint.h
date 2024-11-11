@@ -35,9 +35,9 @@ class SdfAssetPath;
 
 /// \class UsdPhysicsSphericalJoint
 ///
-/// Predefined spherical joint type (Removes linear degrees of 
+/// Predefined spherical joint type (Removes linear degrees of
 /// freedom, cone limit may restrict the motion in a given range.) It allows
-/// two limit values, which when equal create a circular, else an elliptic 
+/// two limit values, which when equal create a circular, else an elliptic
 /// cone limit around the limit axis.
 ///
 /// For any described attribute \em Fallback \em Value or \em Allowed \em Values below
@@ -45,8 +45,7 @@ class SdfAssetPath;
 /// So to set an attribute to the value "rightHanded", use UsdPhysicsTokens->rightHanded
 /// as the value.
 ///
-class UsdPhysicsSphericalJoint : public UsdPhysicsJoint
-{
+class UsdPhysicsSphericalJoint : public UsdPhysicsJoint {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -57,18 +56,12 @@ public:
     /// Equivalent to UsdPhysicsSphericalJoint::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdPhysicsSphericalJoint(const UsdPrim& prim=UsdPrim())
-        : UsdPhysicsJoint(prim)
-    {
-    }
+    explicit UsdPhysicsSphericalJoint(const UsdPrim& prim = UsdPrim()) : UsdPhysicsJoint(prim) {}
 
     /// Construct a UsdPhysicsSphericalJoint on the prim held by \p schemaObj .
     /// Should be preferred over UsdPhysicsSphericalJoint(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdPhysicsSphericalJoint(const UsdSchemaBase& schemaObj)
-        : UsdPhysicsJoint(schemaObj)
-    {
-    }
+    explicit UsdPhysicsSphericalJoint(const UsdSchemaBase& schemaObj) : UsdPhysicsJoint(schemaObj) {}
 
     /// Destructor.
     USDPHYSICS_API
@@ -78,8 +71,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDPHYSICS_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdPhysicsSphericalJoint holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -91,8 +83,7 @@ public:
     /// \endcode
     ///
     USDPHYSICS_API
-    static UsdPhysicsSphericalJoint
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdPhysicsSphericalJoint Get(const UsdStagePtr& stage, const SdfPath& path);
 
     /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
     /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -117,8 +108,7 @@ public:
     /// the opinion at the current EditTarget.
     ///
     USDPHYSICS_API
-    static UsdPhysicsSphericalJoint
-    Define(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdPhysicsSphericalJoint Define(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -131,17 +121,17 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDPHYSICS_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDPHYSICS_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // AXIS 
+    // AXIS
     // --------------------------------------------------------------------- //
     /// Cone limit axis.
     ///
@@ -155,20 +145,20 @@ public:
     USDPHYSICS_API
     UsdAttribute GetAxisAttr() const;
 
-    /// See GetAxisAttr(), and also 
+    /// See GetAxisAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateAxisAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateAxisAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // CONEANGLE0LIMIT 
+    // CONEANGLE0LIMIT
     // --------------------------------------------------------------------- //
-    /// Cone limit from the primary joint axis in the local0 frame 
-    /// toward the next axis. (Next axis of X is Y, and of Z is X.) A 
+    /// Cone limit from the primary joint axis in the local0 frame
+    /// toward the next axis. (Next axis of X is Y, and of Z is X.) A
     /// negative value means not limited. Units: degrees.
     ///
     /// | ||
@@ -179,20 +169,20 @@ public:
     USDPHYSICS_API
     UsdAttribute GetConeAngle0LimitAttr() const;
 
-    /// See GetConeAngle0LimitAttr(), and also 
+    /// See GetConeAngle0LimitAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateConeAngle0LimitAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateConeAngle0LimitAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // CONEANGLE1LIMIT 
+    // CONEANGLE1LIMIT
     // --------------------------------------------------------------------- //
-    /// Cone limit from the primary joint axis in the local0 frame 
-    /// toward the second to next axis. A negative value means not limited. 
+    /// Cone limit from the primary joint axis in the local0 frame
+    /// toward the second to next axis. A negative value means not limited.
     /// Units: degrees.
     ///
     /// | ||
@@ -203,21 +193,21 @@ public:
     USDPHYSICS_API
     UsdAttribute GetConeAngle1LimitAttr() const;
 
-    /// See GetConeAngle1LimitAttr(), and also 
+    /// See GetConeAngle1LimitAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateConeAngle1LimitAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateConeAngle1LimitAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //

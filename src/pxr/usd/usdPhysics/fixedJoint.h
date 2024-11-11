@@ -34,11 +34,10 @@ class SdfAssetPath;
 
 /// \class UsdPhysicsFixedJoint
 ///
-/// Predefined fixed joint type (All degrees of freedom are 
+/// Predefined fixed joint type (All degrees of freedom are
 /// removed.)
 ///
-class UsdPhysicsFixedJoint : public UsdPhysicsJoint
-{
+class UsdPhysicsFixedJoint : public UsdPhysicsJoint {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -49,18 +48,12 @@ public:
     /// Equivalent to UsdPhysicsFixedJoint::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdPhysicsFixedJoint(const UsdPrim& prim=UsdPrim())
-        : UsdPhysicsJoint(prim)
-    {
-    }
+    explicit UsdPhysicsFixedJoint(const UsdPrim& prim = UsdPrim()) : UsdPhysicsJoint(prim) {}
 
     /// Construct a UsdPhysicsFixedJoint on the prim held by \p schemaObj .
     /// Should be preferred over UsdPhysicsFixedJoint(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdPhysicsFixedJoint(const UsdSchemaBase& schemaObj)
-        : UsdPhysicsJoint(schemaObj)
-    {
-    }
+    explicit UsdPhysicsFixedJoint(const UsdSchemaBase& schemaObj) : UsdPhysicsJoint(schemaObj) {}
 
     /// Destructor.
     USDPHYSICS_API
@@ -70,8 +63,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDPHYSICS_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdPhysicsFixedJoint holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -83,8 +75,7 @@ public:
     /// \endcode
     ///
     USDPHYSICS_API
-    static UsdPhysicsFixedJoint
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdPhysicsFixedJoint Get(const UsdStagePtr& stage, const SdfPath& path);
 
     /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
     /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -109,8 +100,7 @@ public:
     /// the opinion at the current EditTarget.
     ///
     USDPHYSICS_API
-    static UsdPhysicsFixedJoint
-    Define(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdPhysicsFixedJoint Define(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -123,21 +113,21 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDPHYSICS_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDPHYSICS_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //

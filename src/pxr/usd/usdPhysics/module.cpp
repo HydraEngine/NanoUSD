@@ -16,10 +16,9 @@ Copyright (c) 2018, NVIDIA CORPORATION
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-TF_WRAP_MODULE
-{
-	TF_WRAP(Metrics);
+TF_WRAP_MODULE {
+    TF_WRAP(Metrics);
 
-    // Generated Schema classes.  Do not remove or edit the following line.
-    #include "generatedSchema.module.h"
+// Generated Schema classes.  Do not remove or edit the following line.
+#include "generatedSchema.module.h"
 }

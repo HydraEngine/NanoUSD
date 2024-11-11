@@ -1,71 +1,44 @@
-set(PXR_PREFIX pxr/usd)
-set(PXR_PACKAGE usdPhysics)
+#  Copyright (c) 2023 Feng Yang
+#
+#  I am making my contributions/submissions to this project solely in my
+#  personal capacity and am not conveying any rights to any intellectual
+#  property of any third parties.
 
-pxr_library(usdPhysics
-    INCLUDE_SCHEMA_FILES
+# create sample app project
+project(usdPhysics LANGUAGES C CXX)
 
-    LIBRARIES
-        tf
-        plug
-        vt
-        sdf
-        trace
-        usd
-        usdGeom
-        usdShade
-        work
-        ${TBB_tbb_LIBRARY}
-
-    INCLUDE_DIRS
-        ${TBB_INCLUDE_DIRS}
-
-    PUBLIC_CLASSES
-        metrics
-        
-    PUBLIC_HEADERS
-        api.h
-        massProperties.h
-
-    PYTHON_CPPFILES
-        moduleDeps.cpp
-
-    PYMODULE_CPPFILES
-        wrapMetrics.cpp
-
-    PYMODULE_FILES
-        __init__.py
-
-    DOXYGEN_FILES
-        overview.dox        
-        examples/usdPhysicsBoxOnBox.usda
-        examples/usdPhysicsBoxOnQuad.usda
-        examples/usdPhysicsDistanceJoint.usda
-        examples/usdPhysicsGroupFiltering.usda
-        examples/usdPhysicsJoints.usda
-        examples/usdPhysicsPairFiltering.usda
-        examples/usdPhysicsSpheresWithMaterial.usda
+set(SRC_FILES
+        articulationRootAPI.cpp
+        collisionAPI.cpp
+        collisionGroup.cpp
+        distanceJoint.cpp
+        driveAPI.cpp
+        filteredPairsAPI.cpp
+        fixedJoint.cpp
+        joint.cpp
+        limitAPI.cpp
+        massAPI.cpp
+        materialAPI.cpp
+        meshCollisionAPI.cpp
+        metrics.cpp
+        prismaticJoint.cpp
+        revoluteJoint.cpp
+        rigidBodyAPI.cpp
+        scene.cpp
+        sphericalJoint.cpp
+        tokens.cpp
 )
 
-pxr_test_scripts(
-    testenv/testUsdPhysicsMetrics.py
-    testenv/testUsdPhysicsRigidBodyAPI.py
-    testenv/testUsdPhysicsCollisionGroupAPI.py
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+        ${PXR_INCLUDE_PATH}
 )
 
-pxr_register_test(testUsdPhysicsMetrics
-    PYTHON
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdPhysicsMetrics"
-    EXPECTED_RETURN_CODE 0
+target_link_libraries(${PROJECT_NAME} PUBLIC
+        fmt::fmt
+        Eigen3::Eigen
+        TBB::tbb
 )
 
-pxr_register_test(testUsdPhysicsRigidBodyAPI
-    PYTHON
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdPhysicsRigidBodyAPI"
-    EXPECTED_RETURN_CODE 0
-)
-
-pxr_register_test(testUsdPhysicsCollisionGroupAPI
-    PYTHON
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdPhysicsCollisionGroupAPI"
-    EXPECTED_RETURN_CODE 0
-)
+set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)

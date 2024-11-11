@@ -36,13 +36,13 @@ class SdfAssetPath;
 /// \class UsdPhysicsDriveAPI
 ///
 /// The PhysicsDriveAPI when applied to any joint primitive will drive
-/// the joint towards a given target. The PhysicsDriveAPI is a multipleApply 
-/// schema: drive can be set per axis "transX", "transY", "transZ", "rotX", 
-/// "rotY", "rotZ" or its "linear" for prismatic joint or "angular" for revolute 
-/// joints. Setting these as a multipleApply schema TfToken name will 
-/// define the degree of freedom the DriveAPI is applied to. Each drive is an 
-/// implicit force-limited damped spring: 
-/// Force or acceleration = stiffness * (targetPosition - position) 
+/// the joint towards a given target. The PhysicsDriveAPI is a multipleApply
+/// schema: drive can be set per axis "transX", "transY", "transZ", "rotX",
+/// "rotY", "rotZ" or its "linear" for prismatic joint or "angular" for revolute
+/// joints. Setting these as a multipleApply schema TfToken name will
+/// define the degree of freedom the DriveAPI is applied to. Each drive is an
+/// implicit force-limited damped spring:
+/// Force or acceleration = stiffness * (targetPosition - position)
 /// + damping * (targetVelocity - velocity)
 ///
 /// For any described attribute \em Fallback \em Value or \em Allowed \em Values below
@@ -50,8 +50,7 @@ class SdfAssetPath;
 /// So to set an attribute to the value "rightHanded", use UsdPhysicsTokens->rightHanded
 /// as the value.
 ///
-class UsdPhysicsDriveAPI : public UsdAPISchemaBase
-{
+class UsdPhysicsDriveAPI : public UsdAPISchemaBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -67,19 +66,15 @@ public:
     ///
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdPhysicsDriveAPI(
-        const UsdPrim& prim=UsdPrim(), const TfToken &name=TfToken())
-        : UsdAPISchemaBase(prim, /*instanceName*/ name)
-    { }
+    explicit UsdPhysicsDriveAPI(const UsdPrim& prim = UsdPrim(), const TfToken& name = TfToken())
+        : UsdAPISchemaBase(prim, /*instanceName*/ name) {}
 
     /// Construct a UsdPhysicsDriveAPI on the prim held by \p schemaObj with
     /// name \p name.  Should be preferred over
     /// UsdPhysicsDriveAPI(schemaObj.GetPrim(), name), as it preserves
     /// SchemaBase state.
-    explicit UsdPhysicsDriveAPI(
-        const UsdSchemaBase& schemaObj, const TfToken &name)
-        : UsdAPISchemaBase(schemaObj, /*instanceName*/ name)
-    { }
+    explicit UsdPhysicsDriveAPI(const UsdSchemaBase& schemaObj, const TfToken& name)
+        : UsdAPISchemaBase(schemaObj, /*instanceName*/ name) {}
 
     /// Destructor.
     USDPHYSICS_API
@@ -89,8 +84,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDPHYSICS_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a vector of names of all pre-declared attributes for this schema
     /// class and all its ancestor classes for a given instance name.  Does not
@@ -98,13 +92,10 @@ public:
     /// the schemas involved. The names returned will have the proper namespace
     /// prefix.
     USDPHYSICS_API
-    static TfTokenVector
-    GetSchemaAttributeNames(bool includeInherited, const TfToken &instanceName);
+    static TfTokenVector GetSchemaAttributeNames(bool includeInherited, const TfToken& instanceName);
 
     /// Returns the name of this multiple-apply schema instance
-    TfToken GetName() const {
-        return _GetInstanceName();
-    }
+    TfToken GetName() const { return _GetInstanceName(); }
 
     /// Return a UsdPhysicsDriveAPI holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -121,44 +112,39 @@ public:
     /// \endcode
     ///
     USDPHYSICS_API
-    static UsdPhysicsDriveAPI
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdPhysicsDriveAPI Get(const UsdStagePtr& stage, const SdfPath& path);
 
     /// Return a UsdPhysicsDriveAPI with name \p name holding the
     /// prim \p prim. Shorthand for UsdPhysicsDriveAPI(prim, name);
     USDPHYSICS_API
-    static UsdPhysicsDriveAPI
-    Get(const UsdPrim &prim, const TfToken &name);
+    static UsdPhysicsDriveAPI Get(const UsdPrim& prim, const TfToken& name);
 
-    /// Return a vector of all named instances of UsdPhysicsDriveAPI on the 
+    /// Return a vector of all named instances of UsdPhysicsDriveAPI on the
     /// given \p prim.
     USDPHYSICS_API
-    static std::vector<UsdPhysicsDriveAPI>
-    GetAll(const UsdPrim &prim);
+    static std::vector<UsdPhysicsDriveAPI> GetAll(const UsdPrim& prim);
 
     /// Checks if the given name \p baseName is the base name of a property
     /// of PhysicsDriveAPI.
     USDPHYSICS_API
-    static bool
-    IsSchemaPropertyBaseName(const TfToken &baseName);
+    static bool IsSchemaPropertyBaseName(const TfToken& baseName);
 
     /// Checks if the given path \p path is of an API schema of type
     /// PhysicsDriveAPI. If so, it stores the instance name of
     /// the schema in \p name and returns true. Otherwise, it returns false.
     USDPHYSICS_API
-    static bool
-    IsPhysicsDriveAPIPath(const SdfPath &path, TfToken *name);
+    static bool IsPhysicsDriveAPIPath(const SdfPath& path, TfToken* name);
 
     /// Returns true if this <b>multiple-apply</b> API schema can be applied,
-    /// with the given instance name, \p name, to the given \p prim. If this 
-    /// schema can not be a applied the prim, this returns false and, if 
+    /// with the given instance name, \p name, to the given \p prim. If this
+    /// schema can not be a applied the prim, this returns false and, if
     /// provided, populates \p whyNot with the reason it can not be applied.
-    /// 
+    ///
     /// Note that if CanApply returns false, that does not necessarily imply
     /// that calling Apply will fail. Callers are expected to call CanApply
-    /// before calling Apply if they want to ensure that it is valid to 
+    /// before calling Apply if they want to ensure that it is valid to
     /// apply a schema.
-    /// 
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -166,23 +152,21 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDPHYSICS_API
-    static bool 
-    CanApply(const UsdPrim &prim, const TfToken &name, 
-             std::string *whyNot=nullptr);
+    static bool CanApply(const UsdPrim& prim, const TfToken& name, std::string* whyNot = nullptr);
 
-    /// Applies this <b>multiple-apply</b> API schema to the given \p prim 
-    /// along with the given instance name, \p name. 
-    /// 
-    /// This information is stored by adding "PhysicsDriveAPI:<i>name</i>" 
+    /// Applies this <b>multiple-apply</b> API schema to the given \p prim
+    /// along with the given instance name, \p name.
+    ///
+    /// This information is stored by adding "PhysicsDriveAPI:<i>name</i>"
     /// to the token-valued, listOp metadata \em apiSchemas on the prim.
-    /// For example, if \p name is 'instance1', the token 
+    /// For example, if \p name is 'instance1', the token
     /// 'PhysicsDriveAPI:instance1' is added to 'apiSchemas'.
-    /// 
-    /// \return A valid UsdPhysicsDriveAPI object is returned upon success. 
-    /// An invalid (or empty) UsdPhysicsDriveAPI object is returned upon 
-    /// failure. See \ref UsdPrim::ApplyAPI() for 
-    /// conditions resulting in failure. 
-    /// 
+    ///
+    /// \return A valid UsdPhysicsDriveAPI object is returned upon success.
+    /// An invalid (or empty) UsdPhysicsDriveAPI object is returned upon
+    /// failure. See \ref UsdPrim::ApplyAPI() for
+    /// conditions resulting in failure.
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -190,8 +174,7 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDPHYSICS_API
-    static UsdPhysicsDriveAPI 
-    Apply(const UsdPrim &prim, const TfToken &name);
+    static UsdPhysicsDriveAPI Apply(const UsdPrim& prim, const TfToken& name);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -204,19 +187,19 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDPHYSICS_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDPHYSICS_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // TYPE 
+    // TYPE
     // --------------------------------------------------------------------- //
-    /// Drive spring is for the acceleration at the joint (rather 
+    /// Drive spring is for the acceleration at the joint (rather
     /// than the force).
     ///
     /// | ||
@@ -229,23 +212,23 @@ public:
     USDPHYSICS_API
     UsdAttribute GetTypeAttr() const;
 
-    /// See GetTypeAttr(), and also 
+    /// See GetTypeAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateTypeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateTypeAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // MAXFORCE 
+    // MAXFORCE
     // --------------------------------------------------------------------- //
-    /// Maximum force that can be applied to drive. Units: 
+    /// Maximum force that can be applied to drive. Units:
     /// if linear drive: mass*DIST_UNITS/second/second
     /// if angular drive: mass*DIST_UNITS*DIST_UNITS/second/second
     /// inf means not limited. Must be non-negative.
-    /// 
+    ///
     ///
     /// | ||
     /// | -- | -- |
@@ -255,19 +238,19 @@ public:
     USDPHYSICS_API
     UsdAttribute GetMaxForceAttr() const;
 
-    /// See GetMaxForceAttr(), and also 
+    /// See GetMaxForceAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateMaxForceAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateMaxForceAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // TARGETPOSITION 
+    // TARGETPOSITION
     // --------------------------------------------------------------------- //
-    /// Target value for position. Units: 
+    /// Target value for position. Units:
     /// if linear drive: distance
     /// if angular drive: degrees.
     ///
@@ -279,19 +262,19 @@ public:
     USDPHYSICS_API
     UsdAttribute GetTargetPositionAttr() const;
 
-    /// See GetTargetPositionAttr(), and also 
+    /// See GetTargetPositionAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateTargetPositionAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateTargetPositionAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // TARGETVELOCITY 
+    // TARGETVELOCITY
     // --------------------------------------------------------------------- //
-    /// Target value for velocity. Units: 
+    /// Target value for velocity. Units:
     /// if linear drive: distance/second
     /// if angular drive: degrees/second.
     ///
@@ -303,19 +286,19 @@ public:
     USDPHYSICS_API
     UsdAttribute GetTargetVelocityAttr() const;
 
-    /// See GetTargetVelocityAttr(), and also 
+    /// See GetTargetVelocityAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateTargetVelocityAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateTargetVelocityAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // DAMPING 
+    // DAMPING
     // --------------------------------------------------------------------- //
-    /// Damping of the drive. Units: 
+    /// Damping of the drive. Units:
     /// if linear drive: mass/second
     /// If angular drive: mass*DIST_UNITS*DIST_UNITS/second/degrees.
     ///
@@ -327,17 +310,17 @@ public:
     USDPHYSICS_API
     UsdAttribute GetDampingAttr() const;
 
-    /// See GetDampingAttr(), and also 
+    /// See GetDampingAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateDampingAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateDampingAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // STIFFNESS 
+    // STIFFNESS
     // --------------------------------------------------------------------- //
     /// Stiffness of the drive. Units:
     /// if linear drive: mass/second/second
@@ -351,21 +334,21 @@ public:
     USDPHYSICS_API
     UsdAttribute GetStiffnessAttr() const;
 
-    /// See GetStiffnessAttr(), and also 
+    /// See GetStiffnessAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateStiffnessAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateStiffnessAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //

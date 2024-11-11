@@ -22,9 +22,7 @@ constexpr double UsdPhysicsMassUnits::grams;
 constexpr double UsdPhysicsMassUnits::kilograms;
 constexpr double UsdPhysicsMassUnits::slugs;
 
-double
-UsdPhysicsGetStageKilogramsPerUnit(const UsdStageWeakPtr &stage)
-{
+double UsdPhysicsGetStageKilogramsPerUnit(const UsdStageWeakPtr& stage) {
     double units = UsdPhysicsMassUnits::kilograms;
     if (!stage) {
         TF_CODING_ERROR("Invalid UsdStage");
@@ -35,9 +33,7 @@ UsdPhysicsGetStageKilogramsPerUnit(const UsdStageWeakPtr &stage)
     return units;
 }
 
-bool
-UsdPhysicsStageHasAuthoredKilogramsPerUnit(const UsdStageWeakPtr &stage)
-{
+bool UsdPhysicsStageHasAuthoredKilogramsPerUnit(const UsdStageWeakPtr& stage) {
     if (!stage) {
         TF_CODING_ERROR("Invalid UsdStage");
         return false;
@@ -46,23 +42,16 @@ UsdPhysicsStageHasAuthoredKilogramsPerUnit(const UsdStageWeakPtr &stage)
     return stage->HasAuthoredMetadata(UsdPhysicsTokens->kilogramsPerUnit);
 }
 
-bool
-UsdPhysicsSetStageKilogramsPerUnit(const UsdStageWeakPtr &stage,
-                                  double kilogramsPerUnit)
-{
+bool UsdPhysicsSetStageKilogramsPerUnit(const UsdStageWeakPtr& stage, double kilogramsPerUnit) {
     if (!stage) {
         TF_CODING_ERROR("Invalid UsdStage");
         return false;
     }
 
-    return stage->SetMetadata(UsdPhysicsTokens->kilogramsPerUnit, 
-            kilogramsPerUnit);
+    return stage->SetMetadata(UsdPhysicsTokens->kilogramsPerUnit, kilogramsPerUnit);
 }
 
-bool
-UsdPhysicsMassUnitsAre(double authoredUnits, double standardUnits,
-                         double epsilon)
-{
+bool UsdPhysicsMassUnitsAre(double authoredUnits, double standardUnits, double epsilon) {
     if (authoredUnits <= 0 || standardUnits <= 0) {
         return false;
     }

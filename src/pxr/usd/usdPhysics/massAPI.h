@@ -35,12 +35,11 @@ class SdfAssetPath;
 
 /// \class UsdPhysicsMassAPI
 ///
-/// Defines explicit mass properties (mass, density, inertia etc.).        
+/// Defines explicit mass properties (mass, density, inertia etc.).
 /// MassAPI can be applied to any object that has a PhysicsCollisionAPI or
 /// a PhysicsRigidBodyAPI.
 ///
-class UsdPhysicsMassAPI : public UsdAPISchemaBase
-{
+class UsdPhysicsMassAPI : public UsdAPISchemaBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -51,18 +50,12 @@ public:
     /// Equivalent to UsdPhysicsMassAPI::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdPhysicsMassAPI(const UsdPrim& prim=UsdPrim())
-        : UsdAPISchemaBase(prim)
-    {
-    }
+    explicit UsdPhysicsMassAPI(const UsdPrim& prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
     /// Construct a UsdPhysicsMassAPI on the prim held by \p schemaObj .
     /// Should be preferred over UsdPhysicsMassAPI(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdPhysicsMassAPI(const UsdSchemaBase& schemaObj)
-        : UsdAPISchemaBase(schemaObj)
-    {
-    }
+    explicit UsdPhysicsMassAPI(const UsdSchemaBase& schemaObj) : UsdAPISchemaBase(schemaObj) {}
 
     /// Destructor.
     USDPHYSICS_API
@@ -72,8 +65,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDPHYSICS_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdPhysicsMassAPI holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -85,20 +77,18 @@ public:
     /// \endcode
     ///
     USDPHYSICS_API
-    static UsdPhysicsMassAPI
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdPhysicsMassAPI Get(const UsdStagePtr& stage, const SdfPath& path);
 
-
-    /// Returns true if this <b>single-apply</b> API schema can be applied to 
-    /// the given \p prim. If this schema can not be a applied to the prim, 
-    /// this returns false and, if provided, populates \p whyNot with the 
+    /// Returns true if this <b>single-apply</b> API schema can be applied to
+    /// the given \p prim. If this schema can not be a applied to the prim,
+    /// this returns false and, if provided, populates \p whyNot with the
     /// reason it can not be applied.
-    /// 
+    ///
     /// Note that if CanApply returns false, that does not necessarily imply
     /// that calling Apply will fail. Callers are expected to call CanApply
-    /// before calling Apply if they want to ensure that it is valid to 
+    /// before calling Apply if they want to ensure that it is valid to
     /// apply a schema.
-    /// 
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -106,18 +96,17 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDPHYSICS_API
-    static bool 
-    CanApply(const UsdPrim &prim, std::string *whyNot=nullptr);
+    static bool CanApply(const UsdPrim& prim, std::string* whyNot = nullptr);
 
     /// Applies this <b>single-apply</b> API schema to the given \p prim.
-    /// This information is stored by adding "PhysicsMassAPI" to the 
+    /// This information is stored by adding "PhysicsMassAPI" to the
     /// token-valued, listOp metadata \em apiSchemas on the prim.
-    /// 
-    /// \return A valid UsdPhysicsMassAPI object is returned upon success. 
-    /// An invalid (or empty) UsdPhysicsMassAPI object is returned upon 
-    /// failure. See \ref UsdPrim::ApplyAPI() for conditions 
-    /// resulting in failure. 
-    /// 
+    ///
+    /// \return A valid UsdPhysicsMassAPI object is returned upon success.
+    /// An invalid (or empty) UsdPhysicsMassAPI object is returned upon
+    /// failure. See \ref UsdPrim::ApplyAPI() for conditions
+    /// resulting in failure.
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -125,8 +114,7 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDPHYSICS_API
-    static UsdPhysicsMassAPI 
-    Apply(const UsdPrim &prim);
+    static UsdPhysicsMassAPI Apply(const UsdPrim& prim);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -139,27 +127,27 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDPHYSICS_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDPHYSICS_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // MASS 
+    // MASS
     // --------------------------------------------------------------------- //
     /// If non-zero, directly specifies the mass of the object.
     /// Note that any child prim can also have a mass when they apply massAPI.
     /// In this case, the precedence rule is 'parent mass overrides the
-    /// child's'. This may come as counter-intuitive, but mass is a computed 
-    /// quantity and in general not accumulative. For example, if a parent 
-    /// has mass of 10, and one of two children has mass of 20, allowing 
-    /// child's mass to override its parent results in a mass of -10 for the 
+    /// child's'. This may come as counter-intuitive, but mass is a computed
+    /// quantity and in general not accumulative. For example, if a parent
+    /// has mass of 10, and one of two children has mass of 20, allowing
+    /// child's mass to override its parent results in a mass of -10 for the
     /// other child. Note if mass is 0.0 it is ignored. Units: mass.
-    /// 
+    ///
     ///
     /// | ||
     /// | -- | -- |
@@ -169,26 +157,26 @@ public:
     USDPHYSICS_API
     UsdAttribute GetMassAttr() const;
 
-    /// See GetMassAttr(), and also 
+    /// See GetMassAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateMassAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateMassAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // DENSITY 
+    // DENSITY
     // --------------------------------------------------------------------- //
     /// If non-zero, specifies the density of the object.
-    /// In the context of rigid body physics, density indirectly results in 
-    /// setting mass via (mass = density x volume of the object). How the 
+    /// In the context of rigid body physics, density indirectly results in
+    /// setting mass via (mass = density x volume of the object). How the
     /// volume is computed is up to implementation of the physics system.
     /// It is generally computed from the collision approximation rather than
-    /// the graphical mesh. In the case where both density and mass are 
-    /// specified for the same object, mass has precedence over density. 
-    /// Unlike mass, child's prim's density overrides parent prim's density 
+    /// the graphical mesh. In the case where both density and mass are
+    /// specified for the same object, mass has precedence over density.
+    /// Unlike mass, child's prim's density overrides parent prim's density
     /// as it is accumulative. Note that density of a collisionAPI can be also
     /// alternatively set through a PhysicsMaterialAPI. The material density
     /// has the weakest precedence in density definition. Note if density is
@@ -202,17 +190,17 @@ public:
     USDPHYSICS_API
     UsdAttribute GetDensityAttr() const;
 
-    /// See GetDensityAttr(), and also 
+    /// See GetDensityAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateDensityAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateDensityAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // CENTEROFMASS 
+    // CENTEROFMASS
     // --------------------------------------------------------------------- //
     /// Center of mass in the prim's local space. Units: distance.
     ///
@@ -224,20 +212,20 @@ public:
     USDPHYSICS_API
     UsdAttribute GetCenterOfMassAttr() const;
 
-    /// See GetCenterOfMassAttr(), and also 
+    /// See GetCenterOfMassAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateCenterOfMassAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateCenterOfMassAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // DIAGONALINERTIA 
+    // DIAGONALINERTIA
     // --------------------------------------------------------------------- //
-    /// If non-zero, specifies diagonalized inertia tensor along the 
-    /// principal axes. Note if diagonalInertial is (0.0, 0.0, 0.0) it is 
+    /// If non-zero, specifies diagonalized inertia tensor along the
+    /// principal axes. Note if diagonalInertial is (0.0, 0.0, 0.0) it is
     /// ignored. Units: mass*distance*distance.
     ///
     /// | ||
@@ -248,19 +236,19 @@ public:
     USDPHYSICS_API
     UsdAttribute GetDiagonalInertiaAttr() const;
 
-    /// See GetDiagonalInertiaAttr(), and also 
+    /// See GetDiagonalInertiaAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreateDiagonalInertiaAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateDiagonalInertiaAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // PRINCIPALAXES 
+    // PRINCIPALAXES
     // --------------------------------------------------------------------- //
-    /// Orientation of the inertia tensor's principal axes in the 
+    /// Orientation of the inertia tensor's principal axes in the
     /// prim's local space.
     ///
     /// | ||
@@ -271,26 +259,25 @@ public:
     USDPHYSICS_API
     UsdAttribute GetPrincipalAxesAttr() const;
 
-    /// See GetPrincipalAxesAttr(), and also 
+    /// See GetPrincipalAxesAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDPHYSICS_API
-    UsdAttribute CreatePrincipalAxesAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreatePrincipalAxesAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
     // --(BEGIN CUSTOM CODE)--
-
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
