@@ -9,7 +9,6 @@
 
 /// \file usdUtils/assetLocalization.h
 
-
 #include "pxr/pxr.h"
 #include "pxr/usd/sdf/layer.h"
 #include "pxr/usd/usdUtils/api.h"
@@ -32,107 +31,80 @@ PXR_NAMESPACE_OPEN_SCOPE
 // context's delegate where all specific processing logic lives.
 class UsdUtils_LocalizationContext {
 public:
-    // Enum class representing the external reference types that must be 
+    // Enum class representing the external reference types that must be
     // included  in the search for external dependencies.
     enum class ReferenceType {
         // Include only references that affect composition.
-        CompositionOnly, 
+        CompositionOnly,
 
         // Include all external references including asset-valued attributes
         // and non-composition metadata containing SdfAssetPath values.
-        All              
+        All
     };
 
 public:
-    UsdUtils_LocalizationContext(UsdUtils_LocalizationDelegate* delegate)
-        :_delegate(delegate)
-        {}
+    UsdUtils_LocalizationContext(UsdUtils_LocalizationDelegate* delegate) : _delegate(delegate) {}
 
     // Begins recursive dependency analysis on the supplied layer
     bool Process(const SdfLayerRefPtr& layer);
 
     // Returns the root layer of the asset
-    SdfLayerRefPtr GetRootLayer() const { 
-        return _rootLayer; 
-    } 
+    SdfLayerRefPtr GetRootLayer() const { return _rootLayer; }
 
     // Toggles metadata filtering.  When active, non-relevant metadata keys will
     // be ignored. Refer to _ShouldFilterAssetPath implementation.
-    inline void SetMetadataFilteringEnabled(bool filteringEnabled) 
-    {
-        _metadataFilteringEnabled = filteringEnabled;
-    }
+    inline void SetMetadataFilteringEnabled(bool filteringEnabled) { _metadataFilteringEnabled = filteringEnabled; }
 
     // Sets whether all layer dependencies should be recursively traversed.
     // When this is false, only direct asset dependencies of the root
     // asset layer will be processed.
-    inline void SetRecurseLayerDependencies(bool recurseLayerDependencies)
-    {
+    inline void SetRecurseLayerDependencies(bool recurseLayerDependencies) {
         _recurseLayerDependencies = recurseLayerDependencies;
     }
 
     // Sets the reference types that will be included for processing.
     // \sa ReferenceType
-    inline void SetRefTypesToInclude(ReferenceType refTypesToInclude )
-    {
-        _refTypesToInclude = refTypesToInclude;
-    }
+    inline void SetRefTypesToInclude(ReferenceType refTypesToInclude) { _refTypesToInclude = refTypesToInclude; }
 
     /// Sets a list of dependencies to skip during packaging.
     /// The paths contained in this array should be fully resolved.
-    inline void SetDependenciesToSkip(
-        const std::vector<std::string> &dependenciesToSkip) 
-    {
-        _dependenciesToSkip = 
-            std::unordered_set<std::string>(dependenciesToSkip.begin(), 
-                                            dependenciesToSkip.end());
+    inline void SetDependenciesToSkip(const std::vector<std::string>& dependenciesToSkip) {
+        _dependenciesToSkip = std::unordered_set<std::string>(dependenciesToSkip.begin(), dependenciesToSkip.end());
     }
 
 private:
     void _ProcessLayer(const SdfLayerRefPtr& layer);
-    void _ProcessSublayers(const SdfLayerRefPtr&  layer);
-    void _ProcessMetadata(const SdfLayerRefPtr&  layer,
-                          const SdfPrimSpecHandle &primSpec);
-    void _ProcessPayloads(const SdfLayerRefPtr&  layer,
-                          const SdfPrimSpecHandle &primSpec);
-    void _ProcessProperties(const SdfLayerRefPtr&  layer,
-                            const SdfPrimSpecHandle &primSpec);
-    void _ProcessReferences(const SdfLayerRefPtr&  layer,
-                            const SdfPrimSpecHandle &primSpec);
-    bool _ShouldFilterAssetPath(const std::string &key,
-                                bool processingMetadata);
+    void _ProcessSublayers(const SdfLayerRefPtr& layer);
+    void _ProcessMetadata(const SdfLayerRefPtr& layer, const SdfPrimSpecHandle& primSpec);
+    void _ProcessPayloads(const SdfLayerRefPtr& layer, const SdfPrimSpecHandle& primSpec);
+    void _ProcessProperties(const SdfLayerRefPtr& layer, const SdfPrimSpecHandle& primSpec);
+    void _ProcessReferences(const SdfLayerRefPtr& layer, const SdfPrimSpecHandle& primSpec);
+    bool _ShouldFilterAssetPath(const std::string& key, bool processingMetadata);
 
-    void _ProcessAssetValue(const SdfLayerRefPtr&  layer, 
-                               const std::string &key,
-                               const VtValue &val,
-                               bool processingMetadata = false);
-    void _ProcessAssetValue(const SdfLayerRefPtr&  layer, 
-                             const VtValue &val,
-                             bool processingMetadata = false);
+    void _ProcessAssetValue(const SdfLayerRefPtr& layer,
+                            const std::string& key,
+                            const VtValue& val,
+                            bool processingMetadata = false);
+    void _ProcessAssetValue(const SdfLayerRefPtr& layer, const VtValue& val, bool processingMetadata = false);
 
     // Searches for udim tiles associated with the given asset path.
-    static std::vector<std::string> _GetUdimTiles(const SdfLayerRefPtr& layer,
-                                           const std::string &assetPath);
+    static std::vector<std::string> _GetUdimTiles(const SdfLayerRefPtr& layer, const std::string& assetPath);
 
     // Discovers all dependencies for the supplied asset path
-    static std::vector<std::string> _GetDependencies(const SdfLayerRefPtr& layer,
-                                           const std::string &assetPath);
-    
+    static std::vector<std::string> _GetDependencies(const SdfLayerRefPtr& layer, const std::string& assetPath);
+
     // Searches for the clips of a given templated string
     // XXX: this method is currently only implemented for filesystem paths and
     // uses globbing to find the clips.
-    static std::vector<std::string> _GetTemplatedClips(const SdfLayerRefPtr& layer,
-                                                const std::string &assetPath);
+    static std::vector<std::string> _GetTemplatedClips(const SdfLayerRefPtr& layer, const std::string& assetPath);
 
     // Enqueues a dependency into the LIFO processing queue
-    void _EnqueueDependency(const SdfLayerRefPtr layer, 
-                           const std::string &assetPath);
-    void _EnqueueDependencies(const SdfLayerRefPtr layer,
-                              const std::vector<std::string> &dependencies);
+    void _EnqueueDependency(const SdfLayerRefPtr layer, const std::string& assetPath);
+    void _EnqueueDependencies(const SdfLayerRefPtr layer, const std::vector<std::string>& dependencies);
 
     // Determines if a value needs to be processed by the delegate. Dictionaries
     // are always considered because they main contain asset path values.
-    static bool _ValueTypeIsRelevant(const VtValue &val);
+    static bool _ValueTypeIsRelevant(const VtValue& val);
 
 private:
     UsdUtils_LocalizationDelegate* _delegate;
@@ -158,18 +130,17 @@ private:
     // Specifies if metadata filtering should be enabled
     bool _metadataFilteringEnabled = false;
 
-    // user supplied list of dependencies that will be skipped when 
+    // user supplied list of dependencies that will be skipped when
     // processing the asset
     std::unordered_set<std::string> _dependenciesToSkip;
 };
 
-void UsdUtils_ExtractExternalReferences(
-    const std::string& filePath,
-    const UsdUtils_LocalizationContext::ReferenceType refTypesToInclude,
-    std::vector<std::string>* subLayers,
-    std::vector<std::string>* references,
-    std::vector<std::string>* payloads);
+void UsdUtils_ExtractExternalReferences(const std::string& filePath,
+                                        const UsdUtils_LocalizationContext::ReferenceType refTypesToInclude,
+                                        std::vector<std::string>* subLayers,
+                                        std::vector<std::string>* references,
+                                        std::vector<std::string>* payloads);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_UTILS_ASSET_LOCALIZATION_H
+#endif  // PXR_USD_USD_UTILS_ASSET_LOCALIZATION_H

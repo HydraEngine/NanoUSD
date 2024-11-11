@@ -1,59 +1,32 @@
-set(PXR_PREFIX pxr/usd)
-set(PXR_PACKAGE usdRi)
+#  Copyright (c) 2023 Feng Yang
+#
+#  I am making my contributions/submissions to this project solely in my
+#  personal capacity and am not conveying any rights to any intellectual
+#  property of any third parties.
 
-pxr_library(usdRi
-    INCLUDE_SCHEMA_FILES
+# create sample app project
+project(usdRi LANGUAGES C CXX)
 
-    LIBRARIES
-        tf
-        vt
-        sdf
-        usd
-        usdShade
-        usdGeom
-
-    PUBLIC_CLASSES
-        rmanUtilities
-
-    PUBLIC_HEADERS
-        api.h
-
-    PYTHON_CPPFILES
-        moduleDeps.cpp
-
-    PRIVATE_CLASSES
-        typeUtils
-
-    PYMODULE_CPPFILES
-        wrapRmanUtilities.cpp
-
-    PYMODULE_FILES
-        __init__.py
-
-    DOXYGEN_FILES
-        overview.dox
+set(SRC_FILES
+        materialAPI.cpp
+        renderPassAPI.cpp
+        rmanUtilities.cpp
+        splineAPI.cpp
+        statementsAPI.cpp
+        tokens.cpp
+        typeUtils.cpp
 )
 
-pxr_test_scripts(
-    testenv/testUsdRiSchemata.py
-    testenv/testUsdRiSplineAPI.py
-    testenv/testUsdRiUtilities.py
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+        ${PXR_INCLUDE_PATH}
 )
 
-pxr_register_test(testUsdRiSchemata
-    PYTHON
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdRiSchemata"  
-    EXPECTED_RETURN_CODE 0
+target_link_libraries(${PROJECT_NAME} PUBLIC
+        fmt::fmt
+        Eigen3::Eigen
+        TBB::tbb
 )
 
-pxr_register_test(testUsdRiSplineAPI
-    PYTHON
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdRiSplineAPI"  
-    EXPECTED_RETURN_CODE 0
-)
-
-pxr_register_test(testUsdRiUtilities
-    PYTHON
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdRiUtilities"  
-    EXPECTED_RETURN_CODE 0
-)
+set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)

@@ -43,8 +43,7 @@ class SdfAssetPath;
 /// So to set an attribute to the value "rightHanded", use UsdVolTokens->rightHanded
 /// as the value.
 ///
-class UsdVolOpenVDBAsset : public UsdVolFieldAsset
-{
+class UsdVolOpenVDBAsset : public UsdVolFieldAsset {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -55,18 +54,12 @@ public:
     /// Equivalent to UsdVolOpenVDBAsset::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdVolOpenVDBAsset(const UsdPrim& prim=UsdPrim())
-        : UsdVolFieldAsset(prim)
-    {
-    }
+    explicit UsdVolOpenVDBAsset(const UsdPrim& prim = UsdPrim()) : UsdVolFieldAsset(prim) {}
 
     /// Construct a UsdVolOpenVDBAsset on the prim held by \p schemaObj .
     /// Should be preferred over UsdVolOpenVDBAsset(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdVolOpenVDBAsset(const UsdSchemaBase& schemaObj)
-        : UsdVolFieldAsset(schemaObj)
-    {
-    }
+    explicit UsdVolOpenVDBAsset(const UsdSchemaBase& schemaObj) : UsdVolFieldAsset(schemaObj) {}
 
     /// Destructor.
     USDVOL_API
@@ -76,8 +69,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDVOL_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdVolOpenVDBAsset holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -89,8 +81,7 @@ public:
     /// \endcode
     ///
     USDVOL_API
-    static UsdVolOpenVDBAsset
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdVolOpenVDBAsset Get(const UsdStagePtr& stage, const SdfPath& path);
 
     /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
     /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -115,8 +106,7 @@ public:
     /// the opinion at the current EditTarget.
     ///
     USDVOL_API
-    static UsdVolOpenVDBAsset
-    Define(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdVolOpenVDBAsset Define(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -129,22 +119,22 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDVOL_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDVOL_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // FIELDDATATYPE 
+    // FIELDDATATYPE
     // --------------------------------------------------------------------- //
     /// Token which is used to indicate the data type of an
     /// individual field. Authors use this to tell consumers more
-    /// about the field without opening the file on disk. The list of 
-    /// allowed tokens reflects the available choices for OpenVDB 
+    /// about the field without opening the file on disk. The list of
+    /// allowed tokens reflects the available choices for OpenVDB
     /// volumes.
     ///
     /// | ||
@@ -152,25 +142,26 @@ public:
     /// | Declaration | `token fieldDataType` |
     /// | C++ Type | TfToken |
     /// | \ref Usd_Datatypes "Usd Type" | SdfValueTypeNames->Token |
-    /// | \ref UsdVolTokens "Allowed Values" | half, float, double, int, uint, int64, half2, float2, double2, int2, half3, float3, double3, int3, matrix3d, matrix4d, quatd, bool, mask, string |
+    /// | \ref UsdVolTokens "Allowed Values" | half, float, double, int, uint, int64, half2, float2, double2, int2,
+    /// half3, float3, double3, int3, matrix3d, matrix4d, quatd, bool, mask, string |
     USDVOL_API
     UsdAttribute GetFieldDataTypeAttr() const;
 
-    /// See GetFieldDataTypeAttr(), and also 
+    /// See GetFieldDataTypeAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDVOL_API
-    UsdAttribute CreateFieldDataTypeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateFieldDataTypeAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // FIELDCLASS 
+    // FIELDCLASS
     // --------------------------------------------------------------------- //
     /// Optional token which can be used to indicate the class of
     /// an individual grid. This is a mapping to openvdb::GridClass
-    /// where the values are GRID_LEVEL_SET, GRID_FOG_VOLUME, 
+    /// where the values are GRID_LEVEL_SET, GRID_FOG_VOLUME,
     /// GRID_STAGGERED, and GRID_UNKNOWN.
     ///
     /// | ||
@@ -182,21 +173,21 @@ public:
     USDVOL_API
     UsdAttribute GetFieldClassAttr() const;
 
-    /// See GetFieldClassAttr(), and also 
+    /// See GetFieldClassAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDVOL_API
-    UsdAttribute CreateFieldClassAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateFieldClassAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //

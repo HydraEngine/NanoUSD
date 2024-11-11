@@ -16,7 +16,7 @@
 #include "pxr/usd/usd/stage.h"
 #include "pxr/usd/usdSkel/tokens.h"
 
-#include "pxr/usd/usdSkel/topology.h" 
+#include "pxr/usd/usdSkel/topology.h"
 
 #include "pxr/base/vt/value.h"
 
@@ -37,14 +37,13 @@ class SdfAssetPath;
 
 /// \class UsdSkelSkeleton
 ///
-/// Describes a skeleton. 
-/// 
+/// Describes a skeleton.
+///
 /// See the extended \ref UsdSkel_Skeleton "Skeleton Schema" documentation for
 /// more information.
-/// 
 ///
-class UsdSkelSkeleton : public UsdGeomBoundable
-{
+///
+class UsdSkelSkeleton : public UsdGeomBoundable {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -55,18 +54,12 @@ public:
     /// Equivalent to UsdSkelSkeleton::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdSkelSkeleton(const UsdPrim& prim=UsdPrim())
-        : UsdGeomBoundable(prim)
-    {
-    }
+    explicit UsdSkelSkeleton(const UsdPrim& prim = UsdPrim()) : UsdGeomBoundable(prim) {}
 
     /// Construct a UsdSkelSkeleton on the prim held by \p schemaObj .
     /// Should be preferred over UsdSkelSkeleton(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdSkelSkeleton(const UsdSchemaBase& schemaObj)
-        : UsdGeomBoundable(schemaObj)
-    {
-    }
+    explicit UsdSkelSkeleton(const UsdSchemaBase& schemaObj) : UsdGeomBoundable(schemaObj) {}
 
     /// Destructor.
     USDSKEL_API
@@ -76,8 +69,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDSKEL_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdSkelSkeleton holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -89,8 +81,7 @@ public:
     /// \endcode
     ///
     USDSKEL_API
-    static UsdSkelSkeleton
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdSkelSkeleton Get(const UsdStagePtr& stage, const SdfPath& path);
 
     /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
     /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -115,8 +106,7 @@ public:
     /// the opinion at the current EditTarget.
     ///
     USDSKEL_API
-    static UsdSkelSkeleton
-    Define(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdSkelSkeleton Define(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -129,17 +119,17 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDSKEL_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDSKEL_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // JOINTS 
+    // JOINTS
     // --------------------------------------------------------------------- //
     /// An array of path tokens identifying the set of joints that make
     /// up the skeleton, and their order. Each token in the array must be valid
@@ -157,20 +147,20 @@ public:
     USDSKEL_API
     UsdAttribute GetJointsAttr() const;
 
-    /// See GetJointsAttr(), and also 
+    /// See GetJointsAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDSKEL_API
-    UsdAttribute CreateJointsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateJointsAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // JOINTNAMES 
+    // JOINTNAMES
     // --------------------------------------------------------------------- //
     /// If authored, provides a unique name per joint. This may be
-    /// optionally set to provide better names when translating to DCC apps 
+    /// optionally set to provide better names when translating to DCC apps
     /// that require unique joint names.
     ///
     /// | ||
@@ -182,17 +172,17 @@ public:
     USDSKEL_API
     UsdAttribute GetJointNamesAttr() const;
 
-    /// See GetJointNamesAttr(), and also 
+    /// See GetJointNamesAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDSKEL_API
-    UsdAttribute CreateJointNamesAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateJointNamesAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // BINDTRANSFORMS 
+    // BINDTRANSFORMS
     // --------------------------------------------------------------------- //
     /// Specifies the bind-pose transforms of each joint in
     /// **world space**, in the ordering imposed by *joints*.
@@ -206,17 +196,17 @@ public:
     USDSKEL_API
     UsdAttribute GetBindTransformsAttr() const;
 
-    /// See GetBindTransformsAttr(), and also 
+    /// See GetBindTransformsAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDSKEL_API
-    UsdAttribute CreateBindTransformsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateBindTransformsAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // RESTTRANSFORMS 
+    // RESTTRANSFORMS
     // --------------------------------------------------------------------- //
     /// Specifies the rest-pose transforms of each joint in
     /// **local space**, in the ordering imposed by *joints*. This provides
@@ -233,21 +223,21 @@ public:
     USDSKEL_API
     UsdAttribute GetRestTransformsAttr() const;
 
-    /// See GetRestTransformsAttr(), and also 
+    /// See GetRestTransformsAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDSKEL_API
-    UsdAttribute CreateRestTransformsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateRestTransformsAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //

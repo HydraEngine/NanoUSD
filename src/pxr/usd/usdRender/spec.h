@@ -105,9 +105,7 @@ struct UsdRenderSpec {
 /// The same list of namespaces is used for finding namespacedSettings
 /// in all UsdRender prim types.
 USDRENDER_API
-UsdRenderSpec
-UsdRenderComputeSpec(UsdRenderSettings const& settings,
-                     TfTokenVector const& namespaces);
+UsdRenderSpec UsdRenderComputeSpec(UsdRenderSettings const& settings, TfTokenVector const& namespaces);
 
 /// Returns a dictionary populated with attributes filtered by the namespaces.
 /// If a non-empty list of namespaces is provided, only authored attributes
@@ -117,9 +115,7 @@ UsdRenderComputeSpec(UsdRenderSettings const& settings,
 /// \note Special handling is provided for connectable attributes that are used
 ///       to represent node graph outputs.
 USDRENDER_API
-VtDictionary
-UsdRenderComputeNamespacedSettings(UsdPrim const& prim,
-                                   TfTokenVector const& namespaces);
+VtDictionary UsdRenderComputeNamespacedSettings(UsdPrim const& prim, TfTokenVector const& namespaces);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

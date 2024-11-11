@@ -16,41 +16,33 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 namespace {
 
 // Cache of string keys (currently representing variant selections) to session
 // layers.
 typedef TfHashMap<std::string, SdfLayerRefPtr, TfHash> _SessionLayerMap;
 
-_SessionLayerMap&
-GetSessionLayerMap()
-{
+_SessionLayerMap& GetSessionLayerMap() {
     // Heap-allocate and deliberately leak this static cache to avoid
     // problems with static destruction order.
-    static _SessionLayerMap *sessionLayerMap = new _SessionLayerMap();
+    static _SessionLayerMap* sessionLayerMap = new _SessionLayerMap();
     return *sessionLayerMap;
 }
 
-}
+}  // namespace
 
-UsdStageCache&
-UsdUtilsStageCache::Get()
-{
+UsdStageCache& UsdUtilsStageCache::Get() {
     // Heap-allocate and deliberately leak this static cache to avoid
     // problems with static destruction order.
-    static UsdStageCache *theCache = new UsdStageCache();
+    static UsdStageCache* theCache = new UsdStageCache();
     return *theCache;
 }
 
-SdfLayerRefPtr 
-UsdUtilsStageCache::GetSessionLayerForVariantSelections(
-        const TfToken& modelName,
-        const std::vector<std::pair<std::string, std::string> >&variantSelections)
-{
+SdfLayerRefPtr UsdUtilsStageCache::GetSessionLayerForVariantSelections(
+        const TfToken& modelName, const std::vector<std::pair<std::string, std::string>>& variantSelections) {
     // Sort so that the key is deterministic.
-    std::vector<std::pair<std::string, std::string> > variantSelectionsSorted(
-        variantSelections.begin(), variantSelections.end());
+    std::vector<std::pair<std::string, std::string>> variantSelectionsSorted(variantSelections.begin(),
+                                                                             variantSelections.end());
     std::sort(variantSelectionsSorted.begin(), variantSelectionsSorted.end());
 
     std::string sessionKey = modelName;
@@ -68,14 +60,10 @@ UsdUtilsStageCache::GetSessionLayerForVariantSelections(
         if (itr == sessionLayerMap.end()) {
             SdfLayerRefPtr layer = SdfLayer::CreateAnonymous();
             if (!variantSelections.empty()) {
-                SdfPrimSpecHandle over = SdfPrimSpec::New(
-                    layer,
-                    modelName,
-                    SdfSpecifierOver);
+                SdfPrimSpecHandle over = SdfPrimSpec::New(layer, modelName, SdfSpecifierOver);
                 TF_FOR_ALL(varSelItr, variantSelections) {
                     // Construct the variant opinion for the session layer.
-                    over->GetVariantSelections()[varSelItr->first] =
-                        varSelItr->second;
+                    over->GetVariantSelections()[varSelItr->first] = varSelItr->second;
                 }
             }
             sessionLayerMap[sessionKey] = layer;
@@ -87,6 +75,4 @@ UsdUtilsStageCache::GetSessionLayerForVariantSelections(
     return ret;
 }
 
-
 PXR_NAMESPACE_CLOSE_SCOPE
-

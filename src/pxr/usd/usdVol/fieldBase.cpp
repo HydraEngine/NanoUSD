@@ -14,22 +14,15 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType)
-{
-    TfType::Define<UsdVolFieldBase,
-        TfType::Bases< UsdGeomXformable > >();
-    
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<UsdVolFieldBase, TfType::Bases<UsdGeomXformable>>();
 }
 
 /* virtual */
-UsdVolFieldBase::~UsdVolFieldBase()
-{
-}
+UsdVolFieldBase::~UsdVolFieldBase() {}
 
 /* static */
-UsdVolFieldBase
-UsdVolFieldBase::Get(const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdVolFieldBase UsdVolFieldBase::Get(const UsdStagePtr& stage, const SdfPath& path) {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdVolFieldBase();
@@ -37,43 +30,32 @@ UsdVolFieldBase::Get(const UsdStagePtr &stage, const SdfPath &path)
     return UsdVolFieldBase(stage->GetPrimAtPath(path));
 }
 
-
 /* virtual */
-UsdSchemaKind UsdVolFieldBase::_GetSchemaKind() const
-{
+UsdSchemaKind UsdVolFieldBase::_GetSchemaKind() const {
     return UsdVolFieldBase::schemaKind;
 }
 
 /* static */
-const TfType &
-UsdVolFieldBase::_GetStaticTfType()
-{
+const TfType& UsdVolFieldBase::_GetStaticTfType() {
     static TfType tfType = TfType::Find<UsdVolFieldBase>();
     return tfType;
 }
 
 /* static */
-bool 
-UsdVolFieldBase::_IsTypedSchema()
-{
+bool UsdVolFieldBase::_IsTypedSchema() {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdVolFieldBase::_GetTfType() const
-{
+const TfType& UsdVolFieldBase::_GetTfType() const {
     return _GetStaticTfType();
 }
 
 /*static*/
-const TfTokenVector&
-UsdVolFieldBase::GetSchemaAttributeNames(bool includeInherited)
-{
+const TfTokenVector& UsdVolFieldBase::GetSchemaAttributeNames(bool includeInherited) {
     static TfTokenVector localNames;
-    static TfTokenVector allNames =
-        UsdGeomXformable::GetSchemaAttributeNames(true);
+    static TfTokenVector allNames = UsdGeomXformable::GetSchemaAttributeNames(true);
 
     if (includeInherited)
         return allNames;

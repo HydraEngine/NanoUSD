@@ -1,46 +1,28 @@
-set(PXR_PREFIX pxr/usd)
-set(PXR_PACKAGE usdSemantics)
+#  Copyright (c) 2023 Feng Yang
+#
+#  I am making my contributions/submissions to this project solely in my
+#  personal capacity and am not conveying any rights to any intellectual
+#  property of any third parties.
 
-pxr_library(usdSemantics
-    INCLUDE_SCHEMA_FILES
+# create sample app project
+project(usdSemantics LANGUAGES C CXX)
 
-    LIBRARIES
-        tf
-        vt
-        usd
-
-    PUBLIC_CLASSES
-        labelsQuery
-
-    PUBLIC_HEADERS
-        api.h
-
-    PYTHON_CPPFILES
-        moduleDeps.cpp
-
-    PYMODULE_CPPFILES
-        wrapLabelsQuery.cpp
-
-    PYMODULE_FILES
-        __init__.py
-
-    DOXYGEN_FILES
-        overview.md
+set(SRC_FILES
+        labelsAPI.cpp
+        labelsQuery.cpp
+        tokens.cpp
 )
 
-pxr_test_scripts(
-    testenv/testUsdSemanticsLabelsAPI.py
-    testenv/testUsdSemanticsLabelsQuery.py
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+        ${PXR_INCLUDE_PATH}
 )
 
-pxr_register_test(testUsdSemanticsLabelsAPI
-    PYTHON
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdSemanticsLabelsAPI"
-    EXPECTED_RETURN_CODE 0
+target_link_libraries(${PROJECT_NAME} PUBLIC
+        fmt::fmt
+        Eigen3::Eigen
+        TBB::tbb
 )
 
-pxr_register_test(testUsdSemanticsQuery
-    PYTHON
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdSemanticsLabelsQuery"
-    EXPECTED_RETURN_CODE 0
-)
+set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)

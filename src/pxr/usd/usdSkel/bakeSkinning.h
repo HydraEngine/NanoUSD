@@ -26,8 +26,7 @@ class UsdSkelCache;
 class UsdSkelRoot;
 
 /// Parameters for configuring UsdSkelBakeSkinning.
-struct UsdSkelBakeSkinningParms
-{
+struct UsdSkelBakeSkinningParms {
     /// Flags for identifying different deformation paths.
     enum DeformationFlags {
         DeformPointsWithSkinning = 1 << 0,
@@ -35,16 +34,13 @@ struct UsdSkelBakeSkinningParms
         DeformXformWithSkinning = 1 << 2,
         DeformPointsWithBlendShapes = 1 << 3,
         DeformNormalsWithBlendShapes = 1 << 4,
-        DeformWithSkinning = (DeformPointsWithSkinning|
-                              DeformNormalsWithSkinning|
-                              DeformXformWithSkinning),
-        DeformWithBlendShapes = (DeformPointsWithBlendShapes|
-                                 DeformNormalsWithBlendShapes),
-        DeformAll = DeformWithSkinning|DeformWithBlendShapes,
+        DeformWithSkinning = (DeformPointsWithSkinning | DeformNormalsWithSkinning | DeformXformWithSkinning),
+        DeformWithBlendShapes = (DeformPointsWithBlendShapes | DeformNormalsWithBlendShapes),
+        DeformAll = DeformWithSkinning | DeformWithBlendShapes,
         /// Flags indicating which components of skinned prims may be
         /// modified, based on the active deformations.
-        ModifiesPoints = DeformPointsWithSkinning|DeformPointsWithBlendShapes,
-        ModifiesNormals = DeformNormalsWithSkinning|DeformNormalsWithBlendShapes,
+        ModifiesPoints = DeformPointsWithSkinning | DeformPointsWithBlendShapes,
+        ModifiesNormals = DeformNormalsWithSkinning | DeformNormalsWithBlendShapes,
         ModifiesXform = DeformXformWithSkinning
     };
 
@@ -61,7 +57,7 @@ struct UsdSkelBakeSkinningParms
     /// are flushed each time pending writes exceed this amount.
     /// Note that at least one frame of data for *all* skinned prims
     /// will be held in memory prior to values being written to disk,
-    /// regardless of this memory limit.    
+    /// regardless of this memory limit.
     /// Since flushing pending changes requires layers to be saved,
     /// memory limiting is only active when _saveLayers_ is enabled.
     size_t memoryLimit = 0;
@@ -98,7 +94,6 @@ struct UsdSkelBakeSkinningParms
     VtUIntArray layerIndices;
 };
 
-
 /// Bake the effect of skinning prims directly into points and transforms,
 /// over \p interval.
 /// This is intended to serve as a complete reference implementation,
@@ -115,13 +110,11 @@ struct UsdSkelBakeSkinningParms
 /// the pipeline as possible (I.e., render time), partially for the sake of
 /// improving IO in distributed renderings contexts. We encourage users to
 /// bring similar deferred-deformation capabalities to their renderer, rather
-/// than relying on baking data down. 
+/// than relying on baking data down.
 USDSKEL_API
-bool
-UsdSkelBakeSkinning(const UsdSkelCache& skelCache,
-                    const UsdSkelBakeSkinningParms& parms,
-                    const GfInterval& interval=GfInterval::GetFullInterval());
-
+bool UsdSkelBakeSkinning(const UsdSkelCache& skelCache,
+                         const UsdSkelBakeSkinningParms& parms,
+                         const GfInterval& interval = GfInterval::GetFullInterval());
 
 /// Overload of UsdSkelBakeSkinning, which bakes the effect of skinning prims
 /// directly into points and transforms, for all skels bound beneath \p root,
@@ -129,10 +122,7 @@ UsdSkelBakeSkinning(const UsdSkelCache& skelCache,
 /// Skinning is baked into the current edit target. The edit target is *not*
 /// saved during skinning: the caller should Save() or Export() the result.
 USDSKEL_API
-bool
-UsdSkelBakeSkinning(const UsdSkelRoot& root,
-                    const GfInterval& interval=GfInterval::GetFullInterval());
-
+bool UsdSkelBakeSkinning(const UsdSkelRoot& root, const GfInterval& interval = GfInterval::GetFullInterval());
 
 /// Overload of UsdSkelBakeSkinning, which bakes the effect of skinning prims
 /// directly into points and transforms, for all SkelRoot prims in \p range,
@@ -140,12 +130,8 @@ UsdSkelBakeSkinning(const UsdSkelRoot& root,
 /// Skinning is baked into the current edit target. The edit target is *not*
 /// saved during skinning: the caller should Save() or Export() the result.
 USDSKEL_API
-bool
-UsdSkelBakeSkinning(const UsdPrimRange& range,
-                    const GfInterval& interval=GfInterval::GetFullInterval());
-
+bool UsdSkelBakeSkinning(const UsdPrimRange& range, const GfInterval& interval = GfInterval::GetFullInterval());
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-
-#endif // PXR_USD_USD_SKEL_BAKE_SKINNING_H
+#endif  // PXR_USD_USD_SKEL_BAKE_SKINNING_H

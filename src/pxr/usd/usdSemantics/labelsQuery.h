@@ -19,7 +19,6 @@
 #include <unordered_map>
 #include <variant>
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
 /// The `UsdSemanticsLabelsQuery` can be used to query a prim's
@@ -30,18 +29,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// The query caches certain reads and computations and should be discarded
 /// when the state of the stage changes. Queries are thread safe.
-class UsdSemanticsLabelsQuery
-{
+class UsdSemanticsLabelsQuery {
 public:
     UsdSemanticsLabelsQuery(const UsdSemanticsLabelsQuery&) = delete;
-    UsdSemanticsLabelsQuery& operator=(
-        const UsdSemanticsLabelsQuery&) = delete;
+    UsdSemanticsLabelsQuery& operator=(const UsdSemanticsLabelsQuery&) = delete;
 
     /// Constructs a query for a `taxonomy` at a single `timeCode`.
-    /// 
+    ///
     /// Requires that the `taxonomy` must not be empty.
-    USDSEMANTICS_API UsdSemanticsLabelsQuery(const TfToken& taxonomy,
-                                             UsdTimeCode timeCode);
+    USDSEMANTICS_API UsdSemanticsLabelsQuery(const TfToken& taxonomy, UsdTimeCode timeCode);
 
     /// Construct a query for a `taxonomy` over an `interval`.
     ///
@@ -50,10 +46,9 @@ public:
     /// \warning Finite minimum values of the interval will return the same
     /// result regardless of closed or open state due to held interpolation
     /// semantics and Zeno's paradox.
-    USDSEMANTICS_API UsdSemanticsLabelsQuery(const TfToken& taxonomy,
-                                             const GfInterval& interval);
+    USDSEMANTICS_API UsdSemanticsLabelsQuery(const TfToken& taxonomy, const GfInterval& interval);
 
-    /// Computes the values for `semantics:labels:<taxonomy>` directly applied 
+    /// Computes the values for `semantics:labels:<taxonomy>` directly applied
     /// to this prim. If this query's specified time is a time code, returns the
     /// values at that time, otherwise, computes the union of values
     /// for the interval.
@@ -67,9 +62,9 @@ public:
     USDSEMANTICS_API
     VtTokenArray ComputeUniqueDirectLabels(const UsdPrim& prim) const;
 
-    /// Computes the values for `semantics:labels:<taxonomy>` including any 
-    /// labels inherited from ancestors. If this query's specified time is a 
-    /// time code, returns the values at that time, otherwise, computes the 
+    /// Computes the values for `semantics:labels:<taxonomy>` including any
+    /// labels inherited from ancestors. If this query's specified time is a
+    /// time code, returns the values at that time, otherwise, computes the
     /// union of values for the interval.
     ///
     /// The results are sorted as if by std::sort
@@ -96,15 +91,13 @@ public:
     bool HasInheritedLabel(const UsdPrim& prim, const TfToken& label) const;
 
     /// Returns the time used by this query when computing a prim's labels.
-    const std::variant<GfInterval, UsdTimeCode>& GetTime() const & { 
-        return _time; }
-    
+    const std::variant<GfInterval, UsdTimeCode>& GetTime() const& { return _time; }
+
     /// Returns the time used by this query when computing a prim's labels.
-    std::variant<GfInterval, UsdTimeCode> GetTime() && { 
-        return std::move(_time); }
+    std::variant<GfInterval, UsdTimeCode> GetTime() && { return std::move(_time); }
 
     /// Returns the taxonomy used by this query when computing a prim's labels.
-    const TfToken& GetTaxonomy() const & { return _taxonomy; }
+    const TfToken& GetTaxonomy() const& { return _taxonomy; }
 
     /// Returns the taxonomy used by this query when computing a prim's labels.
     TfToken GetTaxonomy() && { return std::move(_taxonomy); }

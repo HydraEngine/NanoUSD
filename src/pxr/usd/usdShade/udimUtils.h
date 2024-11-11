@@ -26,43 +26,37 @@ SDF_DECLARE_HANDLES(SdfLayer);
 ///
 class UsdShadeUdimUtils {
 public:
-
     /// Pair representing a resolved UDIM path.
     /// The first member is the fully resolved path
     /// The second number contains only the UDIM tile identifier.
     using ResolvedPathAndTile = std::pair<std::string, std::string>;
 
-    /// Checks if \p identifier contains a UDIM token. Currently only "<UDIM>" 
+    /// Checks if \p identifier contains a UDIM token. Currently only "<UDIM>"
     /// is supported, but other patterns such as "_MAPID_" may be supported in
     /// the future.
     USDSHADE_API
-    static bool IsUdimIdentifier(const std::string &identifier);
-    
+    static bool IsUdimIdentifier(const std::string& identifier);
+
     /// Replaces the UDIM pattern contained in \p identifierWithPattern
     /// with \p replacement
     USDSHADE_API
-    static std::string ReplaceUdimPattern(
-        const std::string &identifierWithPattern,
-        const std::string &replacement);
+    static std::string ReplaceUdimPattern(const std::string& identifierWithPattern, const std::string& replacement);
 
     /// Resolves a \p udimPath containing a UDIM token. The path is first
     /// anchored with the passed \p layer if needed, then the function attempts
     /// to resolve any possible UDIM tiles. If any exist, the resolved path is
-    /// returned with "<UDIM>" substituted back in. If no resolves succeed or 
+    /// returned with "<UDIM>" substituted back in. If no resolves succeed or
     /// \p udimPath does not contain a UDIM token, an empty string is returned.
     USDSHADE_API
-    static std::string ResolveUdimPath(
-        const std::string &udimPath,
-        const SdfLayerHandle &layer);
+    static std::string ResolveUdimPath(const std::string& udimPath, const SdfLayerHandle& layer);
 
     /// Attempts to resolve all paths which match a path containing a UDIM
-    /// pattern. The path is first anchored with the passed \p layer if needed, 
-    /// then the function attempts to resolve all possible UDIM numbers in the 
+    /// pattern. The path is first anchored with the passed \p layer if needed,
+    /// then the function attempts to resolve all possible UDIM numbers in the
     /// path.
     USDSHADE_API
-    static std::vector<ResolvedPathAndTile> ResolveUdimTilePaths(
-        const std::string &udimPath,
-        const SdfLayerHandle &layer);
+    static std::vector<ResolvedPathAndTile> ResolveUdimTilePaths(const std::string& udimPath,
+                                                                 const SdfLayerHandle& layer);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

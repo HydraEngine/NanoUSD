@@ -9,8 +9,7 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-TF_WRAP_MODULE
-{
+TF_WRAP_MODULE {
     TF_WRAP(UsdSkelAnimMapper);
     TF_WRAP(UsdSkelAnimQuery);
     TF_WRAP(UsdSkelBakeSkinning);
@@ -23,6 +22,6 @@ TF_WRAP_MODULE
     TF_WRAP(UsdSkelTopology);
     TF_WRAP(UsdSkelUtils);
 
-    // Generated Schema classes.  Do not remove or edit the following line.
-    #include "generatedSchema.module.h"
+// Generated Schema classes.  Do not remove or edit the following line.
+#include "generatedSchema.module.h"
 }

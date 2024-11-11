@@ -26,46 +26,29 @@
 
 #include <string>
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-
-TF_DEFINE_ENV_SETTING(
-    USD_FORCE_DEFAULT_MATERIALS_SCOPE_NAME,
-    false,
-    "Disables the ability to configure the materials scope name with a "
-    "plugInfo.json value and forces the use of the built-in default instead. "
-    "This is primarily used for unit testing purposes as a way to ignore any "
-    "site-based configuration.");
-
+TF_DEFINE_ENV_SETTING(USD_FORCE_DEFAULT_MATERIALS_SCOPE_NAME,
+                      false,
+                      "Disables the ability to configure the materials scope name with a "
+                      "plugInfo.json value and forces the use of the built-in default instead. "
+                      "This is primarily used for unit testing purposes as a way to ignore any "
+                      "site-based configuration.");
 
 TF_DEFINE_PRIVATE_TOKENS(
-    _tokens,
+        _tokens,
 
-    (UsdUtilsPipeline)
-        (MaterialsScopeName)
-        (PrimaryCameraName)
-        (ProvidesRegisteredVariantSetsFromPlugin)
-        (RegisteredVariantSets)
-            (selectionExportPolicy)
+        (UsdUtilsPipeline)(MaterialsScopeName)(PrimaryCameraName)(ProvidesRegisteredVariantSetsFromPlugin)(RegisteredVariantSets)(selectionExportPolicy)
 
-    ((DefaultMaterialsScopeName, "Looks"))
-    ((DefaultPrimaryCameraName, "main_cam"))
+                ((DefaultMaterialsScopeName, "Looks"))((DefaultPrimaryCameraName, "main_cam"))
 
-    (pref)
-    (st)
-);
+                        (pref)(st));
 
-
-TfToken UsdUtilsGetAlphaAttributeNameForColor(TfToken const &colorAttrName)
-{
-    return TfToken(colorAttrName.GetString()+std::string("_A"));
+TfToken UsdUtilsGetAlphaAttributeNameForColor(TfToken const& colorAttrName) {
+    return TfToken(colorAttrName.GetString() + std::string("_A"));
 }
 
-TfToken
-UsdUtilsGetModelNameFromRootLayer(
-    const SdfLayerHandle& rootLayer)
-{
+TfToken UsdUtilsGetModelNameFromRootLayer(const SdfLayerHandle& rootLayer) {
     // First check if if we have the metadata.
     TfToken modelName = rootLayer->GetDefaultPrim();
     if (!modelName.IsEmpty()) {
@@ -78,10 +61,8 @@ UsdUtilsGetModelNameFromRootLayer(
     std::string baseName = TfGetBaseName(filePath);
     modelName = TfToken(baseName.substr(0, baseName.find('.')));
 
-    if (!modelName.IsEmpty() &&
-            SdfPath::IsValidIdentifier(modelName) && 
-            rootLayer->GetPrimAtPath(
-                SdfPath::AbsoluteRootPath().AppendChild(modelName))) {
+    if (!modelName.IsEmpty() && SdfPath::IsValidIdentifier(modelName) &&
+        rootLayer->GetPrimAtPath(SdfPath::AbsoluteRootPath().AppendChild(modelName))) {
         return modelName;
     }
 
@@ -96,48 +77,35 @@ UsdUtilsGetModelNameFromRootLayer(
     return modelName;
 }
 
-TF_MAKE_STATIC_DATA(std::set<UsdUtilsRegisteredVariantSet>, _regVarSets)
-{
-}
+TF_MAKE_STATIC_DATA(std::set<UsdUtilsRegisteredVariantSet>, _regVarSets) {}
 
-static void
-_RegisterVariantSetsFromPlugInfos()
-{
+static void _RegisterVariantSetsFromPlugInfos() {
     for (PlugPluginPtr plug : PlugRegistry::GetInstance().GetAllPlugins()) {
         JsObject metadata = plug->GetMetadata();
         JsValue pipelineUtilsDictValue;
         if (TfMapLookup(metadata, _tokens->UsdUtilsPipeline, &pipelineUtilsDictValue)) {
             if (!pipelineUtilsDictValue.Is<JsObject>()) {
-                TF_CODING_ERROR(
-                        "%s[UsdUtilsPipeline] was not a dictionary.",
-                        plug->GetName().c_str());
+                TF_CODING_ERROR("%s[UsdUtilsPipeline] was not a dictionary.", plug->GetName().c_str());
                 continue;
             }
 
-            JsObject pipelineUtilsDict =
-                pipelineUtilsDictValue.Get<JsObject>();
+            JsObject pipelineUtilsDict = pipelineUtilsDictValue.Get<JsObject>();
 
             JsValue registeredVariantSetsValue;
-            if (TfMapLookup(pipelineUtilsDict,
-                        _tokens->RegisteredVariantSets,
-                        &registeredVariantSetsValue)) {
+            if (TfMapLookup(pipelineUtilsDict, _tokens->RegisteredVariantSets, &registeredVariantSetsValue)) {
                 if (!registeredVariantSetsValue.IsObject()) {
-                    TF_CODING_ERROR(
-                            "%s[UsdUtilsPipeline][RegisteredVariantSets] was not a dictionary.",
-                            plug->GetName().c_str());
+                    TF_CODING_ERROR("%s[UsdUtilsPipeline][RegisteredVariantSets] was not a dictionary.",
+                                    plug->GetName().c_str());
                     continue;
                 }
 
-                const JsObject& registeredVariantSets =
-                    registeredVariantSetsValue.GetJsObject();
-                for (const auto& i: registeredVariantSets) {
+                const JsObject& registeredVariantSets = registeredVariantSetsValue.GetJsObject();
+                for (const auto& i : registeredVariantSets) {
                     const std::string& variantSetName = i.first;
                     const JsValue& v = i.second;
                     if (!v.IsObject()) {
-                        TF_CODING_ERROR(
-                                "%s[UsdUtilsPipeline][RegisteredVariantSets][%s] was not a dictionary.",
-                                plug->GetName().c_str(),
-                                variantSetName.c_str());
+                        TF_CODING_ERROR("%s[UsdUtilsPipeline][RegisteredVariantSets][%s] was not a dictionary.",
+                                        plug->GetName().c_str(), variantSetName.c_str());
                         continue;
                     }
 
@@ -145,12 +113,10 @@ _RegisterVariantSetsFromPlugInfos()
                     std::string variantSetType = info[_tokens->selectionExportPolicy].GetString();
 
                     UsdUtilsRegisteredVariantSet::SelectionExportPolicy selectionExportPolicy;
-                    if (!UsdUtilsRegisteredVariantSet::
-                            GetSelectionExportPolicyFromString(
-                                variantSetType, &selectionExportPolicy)) {
-                        TF_CODING_ERROR(
-                            "%s[UsdUtilsPipeline][RegisteredVariantSets][%s] was not valid.",
-                            plug->GetName().c_str(), variantSetName.c_str());
+                    if (!UsdUtilsRegisteredVariantSet::GetSelectionExportPolicyFromString(variantSetType,
+                                                                                          &selectionExportPolicy)) {
+                        TF_CODING_ERROR("%s[UsdUtilsPipeline][RegisteredVariantSets][%s] was not valid.",
+                                        plug->GetName().c_str(), variantSetName.c_str());
                         continue;
                     }
                     UsdUtilsRegisterVariantSet(variantSetName, selectionExportPolicy);
@@ -160,30 +126,23 @@ _RegisterVariantSetsFromPlugInfos()
     }
 }
 
-static void
-_LoadPluginsThatRegisterVariantSets()
-{
+static void _LoadPluginsThatRegisterVariantSets() {
     for (PlugPluginPtr plug : PlugRegistry::GetInstance().GetAllPlugins()) {
         JsObject metadata = plug->GetMetadata();
         JsValue pipelineUtilsDictValue;
         if (TfMapLookup(metadata, _tokens->UsdUtilsPipeline, &pipelineUtilsDictValue)) {
             if (!pipelineUtilsDictValue.Is<JsObject>()) {
-                TF_CODING_ERROR(
-                        "%s[UsdUtilsPipeline] was not a dictionary.",
-                        plug->GetName().c_str());
+                TF_CODING_ERROR("%s[UsdUtilsPipeline] was not a dictionary.", plug->GetName().c_str());
                 continue;
             }
 
-            JsObject pipelineUtilsDict =
-                pipelineUtilsDictValue.Get<JsObject>();
+            JsObject pipelineUtilsDict = pipelineUtilsDictValue.Get<JsObject>();
             JsValue registersVariantSets;
-            if (TfMapLookup(pipelineUtilsDict,
-                        _tokens->ProvidesRegisteredVariantSetsFromPlugin,
-                        &registersVariantSets)) {
+            if (TfMapLookup(pipelineUtilsDict, _tokens->ProvidesRegisteredVariantSetsFromPlugin,
+                            &registersVariantSets)) {
                 if (!registersVariantSets.IsBool()) {
-                    TF_CODING_ERROR(
-                            "%s[UsdUtilsPipeline][ProvidesRegisteredVariantSetsFromPlugin] was not a bool.",
-                            plug->GetName().c_str());
+                    TF_CODING_ERROR("%s[UsdUtilsPipeline][ProvidesRegisteredVariantSetsFromPlugin] was not a bool.",
+                                    plug->GetName().c_str());
                 }
 
                 if (registersVariantSets.GetBool()) {
@@ -194,9 +153,7 @@ _LoadPluginsThatRegisterVariantSets()
     }
 }
 
-const std::set<UsdUtilsRegisteredVariantSet>&
-UsdUtilsGetRegisteredVariantSets()
-{
+const std::set<UsdUtilsRegisteredVariantSet>& UsdUtilsGetRegisteredVariantSets() {
     // Lazy population on first use.
     static std::once_flag _flag;
     std::call_once(_flag, []() {
@@ -213,19 +170,12 @@ UsdUtilsGetRegisteredVariantSets()
     return *_regVarSets;
 }
 
-void
-UsdUtilsRegisterVariantSet(
-    const std::string& variantSetName,
-    const UsdUtilsRegisteredVariantSet::SelectionExportPolicy&
-        selectionExportPolicy)
-{
+void UsdUtilsRegisterVariantSet(const std::string& variantSetName,
+                                const UsdUtilsRegisteredVariantSet::SelectionExportPolicy& selectionExportPolicy) {
     _regVarSets->emplace(variantSetName, selectionExportPolicy);
 }
 
-UsdPrim 
-UsdUtilsGetPrimAtPathWithForwarding(const UsdStagePtr &stage, 
-                                    const SdfPath &path)
-{
+UsdPrim UsdUtilsGetPrimAtPathWithForwarding(const UsdStagePtr& stage, const SdfPath& path) {
     // If the given path refers to a prim beneath an instance,
     // UsdStage::GetPrimAtPath will return an instance proxy
     // from which we can retrieve the corresponding prim in
@@ -234,10 +184,7 @@ UsdUtilsGetPrimAtPathWithForwarding(const UsdStagePtr &stage,
     return (p && p.IsInstanceProxy()) ? p.GetPrimInPrototype() : p;
 }
 
-UsdPrim 
-UsdUtilsUninstancePrimAtPath(const UsdStagePtr &stage, 
-                             const SdfPath &path)
-{
+UsdPrim UsdUtilsUninstancePrimAtPath(const UsdStagePtr& stage, const SdfPath& path) {
     // If a valid prim exists at the requested path, simply return it.
     // If the prim is an instance proxy, it means this path indicates
     // a prim beneath an instance. In order to uninstance it, we need
@@ -272,13 +219,11 @@ UsdUtilsUninstancePrimAtPath(const UsdStagePtr &stage,
     return p;
 }
 
-const TfToken& UsdUtilsGetPrimaryUVSetName()
-{
+const TfToken& UsdUtilsGetPrimaryUVSetName() {
     return _tokens->st;
 }
 
-const TfToken& UsdUtilsGetPrefName()
-{
+const TfToken& UsdUtilsGetPrefName() {
     return _tokens->pref;
 }
 
@@ -292,16 +237,12 @@ using _TokenToTokenMap = TfHashMap<TfToken, TfToken, TfToken::HashFunctor>;
 ///
 /// The first valid string value identifier found for each identifierKey, if
 /// any, is inserted into the returned map.
-static
-_TokenToTokenMap
-_GetPipelineIdentifierTokens(const TfTokenVector& identifierKeys)
-{
+static _TokenToTokenMap _GetPipelineIdentifierTokens(const TfTokenVector& identifierKeys) {
     const TfToken metadataDictKey = _tokens->UsdUtilsPipeline;
 
     _TokenToTokenMap identifierMap;
 
-    const PlugPluginPtrVector plugs =
-        PlugRegistry::GetInstance().GetAllPlugins();
+    const PlugPluginPtrVector plugs = PlugRegistry::GetInstance().GetAllPlugins();
     for (const PlugPluginPtr& plug : plugs) {
         JsObject metadata = plug->GetMetadata();
         JsValue metadataDictValue;
@@ -310,10 +251,7 @@ _GetPipelineIdentifierTokens(const TfTokenVector& identifierKeys)
         }
 
         if (!metadataDictValue.Is<JsObject>()) {
-            TF_CODING_ERROR(
-                "%s[%s] was not a dictionary.",
-                plug->GetName().c_str(),
-                metadataDictKey.GetText());
+            TF_CODING_ERROR("%s[%s] was not a dictionary.", plug->GetName().c_str(), metadataDictKey.GetText());
             continue;
         }
 
@@ -326,22 +264,15 @@ _GetPipelineIdentifierTokens(const TfTokenVector& identifierKeys)
             }
 
             if (!stringJsValue.IsString()) {
-                TF_CODING_ERROR(
-                    "%s[%s][%s] was not a string.",
-                    plug->GetName().c_str(),
-                    metadataDictKey.GetText(),
-                    identifierKey.GetText());
+                TF_CODING_ERROR("%s[%s][%s] was not a string.", plug->GetName().c_str(), metadataDictKey.GetText(),
+                                identifierKey.GetText());
                 continue;
             }
 
             const std::string valueString = stringJsValue.GetString();
             if (!SdfPath::IsValidIdentifier(valueString)) {
-                TF_CODING_ERROR(
-                    "%s[%s][%s] was not a valid identifier: \"%s\".",
-                    plug->GetName().c_str(),
-                    metadataDictKey.GetText(),
-                    identifierKey.GetText(),
-                    valueString.c_str());
+                TF_CODING_ERROR("%s[%s][%s] was not a valid identifier: \"%s\".", plug->GetName().c_str(),
+                                metadataDictKey.GetText(), identifierKey.GetText(), valueString.c_str());
                 continue;
             }
 
@@ -358,42 +289,27 @@ _GetPipelineIdentifierTokens(const TfTokenVector& identifierKeys)
     return identifierMap;
 }
 
-TF_MAKE_STATIC_DATA(_TokenToTokenMap, _pipelineIdentifiersMap)
-{
-    const TfTokenVector identifierKeys({
-        _tokens->MaterialsScopeName,
-        _tokens->PrimaryCameraName
-    });
+TF_MAKE_STATIC_DATA(_TokenToTokenMap, _pipelineIdentifiersMap) {
+    const TfTokenVector identifierKeys({_tokens->MaterialsScopeName, _tokens->PrimaryCameraName});
 
     *_pipelineIdentifiersMap = _GetPipelineIdentifierTokens(identifierKeys);
 }
 
-TfToken
-UsdUtilsGetMaterialsScopeName(const bool forceDefault)
-{
-    if (TfGetEnvSetting(USD_FORCE_DEFAULT_MATERIALS_SCOPE_NAME) ||
-            forceDefault) {
+TfToken UsdUtilsGetMaterialsScopeName(const bool forceDefault) {
+    if (TfGetEnvSetting(USD_FORCE_DEFAULT_MATERIALS_SCOPE_NAME) || forceDefault) {
         return _tokens->DefaultMaterialsScopeName;
     }
 
-    return TfMapLookupByValue(
-        *_pipelineIdentifiersMap,
-        _tokens->MaterialsScopeName,
-        _tokens->DefaultMaterialsScopeName);
+    return TfMapLookupByValue(*_pipelineIdentifiersMap, _tokens->MaterialsScopeName,
+                              _tokens->DefaultMaterialsScopeName);
 }
 
-TfToken
-UsdUtilsGetPrimaryCameraName(const bool forceDefault)
-{
+TfToken UsdUtilsGetPrimaryCameraName(const bool forceDefault) {
     if (forceDefault) {
         return _tokens->DefaultPrimaryCameraName;
     }
 
-    return TfMapLookupByValue(
-        *_pipelineIdentifiersMap,
-        _tokens->PrimaryCameraName,
-        _tokens->DefaultPrimaryCameraName);
+    return TfMapLookupByValue(*_pipelineIdentifiersMap, _tokens->PrimaryCameraName, _tokens->DefaultPrimaryCameraName);
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

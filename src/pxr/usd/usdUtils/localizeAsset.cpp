@@ -30,24 +30,16 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class UsdUtils_LocalizedAssetBuilder : public UsdUtils_AssetLocalizationPackage
-{
+class UsdUtils_LocalizedAssetBuilder : public UsdUtils_AssetLocalizationPackage {
 public:
-    virtual bool 
-    Write(
-        const std::string &localizationRoot) override
-    {
+    virtual bool Write(const std::string& localizationRoot) override {
         _localizationRoot = localizationRoot;
 
         return UsdUtils_AssetLocalizationPackage::Write(_localizationRoot);
     }
 
 protected:
-    virtual bool 
-    _WriteToPackage(
-        const std::string &src, 
-        const std::string &dest) override
-    {
+    virtual bool _WriteToPackage(const std::string& src, const std::string& dest) override {
         auto& resolver = ArGetResolver();
 
         const std::string destPath = TfStringCatPaths(_localizationRoot, dest);
@@ -56,19 +48,18 @@ protected:
 
         if (srcResolvedPath.empty()) {
             TF_WARN("Failed to resolve source path: %s", src.c_str());
-            
+
             return false;
         }
 
         if (destResolvedPath.empty()) {
             TF_WARN("Failed to resolve source path: %s", dest.c_str());
-            
+
             return false;
         }
 
         auto sourceAsset = resolver.OpenAsset(srcResolvedPath);
-        auto destAsset = resolver.OpenAssetForWrite(
-                destResolvedPath, ArResolver::WriteMode::Replace);
+        auto destAsset = resolver.OpenAssetForWrite(destResolvedPath, ArResolver::WriteMode::Replace);
 
         if (!sourceAsset) {
             TF_WARN("Failed to open source asset: %s", src.c_str());
@@ -99,18 +90,14 @@ protected:
     std::string _localizationRoot;
 };
 
-bool
-UsdUtilsLocalizeAsset(
-    const SdfAssetPath& assetPath,
-    const std::string& localizationDir,
-    bool editLayersInPlace,
-    std::function<UsdUtilsProcessingFunc> processingFunc)
-{
+bool UsdUtilsLocalizeAsset(const SdfAssetPath& assetPath,
+                           const std::string& localizationDir,
+                           bool editLayersInPlace,
+                           std::function<UsdUtilsProcessingFunc> processingFunc) {
     TRACE_FUNCTION();
 
     if (TfPathExists(localizationDir) && !TfIsDir(localizationDir)) {
-        TF_CODING_ERROR("Unable to localize to non directory path: %s", 
-            localizationDir.c_str());
+        TF_CODING_ERROR("Unable to localize to non directory path: %s", localizationDir.c_str());
         return false;
     }
 

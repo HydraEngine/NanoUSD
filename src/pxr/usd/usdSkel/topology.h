@@ -16,17 +16,14 @@
 #include "pxr/usd/sdf/path.h"
 #include "pxr/usd/sdf/types.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
-
 
 /// \class UsdSkelTopology
 ///
 /// Object holding information describing skeleton topology.
 /// This provides the hierarchical information needed to reason about joint
 /// relationships in a manner suitable to computations.
-class UsdSkelTopology
-{
+class UsdSkelTopology {
 public:
     /// Construct an empty topology.
     UsdSkelTopology() = default;
@@ -53,7 +50,7 @@ public:
     /// If validation is unsuccessful, a reason
     /// why will be written to \p reason, if provided.
     USDSKEL_API
-    bool Validate(std::string* reason=nullptr) const;
+    bool Validate(std::string* reason = nullptr) const;
 
     const VtIntArray& GetParentIndices() const { return _parentIndices; }
 
@@ -70,23 +67,17 @@ public:
 
     bool operator==(const UsdSkelTopology& o) const;
 
-    bool operator!=(const UsdSkelTopology& o) const {
-        return !(*this == o);
-    }
+    bool operator!=(const UsdSkelTopology& o) const { return !(*this == o); }
 
 private:
     VtIntArray _parentIndices;
 };
 
-
-int
-UsdSkelTopology::GetParent(size_t index) const
-{
+int UsdSkelTopology::GetParent(size_t index) const {
     TF_DEV_AXIOM(index < _parentIndices.size());
     return _parentIndices[index];
 }
 
-
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_SKEL_TOPOLOGY_H
+#endif  // PXR_USD_USD_SKEL_TOPOLOGY_H

@@ -16,7 +16,7 @@
 #include "pxr/usd/usd/stage.h"
 #include "pxr/usd/usdRi/tokens.h"
 
-#include "pxr/usd/usd/collectionAPI.h" 
+#include "pxr/usd/usd/collectionAPI.h"
 
 #include "pxr/base/vt/value.h"
 
@@ -37,28 +37,27 @@ class SdfAssetPath;
 
 /// \class UsdRiRenderPassAPI
 ///
-/// 
+///
 /// RiRenderPassAPI is an API schema that provides a mechanism
 /// to set certain Ri statements on each prim in a collection,
 /// for a given RenderPass prim.
-/// 
+///
 /// \anchor usdRi_cameraVisibility
-/// The objects that are relevant to the render is specified via the 
-/// cameraVisibility collection (UsdCollectionAPI) and can be accessed via 
+/// The objects that are relevant to the render is specified via the
+/// cameraVisibility collection (UsdCollectionAPI) and can be accessed via
 /// GetCameraVisibilityCollectionAPI(). Each prim in the collection will have
-/// ri:visible:camera set to 1.  By default everything in the scene should be 
+/// ri:visible:camera set to 1.  By default everything in the scene should be
 /// visible to camera, so this collection sets includeRoot to 1.
-/// 
+///
 /// \anchor usdRi_matte
-/// The objects that are relevant to the render is specified via the 
-/// matte collection (UsdCollectionAPI) and can be accessed via 
+/// The objects that are relevant to the render is specified via the
+/// matte collection (UsdCollectionAPI) and can be accessed via
 /// GetMatteCollectionAPI().  Each prim in the collection will have
 /// ri:matte set to 1.  By default everything in the scene should render
 /// normally, so this collection sets includeRoot to 0.
-/// 
 ///
-class UsdRiRenderPassAPI : public UsdAPISchemaBase
-{
+///
+class UsdRiRenderPassAPI : public UsdAPISchemaBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -69,18 +68,12 @@ public:
     /// Equivalent to UsdRiRenderPassAPI::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdRiRenderPassAPI(const UsdPrim& prim=UsdPrim())
-        : UsdAPISchemaBase(prim)
-    {
-    }
+    explicit UsdRiRenderPassAPI(const UsdPrim& prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
     /// Construct a UsdRiRenderPassAPI on the prim held by \p schemaObj .
     /// Should be preferred over UsdRiRenderPassAPI(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdRiRenderPassAPI(const UsdSchemaBase& schemaObj)
-        : UsdAPISchemaBase(schemaObj)
-    {
-    }
+    explicit UsdRiRenderPassAPI(const UsdSchemaBase& schemaObj) : UsdAPISchemaBase(schemaObj) {}
 
     /// Destructor.
     USDRI_API
@@ -90,8 +83,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDRI_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdRiRenderPassAPI holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -103,20 +95,18 @@ public:
     /// \endcode
     ///
     USDRI_API
-    static UsdRiRenderPassAPI
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdRiRenderPassAPI Get(const UsdStagePtr& stage, const SdfPath& path);
 
-
-    /// Returns true if this <b>single-apply</b> API schema can be applied to 
-    /// the given \p prim. If this schema can not be a applied to the prim, 
-    /// this returns false and, if provided, populates \p whyNot with the 
+    /// Returns true if this <b>single-apply</b> API schema can be applied to
+    /// the given \p prim. If this schema can not be a applied to the prim,
+    /// this returns false and, if provided, populates \p whyNot with the
     /// reason it can not be applied.
-    /// 
+    ///
     /// Note that if CanApply returns false, that does not necessarily imply
     /// that calling Apply will fail. Callers are expected to call CanApply
-    /// before calling Apply if they want to ensure that it is valid to 
+    /// before calling Apply if they want to ensure that it is valid to
     /// apply a schema.
-    /// 
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -124,18 +114,17 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDRI_API
-    static bool 
-    CanApply(const UsdPrim &prim, std::string *whyNot=nullptr);
+    static bool CanApply(const UsdPrim& prim, std::string* whyNot = nullptr);
 
     /// Applies this <b>single-apply</b> API schema to the given \p prim.
-    /// This information is stored by adding "RiRenderPassAPI" to the 
+    /// This information is stored by adding "RiRenderPassAPI" to the
     /// token-valued, listOp metadata \em apiSchemas on the prim.
-    /// 
-    /// \return A valid UsdRiRenderPassAPI object is returned upon success. 
-    /// An invalid (or empty) UsdRiRenderPassAPI object is returned upon 
-    /// failure. See \ref UsdPrim::ApplyAPI() for conditions 
-    /// resulting in failure. 
-    /// 
+    ///
+    /// \return A valid UsdRiRenderPassAPI object is returned upon success.
+    /// An invalid (or empty) UsdRiRenderPassAPI object is returned upon
+    /// failure. See \ref UsdPrim::ApplyAPI() for conditions
+    /// resulting in failure.
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -143,8 +132,7 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDRI_API
-    static UsdRiRenderPassAPI 
-    Apply(const UsdPrim &prim);
+    static UsdRiRenderPassAPI Apply(const UsdPrim& prim);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -157,21 +145,21 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDRI_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDRI_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
@@ -179,14 +167,14 @@ public:
 
     /// Return the UsdCollectionAPI interface used for examining and
     /// modifying the camera visibility collection of this prim.
-    // For more information, see 
+    // For more information, see
     // \\ref usdRi_cameraVisibility "Camera Visibility"
     USDRI_API
     UsdCollectionAPI GetCameraVisibilityCollectionAPI() const;
 
     /// Return the UsdCollectionAPI interface used for examining and
     /// modifying the matte collection of this prim.
-    // For more information, see 
+    // For more information, see
     // \\ref usdRi_matte "Matte"
     USDRI_API
     UsdCollectionAPI GetMatteCollectionAPI() const;

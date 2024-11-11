@@ -34,7 +34,7 @@ extern TfEnvSetting<bool> USD_FORCE_DEFAULT_MATERIALS_SCOPE_NAME;
 /// alpha/opacity attribute and primvarnames given the full name of a
 /// color-valued attribute
 USDUTILS_API
-TfToken UsdUtilsGetAlphaAttributeNameForColor(TfToken const &colorAttrName);
+TfToken UsdUtilsGetAlphaAttributeNameForColor(TfToken const& colorAttrName);
 
 /// Returns the model name associated with a given root layer. In order,
 /// it looks for defaultPrim metadata, a prim matching the filename,
@@ -45,7 +45,7 @@ TfToken UsdUtilsGetModelNameFromRootLayer(const SdfLayerHandle& rootLayer);
 /// Certain variant sets can be registered with the system.
 ///
 /// Returns the set of UsdUtilsRegisteredVariantSet objects that are registered
-/// with the pipeline. 
+/// with the pipeline.
 ///
 /// Variant sets can be registered through direct enumeration inside a
 /// `plugInfo.json`, or via a plugin for situations that require dynamic
@@ -64,10 +64,10 @@ TfToken UsdUtilsGetModelNameFromRootLayer(const SdfLayerHandle& rootLayer);
 ///                "selectionExportPolicy": "never"
 ///            }
 ///        }
-///    }    
+///    }
 /// \endcode
 ///
-/// After the above variantSets are registered, this will then load any plugin 
+/// After the above variantSets are registered, this will then load any plugin
 /// that has a `plugInfo.json` with:
 ///
 /// \code{json}
@@ -86,7 +86,7 @@ TfToken UsdUtilsGetModelNameFromRootLayer(const SdfLayerHandle& rootLayer);
 /// }
 /// \endcode
 ///
-/// \sa UsdUtilsRegisterVariantSet 
+/// \sa UsdUtilsRegisterVariantSet
 USDUTILS_API
 const std::set<UsdUtilsRegisteredVariantSet>& UsdUtilsGetRegisteredVariantSets();
 
@@ -94,32 +94,28 @@ const std::set<UsdUtilsRegisteredVariantSet>& UsdUtilsGetRegisteredVariantSets()
 ///
 /// \sa UsdUtilsGetRegisteredVariantSets
 USDUTILS_API
-void UsdUtilsRegisterVariantSet(
-    const std::string& variantSetName,
-    const UsdUtilsRegisteredVariantSet::SelectionExportPolicy&
-        selectionExportPolicy);
+void UsdUtilsRegisterVariantSet(const std::string& variantSetName,
+                                const UsdUtilsRegisteredVariantSet::SelectionExportPolicy& selectionExportPolicy);
 
-/// If a valid UsdPrim already exists at \p path on the USD stage \p stage, 
-/// returns it. It not, it checks to see if the path belongs to a prim 
-/// underneath an instance and returns the corresponding prototype prim. 
-/// 
-/// This returns an invalid UsdPrim if no corresponding prototype prim can be 
+/// If a valid UsdPrim already exists at \p path on the USD stage \p stage,
+/// returns it. It not, it checks to see if the path belongs to a prim
+/// underneath an instance and returns the corresponding prototype prim.
+///
+/// This returns an invalid UsdPrim if no corresponding prototype prim can be
 /// found and if no prim exists at the path.
 ///
-/// This method is similar to UsdStage::GetPrimAtPath(), in that it will never 
-/// author scene description, and therefore is safe to use as a "reader" in the 
+/// This method is similar to UsdStage::GetPrimAtPath(), in that it will never
+/// author scene description, and therefore is safe to use as a "reader" in the
 /// Usd multi-threading model.
 USDUTILS_API
-UsdPrim UsdUtilsGetPrimAtPathWithForwarding(const UsdStagePtr &stage, 
-                                            const SdfPath &path);
+UsdPrim UsdUtilsGetPrimAtPathWithForwarding(const UsdStagePtr& stage, const SdfPath& path);
 
 /// Given a path, uninstances all the instanced prims in the namespace chain and
 /// returns the resulting prim at the requested path. Returns a NULL prim if the
 /// given path doesn't exist and does not correspond to a valid prim inside a
 /// prototype.
 USDUTILS_API
-UsdPrim UsdUtilsUninstancePrimAtPath(const UsdStagePtr &stage, 
-                                     const SdfPath &path);
+UsdPrim UsdUtilsUninstancePrimAtPath(const UsdStagePtr& stage, const SdfPath& path);
 
 /// Returns the name of the primary UV set used on meshes and nurbs.
 /// By default the name is "st".

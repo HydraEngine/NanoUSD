@@ -42,8 +42,7 @@ class SdfAssetPath;
 /// So to set an attribute to the value "rightHanded", use UsdVolTokens->rightHanded
 /// as the value.
 ///
-class UsdVolFieldAsset : public UsdVolFieldBase
-{
+class UsdVolFieldAsset : public UsdVolFieldBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -54,18 +53,12 @@ public:
     /// Equivalent to UsdVolFieldAsset::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdVolFieldAsset(const UsdPrim& prim=UsdPrim())
-        : UsdVolFieldBase(prim)
-    {
-    }
+    explicit UsdVolFieldAsset(const UsdPrim& prim = UsdPrim()) : UsdVolFieldBase(prim) {}
 
     /// Construct a UsdVolFieldAsset on the prim held by \p schemaObj .
     /// Should be preferred over UsdVolFieldAsset(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdVolFieldAsset(const UsdSchemaBase& schemaObj)
-        : UsdVolFieldBase(schemaObj)
-    {
-    }
+    explicit UsdVolFieldAsset(const UsdSchemaBase& schemaObj) : UsdVolFieldBase(schemaObj) {}
 
     /// Destructor.
     USDVOL_API
@@ -75,8 +68,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDVOL_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdVolFieldAsset holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -88,9 +80,7 @@ public:
     /// \endcode
     ///
     USDVOL_API
-    static UsdVolFieldAsset
-    Get(const UsdStagePtr &stage, const SdfPath &path);
-
+    static UsdVolFieldAsset Get(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -103,26 +93,26 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDVOL_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDVOL_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // FILEPATH 
+    // FILEPATH
     // --------------------------------------------------------------------- //
     /// An asset path attribute that points to a file on disk.
     /// For each supported file format, a separate FieldAsset
-    /// subclass is required. 
-    /// 
+    /// subclass is required.
+    ///
     /// This attribute's value can be animated over time, as most
     /// volume asset formats represent just a single timeSample of
     /// a volume.  However, it does not, at this time, support
-    /// any pattern substitutions like "$F". 
+    /// any pattern substitutions like "$F".
     ///
     /// | ||
     /// | -- | -- |
@@ -132,17 +122,17 @@ public:
     USDVOL_API
     UsdAttribute GetFilePathAttr() const;
 
-    /// See GetFilePathAttr(), and also 
+    /// See GetFilePathAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDVOL_API
-    UsdAttribute CreateFilePathAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateFilePathAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // FIELDNAME 
+    // FIELDNAME
     // --------------------------------------------------------------------- //
     /// Name of an individual field within the file specified by
     /// the filePath attribute.
@@ -155,17 +145,17 @@ public:
     USDVOL_API
     UsdAttribute GetFieldNameAttr() const;
 
-    /// See GetFieldNameAttr(), and also 
+    /// See GetFieldNameAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDVOL_API
-    UsdAttribute CreateFieldNameAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateFieldNameAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // FIELDINDEX 
+    // FIELDINDEX
     // --------------------------------------------------------------------- //
     /// A file can contain multiple fields with the same
     /// name. This optional attribute is an index used to
@@ -180,22 +170,22 @@ public:
     USDVOL_API
     UsdAttribute GetFieldIndexAttr() const;
 
-    /// See GetFieldIndexAttr(), and also 
+    /// See GetFieldIndexAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDVOL_API
-    UsdAttribute CreateFieldIndexAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateFieldIndexAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // FIELDDATATYPE 
+    // FIELDDATATYPE
     // --------------------------------------------------------------------- //
     /// Token which is used to indicate the data type of an
     /// individual field. Authors use this to tell consumers more
-    /// about the field without opening the file on disk. The list of 
-    /// allowed tokens is specified with the specific asset type. 
+    /// about the field without opening the file on disk. The list of
+    /// allowed tokens is specified with the specific asset type.
     /// A missing value is considered an error.
     ///
     /// | ||
@@ -206,21 +196,21 @@ public:
     USDVOL_API
     UsdAttribute GetFieldDataTypeAttr() const;
 
-    /// See GetFieldDataTypeAttr(), and also 
+    /// See GetFieldDataTypeAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDVOL_API
-    UsdAttribute CreateFieldDataTypeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateFieldDataTypeAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // VECTORDATAROLEHINT 
+    // VECTORDATAROLEHINT
     // --------------------------------------------------------------------- //
     /// Optional token which is used to indicate the role of a vector
     /// valued field. This can drive the data type in which fields
-    /// are made available in a renderer or whether the vector values 
+    /// are made available in a renderer or whether the vector values
     /// are to be transformed.
     ///
     /// | ||
@@ -232,21 +222,22 @@ public:
     USDVOL_API
     UsdAttribute GetVectorDataRoleHintAttr() const;
 
-    /// See GetVectorDataRoleHintAttr(), and also 
+    /// See GetVectorDataRoleHintAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDVOL_API
-    UsdAttribute CreateVectorDataRoleHintAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateVectorDataRoleHintAttr(VtValue const& defaultValue = VtValue(),
+                                              bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //

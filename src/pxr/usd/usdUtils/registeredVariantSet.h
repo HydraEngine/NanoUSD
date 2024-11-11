@@ -15,7 +15,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 /// \class UsdUtilsRegisteredVariantSet
 ///
 /// Class that holds information about variantSets that are registered with
@@ -25,8 +24,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// be reasoned about by apps during import/export.
 ///
 /// \sa UsdUtilsGetRegisteredVariantSets
-struct UsdUtilsRegisteredVariantSet
-{
+struct UsdUtilsRegisteredVariantSet {
 public:
     /// The name of the variantSet.
     const std::string name;
@@ -58,28 +56,18 @@ public:
     };
 
     /// Returns the export policy from the string.
-    static bool GetSelectionExportPolicyFromString(
-        const std::string& selectionExportPolicyStr,
-        SelectionExportPolicy* selectionExportPolicy);
+    static bool GetSelectionExportPolicyFromString(const std::string& selectionExportPolicyStr,
+                                                   SelectionExportPolicy* selectionExportPolicy);
 
     /// Specifies how to export a variant selection.
     const SelectionExportPolicy selectionExportPolicy;
 
-    UsdUtilsRegisteredVariantSet(
-            const std::string& name,
-            const SelectionExportPolicy& selectionExportPolicy) :
-        name(name),
-        selectionExportPolicy(selectionExportPolicy)
-    {
-    }
+    UsdUtilsRegisteredVariantSet(const std::string& name, const SelectionExportPolicy& selectionExportPolicy)
+        : name(name), selectionExportPolicy(selectionExportPolicy) {}
 
     // provided so this can be stored in a std::set.
-    bool operator<(const UsdUtilsRegisteredVariantSet&
-            other) const {
-        return this->name < other.name;
-    }
+    bool operator<(const UsdUtilsRegisteredVariantSet& other) const { return this->name < other.name; }
 };
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

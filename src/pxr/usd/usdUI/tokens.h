@@ -10,10 +10,10 @@
 /// \file usdUI/tokens.h
 
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-// 
+//
 // This is an automatically generated file (by usdGenSchema.py).
 // Do not hand-edit!
-// 
+//
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 #include "pxr/pxr.h"
@@ -23,7 +23,6 @@
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
-
 
 /// \class UsdUITokensType
 ///
@@ -46,67 +45,67 @@ PXR_NAMESPACE_OPEN_SCOPE
 struct UsdUITokensType {
     USDUI_API UsdUITokensType();
     /// \brief "closed"
-    /// 
+    ///
     /// Possible value for UsdUINodeGraphNodeAPI::GetExpansionStateAttr()
     const TfToken closed;
     /// \brief "minimized"
-    /// 
+    ///
     /// Possible value for UsdUINodeGraphNodeAPI::GetExpansionStateAttr()
     const TfToken minimized;
     /// \brief "open"
-    /// 
+    ///
     /// Possible value for UsdUINodeGraphNodeAPI::GetExpansionStateAttr()
     const TfToken open;
     /// \brief "ui:description"
-    /// 
+    ///
     /// UsdUIBackdrop
     const TfToken uiDescription;
     /// \brief "ui:displayGroup"
-    /// 
+    ///
     /// UsdUISceneGraphPrimAPI
     const TfToken uiDisplayGroup;
     /// \brief "ui:displayName"
-    /// 
+    ///
     /// UsdUISceneGraphPrimAPI
     const TfToken uiDisplayName;
     /// \brief "ui:nodegraph:node:displayColor"
-    /// 
+    ///
     /// UsdUINodeGraphNodeAPI
     const TfToken uiNodegraphNodeDisplayColor;
     /// \brief "ui:nodegraph:node:docURI"
-    /// 
+    ///
     /// UsdUINodeGraphNodeAPI
     const TfToken uiNodegraphNodeDocURI;
     /// \brief "ui:nodegraph:node:expansionState"
-    /// 
+    ///
     /// UsdUINodeGraphNodeAPI
     const TfToken uiNodegraphNodeExpansionState;
     /// \brief "ui:nodegraph:node:icon"
-    /// 
+    ///
     /// UsdUINodeGraphNodeAPI
     const TfToken uiNodegraphNodeIcon;
     /// \brief "ui:nodegraph:node:pos"
-    /// 
+    ///
     /// UsdUINodeGraphNodeAPI
     const TfToken uiNodegraphNodePos;
     /// \brief "ui:nodegraph:node:size"
-    /// 
+    ///
     /// UsdUINodeGraphNodeAPI
     const TfToken uiNodegraphNodeSize;
     /// \brief "ui:nodegraph:node:stackingOrder"
-    /// 
+    ///
     /// UsdUINodeGraphNodeAPI
     const TfToken uiNodegraphNodeStackingOrder;
     /// \brief "Backdrop"
-    /// 
+    ///
     /// Schema identifer and family for UsdUIBackdrop
     const TfToken Backdrop;
     /// \brief "NodeGraphNodeAPI"
-    /// 
+    ///
     /// Schema identifer and family for UsdUINodeGraphNodeAPI
     const TfToken NodeGraphNodeAPI;
     /// \brief "SceneGraphPrimAPI"
-    /// 
+    ///
     /// Schema identifer and family for UsdUISceneGraphPrimAPI
     const TfToken SceneGraphPrimAPI;
     /// A vector of all of the tokens listed above.

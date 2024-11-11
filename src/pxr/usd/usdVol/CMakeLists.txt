@@ -1,35 +1,31 @@
-set(PXR_PREFIX pxr/usd)
-set(PXR_PACKAGE usdVol)
+#  Copyright (c) 2023 Feng Yang
+#
+#  I am making my contributions/submissions to this project solely in my
+#  personal capacity and am not conveying any rights to any intellectual
+#  property of any third parties.
 
-pxr_library(usdVol
-    INCLUDE_SCHEMA_FILES
+# create sample app project
+project(usdVol LANGUAGES C CXX)
 
-    LIBRARIES
-        tf
-        usd
-        usdGeom
-
-    PUBLIC_HEADERS
-        api.h
-
-    PYTHON_CPPFILES
-        moduleDeps.cpp
-
-    PYMODULE_FILES
-        __init__.py
-
-    DOXYGEN_FILES
-        overview.dox
+set(SRC_FILES
+        field3DAsset.cpp
+        fieldAsset.cpp
+        fieldBase.cpp
+        openVDBAsset.cpp
+        tokens.cpp
+        volume.cpp
 )
 
-pxr_test_scripts(
-    testenv/testUsdVolVolume.py
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+        ${PXR_INCLUDE_PATH}
 )
 
-pxr_register_test(testUsdVolVolume
-    PYTHON
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdVolVolume"
-    EXPECTED_RETURN_CODE 0
+target_link_libraries(${PROJECT_NAME} PUBLIC
+        fmt::fmt
+        Eigen3::Eigen
+        TBB::tbb
 )
 
-
+set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)

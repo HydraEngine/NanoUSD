@@ -22,7 +22,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 TF_DECLARE_WEAK_AND_REF_PTRS(SdfLayer);
 
 /// \class UsdUtilsStageCache
@@ -33,10 +32,9 @@ TF_DECLARE_WEAK_AND_REF_PTRS(SdfLayer);
 ///
 class UsdUtilsStageCache {
 public:
-
     /// Returns the singleton stage cache.
     USDUTILS_API
-    static UsdStageCache &Get();
+    static UsdStageCache& Get();
 
     /// Given variant selections as a vector of pairs (vector in case order
     /// matters to the client), constructs a session layer with overs on the
@@ -44,10 +42,8 @@ public:
     /// session layer with those opinions.
     USDUTILS_API
     static SdfLayerRefPtr GetSessionLayerForVariantSelections(
-        const TfToken& modelName,
-        const std::vector<std::pair<std::string, std::string> > &variantSelections);
+            const TfToken& modelName, const std::vector<std::pair<std::string, std::string>>& variantSelections);
 };
-
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

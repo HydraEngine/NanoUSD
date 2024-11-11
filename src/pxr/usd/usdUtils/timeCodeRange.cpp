@@ -16,24 +16,16 @@
 #include <string>
 #include <vector>
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-
-TF_DEFINE_PUBLIC_TOKENS(
-    UsdUtilsTimeCodeRangeTokens,
-    USDUTILS_TIME_CODE_RANGE_TOKENS);
-
+TF_DEFINE_PUBLIC_TOKENS(UsdUtilsTimeCodeRangeTokens, USDUTILS_TIME_CODE_RANGE_TOKENS);
 
 /// Attempts to convert the string \p valueString to a double.
 ///
 /// If the string converts successfully *and* the entire string is consumed by
 /// the conversion, then the result is stored in \p value and true is returned.
 /// Otherwise, \p value is left unchanged and false is returned.
-static
-bool
-_StringToDouble(const std::string& valueString, double& value)
-{
+static bool _StringToDouble(const std::string& valueString, double& value) {
     double tmpValue = 0.0;
     size_t numCharsConverted = 0u;
 
@@ -53,9 +45,7 @@ _StringToDouble(const std::string& valueString, double& value)
 }
 
 /* static */
-UsdUtilsTimeCodeRange
-UsdUtilsTimeCodeRange::CreateFromFrameSpec(const std::string& frameSpec)
-{
+UsdUtilsTimeCodeRange UsdUtilsTimeCodeRange::CreateFromFrameSpec(const std::string& frameSpec) {
     if (frameSpec.empty()) {
         return UsdUtilsTimeCodeRange();
     }
@@ -63,8 +53,7 @@ UsdUtilsTimeCodeRange::CreateFromFrameSpec(const std::string& frameSpec)
     // FrameSpecs must contain at least one time code value, but check whether
     // it also contains the range separator. Issue an error and return an
     // invalid empty range if there is more than one separator.
-    std::vector<std::string> frameSpecParts =
-        TfStringSplit(frameSpec, UsdUtilsTimeCodeRangeTokens->RangeSeparator);
+    std::vector<std::string> frameSpecParts = TfStringSplit(frameSpec, UsdUtilsTimeCodeRangeTokens->RangeSeparator);
     if (frameSpecParts.size() > 2u) {
         TF_CODING_ERROR("Invalid FrameSpec: \"%s\"", frameSpec.c_str());
         return UsdUtilsTimeCodeRange();
@@ -84,10 +73,7 @@ UsdUtilsTimeCodeRange::CreateFromFrameSpec(const std::string& frameSpec)
     // Check whether the FrameSpec contains the stride separator. Issue an
     // error and return an invalid empty range if there is more than one
     // separator.
-    frameSpecParts =
-        TfStringSplit(
-            frameSpecParts[1],
-            UsdUtilsTimeCodeRangeTokens->StrideSeparator);
+    frameSpecParts = TfStringSplit(frameSpecParts[1], UsdUtilsTimeCodeRangeTokens->StrideSeparator);
     if (frameSpecParts.size() > 2u) {
         TF_CODING_ERROR("Invalid FrameSpec: \"%s\"", frameSpec.c_str());
         return UsdUtilsTimeCodeRange();
@@ -114,9 +100,7 @@ UsdUtilsTimeCodeRange::CreateFromFrameSpec(const std::string& frameSpec)
     return UsdUtilsTimeCodeRange(startTimeCode, endTimeCode, stride);
 }
 
-std::ostream&
-operator<<(std::ostream& os, const UsdUtilsTimeCodeRange& timeCodeRange)
-{
+std::ostream& operator<<(std::ostream& os, const UsdUtilsTimeCodeRange& timeCodeRange) {
     if (timeCodeRange.empty()) {
         os << UsdUtilsTimeCodeRangeTokens->EmptyTimeCodeRange;
         return os;
@@ -139,14 +123,11 @@ operator<<(std::ostream& os, const UsdUtilsTimeCodeRange& timeCodeRange)
     return os;
 }
 
-std::istream&
-operator>>(std::istream& is, UsdUtilsTimeCodeRange& timeCodeRange)
-{
+std::istream& operator>>(std::istream& is, UsdUtilsTimeCodeRange& timeCodeRange) {
     std::string rangeString;
     is >> rangeString;
     timeCodeRange = UsdUtilsTimeCodeRange::CreateFromFrameSpec(rangeString);
     return is;
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

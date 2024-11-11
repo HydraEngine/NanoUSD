@@ -17,7 +17,7 @@
 #include "pxr/usd/usdSkel/tokens.h"
 
 #include "pxr/base/tf/span.h"
-#include "pxr/usd/usdSkel/inbetweenShape.h" 
+#include "pxr/usd/usdSkel/inbetweenShape.h"
 
 #include "pxr/base/vt/value.h"
 
@@ -40,13 +40,12 @@ class SdfAssetPath;
 ///
 /// Describes a target blend shape, possibly containing inbetween
 /// shapes.
-/// 
+///
 /// See the extended \ref UsdSkel_BlendShape "Blend Shape Schema
 /// documentation for information.
-/// 
 ///
-class UsdSkelBlendShape : public UsdTyped
-{
+///
+class UsdSkelBlendShape : public UsdTyped {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -57,18 +56,12 @@ public:
     /// Equivalent to UsdSkelBlendShape::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdSkelBlendShape(const UsdPrim& prim=UsdPrim())
-        : UsdTyped(prim)
-    {
-    }
+    explicit UsdSkelBlendShape(const UsdPrim& prim = UsdPrim()) : UsdTyped(prim) {}
 
     /// Construct a UsdSkelBlendShape on the prim held by \p schemaObj .
     /// Should be preferred over UsdSkelBlendShape(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdSkelBlendShape(const UsdSchemaBase& schemaObj)
-        : UsdTyped(schemaObj)
-    {
-    }
+    explicit UsdSkelBlendShape(const UsdSchemaBase& schemaObj) : UsdTyped(schemaObj) {}
 
     /// Destructor.
     USDSKEL_API
@@ -78,8 +71,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDSKEL_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdSkelBlendShape holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -91,8 +83,7 @@ public:
     /// \endcode
     ///
     USDSKEL_API
-    static UsdSkelBlendShape
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdSkelBlendShape Get(const UsdStagePtr& stage, const SdfPath& path);
 
     /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
     /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -117,8 +108,7 @@ public:
     /// the opinion at the current EditTarget.
     ///
     USDSKEL_API
-    static UsdSkelBlendShape
-    Define(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdSkelBlendShape Define(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -131,17 +121,17 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDSKEL_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDSKEL_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // OFFSETS 
+    // OFFSETS
     // --------------------------------------------------------------------- //
     /// **Required property**. Position offsets which, when added to the
     /// base pose, provides the target shape.
@@ -155,17 +145,17 @@ public:
     USDSKEL_API
     UsdAttribute GetOffsetsAttr() const;
 
-    /// See GetOffsetsAttr(), and also 
+    /// See GetOffsetsAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDSKEL_API
-    UsdAttribute CreateOffsetsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateOffsetsAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // NORMALOFFSETS 
+    // NORMALOFFSETS
     // --------------------------------------------------------------------- //
     /// **Required property**. Normal offsets which, when added to the
     /// base pose, provides the normals of the target shape.
@@ -179,17 +169,17 @@ public:
     USDSKEL_API
     UsdAttribute GetNormalOffsetsAttr() const;
 
-    /// See GetNormalOffsetsAttr(), and also 
+    /// See GetNormalOffsetsAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDSKEL_API
-    UsdAttribute CreateNormalOffsetsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateNormalOffsetsAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // POINTINDICES 
+    // POINTINDICES
     // --------------------------------------------------------------------- //
     /// **Optional property**. Indices into the original mesh that
     /// correspond to the values in *offsets* and of any inbetween shapes. If
@@ -205,21 +195,21 @@ public:
     USDSKEL_API
     UsdAttribute GetPointIndicesAttr() const;
 
-    /// See GetPointIndicesAttr(), and also 
+    /// See GetPointIndicesAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDSKEL_API
-    UsdAttribute CreatePointIndicesAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreatePointIndicesAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
@@ -278,13 +268,10 @@ public:
     /// If invalid and \p reason is non-null, an error message describing
     /// the first validation error will be set.
     USDSKEL_API
-    static bool ValidatePointIndices(TfSpan<const int> indices,
-                                     size_t numPoints,
-                                     std::string* reason=nullptr);
+    static bool ValidatePointIndices(TfSpan<const int> indices, size_t numPoints, std::string* reason = nullptr);
 
 private:
-    std::vector<UsdSkelInbetweenShape>
-    _MakeInbetweens(const std::vector<UsdProperty>& props) const;
+    std::vector<UsdSkelInbetweenShape> _MakeInbetweens(const std::vector<UsdProperty>& props) const;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

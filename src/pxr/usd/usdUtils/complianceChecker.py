@@ -13,11 +13,13 @@ from pxr import Ar
 
 from pxr.UsdUtils.constantsGroup import ConstantsGroup
 
+
 class NodeTypes(ConstantsGroup):
     UsdPreviewSurface = "UsdPreviewSurface"
     UsdUVTexture = "UsdUVTexture"
     UsdTransform2d = "UsdTransform2d"
     UsdPrimvarReader = "UsdPrimvarReader"
+
 
 class ShaderProps(ConstantsGroup):
     Bias = "bias"
@@ -29,10 +31,12 @@ class ShaderProps(ConstantsGroup):
 
 def _IsPackageOrPackagedLayer(layer):
     return layer.GetFileFormat().IsPackage() or \
-           Ar.IsPackageRelativePath(layer.identifier)
+        Ar.IsPackageRelativePath(layer.identifier)
+
 
 class BaseRuleChecker(object):
     """This is Base class for all the rule-checkers."""
+
     def __init__(self, verbose, consumerLevelChecks, assetLevelChecks):
         self._verbose = verbose
         self._consumerLevelChecks = consumerLevelChecks
@@ -82,7 +86,7 @@ class BaseRuleChecker(object):
         """ Check the diagnostic messages that were generated when opening the 
             USD stage. The diagnostic messages are collected using a 
             UsdUtilsCoalescingDiagnosticDelegate.
-        """ 
+        """
         pass
 
     def CheckUnresolvedPaths(self, unresolvedPaths):
@@ -121,11 +125,12 @@ class BaseRuleChecker(object):
 
     # -------------------------------------------------------------------------
 
+
 class ByteAlignmentChecker(BaseRuleChecker):
     @staticmethod
     def GetDescription():
-        return "Files within a usdz package must be laid out properly, "\
-                "i.e. they should be aligned to 64 bytes."
+        return "Files within a usdz package must be laid out properly, " \
+               "i.e. they should be aligned to 64 bytes."
 
     def __init__(self, verbose, consumerLevelChecks, assetLevelChecks):
         super(ByteAlignmentChecker, self).__init__(verbose,
@@ -137,16 +142,17 @@ class ByteAlignmentChecker(BaseRuleChecker):
         for fileName in fileNames:
             fileExt = Ar.GetResolver().GetExtension(fileName)
             fileInfo = zipFile.GetFileInfo(fileName)
-            offset = fileInfo.dataOffset 
+            offset = fileInfo.dataOffset
             if offset % 64 != 0:
                 self._AddFailedCheck("File '%s' in package '%s' has an "
-                        "invalid offset %s." % 
-                        (fileName, packagePath, offset))
+                                     "invalid offset %s." %
+                                     (fileName, packagePath, offset))
+
 
 class CompressionChecker(BaseRuleChecker):
     @staticmethod
     def GetDescription():
-        return "Files within a usdz package should not be compressed or "\
+        return "Files within a usdz package should not be compressed or " \
                "encrypted."
 
     def __init__(self, verbose, consumerLevelChecks, assetLevelChecks):
@@ -161,20 +167,21 @@ class CompressionChecker(BaseRuleChecker):
             fileInfo = zipFile.GetFileInfo(fileName)
             if fileInfo.compressionMethod != 0:
                 self._AddFailedCheck("File '%s' in package '%s' has "
-                    "compression. Compression method is '%s', actual size "
-                    "is %s. Uncompressed size is %s." % (
-                    fileName, packagePath, fileInfo.compressionMethod,
-                    fileInfo.size, fileInfo.uncompressedSize))
+                                     "compression. Compression method is '%s', actual size "
+                                     "is %s. Uncompressed size is %s." % (
+                                         fileName, packagePath, fileInfo.compressionMethod,
+                                         fileInfo.size, fileInfo.uncompressedSize))
+
 
 class MissingReferenceChecker(BaseRuleChecker):
     @staticmethod
     def GetDescription():
-        return "The composed USD stage should not contain any unresolvable"\
-            " asset dependencies (in every possible variation of the "\
-            "asset), when using the default asset resolver. "
+        return "The composed USD stage should not contain any unresolvable" \
+               " asset dependencies (in every possible variation of the " \
+               "asset), when using the default asset resolver. "
 
     def __init__(self, verbose, consumerLevelChecks, assetLevelChecks):
-        super(MissingReferenceChecker, self).__init__(verbose, 
+        super(MissingReferenceChecker, self).__init__(verbose,
                                                       consumerLevelChecks,
                                                       assetLevelChecks)
 
@@ -184,13 +191,14 @@ class MissingReferenceChecker(BaseRuleChecker):
             # warnings about unresolved references, sublayers and other 
             # composition arcs.
             if '_ReportErrors' in diag.sourceFunction and \
-                'usd/stage.cpp' in diag.sourceFileName:
+                    'usd/stage.cpp' in diag.sourceFileName:
                 self._AddFailedCheck(diag.commentary)
 
     def CheckUnresolvedPaths(self, unresolvedPaths):
         for unresolvedPath in unresolvedPaths:
             self._AddFailedCheck("Found unresolvable external dependency "
-                    "'%s'." % unresolvedPath)
+                                 "'%s'." % unresolvedPath)
+
 
 class StageMetadataChecker(BaseRuleChecker):
     @staticmethod
@@ -215,7 +223,7 @@ should always have upAxis set to 'Y'"""
             if upAxis != UsdGeom.Tokens.y:
                 self._AddFailedCheck("Stage specifies upAxis '%s'. upAxis should"
                                      " be '%s'." % (upAxis, UsdGeom.Tokens.y))
-        
+
         if not usdStage.HasAuthoredMetadata(UsdGeom.Tokens.metersPerUnit):
             self._AddFailedCheck("Stage does not specify its linear scale "
                                  "in metersPerUnit.")
@@ -224,8 +232,7 @@ should always have upAxis set to 'Y'"""
             defaultPrim = usdStage.GetDefaultPrim()
             if not defaultPrim:
                 self._AddFailedCheck("Stage has missing or invalid defaultPrim.")
-                
-        
+
 
 class TextureChecker(BaseRuleChecker):
     # The most basic formats are those published in the USDZ spec
@@ -234,7 +241,7 @@ class TextureChecker(BaseRuleChecker):
     # Include a list of "unsupported" image formats to provide better error
     # messages when we find one of these.  Our builtin image decoder
     # _can_ decode these, but they are not considered portable consumer-level
-    _unsupportedImageFormats = ["bmp", "tga", "hdr", "tif", "tx", "zfile"] 
+    _unsupportedImageFormats = ["bmp", "tga", "hdr", "tif", "tx", "zfile"]
 
     @staticmethod
     def GetDescription():
@@ -243,7 +250,7 @@ class TextureChecker(BaseRuleChecker):
 
     def __init__(self, verbose, consumerLevelChecks, assetLevelChecks):
         # Check if the prim has an allowed type.
-        super(TextureChecker, self).__init__(verbose, consumerLevelChecks, 
+        super(TextureChecker, self).__init__(verbose, consumerLevelChecks,
                                              assetLevelChecks)
         # a None value for _allowedFormats indicates all formats are allowed
         self._allowedFormats = None
@@ -258,12 +265,11 @@ class TextureChecker(BaseRuleChecker):
             self._Msg("Not performing texture format checks for general "
                       "USD asset")
 
-
     def _CheckTexture(self, texAssetPath, inputPath):
         self._Msg("Checking texture <%s>." % texAssetPath)
         texFileExt = Ar.GetResolver().GetExtension(texAssetPath).lower()
         if (self._consumerLevelChecks and
-            texFileExt in TextureChecker._unsupportedImageFormats):
+                texFileExt in TextureChecker._unsupportedImageFormats):
             self._AddFailedCheck("Texture <%s> with asset @%s@ has non-portable "
                                  "file format." % (inputPath, texAssetPath))
         elif texFileExt not in self._allowedFormats:
@@ -279,7 +285,7 @@ class TextureChecker(BaseRuleChecker):
         # we are an untyped prim
         if self._allowedFormats is None or not prim.GetTypeName():
             return
-            
+
         # Check if the prim is Connectable.
         connectable = UsdShade.ConnectableAPI(prim)
         if not connectable:
@@ -299,6 +305,7 @@ class TextureChecker(BaseRuleChecker):
                     for texPath in texPathArray:
                         self._CheckTexture(texPath, attrPath)
 
+
 class PrimEncapsulationChecker(BaseRuleChecker):
     @staticmethod
     def GetDescription():
@@ -309,7 +316,7 @@ class PrimEncapsulationChecker(BaseRuleChecker):
      include Material, NodeGraph, Light, LightFilter, and *exclude Shader*"""
 
     def __init__(self, verbose, consumerLevelChecks, assetLevelChecks):
-        super(PrimEncapsulationChecker, self).__init__(verbose, 
+        super(PrimEncapsulationChecker, self).__init__(verbose,
                                                        consumerLevelChecks,
                                                        assetLevelChecks)
         self.ResetCaches()
@@ -323,11 +330,11 @@ class PrimEncapsulationChecker(BaseRuleChecker):
             self._hasGprimInPathMap[path] = False
             return False
         else:
-            val = (self._HasGprimAncestor(prim.GetParent()) or 
+            val = (self._HasGprimAncestor(prim.GetParent()) or
                    prim.IsA(UsdGeom.Gprim))
             self._hasGprimInPathMap[path] = val
             return val
-        
+
     def _FindConnectableAncestor(self, prim):
         from pxr import Sdf, UsdShade
         path = prim.GetPath()
@@ -346,11 +353,10 @@ class PrimEncapsulationChecker(BaseRuleChecker):
                     val = prim
             self._connectableAncestorMap[path] = val
             return val
-        
-            
+
     def CheckPrim(self, prim):
         from pxr import UsdGeom, UsdShade
-        
+
         parent = prim.GetParent()
 
         # Of course we must allow Boundables under other Boundables, so that
@@ -365,7 +371,7 @@ class PrimEncapsulationChecker(BaseRuleChecker):
                     self._AddFailedCheck("Gprim <%s> has an ancestor prim that "
                                          "is also a Gprim, which is not allowed."
                                          % prim.GetPath())
-                    
+
         connectable = UsdShade.ConnectableAPI(prim)
         # The GetTypeName() check is to work around a bug in
         # ConnectableAPIBehavior registry.
@@ -379,10 +385,10 @@ class PrimEncapsulationChecker(BaseRuleChecker):
                     # encapsulation of connectable prims under a Container-type
                     # connectable prim.
                     self._AddFailedCheck("Connectable %s <%s> cannot reside "
-                                     "under a non-Container Connectable %s"
-                                     % (prim.GetTypeName(),
-                                        prim.GetPath(),
-                                        parent.GetTypeName()))
+                                         "under a non-Container Connectable %s"
+                                         % (prim.GetTypeName(),
+                                            prim.GetPath(),
+                                            parent.GetTypeName()))
                 elif not pConnectable:
                     # it's only OK to have a non-connectable parent if all
                     # the rest of your ancestors are also non-connectable.  The
@@ -401,12 +407,10 @@ class PrimEncapsulationChecker(BaseRuleChecker):
                                               connAnstr.GetPath(),
                                               parent.GetName(),
                                               parent.GetTypeName()))
-                
 
     def ResetCaches(self):
         self._connectableAncestorMap = dict()
         self._hasGprimInPathMap = dict()
-
 
 
 class NormalMapTextureChecker(BaseRuleChecker):
@@ -424,9 +428,10 @@ Specifically:
      images to SRGB.  To prevent an unwanted transformation, the UsdUVTexture's
      _inputs:sourceColorSpace_ must be set to "raw".
 """
+
     def __init__(self, verbose, consumerLevelChecks, assetLevelChecks):
-        super(NormalMapTextureChecker, self).__init__(verbose, 
-                                                      consumerLevelChecks, 
+        super(NormalMapTextureChecker, self).__init__(verbose,
+                                                      consumerLevelChecks,
                                                       assetLevelChecks)
 
     def _GetShaderId(self, shader):
@@ -497,7 +502,7 @@ Specifically:
                                  (NodeTypes.UsdPreviewSurface,
                                   ShaderProps.Normal))
             return
-        
+
         sourceId = self._GetShaderId(sourceShader)
 
         # We may have failed to fetch an identifier for asset/source-based
@@ -505,9 +510,9 @@ Specifically:
         # in which case we'd have nothing to validate
         if not sourceId or sourceId != NodeTypes.UsdUVTexture:
             return
-           
+
         texAsset = self._GetInputValue(sourceShader, ShaderProps.File)
-        
+
         if not texAsset or not texAsset.resolvedPath:
             self._AddFailedCheck("%s prim <%s> has invalid or unresolvable "
                                  "inputs:file of @%s@" % \
@@ -515,7 +520,7 @@ Specifically:
                                   sourcePrim.GetPath(),
                                   texAsset.path if texAsset else ""))
             return
-            
+
         if not self._TextureIs8Bit(texAsset):
             # really nothing more is required for image depths > 8 bits,
             # which we assume FOR NOW, are floating point
@@ -523,28 +528,28 @@ Specifically:
 
         # -- 8-bit texture validations --
         colorSpace = self._GetInputValue(sourceShader,
-                ShaderProps.SourceColorSpace)
+                                         ShaderProps.SourceColorSpace)
         if not colorSpace or not colorSpace == 'raw':
             self._AddError("%s prim <%s> that reads Normal Map @%s@ should "
-                             "set inputs:sourceColorSpace to 'raw'." % \
-                             (NodeTypes.UsdUVTexture,
-                              sourcePrim.GetPath(),
-                              texAsset.path))
+                           "set inputs:sourceColorSpace to 'raw'." % \
+                           (NodeTypes.UsdUVTexture,
+                            sourcePrim.GetPath(),
+                            texAsset.path))
 
         bias = self._GetInputValue(sourceShader, ShaderProps.Bias)
- 
+
         scale = self._GetInputValue(sourceShader, ShaderProps.Scale)
 
-        if not (bias and scale and 
+        if not (bias and scale and
                 isinstance(bias, Gf.Vec4f) and isinstance(scale, Gf.Vec4f)):
             self._AddError("%s prim <%s> reads 8 bit Normal Map @%s@, "
                            "which requires that inputs:scale be set to "
                            "(2, 2, 2, 1) and inputs:bias be set to "
                            "(-1, -1, -1, 0) for proper interpretation as per "
-                           "the UsdPreviewSurface and UsdUVTexture docs." %\
-                             (NodeTypes.UsdUVTexture,
-                              sourcePrim.GetPath(),
-                              texAsset.path))
+                           "the UsdPreviewSurface and UsdUVTexture docs." % \
+                           (NodeTypes.UsdUVTexture,
+                            sourcePrim.GetPath(),
+                            texAsset.path))
             return
 
         # We still warn for inputs:scale not conforming to UsdPreviewSurface
@@ -552,19 +557,17 @@ Specifically:
         # effect of normal perturbations.
         # don't really care about fourth components...
         nonCompliantScaleValues = \
-                (scale[0] != 2 or scale[1] != 2 or scale[2] != 2)
+            (scale[0] != 2 or scale[1] != 2 or scale[2] != 2)
         if nonCompliantScaleValues:
             self._AddWarning("%s prim <%s> reads an 8 bit Normal Map, "
-                             "but has non-standard inputs:scale value of %s." 
-                             "inputs:scale must be set to (2, 2, 2, 1) so as " 
-                             "fullfill the requirements of the normals to be " 
+                             "but has non-standard inputs:scale value of %s."
+                             "inputs:scale must be set to (2, 2, 2, 1) so as "
+                             "fullfill the requirements of the normals to be "
                              "in tangent space of [(-1,-1,-1), (1,1,1)] as "
                              "documented in the UsdPreviewSurface and "
-                             "UsdUVTexture docs." %\
+                             "UsdUVTexture docs." % \
                              (NodeTypes.UsdUVTexture,
                               sourcePrim.GetPath(), str(scale)))
-
-        
 
         # Note that for a 8bit normal map, inputs:bias must be appropriately
         # set to [-1, -1, -1, 0] so as to fullfill the requirements of the
@@ -572,16 +575,17 @@ Specifically:
         # in the UsdPreviewSurface docs. Note this is true only when scale
         # values are respecting the requirements laid in the
         # UsdPreviewSurface / UsdUVTexture docs. We continue to warn!
-        if (not nonCompliantScaleValues and 
+        if (not nonCompliantScaleValues and
                 (bias[0] != -1 or bias[1] != -1 or bias[2] != -1)):
             self._AddError("%s prim <%s> reads an 8 bit Normal Map, but has "
                            "non-standard inputs:bias value of %s. inputs:bias "
                            "must be set to [-1,-1,-1,0] so as to fullfill "
                            "the requirements of the normals to be in tangent "
                            "space of [(-1,-1,-1), (1,1,1)] as documented "
-                           "in the UsdPreviewSurface and UsdUVTexture docs." %\
-                             (NodeTypes.UsdUVTexture,
-                              sourcePrim.GetPath(), str(bias)))
+                           "in the UsdPreviewSurface and UsdUVTexture docs." % \
+                           (NodeTypes.UsdUVTexture,
+                            sourcePrim.GetPath(), str(bias)))
+
 
 class MaterialBindingAPIAppliedChecker(BaseRuleChecker):
     @staticmethod
@@ -590,19 +594,20 @@ class MaterialBindingAPIAppliedChecker(BaseRuleChecker):
                "MaterialBindingAPI applied on the prim."
 
     def __init__(self, verbose, consumerLevelChecks, assetLevelChecks):
-        super(MaterialBindingAPIAppliedChecker, self).__init__(verbose, 
-                                                          consumerLevelChecks,
-                                                          assetLevelChecks)
+        super(MaterialBindingAPIAppliedChecker, self).__init__(verbose,
+                                                               consumerLevelChecks,
+                                                               assetLevelChecks)
 
     def CheckPrim(self, prim):
         from pxr import UsdShade
         numMaterialBindings = len([rel for rel in prim.GetRelationships() \
-                if rel.GetName().startswith(UsdShade.Tokens.materialBinding)])
-        if ( (numMaterialBindings > 0) and 
-            not prim.HasAPI(UsdShade.MaterialBindingAPI)):
-                self._AddFailedCheck("Found material bindings but no " \
-                    "MaterialBindingAPI applied on the prim <%s>." \
-                    % prim.GetPath())
+                                   if rel.GetName().startswith(UsdShade.Tokens.materialBinding)])
+        if ((numMaterialBindings > 0) and
+                not prim.HasAPI(UsdShade.MaterialBindingAPI)):
+            self._AddFailedCheck("Found material bindings but no " \
+                                 "MaterialBindingAPI applied on the prim <%s>." \
+                                 % prim.GetPath())
+
 
 class SkelBindingAPIAppliedChecker(BaseRuleChecker):
     @staticmethod
@@ -614,10 +619,10 @@ class SkelBindingAPIAppliedChecker(BaseRuleChecker):
         from pxr import Usd
         usdSchemaRegistry = Usd.SchemaRegistry()
         primDef = usdSchemaRegistry.BuildComposedPrimDefinition("",
-                ["SkelBindingAPI"])
+                                                                ["SkelBindingAPI"])
         self._skelBindingAPIProps = primDef.GetPropertyNames()
         super(SkelBindingAPIAppliedChecker, self).__init__(verbose,
-                consumerLevelChecks, assetLevelChecks)
+                                                           consumerLevelChecks, assetLevelChecks)
 
     def CheckPrim(self, prim):
         from pxr import UsdSkel
@@ -626,8 +631,8 @@ class SkelBindingAPIAppliedChecker(BaseRuleChecker):
             for skelProperty in self._skelBindingAPIProps:
                 if skelProperty in primProperties:
                     self._AddFailedCheck("Found a UsdSkelBinding property " \
-                        "(%s) , but no SkelBindingAPI applied on the prim " \
-                        "<%s>." %(skelProperty, prim.GetPath()))
+                                         "(%s) , but no SkelBindingAPI applied on the prim " \
+                                         "<%s>." % (skelProperty, prim.GetPath()))
                     return
         else:
             # If the API is already applied make sure this prim is either
@@ -641,27 +646,26 @@ class SkelBindingAPIAppliedChecker(BaseRuleChecker):
                     return
                 parentPrim = parentPrim.GetParent()
             self._AddFailedCheck("UsdSkelBindingAPI applied on a prim, which " \
-                    "is not of type SkelRoot or is not rooted at a prim of " \
-                    "type SkelRoot, as required by the UsdSkel schema.");
+                                 "is not of type SkelRoot or is not rooted at a prim of " \
+                                 "type SkelRoot, as required by the UsdSkel schema.");
+
 
 class ShaderPropertyTypeConformanceChecker(BaseRuleChecker):
     @staticmethod
     def GetDescription():
         return "Shader prim's input types must be conforming to their " \
-            "appropriate Sdf types in the respective sdr shader."
+               "appropriate Sdf types in the respective sdr shader."
 
     def __init__(self, verbose, consumerLevelChecks, assetLevelChecks):
         super(ShaderPropertyTypeConformanceChecker, self).__init__(verbose,
-                                                   consumerLevelChecks,
-                                                   assetLevelChecks)
+                                                                   consumerLevelChecks,
+                                                                   assetLevelChecks)
 
     def _FillSdrNameToTypeMap(self, shadeNode, mapping):
         for inputName in shadeNode.GetInputNames():
             prop = shadeNode.GetInput(inputName)
             propName = prop.GetName()
             mapping[propName] = prop.GetTypeAsSdfType().GetSdfType()
-
-
 
     def CheckPrim(self, prim):
         from pxr import Sdr, UsdShade
@@ -681,22 +685,22 @@ class ShaderPropertyTypeConformanceChecker(BaseRuleChecker):
         sdrNameToTypeMapping = {}
         sdrShaderNode = None
         inputs = []
-        expectedImplSources = [UsdShade.Tokens.id, 
-                               UsdShade.Tokens.sourceAsset, 
+        expectedImplSources = [UsdShade.Tokens.id,
+                               UsdShade.Tokens.sourceAsset,
                                UsdShade.Tokens.sourceCode]
         implSource = shader.GetImplementationSource()
         if implSource in expectedImplSources:
             sourceTypes = shader.GetSourceTypes()
             hasNoSources = not len(sourceTypes)
             if hasNoSources and implSource == UsdShade.Tokens.id:
-                shaderId = shader.GetShaderId( )
+                shaderId = shader.GetShaderId()
                 if not shaderId:
                     return
                 sdrShaderNode = \
                     Sdr.Registry().GetShaderNodeByIdentifier(shaderId)
             elif hasNoSources:
                 self._AddFailedCheck("Shader <%s> has no sourceType. "
-                     % (prim.GetPath()))
+                                     % (prim.GetPath()))
                 return
             else:
                 # If a shader has multiple source types, they will all share
@@ -705,12 +709,12 @@ class ShaderPropertyTypeConformanceChecker(BaseRuleChecker):
                     shader.GetShaderNodeForSourceType(sourceTypes[0])
         else:
             self._AddFailedCheck("Shader <%s> has invalid implementation "
-                    "source '%s'." % (prim.GetPath(), implSource))
+                                 "source '%s'." % (prim.GetPath(), implSource))
             return
 
         if not sdrShaderNode:
             self._AddFailedCheck("Shader <%s> has invalid shader node. "
-                     % (prim.GetPath()))
+                                 % (prim.GetPath()))
             return
 
         self._FillSdrNameToTypeMap(sdrShaderNode, sdrNameToTypeMapping)
@@ -724,18 +728,19 @@ class ShaderPropertyTypeConformanceChecker(BaseRuleChecker):
                 sdrSdfType = sdrNameToTypeMapping[inputName]
                 if not (sdrSdfType == schemaSdfType):
                     self._AddFailedCheck("Incorrect type for %s. Expected '%s'"
-                        "; got '%s'." %
-                        (input.GetAttr().GetPath(), sdrSdfType, schemaSdfType))
+                                         "; got '%s'." %
+                                         (input.GetAttr().GetPath(), sdrSdfType, schemaSdfType))
+
 
 class ARKitPackageEncapsulationChecker(BaseRuleChecker):
     @staticmethod
     def GetDescription():
-        return "If the root layer is a package, then the composed stage "\
-               "should not contain references to files outside the package. "\
+        return "If the root layer is a package, then the composed stage " \
+               "should not contain references to files outside the package. " \
                "In other words, the package should be entirely self-contained."
 
     def __init__(self, verbose, consumerLevelChecks, assetLevelChecks):
-        super(ARKitPackageEncapsulationChecker, self).\
+        super(ARKitPackageEncapsulationChecker, self). \
             __init__(verbose, consumerLevelChecks, assetLevelChecks)
 
     def CheckDependencies(self, usdStage, layerDeps, assetDeps):
@@ -747,33 +752,34 @@ class ARKitPackageEncapsulationChecker(BaseRuleChecker):
         if packagePath:
             if Ar.IsPackageRelativePath(packagePath):
                 packagePath = Ar.SplitPackageRelativePathOuter(
-                        packagePath)[0]
+                    packagePath)[0]
             for layer in layerDeps:
                 # In-memory layers like session layers (which we must skip when 
                 # doing this check) won't have a real path.
                 if layer.realPath:
                     if not layer.realPath.startswith(packagePath):
                         self._AddFailedCheck("Found loaded layer '%s' that "
-                            "does not belong to the package '%s'." % 
-                            (layer.identifier, packagePath))
+                                             "does not belong to the package '%s'." %
+                                             (layer.identifier, packagePath))
             for asset in assetDeps:
                 if not asset.startswith(packagePath):
                     self._AddFailedCheck("Found asset reference '%s' that "
-                        "does not belong to the package '%s'." % 
-                        (asset, packagePath))
-    
+                                         "does not belong to the package '%s'." %
+                                         (asset, packagePath))
+
+
 class ARKitLayerChecker(BaseRuleChecker):
     # Only core USD file formats are allowed.
     _allowedLayerFormatIds = ('usd', 'usda', 'usdc', 'usdz')
 
     @staticmethod
     def GetDescription():
-        return "All included layers that participate in composition should"\
-            " have one of the core supported file formats."
+        return "All included layers that participate in composition should" \
+               " have one of the core supported file formats."
 
     def __init__(self, verbose, consumerLevelChecks, assetLevelChecks):
         # Check if the prim has an allowed type.
-        super(ARKitLayerChecker, self).__init__(verbose, 
+        super(ARKitLayerChecker, self).__init__(verbose,
                                                 consumerLevelChecks,
                                                 assetLevelChecks)
 
@@ -782,52 +788,54 @@ class ARKitLayerChecker(BaseRuleChecker):
 
         formatId = layer.GetFileFormat().formatId
         if not formatId in \
-            ARKitLayerChecker._allowedLayerFormatIds:
+               ARKitLayerChecker._allowedLayerFormatIds:
             self._AddFailedCheck("Layer '%s' has unsupported formatId "
-                    "'%s'." % (layer.identifier, formatId))
+                                 "'%s'." % (layer.identifier, formatId))
+
 
 class ARKitPrimTypeChecker(BaseRuleChecker):
     # All core prim types other than UsdGeomPointInstancers, Curve types, Nurbs,
     # and the types in  UsdLux are allowed.
     _allowedPrimTypeNames = ('', 'Scope', 'Xform', 'Camera',
-                            'Shader', 'Material',
-                            'Mesh', 'Sphere', 'Cube', 'Cylinder', 'Cone',
-                            'Capsule', 'GeomSubset', 'Points', 
-                            'SkelRoot', 'Skeleton', 'SkelAnimation', 
-                            'BlendShape', 'SpatialAudio', 'PhysicsScene',
-                            'Preliminary_ReferenceImage', 'Preliminary_Text',
-                            'Preliminary_Trigger')
+                             'Shader', 'Material',
+                             'Mesh', 'Sphere', 'Cube', 'Cylinder', 'Cone',
+                             'Capsule', 'GeomSubset', 'Points',
+                             'SkelRoot', 'Skeleton', 'SkelAnimation',
+                             'BlendShape', 'SpatialAudio', 'PhysicsScene',
+                             'Preliminary_ReferenceImage', 'Preliminary_Text',
+                             'Preliminary_Trigger')
 
     @staticmethod
     def GetDescription():
-        return "UsdGeomPointInstancers and custom schemas not provided by "\
-                "core USD are not allowed."
+        return "UsdGeomPointInstancers and custom schemas not provided by " \
+               "core USD are not allowed."
 
     def __init__(self, verbose, consumerLevelChecks, assetLevelChecks):
         # Check if the prim has an allowed type.
-        super(ARKitPrimTypeChecker, self).__init__(verbose, 
+        super(ARKitPrimTypeChecker, self).__init__(verbose,
                                                    consumerLevelChecks,
                                                    assetLevelChecks)
 
     def CheckPrim(self, prim):
         self._Msg("Checking prim <%s>." % prim.GetPath())
         if (
-            (prim.GetTypeName() not in ARKitPrimTypeChecker._allowedPrimTypeNames) and
-            (not prim.GetTypeName().startswith("RealityKit"))
+                (prim.GetTypeName() not in ARKitPrimTypeChecker._allowedPrimTypeNames) and
+                (not prim.GetTypeName().startswith("RealityKit"))
         ):
-            self._AddFailedCheck("Prim <%s> has unsupported type '%s'." % 
-                                    (prim.GetPath(), prim.GetTypeName()))
+            self._AddFailedCheck("Prim <%s> has unsupported type '%s'." %
+                                 (prim.GetPath(), prim.GetTypeName()))
+
 
 class ARKitShaderChecker(BaseRuleChecker):
     @staticmethod
     def GetDescription():
-        return "Shader nodes must have \"id\" as the implementationSource, "  \
-               "with id values that begin with \"Usd*|ND_*\". Also, shader inputs "\
-               "with connections must each have a single, valid connection "  \
+        return "Shader nodes must have \"id\" as the implementationSource, " \
+               "with id values that begin with \"Usd*|ND_*\". Also, shader inputs " \
+               "with connections must each have a single, valid connection " \
                "source."
 
     def __init__(self, verbose, consumerLevelChecks, assetLevelChecks):
-        super(ARKitShaderChecker, self).__init__(verbose, consumerLevelChecks, 
+        super(ARKitShaderChecker, self).__init__(verbose, consumerLevelChecks,
                                                  assetLevelChecks)
 
     def CheckPrim(self, prim):
@@ -846,43 +854,44 @@ class ARKitShaderChecker(BaseRuleChecker):
         implSource = shader.GetImplementationSource()
         if implSource != UsdShade.Tokens.id:
             self._AddFailedCheck("Shader <%s> has non-id implementation "
-                    "source '%s'." % (prim.GetPath(), implSource))
+                                 "source '%s'." % (prim.GetPath(), implSource))
 
         shaderId = shader.GetShaderId()
         if not shaderId or \
-           not (shaderId in [NodeTypes.UsdPreviewSurface, 
-                             NodeTypes.UsdUVTexture, 
-                             NodeTypes.UsdTransform2d] or
-                shaderId.startswith(NodeTypes.UsdPrimvarReader) or
-                shaderId.startswith("ND_")) :
-            self._AddFailedCheck("Shader <%s> has unsupported info:id '%s'." 
-                    % (prim.GetPath(), shaderId))
+                not (shaderId in [NodeTypes.UsdPreviewSurface,
+                                  NodeTypes.UsdUVTexture,
+                                  NodeTypes.UsdTransform2d] or
+                     shaderId.startswith(NodeTypes.UsdPrimvarReader) or
+                     shaderId.startswith("ND_")):
+            self._AddFailedCheck("Shader <%s> has unsupported info:id '%s'."
+                                 % (prim.GetPath(), shaderId))
 
         # Check shader input connections
         shaderInputs = shader.GetInputs()
-        for shdInput in shaderInputs: 
+        for shdInput in shaderInputs:
             connections = shdInput.GetAttr().GetConnections()
             # If an input has one or more connections, ensure that the 
             # connections are valid.
             if len(connections) > 0:
                 if len(connections) > 1:
                     self._AddFailedCheck("Shader input <%s> has %s connection "
-                        "sources, but only one is allowed." % 
-                        (shdInput.GetAttr.GetPath(), len(connections)))
+                                         "sources, but only one is allowed." %
+                                         (shdInput.GetAttr.GetPath(), len(connections)))
                 connectedSource = shdInput.GetConnectedSource()
                 if connectedSource is None:
                     self._AddFailedCheck("Connection source <%s> for shader "
-                        "input <%s> is missing." % (connections[0], 
-                        shdInput.GetAttr().GetPath()))
+                                         "input <%s> is missing." % (connections[0],
+                                                                     shdInput.GetAttr().GetPath()))
                 else:
                     # The source must be a valid shader or material prim.
                     source = connectedSource[0]
                     if not source.GetPrim().IsA(UsdShade.Shader) and \
-                       not source.GetPrim().IsA(UsdShade.Material):
+                            not source.GetPrim().IsA(UsdShade.Material):
                         self._AddFailedCheck("Shader input <%s> has an invalid "
-                            "connection source prim of type '%s'." % 
-                            (shdInput.GetAttr().GetPath(), 
-                             source.GetPrim().GetTypeName()))
+                                             "connection source prim of type '%s'." %
+                                             (shdInput.GetAttr().GetPath(),
+                                              source.GetPrim().GetTypeName()))
+
 
 class ARKitMaterialBindingChecker(BaseRuleChecker):
     @staticmethod
@@ -890,36 +899,37 @@ class ARKitMaterialBindingChecker(BaseRuleChecker):
         return "All material binding relationships must have valid targets."
 
     def __init__(self, verbose, consumerLevelChecks, assetLevelChecks):
-        super(ARKitMaterialBindingChecker, self).__init__(verbose, 
+        super(ARKitMaterialBindingChecker, self).__init__(verbose,
                                                           consumerLevelChecks,
                                                           assetLevelChecks)
 
     def CheckPrim(self, prim):
         from pxr import UsdShade
         relationships = prim.GetRelationships()
-        bindingRels = [rel for rel in relationships if 
-                rel.GetName().startswith(UsdShade.Tokens.materialBinding)]
-        
+        bindingRels = [rel for rel in relationships if
+                       rel.GetName().startswith(UsdShade.Tokens.materialBinding)]
+
         for bindingRel in bindingRels:
             targets = bindingRel.GetTargets()
             if len(targets) == 1:
                 directBinding = UsdShade.MaterialBindingAPI.DirectBinding(
-                        bindingRel)
+                    bindingRel)
                 if not directBinding.GetMaterial():
                     self._AddFailedCheck("Direct material binding <%s> targets "
-                        "an invalid material <%s>." % (bindingRel.GetPath(), 
-                        directBinding.GetMaterialPath()))
+                                         "an invalid material <%s>." % (bindingRel.GetPath(),
+                                                                        directBinding.GetMaterialPath()))
             elif len(targets) == 2:
                 collBinding = UsdShade.MaterialBindingAPI.CollectionBinding(
-                        bindingRel)
+                    bindingRel)
                 if not collBinding.GetMaterial():
                     self._AddFailedCheck("Collection-based material binding "
-                        "<%s> targets an invalid material <%s>." % 
-                        (bindingRel.GetPath(), collBinding.GetMaterialPath()))
+                                         "<%s> targets an invalid material <%s>." %
+                                         (bindingRel.GetPath(), collBinding.GetMaterialPath()))
                 if not collBinding.GetCollection():
                     self._AddFailedCheck("Collection-based material binding "
-                        "<%s> targets an invalid collection <%s>." % 
-                        (bindingRel.GetPath(), collBinding.GetCollectionPath()))
+                                         "<%s> targets an invalid collection <%s>." %
+                                         (bindingRel.GetPath(), collBinding.GetCollectionPath()))
+
 
 class ARKitFileExtensionChecker(BaseRuleChecker):
     _allowedFileExtensions = \
@@ -931,8 +941,8 @@ class ARKitFileExtensionChecker(BaseRuleChecker):
         return "Only layer files and textures are allowed in a package."
 
     def __init__(self, verbose, consumerLevelChecks, assetLevelChecks):
-        super(ARKitFileExtensionChecker, self).__init__(verbose, 
-                                                        consumerLevelChecks, 
+        super(ARKitFileExtensionChecker, self).__init__(verbose,
+                                                        consumerLevelChecks,
                                                         assetLevelChecks)
 
     def CheckZipFile(self, zipFile, packagePath):
@@ -941,8 +951,8 @@ class ARKitFileExtensionChecker(BaseRuleChecker):
             fileExt = Ar.GetResolver().GetExtension(fileName)
             if fileExt not in ARKitFileExtensionChecker._allowedFileExtensions:
                 self._AddFailedCheck("File '%s' in package '%s' has an "
-                    "unknown or unsupported extension '%s'." % 
-                    (fileName, packagePath, fileExt))
+                                     "unknown or unsupported extension '%s'." %
+                                     (fileName, packagePath, fileExt))
 
 
 class ComplianceChecker(object):
@@ -969,20 +979,21 @@ class ComplianceChecker(object):
     @staticmethod
     def GetBaseRules():
         return [ByteAlignmentChecker, CompressionChecker, ShaderPropertyTypeConformanceChecker,
-                MissingReferenceChecker, StageMetadataChecker, TextureChecker, 
+                MissingReferenceChecker, StageMetadataChecker, TextureChecker,
                 PrimEncapsulationChecker, NormalMapTextureChecker,
                 MaterialBindingAPIAppliedChecker, SkelBindingAPIAppliedChecker]
 
     @staticmethod
     def GetARKitRules(skipARKitRootLayerCheck=False):
-        arkitRules = [ARKitLayerChecker, ARKitPrimTypeChecker, 
-                      ARKitShaderChecker, 
+        arkitRules = [ARKitLayerChecker, ARKitPrimTypeChecker,
+                      ARKitShaderChecker,
                       ARKitMaterialBindingChecker,
-                      ARKitFileExtensionChecker, 
+                      ARKitFileExtensionChecker,
                       ARKitPackageEncapsulationChecker]
         if skipARKitRootLayerCheck:
-            warnings.warn("skipARKitRootLayerCheck is no longer supported. It will be removed in a future version",
-                          PendingDeprecationWarning)
+            warnings.warn(
+                "skipARKitRootLayerCheck is no longer supported. It will be removed in a future version",
+                PendingDeprecationWarning)
         return arkitRules
 
     @staticmethod
@@ -990,11 +1001,11 @@ class ComplianceChecker(object):
         allRules = ComplianceChecker.GetBaseRules()
         if arkit:
             arkitRules = ComplianceChecker.GetARKitRules(
-                    skipARKitRootLayerCheck=skipARKitRootLayerCheck)
+                skipARKitRootLayerCheck=skipARKitRootLayerCheck)
             allRules += arkitRules
         return allRules
 
-    @staticmethod 
+    @staticmethod
     def DumpAllRules():
         print('Base rules:')
         for ruleNum, rule in enumerate(GetBaseRules()):
@@ -1004,7 +1015,7 @@ class ComplianceChecker(object):
         for ruleNum, rule in enumerate(GetBaseRules()):
             print('[%s] %s' % (ruleNum + 1, rule.GetDescription()))
         print('-' * 30)
-            
+
     def __init__(self, arkit=False, skipARKitRootLayerCheck=False,
                  rootPackageOnly=False, skipVariants=False, verbose=False,
                  assetLevelChecks=True):
@@ -1018,13 +1029,13 @@ class ComplianceChecker(object):
         self._checkedPackages = set()
 
         # Instantiate an instance of every rule checker and store in a list.
-        self._rules = [Rule(self._verbose, arkit, assetLevelChecks) for Rule in 
-                ComplianceChecker.GetRules(arkit, skipARKitRootLayerCheck)]
+        self._rules = [Rule(self._verbose, arkit, assetLevelChecks) for Rule in
+                       ComplianceChecker.GetRules(arkit, skipARKitRootLayerCheck)]
 
     def _Msg(self, msg):
         if self._verbose:
             print(msg)
-    
+
     def _AddError(self, errMsg):
         self._errors.append(errMsg)
 
@@ -1036,8 +1047,8 @@ class ComplianceChecker(object):
         for rule in self._rules:
             errs = rule.GetErrors()
             for err in errs:
-                errors.append("Error checking rule '%s': %s" % 
-                    (type(rule).__name__, err))
+                errors.append("Error checking rule '%s': %s" %
+                              (type(rule).__name__, err))
         return errors
 
     def GetWarnings(self):
@@ -1045,8 +1056,8 @@ class ComplianceChecker(object):
         for rule in self._rules:
             advisories = rule.GetWarnings()
             for ad in advisories:
-                warnings.append("%s (may violate '%s')" % (ad, 
-                        type(rule).__name__))
+                warnings.append("%s (may violate '%s')" % (ad,
+                                                           type(rule).__name__))
         return warnings
 
     def DumpRules(self):
@@ -1061,8 +1072,8 @@ class ComplianceChecker(object):
         for rule in self._rules:
             fcs = rule.GetFailedChecks()
             for fc in fcs:
-                failedChecks.append("%s (fails '%s')" % (fc, 
-                        type(rule).__name__))
+                failedChecks.append("%s (fails '%s')" % (fc,
+                                                         type(rule).__name__))
         return failedChecks
 
     def CheckCompliance(self, inputFile):
@@ -1084,7 +1095,7 @@ class ComplianceChecker(object):
             # This recursively computes all of inputFiles's external 
             # dependencies.
             (allLayers, allAssets, unresolvedPaths) = \
-                    UsdUtils.ComputeAllDependencies(Sdf.AssetPath(inputFile))
+                UsdUtils.ComputeAllDependencies(Sdf.AssetPath(inputFile))
             for rule in self._rules:
                 rule.CheckUnresolvedPaths(unresolvedPaths)
                 rule.CheckDependencies(usdStage, allLayers, allAssets)
@@ -1093,19 +1104,19 @@ class ComplianceChecker(object):
                 rootLayer = usdStage.GetRootLayer()
                 if rootLayer.GetFileFormat().IsPackage():
                     packagePath = Ar.SplitPackageRelativePathInner(
-                            rootLayer.identifier)[0]
+                        rootLayer.identifier)[0]
                     self._CheckPackage(packagePath)
                 else:
                     self._AddError("Root layer of the USD stage (%s) doesn't belong to "
-                        "a package, but 'rootPackageOnly' is True!" % 
-                        Usd.Describe(usdStage))
+                                   "a package, but 'rootPackageOnly' is True!" %
+                                   Usd.Describe(usdStage))
             else:
                 # Process every package just once by storing them all in a set.
                 packages = set()
                 for layer in allLayers:
                     if _IsPackageOrPackagedLayer(layer):
                         packagePath = Ar.SplitPackageRelativePathInner(
-                                layer.identifier)[0]
+                            layer.identifier)[0]
                         packages.add(packagePath)
                     self._CheckLayer(layer)
                 for package in packages:
@@ -1115,10 +1126,10 @@ class ComplianceChecker(object):
                 from pxr import Usd
                 # Author all variant switches in the session layer.
                 usdStage.SetEditTarget(usdStage.GetSessionLayer())
-                allPrimsIt = iter(Usd.PrimRange.Stage(usdStage, 
-                        Usd.TraverseInstanceProxies()))
+                allPrimsIt = iter(Usd.PrimRange.Stage(usdStage,
+                                                      Usd.TraverseInstanceProxies()))
                 self._TraverseRange(allPrimsIt, isStageRoot=True)
-    
+
     def _CheckPackage(self, packagePath):
         self._Msg("Checking package <%s>." % packagePath)
 
@@ -1128,7 +1139,7 @@ class ComplianceChecker(object):
         from pxr import Usd
         pkgExt = Ar.GetResolver().GetExtension(packagePath)
         if pkgExt != "usdz":
-            self._AddError("Package at path %s has an invalid extension." 
+            self._AddError("Package at path %s has an invalid extension."
                            % packagePath)
             return
 
@@ -1136,7 +1147,7 @@ class ComplianceChecker(object):
         if Ar.IsPackageRelativePath(packagePath):
             parentPackagePath = Ar.SplitPackageRelativePathInner(packagePath)[0]
             self._CheckPackage(parentPackagePath)
-        
+
         # Avoid checking the same parent package multiple times.
         if packagePath in self._checkedPackages:
             return
@@ -1149,7 +1160,7 @@ class ComplianceChecker(object):
 
         zipFile = Usd.ZipFile.Open(resolvedPath)
         if not zipFile:
-            self._AddError("Could not open package at path '%s'." % 
+            self._AddError("Could not open package at path '%s'." %
                            resolvedPath)
             return
         for rule in self._rules:
@@ -1200,12 +1211,12 @@ class ComplianceChecker(object):
         allVariations = itertools.product(*allVariantNames)
 
         for variation in allVariations:
-            self._Msg("Testing variation %s of prim <%s>" % 
+            self._Msg("Testing variation %s of prim <%s>" %
                       (variation, prim.GetPath()))
             for (idx, sel) in enumerate(variation):
                 vSets.SetSelection(vSetNames[idx], sel)
             for rule in self._rules:
                 rule.ResetCaches()
-            primRangeIt = iter(Usd.PrimRange(prim, 
-                    Usd.TraverseInstanceProxies()))
+            primRangeIt = iter(Usd.PrimRange(prim,
+                                             Usd.TraverseInstanceProxies()))
             self._TraverseRange(primRangeIt, isStageRoot=False)

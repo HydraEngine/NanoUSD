@@ -24,44 +24,38 @@ struct UsdShadeConnectionSourceInfo;
 class UsdShadeOutput;
 
 /// \class UsdShadeInput
-/// 
-/// This class encapsulates a shader or node-graph input, which is a 
+///
+/// This class encapsulates a shader or node-graph input, which is a
 /// connectable attribute representing a typed value.
-/// 
-class UsdShadeInput
-{
+///
+class UsdShadeInput {
 public:
     /// Default constructor returns an invalid Input.  Exists for the sake of
     /// container classes
-    UsdShadeInput()
-    {
+    UsdShadeInput() {
         // nothing
     }
 
-    /// Get the name of the attribute associated with the Input. 
-    /// 
-    TfToken const &GetFullName() const { 
-        return _attr.GetName(); 
-    }
+    /// Get the name of the attribute associated with the Input.
+    ///
+    TfToken const& GetFullName() const { return _attr.GetName(); }
 
-    /// Returns the name of the input. 
-    /// 
-    /// We call this the base name since it strips off the "inputs:" namespace 
+    /// Returns the name of the input.
+    ///
+    /// We call this the base name since it strips off the "inputs:" namespace
     /// prefix from the attribute name, and returns it.
-    /// 
+    ///
     USDSHADE_API
     TfToken GetBaseName() const;
 
-    /// Get the "scene description" value type name of the attribute associated 
+    /// Get the "scene description" value type name of the attribute associated
     /// with the Input.
-    /// 
+    ///
     USDSHADE_API
     SdfValueTypeName GetTypeName() const;
-    
+
     /// Get the prim that the input belongs to.
-    UsdPrim GetPrim() const {
-        return _attr.GetPrim();
-    }
+    UsdPrim GetPrim() const { return _attr.GetPrim(); }
 
     /// Convenience wrapper for the templated UsdAttribute::Get().
     template <typename T>
@@ -74,14 +68,13 @@ public:
     bool Get(VtValue* value, UsdTimeCode time = UsdTimeCode::Default()) const;
 
     /// Set a value for the Input at \p time.
-    /// 
+    ///
     USDSHADE_API
-    bool Set(const VtValue& value, 
-             UsdTimeCode time = UsdTimeCode::Default()) const;
+    bool Set(const VtValue& value, UsdTimeCode time = UsdTimeCode::Default()) const;
 
-    /// \overload 
+    /// \overload
     /// Set a value of the Input at \p time.
-    /// 
+    ///
     template <typename T>
     bool Set(const T& value, UsdTimeCode time = UsdTimeCode::Default()) const {
         return _attr.Set(value, time);
@@ -89,9 +82,7 @@ public:
 
     /// Hash functor.
     struct Hash {
-        inline size_t operator()(const UsdShadeInput &input) const {
-            return hash_value(input._attr);
-        }
+        inline size_t operator()(const UsdShadeInput& input) const { return hash_value(input._attr); }
     };
 
     /// \name Configuring the Input's Type
@@ -125,61 +116,59 @@ public:
     /// @}
 
     /// \name API to author and query an Input's sdrMetadata
-    /// 
+    ///
     /// This section provides API for authoring and querying shader registry
-    /// metadata on an Input. When the owning shader prim is providing a shader 
-    /// definition, the authored "sdrMetadata" dictionary value provides 
-    /// metadata needed to populate the Input correctly in the shader registry. 
-    /// 
-    /// We expect the keys in sdrMetadata to correspond to the keys 
+    /// metadata on an Input. When the owning shader prim is providing a shader
+    /// definition, the authored "sdrMetadata" dictionary value provides
+    /// metadata needed to populate the Input correctly in the shader registry.
+    ///
+    /// We expect the keys in sdrMetadata to correspond to the keys
     /// in \ref SdrPropertyMetadata. However, this is not strictly enforced by
-    /// the API. The only allowed value type in the "sdrMetadata" dictionary is 
-    /// a std::string since it needs to be converted into a NdrTokenMap, which 
+    /// the API. The only allowed value type in the "sdrMetadata" dictionary is
+    /// a std::string since it needs to be converted into a NdrTokenMap, which
     /// Sdr will parse using the utilities available in \ref SdrMetadataHelpers.
-    /// 
+    ///
     /// @{
 
-    /// Returns this Input's composed "sdrMetadata" dictionary as a 
+    /// Returns this Input's composed "sdrMetadata" dictionary as a
     /// NdrTokenMap.
     USDSHADE_API
     NdrTokenMap GetSdrMetadata() const;
-    
-    /// Returns the value corresponding to \p key in the composed 
+
+    /// Returns the value corresponding to \p key in the composed
     /// <b>sdrMetadata</b> dictionary.
     USDSHADE_API
-    std::string GetSdrMetadataByKey(const TfToken &key) const;
-        
-    /// Authors the given \p sdrMetadata value on this Input at the current 
+    std::string GetSdrMetadataByKey(const TfToken& key) const;
+
+    /// Authors the given \p sdrMetadata value on this Input at the current
     /// EditTarget.
     USDSHADE_API
-    void SetSdrMetadata(const NdrTokenMap &sdrMetadata) const;
+    void SetSdrMetadata(const NdrTokenMap& sdrMetadata) const;
 
-    /// Sets the value corresponding to \p key to the given string \p value, in 
+    /// Sets the value corresponding to \p key to the given string \p value, in
     /// the Input's "sdrMetadata" dictionary at the current EditTarget.
     USDSHADE_API
-    void SetSdrMetadataByKey(
-        const TfToken &key, 
-        const std::string &value) const;
+    void SetSdrMetadataByKey(const TfToken& key, const std::string& value) const;
 
-    /// Returns true if the Input has a non-empty composed "sdrMetadata" 
+    /// Returns true if the Input has a non-empty composed "sdrMetadata"
     /// dictionary value.
     USDSHADE_API
     bool HasSdrMetadata() const;
 
-    /// Returns true if there is a value corresponding to the given \p key in 
+    /// Returns true if there is a value corresponding to the given \p key in
     /// the composed "sdrMetadata" dictionary.
     USDSHADE_API
-    bool HasSdrMetadataByKey(const TfToken &key) const;
+    bool HasSdrMetadataByKey(const TfToken& key) const;
 
-    /// Clears any "sdrMetadata" value authored on the Input in the current 
+    /// Clears any "sdrMetadata" value authored on the Input in the current
     /// EditTarget.
     USDSHADE_API
     void ClearSdrMetadata() const;
 
-    /// Clears the entry corresponding to the given \p key in the 
+    /// Clears the entry corresponding to the given \p key in the
     /// "sdrMetadata" dictionary authored in the current EditTarget.
     USDSHADE_API
-    void ClearSdrMetadataByKey(const TfToken &key) const;
+    void ClearSdrMetadataByKey(const TfToken& key) const;
 
     /// @}
 
@@ -190,37 +179,35 @@ public:
     /// @{
 
     /// Speculative constructor that will produce a valid UsdShadeInput when
-    /// \p attr already represents a shade Input, and produces an \em invalid 
-    /// UsdShadeInput otherwise (i.e. the explicit bool conversion operator will 
+    /// \p attr already represents a shade Input, and produces an \em invalid
+    /// UsdShadeInput otherwise (i.e. the explicit bool conversion operator will
     /// return false).
     USDSHADE_API
-    explicit UsdShadeInput(const UsdAttribute &attr);
+    explicit UsdShadeInput(const UsdAttribute& attr);
 
     /// Test whether a given UsdAttribute represents a valid Input, which
     /// implies that creating a UsdShadeInput from the attribute will succeed.
     ///
     /// Success implies that \c attr.IsDefined() is true.
     USDSHADE_API
-    static bool IsInput(const UsdAttribute &attr);
+    static bool IsInput(const UsdAttribute& attr);
 
     /// Test if this name has a namespace that indicates it could be an
     /// input.
     USDSHADE_API
-    static bool IsInterfaceInputName(const std::string & name);
+    static bool IsInterfaceInputName(const std::string& name);
 
     /// Explicit UsdAttribute extractor.
-    const UsdAttribute &GetAttr() const { return _attr; }
+    const UsdAttribute& GetAttr() const { return _attr; }
 
     /// Allow UsdShadeInput to auto-convert to UsdAttribute, so you can
     /// pass a UsdShadeInput to any function that accepts a UsdAttribute or
     /// const-ref thereto.
-    operator const UsdAttribute & () const { return GetAttr(); }
+    operator const UsdAttribute&() const { return GetAttr(); }
 
-    /// Return true if the wrapped UsdAttribute is defined, and in addition the 
+    /// Return true if the wrapped UsdAttribute is defined, and in addition the
     /// attribute is identified as an input.
-    bool IsDefined() const {
-        return _attr && IsInput(_attr);
-    }
+    bool IsDefined() const { return _attr && IsInput(_attr); }
 
     /// Set documentation string for this Input.
     /// \sa UsdObject::SetDocumentation()
@@ -242,7 +229,7 @@ public:
     USDSHADE_API
     bool SetDisplayGroup(const std::string& displayGroup) const;
 
-    /// Get the displayGroup metadata for this Input, i.e. hint for the location 
+    /// Get the displayGroup metadata for this Input, i.e. hint for the location
     /// and nesting of the attribute.
     /// \sa UsdProperty::GetDisplayGroup(), UsdProperty::GetNestedDisplayGroup()
     USDSHADE_API
@@ -252,46 +239,42 @@ public:
 
     /// Return true if this Input is valid for querying and authoring
     /// values and metadata, which is identically equivalent to IsDefined().
-    explicit operator bool() const { 
-        return IsDefined(); 
-    }
+    explicit operator bool() const { return IsDefined(); }
 
-    /// Equality comparison. Returns true if \a lhs and \a rhs represent the 
+    /// Equality comparison. Returns true if \a lhs and \a rhs represent the
     /// same UsdShadeInput, false otherwise.
-    friend bool operator==(const UsdShadeInput &lhs, const UsdShadeInput &rhs) {
+    friend bool operator==(const UsdShadeInput& lhs, const UsdShadeInput& rhs) {
         return lhs.GetAttr() == rhs.GetAttr();
     }
 
     /// Inequality comparison. Return false if \a lhs and \a rhs represent the
     /// same UsdShadeInput, true otherwise.
-    friend bool operator!=(const UsdShadeInput &lhs, const UsdShadeInput &rhs) {
-        return !(lhs == rhs);
-    }
-    
+    friend bool operator!=(const UsdShadeInput& lhs, const UsdShadeInput& rhs) { return !(lhs == rhs); }
+
     // -------------------------------------------------------------------------
     /// \name Connections API
     // -------------------------------------------------------------------------
     /// @{
 
-    /// Determines whether this Input can be connected to the given 
+    /// Determines whether this Input can be connected to the given
     /// source attribute, which can be an input or an output.
-    /// 
+    ///
     /// \sa UsdShadeConnectableAPI::CanConnect
     USDSHADE_API
-    bool CanConnect(const UsdAttribute &source) const;
+    bool CanConnect(const UsdAttribute& source) const;
 
     /// \overload
     USDSHADE_API
-    bool CanConnect(const UsdShadeInput &sourceInput) const;
+    bool CanConnect(const UsdShadeInput& sourceInput) const;
 
     /// \overload
     USDSHADE_API
-    bool CanConnect(const UsdShadeOutput &sourceOutput) const;
+    bool CanConnect(const UsdShadeOutput& sourceOutput) const;
 
     using ConnectionModification = UsdShadeConnectionModification;
 
     /// Authors a connection for this Input
-    /// 
+    ///
     /// \p source is a struct that describes the upstream source attribute
     /// with all the information necessary to make a connection. See the
     /// documentation for UsdShadeConnectionSourceInfo.
@@ -299,112 +282,107 @@ public:
     /// connections. By default the new connection will replace any existing
     /// connections, but it can add to the list of connections to represent
     /// multiple input connections.
-    /// 
+    ///
     /// \return
     /// \c true if a connection was created successfully.
     /// \c false if this input or \p source is invalid.
-    /// 
+    ///
     /// \note This method does not verify the connectability of the shading
     /// attribute to the source. Clients must invoke CanConnect() themselves
     /// to ensure compatibility.
     /// \note The source shading attribute is created if it doesn't exist
     /// already.
-    /// 
+    ///
     /// \sa UsdShadeConnectableAPI::ConnectToSource
     ///
     USDSHADE_API
-    bool ConnectToSource(
-        UsdShadeConnectionSourceInfo const &source,
-        ConnectionModification const mod =
-            ConnectionModification::Replace) const;
+    bool ConnectToSource(UsdShadeConnectionSourceInfo const& source,
+                         ConnectionModification const mod = ConnectionModification::Replace) const;
 
     /// \deprecated
     /// \overload
     USDSHADE_API
-    bool ConnectToSource(
-        UsdShadeConnectableAPI const &source,
-        TfToken const &sourceName,
-        UsdShadeAttributeType const sourceType=UsdShadeAttributeType::Output,
-        SdfValueTypeName typeName=SdfValueTypeName()) const;
+    bool ConnectToSource(UsdShadeConnectableAPI const& source,
+                         TfToken const& sourceName,
+                         UsdShadeAttributeType const sourceType = UsdShadeAttributeType::Output,
+                         SdfValueTypeName typeName = SdfValueTypeName()) const;
 
     /// Authors a connection for this Input to the source at the given path.
-    /// 
+    ///
     /// \sa UsdShadeConnectableAPI::ConnectToSource
     ///
     USDSHADE_API
-    bool ConnectToSource(SdfPath const &sourcePath) const;
+    bool ConnectToSource(SdfPath const& sourcePath) const;
 
     /// Connects this Input to the given input, \p sourceInput.
-    /// 
+    ///
     /// \sa UsdShadeConnectableAPI::ConnectToSource
     ///
     USDSHADE_API
-    bool ConnectToSource(UsdShadeInput const &sourceInput) const;
+    bool ConnectToSource(UsdShadeInput const& sourceInput) const;
 
     /// Connects this Input to the given output, \p sourceOutput.
-    /// 
+    ///
     /// \sa UsdShadeConnectableAPI::ConnectToSource
     ///
     USDSHADE_API
-    bool ConnectToSource(UsdShadeOutput const &sourceOutput) const;
+    bool ConnectToSource(UsdShadeOutput const& sourceOutput) const;
 
     /// Connects this Input to the given sources, \p sourceInfos
-    /// 
+    ///
     /// \sa UsdShadeConnectableAPI::SetConnectedSources
     ///
     USDSHADE_API
-    bool SetConnectedSources(
-        std::vector<UsdShadeConnectionSourceInfo> const &sourceInfos) const;
+    bool SetConnectedSources(std::vector<UsdShadeConnectionSourceInfo> const& sourceInfos) const;
 
     using SourceInfoVector = TfSmallVector<UsdShadeConnectionSourceInfo, 1>;
 
     /// Finds the valid sources of connections for the Input.
-    /// 
+    ///
     /// \p invalidSourcePaths is an optional output parameter to collect the
     /// invalid source paths that have not been reported in the returned vector.
-    /// 
+    ///
     /// Returns a vector of \p UsdShadeConnectionSourceInfo structs with
     /// information about each upsteam attribute. If the vector is empty, there
     /// have been no valid connections.
-    /// 
+    ///
     /// \note A valid connection requires the existence of the source attribute
     /// and also requires that the source prim is UsdShadeConnectableAPI
     /// compatible.
     /// \note The python wrapping returns a tuple with the valid connections
     /// first, followed by the invalid source paths.
-    /// 
+    ///
     /// \sa UsdShadeConnectableAPI::GetConnectedSources
     ///
     USDSHADE_API
-    SourceInfoVector GetConnectedSources(
-        SdfPathVector *invalidSourcePaths = nullptr) const;
+    SourceInfoVector GetConnectedSources(SdfPathVector* invalidSourcePaths = nullptr) const;
 
     /// \deprecated
     USDSHADE_API
-    bool GetConnectedSource(UsdShadeConnectableAPI *source,
-                            TfToken *sourceName,
-                            UsdShadeAttributeType *sourceType) const;
+    bool GetConnectedSource(UsdShadeConnectableAPI* source,
+                            TfToken* sourceName,
+                            UsdShadeAttributeType* sourceType) const;
 
     /// \deprecated
     /// Returns the "raw" (authored) connected source paths for this Input.
-    /// 
+    ///
     /// \sa UsdShadeConnectableAPI::GetRawConnectedSourcePaths
     ///
     USDSHADE_API
-    bool GetRawConnectedSourcePaths(SdfPathVector *sourcePaths) const;
+    bool GetRawConnectedSourcePaths(SdfPathVector* sourcePaths) const;
 
-    /// Returns true if and only if this Input is currently connected to a 
-    /// valid (defined) source. 
+    /// Returns true if and only if this Input is currently connected to a
+    /// valid (defined) source.
     ///
     /// \sa UsdShadeConnectableAPI::HasConnectedSource
-    /// 
+    ///
     USDSHADE_API
     bool HasConnectedSource() const;
 
-    /// Returns true if the connection to this Input's source, as returned by 
-    /// GetConnectedSource(), is authored across a specializes arc, which is 
+    /// Returns true if the connection to this Input's source, as returned by
+    /// GetConnectedSource(), is authored across a specializes arc, which is
     /// used to denote a base material.
-    /// 
+    ///
     /// \sa UsdShadeConnectableAPI::IsSourceConnectionFromBaseMaterial
     ///
     USDSHADE_API
@@ -413,11 +391,11 @@ public:
     /// Disconnect source for this Input. If \p sourceAttr is valid, only a
     /// connection to the specified attribute is disconnected, otherwise all
     /// connections are removed.
-    /// 
+    ///
     /// \sa UsdShadeConnectableAPI::DisconnectSource
     ///
     USDSHADE_API
-    bool DisconnectSource(UsdAttribute const &sourceAttr = UsdAttribute()) const;
+    bool DisconnectSource(UsdAttribute const& sourceAttr = UsdAttribute()) const;
 
     /// Clears sources for this Input in the current UsdEditTarget.
     ///
@@ -439,39 +417,39 @@ public:
     /// \name Connectability API
     // -------------------------------------------------------------------------
     /// @{
-        
-    /// \brief Set the connectability of the Input. 
-    /// 
-    /// In certain shading data models, there is a need to distinguish which 
-    /// inputs <b>can</b> vary over a surface from those that must be 
-    /// <b>uniform</b>. This is accomplished in UsdShade by limiting the 
-    /// connectability of the input. This is done by setting the 
+
+    /// \brief Set the connectability of the Input.
+    ///
+    /// In certain shading data models, there is a need to distinguish which
+    /// inputs <b>can</b> vary over a surface from those that must be
+    /// <b>uniform</b>. This is accomplished in UsdShade by limiting the
+    /// connectability of the input. This is done by setting the
     /// "connectability" metadata on the associated attribute.
-    /// 
-    /// Connectability of an Input can be set to UsdShadeTokens->full or 
-    /// UsdShadeTokens->interfaceOnly. 
-    /// 
-    /// \li <b>full</b> implies that  the Input can be connected to any other 
-    /// Input or Output.  
-    /// \li <b>interfaceOnly</b> implies that the Input can only be connected to 
-    /// a NodeGraph Input (which represents an interface override, not a 
-    /// render-time dataflow connection), or another Input whose connectability 
+    ///
+    /// Connectability of an Input can be set to UsdShadeTokens->full or
+    /// UsdShadeTokens->interfaceOnly.
+    ///
+    /// \li <b>full</b> implies that  the Input can be connected to any other
+    /// Input or Output.
+    /// \li <b>interfaceOnly</b> implies that the Input can only be connected to
+    /// a NodeGraph Input (which represents an interface override, not a
+    /// render-time dataflow connection), or another Input whose connectability
     /// is also "interfaceOnly".
-    /// 
+    ///
     /// The default connectability of an input is UsdShadeTokens->full.
-    /// 
+    ///
     /// \sa SetConnectability()
     USDSHADE_API
-    bool SetConnectability(const TfToken &connectability) const;
+    bool SetConnectability(const TfToken& connectability) const;
 
     /// \brief Returns the connectability of the Input.
-    /// 
+    ///
     /// \sa SetConnectability()
     USDSHADE_API
     TfToken GetConnectability() const;
 
     /// \brief Clears any authored connectability on the Input.
-    /// 
+    ///
     USDSHADE_API
     bool ClearConnectability() const;
 
@@ -486,29 +464,25 @@ public:
     ///
     /// \sa UsdShadeUtils::GetValueProducingAttributes
     USDSHADE_API
-    UsdShadeAttributeVector GetValueProducingAttributes(
-        bool shaderOutputsOnly = false) const;
+    UsdShadeAttributeVector GetValueProducingAttributes(bool shaderOutputsOnly = false) const;
 
     /// \deprecated in favor of calling GetValueProducingAttributes
     USDSHADE_API
-    UsdAttribute GetValueProducingAttribute(
-        UsdShadeAttributeType* attrType) const;
+    UsdAttribute GetValueProducingAttribute(UsdShadeAttributeType* attrType) const;
 
     /// @}
 
 private:
     friend class UsdShadeConnectableAPI;
 
-    // Constructor that creates a UsdShadeInput with the given name on the 
+    // Constructor that creates a UsdShadeInput with the given name on the
     // given prim.
     // \p name here is the unnamespaced name of the input.
-    UsdShadeInput(UsdPrim prim,
-                  TfToken const &name,
-                  SdfValueTypeName const &typeName);
-    
+    UsdShadeInput(UsdPrim prim, TfToken const& name, SdfValueTypeName const& typeName);
+
     UsdAttribute _attr;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_SHADE_INPUT_H
+#endif  // PXR_USD_USD_SHADE_INPUT_H

@@ -27,7 +27,7 @@ struct UsdShadeConnectionSourceInfo;
 
 /// \class UsdShadeUtils
 ///
-/// This class contains a set of utility functions used when authoring and 
+/// This class contains a set of utility functions used when authoring and
 /// querying shading networks.
 ///
 class UsdShadeUtils {
@@ -35,33 +35,29 @@ public:
     /// Returns the namespace prefix of the USD attribute associated with the
     /// given shading attribute type.
     USDSHADE_API
-    static std::string GetPrefixForAttributeType(
-        UsdShadeAttributeType sourceType);
+    static std::string GetPrefixForAttributeType(UsdShadeAttributeType sourceType);
 
     /// For a valid UsdShadeConnectionSourceInfo, return the complete path
     /// to the source property; otherwise the empty path.
     USDSHADE_API
-    static SdfPath 
-    GetConnectedSourcePath(const UsdShadeConnectionSourceInfo &srcInfo);
+    static SdfPath GetConnectedSourcePath(const UsdShadeConnectionSourceInfo& srcInfo);
 
     /// Given the full name of a shading attribute, returns it's base name and
     /// shading attribute type.
     USDSHADE_API
-    static std::pair<TfToken, UsdShadeAttributeType> 
-        GetBaseNameAndType(const TfToken &fullName);
+    static std::pair<TfToken, UsdShadeAttributeType> GetBaseNameAndType(const TfToken& fullName);
 
     /// Given the full name of a shading attribute, returns its shading
     /// attribute type.
     USDSHADE_API
-    static UsdShadeAttributeType GetType(const TfToken &fullName);
+    static UsdShadeAttributeType GetType(const TfToken& fullName);
 
     /// Returns the full shading attribute name given the basename and the
     /// shading attribute type. \p baseName is the name of the input or output
     /// on the shading node. \p type is the \ref UsdShadeAttributeType of the
     /// shading attribute.
     USDSHADE_API
-    static TfToken GetFullName(const TfToken &baseName, 
-                               const UsdShadeAttributeType type);
+    static TfToken GetFullName(const TfToken& baseName, const UsdShadeAttributeType type);
 
     /// \brief Find what is connected to an Input or Output recursively
     ///
@@ -105,14 +101,12 @@ public:
     /// UsdShadeInput attributes. It is up to the caller to decide how to
     /// process such a mixture.
     USDSHADE_API
-    static UsdShadeAttributeVector GetValueProducingAttributes(
-        UsdShadeInput const &input,
-        bool shaderOutputsOnly = false);
+    static UsdShadeAttributeVector GetValueProducingAttributes(UsdShadeInput const& input,
+                                                               bool shaderOutputsOnly = false);
     /// \overload
     USDSHADE_API
-    static UsdShadeAttributeVector GetValueProducingAttributes(
-        UsdShadeOutput const &output,
-        bool shaderOutputsOnly = false);
+    static UsdShadeAttributeVector GetValueProducingAttributes(UsdShadeOutput const& output,
+                                                               bool shaderOutputsOnly = false);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -9,6 +9,7 @@ import platform
 import sys
 from distutils.spawn import find_executable
 
+
 def FindUsdBinary(name):
     """Returns the full path to the named executable if it can be found, or
     None if the executable cannot be located. This first searches in PATH, and
@@ -26,7 +27,7 @@ def FindUsdBinary(name):
 
     # Then look relative to the current executable
     binpath = find_executable(name,
-        path=os.path.abspath(os.path.dirname(sys.argv[0])))
+                              path=os.path.abspath(os.path.dirname(sys.argv[0])))
     if binpath:
         return binpath
 

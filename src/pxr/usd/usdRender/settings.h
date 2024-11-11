@@ -45,8 +45,7 @@ class SdfAssetPath;
 /// So to set an attribute to the value "rightHanded", use UsdRenderTokens->rightHanded
 /// as the value.
 ///
-class UsdRenderSettings : public UsdRenderSettingsBase
-{
+class UsdRenderSettings : public UsdRenderSettingsBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -57,18 +56,12 @@ public:
     /// Equivalent to UsdRenderSettings::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdRenderSettings(const UsdPrim& prim=UsdPrim())
-        : UsdRenderSettingsBase(prim)
-    {
-    }
+    explicit UsdRenderSettings(const UsdPrim& prim = UsdPrim()) : UsdRenderSettingsBase(prim) {}
 
     /// Construct a UsdRenderSettings on the prim held by \p schemaObj .
     /// Should be preferred over UsdRenderSettings(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdRenderSettings(const UsdSchemaBase& schemaObj)
-        : UsdRenderSettingsBase(schemaObj)
-    {
-    }
+    explicit UsdRenderSettings(const UsdSchemaBase& schemaObj) : UsdRenderSettingsBase(schemaObj) {}
 
     /// Destructor.
     USDRENDER_API
@@ -78,8 +71,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDRENDER_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdRenderSettings holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -91,8 +83,7 @@ public:
     /// \endcode
     ///
     USDRENDER_API
-    static UsdRenderSettings
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdRenderSettings Get(const UsdStagePtr& stage, const SdfPath& path);
 
     /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
     /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -117,8 +108,7 @@ public:
     /// the opinion at the current EditTarget.
     ///
     USDRENDER_API
-    static UsdRenderSettings
-    Define(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdRenderSettings Define(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -131,17 +121,17 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDRENDER_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDRENDER_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // INCLUDEDPURPOSES 
+    // INCLUDEDPURPOSES
     // --------------------------------------------------------------------- //
     /// The list of UsdGeomImageable _purpose_ values that
     /// should be included in the render.  Note this cannot be
@@ -157,17 +147,17 @@ public:
     USDRENDER_API
     UsdAttribute GetIncludedPurposesAttr() const;
 
-    /// See GetIncludedPurposesAttr(), and also 
+    /// See GetIncludedPurposesAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDRENDER_API
-    UsdAttribute CreateIncludedPurposesAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateIncludedPurposesAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // MATERIALBINDINGPURPOSES 
+    // MATERIALBINDINGPURPOSES
     // --------------------------------------------------------------------- //
     /// Ordered list of material purposes to consider when
     /// resolving material bindings in the scene.  The empty string
@@ -183,17 +173,18 @@ public:
     USDRENDER_API
     UsdAttribute GetMaterialBindingPurposesAttr() const;
 
-    /// See GetMaterialBindingPurposesAttr(), and also 
+    /// See GetMaterialBindingPurposesAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDRENDER_API
-    UsdAttribute CreateMaterialBindingPurposesAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateMaterialBindingPurposesAttr(VtValue const& defaultValue = VtValue(),
+                                                   bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // RENDERINGCOLORSPACE 
+    // RENDERINGCOLORSPACE
     // --------------------------------------------------------------------- //
     /// Describes a renderer's working (linear) colorSpace where all
     /// the renderer/shader math is expected to happen. When no
@@ -208,17 +199,18 @@ public:
     USDRENDER_API
     UsdAttribute GetRenderingColorSpaceAttr() const;
 
-    /// See GetRenderingColorSpaceAttr(), and also 
+    /// See GetRenderingColorSpaceAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDRENDER_API
-    UsdAttribute CreateRenderingColorSpaceAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateRenderingColorSpaceAttr(VtValue const& defaultValue = VtValue(),
+                                               bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // PRODUCTS 
+    // PRODUCTS
     // --------------------------------------------------------------------- //
     /// The set of RenderProducts the render should produce.
     /// This relationship should target UsdRenderProduct prims.
@@ -229,18 +221,18 @@ public:
     USDRENDER_API
     UsdRelationship GetProductsRel() const;
 
-    /// See GetProductsRel(), and also 
+    /// See GetProductsRel(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create
     USDRENDER_API
     UsdRelationship CreateProductsRel() const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
@@ -251,8 +243,7 @@ public:
     /// a valid UsdRenderSettings prim, this will return an invalid
     /// UsdRenderSettings prim.
     USDRENDER_API
-    static UsdRenderSettings
-    GetStageRenderSettings(const UsdStageWeakPtr &stage);
+    static UsdRenderSettings GetStageRenderSettings(const UsdStageWeakPtr& stage);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

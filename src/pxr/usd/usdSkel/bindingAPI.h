@@ -18,7 +18,7 @@
 
 #include "pxr/base/tf/span.h"
 #include "pxr/usd/usdGeom/primvar.h"
-#include "pxr/usd/usdSkel/skeleton.h" 
+#include "pxr/usd/usdSkel/skeleton.h"
 
 #include "pxr/base/vt/value.h"
 
@@ -42,18 +42,17 @@ class SdfAssetPath;
 /// Provides API for authoring and extracting all the skinning-related
 /// data that lives in the "geometry hierarchy" of prims and models that want
 /// to be skeletally deformed.
-/// 
+///
 /// See the extended \ref UsdSkel_BindingAPI "UsdSkelBindingAPI schema"
 /// documentation for more about bindings and how they apply in a scene graph.
-/// 
+///
 ///
 /// For any described attribute \em Fallback \em Value or \em Allowed \em Values below
 /// that are text/tokens, the actual token is published and defined in \ref UsdSkelTokens.
 /// So to set an attribute to the value "rightHanded", use UsdSkelTokens->rightHanded
 /// as the value.
 ///
-class UsdSkelBindingAPI : public UsdAPISchemaBase
-{
+class UsdSkelBindingAPI : public UsdAPISchemaBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -64,18 +63,12 @@ public:
     /// Equivalent to UsdSkelBindingAPI::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdSkelBindingAPI(const UsdPrim& prim=UsdPrim())
-        : UsdAPISchemaBase(prim)
-    {
-    }
+    explicit UsdSkelBindingAPI(const UsdPrim& prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
     /// Construct a UsdSkelBindingAPI on the prim held by \p schemaObj .
     /// Should be preferred over UsdSkelBindingAPI(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdSkelBindingAPI(const UsdSchemaBase& schemaObj)
-        : UsdAPISchemaBase(schemaObj)
-    {
-    }
+    explicit UsdSkelBindingAPI(const UsdSchemaBase& schemaObj) : UsdAPISchemaBase(schemaObj) {}
 
     /// Destructor.
     USDSKEL_API
@@ -85,8 +78,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDSKEL_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdSkelBindingAPI holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -98,20 +90,18 @@ public:
     /// \endcode
     ///
     USDSKEL_API
-    static UsdSkelBindingAPI
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdSkelBindingAPI Get(const UsdStagePtr& stage, const SdfPath& path);
 
-
-    /// Returns true if this <b>single-apply</b> API schema can be applied to 
-    /// the given \p prim. If this schema can not be a applied to the prim, 
-    /// this returns false and, if provided, populates \p whyNot with the 
+    /// Returns true if this <b>single-apply</b> API schema can be applied to
+    /// the given \p prim. If this schema can not be a applied to the prim,
+    /// this returns false and, if provided, populates \p whyNot with the
     /// reason it can not be applied.
-    /// 
+    ///
     /// Note that if CanApply returns false, that does not necessarily imply
     /// that calling Apply will fail. Callers are expected to call CanApply
-    /// before calling Apply if they want to ensure that it is valid to 
+    /// before calling Apply if they want to ensure that it is valid to
     /// apply a schema.
-    /// 
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -119,18 +109,17 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDSKEL_API
-    static bool 
-    CanApply(const UsdPrim &prim, std::string *whyNot=nullptr);
+    static bool CanApply(const UsdPrim& prim, std::string* whyNot = nullptr);
 
     /// Applies this <b>single-apply</b> API schema to the given \p prim.
-    /// This information is stored by adding "SkelBindingAPI" to the 
+    /// This information is stored by adding "SkelBindingAPI" to the
     /// token-valued, listOp metadata \em apiSchemas on the prim.
-    /// 
-    /// \return A valid UsdSkelBindingAPI object is returned upon success. 
-    /// An invalid (or empty) UsdSkelBindingAPI object is returned upon 
-    /// failure. See \ref UsdPrim::ApplyAPI() for conditions 
-    /// resulting in failure. 
-    /// 
+    ///
+    /// \return A valid UsdSkelBindingAPI object is returned upon success.
+    /// An invalid (or empty) UsdSkelBindingAPI object is returned upon
+    /// failure. See \ref UsdPrim::ApplyAPI() for conditions
+    /// resulting in failure.
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -138,8 +127,7 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDSKEL_API
-    static UsdSkelBindingAPI 
-    Apply(const UsdPrim &prim);
+    static UsdSkelBindingAPI Apply(const UsdPrim& prim);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -152,17 +140,17 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDSKEL_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDSKEL_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // --------------------------------------------------------------------- //
-    // SKINNINGMETHOD 
+    // SKINNINGMETHOD
     // --------------------------------------------------------------------- //
     /// The skinningMethod specifies the skinning method for the prim.
     ///
@@ -176,17 +164,17 @@ public:
     USDSKEL_API
     UsdAttribute GetSkinningMethodAttr() const;
 
-    /// See GetSkinningMethodAttr(), and also 
+    /// See GetSkinningMethodAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDSKEL_API
-    UsdAttribute CreateSkinningMethodAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateSkinningMethodAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // GEOMBINDTRANSFORM 
+    // GEOMBINDTRANSFORM
     // --------------------------------------------------------------------- //
     /// Encodes the bind-time world space transforms of the prim.
     /// If the transform is identical for a group of gprims that share a common
@@ -202,22 +190,22 @@ public:
     USDSKEL_API
     UsdAttribute GetGeomBindTransformAttr() const;
 
-    /// See GetGeomBindTransformAttr(), and also 
+    /// See GetGeomBindTransformAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDSKEL_API
-    UsdAttribute CreateGeomBindTransformAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateGeomBindTransformAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // JOINTS 
+    // JOINTS
     // --------------------------------------------------------------------- //
     /// An (optional) array of tokens defining the list of
     /// joints to which jointIndices apply. If not defined, jointIndices applies
     /// to the ordered list of joints defined in the bound Skeleton's *joints*
-    /// attribute. If undefined on a primitive, the primitive inherits the 
+    /// attribute. If undefined on a primitive, the primitive inherits the
     /// value of the nearest ancestor prim, if any.
     ///
     /// | ||
@@ -229,17 +217,17 @@ public:
     USDSKEL_API
     UsdAttribute GetJointsAttr() const;
 
-    /// See GetJointsAttr(), and also 
+    /// See GetJointsAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDSKEL_API
-    UsdAttribute CreateJointsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateJointsAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // JOINTINDICES 
+    // JOINTINDICES
     // --------------------------------------------------------------------- //
     /// Indices into the *joints* attribute of the closest
     /// (in namespace) bound Skeleton that affect each point of a PointBased
@@ -258,17 +246,17 @@ public:
     USDSKEL_API
     UsdAttribute GetJointIndicesAttr() const;
 
-    /// See GetJointIndicesAttr(), and also 
+    /// See GetJointIndicesAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDSKEL_API
-    UsdAttribute CreateJointIndicesAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateJointIndicesAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // JOINTWEIGHTS 
+    // JOINTWEIGHTS
     // --------------------------------------------------------------------- //
     /// Weights for the joints that affect each point of a PointBased
     /// gprim. The primvar can have either *constant* or *vertex* interpolation.
@@ -285,17 +273,17 @@ public:
     USDSKEL_API
     UsdAttribute GetJointWeightsAttr() const;
 
-    /// See GetJointWeightsAttr(), and also 
+    /// See GetJointWeightsAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDSKEL_API
-    UsdAttribute CreateJointWeightsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateJointWeightsAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // BLENDSHAPES 
+    // BLENDSHAPES
     // --------------------------------------------------------------------- //
     /// An array of tokens defining the order onto which blend shape
     /// weights from an animation source map onto the *skel:blendShapeTargets*
@@ -313,33 +301,33 @@ public:
     USDSKEL_API
     UsdAttribute GetBlendShapesAttr() const;
 
-    /// See GetBlendShapesAttr(), and also 
+    /// See GetBlendShapesAttr(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDSKEL_API
-    UsdAttribute CreateBlendShapesAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateBlendShapesAttr(VtValue const& defaultValue = VtValue(), bool writeSparsely = false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // ANIMATIONSOURCE 
+    // ANIMATIONSOURCE
     // --------------------------------------------------------------------- //
     /// Animation source to be bound to Skeleton primitives at or
     /// beneath the location at which this property is defined.
-    /// 
+    ///
     ///
     USDSKEL_API
     UsdRelationship GetAnimationSourceRel() const;
 
-    /// See GetAnimationSourceRel(), and also 
+    /// See GetAnimationSourceRel(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create
     USDSKEL_API
     UsdRelationship CreateAnimationSourceRel() const;
 
 public:
     // --------------------------------------------------------------------- //
-    // SKELETON 
+    // SKELETON
     // --------------------------------------------------------------------- //
     /// Skeleton to be bound to this prim and its descendents that
     /// possess a mapping and weighting to the joints of the identified
@@ -348,14 +336,14 @@ public:
     USDSKEL_API
     UsdRelationship GetSkeletonRel() const;
 
-    /// See GetSkeletonRel(), and also 
+    /// See GetSkeletonRel(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create
     USDSKEL_API
     UsdRelationship CreateSkeletonRel() const;
 
 public:
     // --------------------------------------------------------------------- //
-    // BLENDSHAPETARGETS 
+    // BLENDSHAPETARGETS
     // --------------------------------------------------------------------- //
     /// Ordered list of all target blend shapes. This property is not
     /// inherited hierarchically, and is expected to be authored directly on
@@ -364,18 +352,18 @@ public:
     USDSKEL_API
     UsdRelationship GetBlendShapeTargetsRel() const;
 
-    /// See GetBlendShapeTargetsRel(), and also 
+    /// See GetBlendShapeTargetsRel(), and also
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create
     USDSKEL_API
     UsdRelationship CreateBlendShapeTargetsRel() const;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
@@ -389,15 +377,14 @@ public:
 
     /// Convenience function to create the jointIndices primvar, optionally
     /// specifying elementSize.
-    /// If \p constant is true, the resulting primvar is configured 
+    /// If \p constant is true, the resulting primvar is configured
     /// with 'constant' interpolation, and describes a rigid deformation.
     /// Otherwise, the primvar is configured with 'vertex' interpolation,
     /// and describes joint influences that vary per point.
     ///
     /// \sa CreateJointIndicesAttr(), GetJointIndicesPrimvar()
     USDSKEL_API
-    UsdGeomPrimvar CreateJointIndicesPrimvar(bool constant,
-                                             int elementSize=-1) const;
+    UsdGeomPrimvar CreateJointIndicesPrimvar(bool constant, int elementSize = -1) const;
 
     /// Convenience function to get the jointWeights attribute as a primvar.
     ///
@@ -407,20 +394,19 @@ public:
 
     /// Convenience function to create the jointWeights primvar, optionally
     /// specifying elementSize.
-    /// If \p constant is true, the resulting primvar is configured 
+    /// If \p constant is true, the resulting primvar is configured
     /// with 'constant' interpolation, and describes a rigid deformation.
     /// Otherwise, the primvar is configured with 'vertex' interpolation,
     /// and describes joint influences that vary per point.
     ///
     /// \sa CreateJointWeightsAttr(), GetJointWeightsPrimvar()
     USDSKEL_API
-    UsdGeomPrimvar CreateJointWeightsPrimvar(bool constant,
-                                             int elementSize=-1) const;
+    UsdGeomPrimvar CreateJointWeightsPrimvar(bool constant, int elementSize = -1) const;
 
     /// Convenience method for defining joints influences that
     /// make a primitive rigidly deformed by a single joint.
     USDSKEL_API
-    bool SetRigidJointInfluence(int jointIndex, float weight=1) const;
+    bool SetRigidJointInfluence(int jointIndex, float weight = 1) const;
 
     /// Convenience method to query the Skeleton bound on this prim.
     /// Returns true if a Skeleton binding is defined, and sets \p skel to
@@ -455,9 +441,7 @@ public:
     /// If invalid and \p reason is non-null, an error message describing
     /// the first validation error will be set.
     USDSKEL_API
-    static bool ValidateJointIndices(TfSpan<const int> indices,
-                                     size_t numJoints,
-                                     std::string* reason=nullptr);
+    static bool ValidateJointIndices(TfSpan<const int> indices, size_t numJoints, std::string* reason = nullptr);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

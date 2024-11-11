@@ -13,11 +13,9 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
-std::string UsdRi_GetRiType(const SdfValueTypeName &usdType);
-SdfValueTypeName UsdRi_GetUsdType(const std::string &riType);
-
+std::string UsdRi_GetRiType(const SdfValueTypeName& usdType);
+SdfValueTypeName UsdRi_GetUsdType(const std::string& riType);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_RI_TYPE_UTILS_H
+#endif  // PXR_USD_USD_RI_TYPE_UTILS_H

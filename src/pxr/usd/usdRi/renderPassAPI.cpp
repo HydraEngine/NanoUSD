@@ -14,22 +14,15 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register the schema with the TfType system.
-TF_REGISTRY_FUNCTION(TfType)
-{
-    TfType::Define<UsdRiRenderPassAPI,
-        TfType::Bases< UsdAPISchemaBase > >();
-    
+TF_REGISTRY_FUNCTION(TfType) {
+    TfType::Define<UsdRiRenderPassAPI, TfType::Bases<UsdAPISchemaBase>>();
 }
 
 /* virtual */
-UsdRiRenderPassAPI::~UsdRiRenderPassAPI()
-{
-}
+UsdRiRenderPassAPI::~UsdRiRenderPassAPI() {}
 
 /* static */
-UsdRiRenderPassAPI
-UsdRiRenderPassAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
-{
+UsdRiRenderPassAPI UsdRiRenderPassAPI::Get(const UsdStagePtr& stage, const SdfPath& path) {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
         return UsdRiRenderPassAPI();
@@ -37,25 +30,18 @@ UsdRiRenderPassAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
     return UsdRiRenderPassAPI(stage->GetPrimAtPath(path));
 }
 
-
 /* virtual */
-UsdSchemaKind UsdRiRenderPassAPI::_GetSchemaKind() const
-{
+UsdSchemaKind UsdRiRenderPassAPI::_GetSchemaKind() const {
     return UsdRiRenderPassAPI::schemaKind;
 }
 
 /* static */
-bool
-UsdRiRenderPassAPI::CanApply(
-    const UsdPrim &prim, std::string *whyNot)
-{
+bool UsdRiRenderPassAPI::CanApply(const UsdPrim& prim, std::string* whyNot) {
     return prim.CanApplyAPI<UsdRiRenderPassAPI>(whyNot);
 }
 
 /* static */
-UsdRiRenderPassAPI
-UsdRiRenderPassAPI::Apply(const UsdPrim &prim)
-{
+UsdRiRenderPassAPI UsdRiRenderPassAPI::Apply(const UsdPrim& prim) {
     if (prim.ApplyAPI<UsdRiRenderPassAPI>()) {
         return UsdRiRenderPassAPI(prim);
     }
@@ -63,50 +49,37 @@ UsdRiRenderPassAPI::Apply(const UsdPrim &prim)
 }
 
 /* static */
-const TfType &
-UsdRiRenderPassAPI::_GetStaticTfType()
-{
+const TfType& UsdRiRenderPassAPI::_GetStaticTfType() {
     static TfType tfType = TfType::Find<UsdRiRenderPassAPI>();
     return tfType;
 }
 
 /* static */
-bool 
-UsdRiRenderPassAPI::_IsTypedSchema()
-{
+bool UsdRiRenderPassAPI::_IsTypedSchema() {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
 }
 
 /* virtual */
-const TfType &
-UsdRiRenderPassAPI::_GetTfType() const
-{
+const TfType& UsdRiRenderPassAPI::_GetTfType() const {
     return _GetStaticTfType();
 }
 
 namespace {
-static inline TfTokenVector
-_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
-{
+static inline TfTokenVector _ConcatenateAttributeNames(const TfTokenVector& left, const TfTokenVector& right) {
     TfTokenVector result;
     result.reserve(left.size() + right.size());
     result.insert(result.end(), left.begin(), left.end());
     result.insert(result.end(), right.begin(), right.end());
     return result;
 }
-}
+}  // namespace
 
 /*static*/
-const TfTokenVector&
-UsdRiRenderPassAPI::GetSchemaAttributeNames(bool includeInherited)
-{
-    static TfTokenVector localNames = {
-    };
+const TfTokenVector& UsdRiRenderPassAPI::GetSchemaAttributeNames(bool includeInherited) {
+    static TfTokenVector localNames = {};
     static TfTokenVector allNames =
-        _ConcatenateAttributeNames(
-            UsdAPISchemaBase::GetSchemaAttributeNames(true),
-            localNames);
+            _ConcatenateAttributeNames(UsdAPISchemaBase::GetSchemaAttributeNames(true), localNames);
 
     if (includeInherited)
         return allNames;
@@ -126,15 +99,11 @@ PXR_NAMESPACE_CLOSE_SCOPE
 // --(BEGIN CUSTOM CODE)--
 PXR_NAMESPACE_OPEN_SCOPE
 
-UsdCollectionAPI
-UsdRiRenderPassAPI::GetCameraVisibilityCollectionAPI() const
-{
+UsdCollectionAPI UsdRiRenderPassAPI::GetCameraVisibilityCollectionAPI() const {
     return UsdCollectionAPI(GetPrim(), UsdRiTokens->cameraVisibility);
 }
 
-UsdCollectionAPI
-UsdRiRenderPassAPI::GetMatteCollectionAPI() const
-{
+UsdCollectionAPI UsdRiRenderPassAPI::GetMatteCollectionAPI() const {
     return UsdCollectionAPI(GetPrim(), UsdRiTokens->matte);
 }
 

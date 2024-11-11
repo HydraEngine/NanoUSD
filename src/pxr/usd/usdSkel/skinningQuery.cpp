@@ -18,37 +18,26 @@
 
 #include "pxr/usd/usdSkel/utils.h"
 
-
 PXR_NAMESPACE_OPEN_SCOPE
-
 
 namespace {
 
+enum UsdSkel_SkinningQueryFlags { UsdSkel_HasJointInfluences = 1 << 0, UsdSkel_HasBlendShapes = 1 << 1 };
 
-enum UsdSkel_SkinningQueryFlags {
-    UsdSkel_HasJointInfluences = 1 << 0,
-    UsdSkel_HasBlendShapes = 1 << 1
-};
+}  // namespace
 
+UsdSkelSkinningQuery::UsdSkelSkinningQuery() {}
 
-} // namespace
-
-
-UsdSkelSkinningQuery::UsdSkelSkinningQuery()
-{}
-
-
-UsdSkelSkinningQuery::UsdSkelSkinningQuery(
-    const UsdPrim& prim,
-    const VtTokenArray& skelJointOrder,
-    const VtTokenArray& animBlendShapeOrder,
-    const UsdAttribute& jointIndices,
-    const UsdAttribute& jointWeights,
-    const UsdAttribute& skinningMethod,
-    const UsdAttribute& geomBindTransform,
-    const UsdAttribute& joints,
-    const UsdAttribute& blendShapes,
-    const UsdRelationship& blendShapeTargets)
+UsdSkelSkinningQuery::UsdSkelSkinningQuery(const UsdPrim& prim,
+                                           const VtTokenArray& skelJointOrder,
+                                           const VtTokenArray& animBlendShapeOrder,
+                                           const UsdAttribute& jointIndices,
+                                           const UsdAttribute& jointWeights,
+                                           const UsdAttribute& skinningMethod,
+                                           const UsdAttribute& geomBindTransform,
+                                           const UsdAttribute& joints,
+                                           const UsdAttribute& blendShapes,
+                                           const UsdRelationship& blendShapeTargets)
     : _prim(prim),
       _interpolation(UsdGeomTokens->constant),
       _jointIndicesPrimvar(jointIndices),
@@ -56,30 +45,23 @@ UsdSkelSkinningQuery::UsdSkelSkinningQuery(
       _skinningMethodAttr(skinningMethod),
       _geomBindTransformAttr(geomBindTransform),
       _blendShapes(blendShapes),
-      _blendShapeTargets(blendShapeTargets)
-{
+      _blendShapeTargets(blendShapeTargets) {
     VtTokenArray order;
     if (joints && joints.Get(&order)) {
         _jointOrder = order;
-        _jointMapper =
-            std::make_shared<UsdSkelAnimMapper>(skelJointOrder, order);
+        _jointMapper = std::make_shared<UsdSkelAnimMapper>(skelJointOrder, order);
     }
     if (blendShapes && blendShapes.Get(&order)) {
         _blendShapeOrder = order;
-        _blendShapeMapper =
-            std::make_shared<UsdSkelAnimMapper>(animBlendShapeOrder, order);
+        _blendShapeMapper = std::make_shared<UsdSkelAnimMapper>(animBlendShapeOrder, order);
     }
 
     _InitializeJointInfluenceBindings(jointIndices, jointWeights);
     _InitializeBlendShapeBindings(blendShapes, blendShapeTargets);
 }
 
-
-void
-UsdSkelSkinningQuery::_InitializeJointInfluenceBindings(
-    const UsdAttribute& jointIndices,
-    const UsdAttribute& jointWeights)
-{
+void UsdSkelSkinningQuery::_InitializeJointInfluenceBindings(const UsdAttribute& jointIndices,
+                                                             const UsdAttribute& jointWeights) {
     if (!jointIndices || !jointWeights) {
         // Have incomplete joint influences.
         // Skipping remainder of validation.
@@ -99,7 +81,8 @@ UsdSkelSkinningQuery::_InitializeJointInfluenceBindings(
 
     if (indicesElementSize <= 0) {
         TF_WARN("Invalid element size [%d]: element size must "
-                "be greater than zero.", indicesElementSize);
+                "be greater than zero.",
+                indicesElementSize);
         return;
     }
 
@@ -108,13 +91,11 @@ UsdSkelSkinningQuery::_InitializeJointInfluenceBindings(
     if (indicesInterpolation != weightsInterpolation) {
         TF_WARN("jointIndices interpolation (%s) != "
                 "jointWeights interpolation (%s).",
-                indicesInterpolation.GetText(),
-                weightsInterpolation.GetText());
+                indicesInterpolation.GetText(), weightsInterpolation.GetText());
         return;
     }
 
-    if (indicesInterpolation != UsdGeomTokens->constant &&
-        indicesInterpolation != UsdGeomTokens->vertex) {
+    if (indicesInterpolation != UsdGeomTokens->constant && indicesInterpolation != UsdGeomTokens->vertex) {
         TF_WARN("Invalid interpolation (%s) for joint influences: "
                 "interpolation must be either 'constant' or 'vertex'.",
                 indicesInterpolation.GetText());
@@ -131,42 +112,26 @@ UsdSkelSkinningQuery::_InitializeJointInfluenceBindings(
     _flags |= UsdSkel_HasJointInfluences;
 }
 
-
-void
-UsdSkelSkinningQuery::_InitializeBlendShapeBindings(
-    const UsdAttribute& blendShapes,
-    const UsdRelationship& blendShapeTargets)
-{
+void UsdSkelSkinningQuery::_InitializeBlendShapeBindings(const UsdAttribute& blendShapes,
+                                                         const UsdRelationship& blendShapeTargets) {
     if (blendShapes && blendShapeTargets && _blendShapeMapper) {
         _flags |= UsdSkel_HasBlendShapes;
     }
 }
 
-
-bool
-UsdSkelSkinningQuery::HasBlendShapes() const
-{
+bool UsdSkelSkinningQuery::HasBlendShapes() const {
     return _flags & UsdSkel_HasBlendShapes;
 }
 
-
-bool
-UsdSkelSkinningQuery::HasJointInfluences() const
-{
+bool UsdSkelSkinningQuery::HasJointInfluences() const {
     return _flags & UsdSkel_HasJointInfluences;
 }
 
-
-bool
-UsdSkelSkinningQuery::IsRigidlyDeformed() const
-{
+bool UsdSkelSkinningQuery::IsRigidlyDeformed() const {
     return _interpolation == UsdGeomTokens->constant;
 }
 
-
-bool
-UsdSkelSkinningQuery::GetJointOrder(VtTokenArray* jointOrder) const
-{
+bool UsdSkelSkinningQuery::GetJointOrder(VtTokenArray* jointOrder) const {
     if (jointOrder) {
         if (_jointOrder) {
             *jointOrder = *_jointOrder;
@@ -178,10 +143,7 @@ UsdSkelSkinningQuery::GetJointOrder(VtTokenArray* jointOrder) const
     return false;
 }
 
-
-bool
-UsdSkelSkinningQuery::GetBlendShapeOrder(VtTokenArray* blendShapeOrder) const
-{
+bool UsdSkelSkinningQuery::GetBlendShapeOrder(VtTokenArray* blendShapeOrder) const {
     if (blendShapeOrder) {
         if (_blendShapeOrder) {
             *blendShapeOrder = *_blendShapeOrder;
@@ -193,18 +155,11 @@ UsdSkelSkinningQuery::GetBlendShapeOrder(VtTokenArray* blendShapeOrder) const
     return false;
 }
 
-
-bool
-UsdSkelSkinningQuery::GetTimeSamples(std::vector<double>* times) const
-{
+bool UsdSkelSkinningQuery::GetTimeSamples(std::vector<double>* times) const {
     return GetTimeSamplesInInterval(GfInterval::GetFullInterval(), times);
 }
 
-
-bool
-UsdSkelSkinningQuery::GetTimeSamplesInInterval(const GfInterval& interval,
-                                               std::vector<double>* times) const
-{
+bool UsdSkelSkinningQuery::GetTimeSamplesInInterval(const GfInterval& interval, std::vector<double>* times) const {
     if (!times) {
         TF_CODING_ERROR("'times' pointer is null.");
         return false;
@@ -214,7 +169,7 @@ UsdSkelSkinningQuery::GetTimeSamplesInInterval(const GfInterval& interval,
 
     std::vector<double> tmpTimes;
     for (const auto& pv : {_jointIndicesPrimvar, _jointWeightsPrimvar}) {
-        if (pv.GetTimeSamplesInInterval(interval, &tmpTimes)) {  
+        if (pv.GetTimeSamplesInInterval(interval, &tmpTimes)) {
             times->insert(times->end(), tmpTimes.begin(), tmpTimes.end());
         }
     }
@@ -227,26 +182,19 @@ UsdSkelSkinningQuery::GetTimeSamplesInInterval(const GfInterval& interval,
     return true;
 }
 
-
-bool
-UsdSkelSkinningQuery::ComputeJointInfluences(VtIntArray* indices,
-                                             VtFloatArray* weights,
-                                             UsdTimeCode time) const
-{
+bool UsdSkelSkinningQuery::ComputeJointInfluences(VtIntArray* indices, VtFloatArray* weights, UsdTimeCode time) const {
     TRACE_FUNCTION();
 
-    if (!TF_VERIFY(IsValid(), "invalid skinning query") ||
-        !TF_VERIFY(_jointIndicesPrimvar) ||
+    if (!TF_VERIFY(IsValid(), "invalid skinning query") || !TF_VERIFY(_jointIndicesPrimvar) ||
         !TF_VERIFY(_jointWeightsPrimvar)) {
         return false;
     }
 
-    if (_jointIndicesPrimvar.ComputeFlattened(indices, time) &&
-        _jointWeightsPrimvar.ComputeFlattened(weights, time)) {
-
+    if (_jointIndicesPrimvar.ComputeFlattened(indices, time) && _jointWeightsPrimvar.ComputeFlattened(weights, time)) {
         if (indices->size() != weights->size()) {
             TF_WARN("Size of jointIndices [%zu] != size of "
-                    "jointWeights [%zu].", indices->size(), weights->size());
+                    "jointWeights [%zu].",
+                    indices->size(), weights->size());
             return false;
         }
 
@@ -254,7 +202,7 @@ UsdSkelSkinningQuery::ComputeJointInfluences(VtIntArray* indices,
             return false;
         }
 
-        if (indices->size()%_numInfluencesPerComponent != 0) {
+        if (indices->size() % _numInfluencesPerComponent != 0) {
             TF_WARN("unexpected size of jointIndices and jointWeights "
                     "arrays [%zu]: size must be a multiple of the number of "
                     "influences per component (%d).",
@@ -262,14 +210,12 @@ UsdSkelSkinningQuery::ComputeJointInfluences(VtIntArray* indices,
             return false;
         }
 
-        if (IsRigidlyDeformed() &&
-           indices->size() != static_cast<size_t>(_numInfluencesPerComponent)) {
-
+        if (IsRigidlyDeformed() && indices->size() != static_cast<size_t>(_numInfluencesPerComponent)) {
             TF_WARN("Unexpected size of jointIndices and jointWeights "
                     "arrays [%zu]: joint influences are defined with 'constant'"
                     " interpolation, so the array size must be equal to the "
-                    "element size (%d).", indices->size(),
-                    _numInfluencesPerComponent);
+                    "element size (%d).",
+                    indices->size(), _numInfluencesPerComponent);
             return false;
         }
 
@@ -278,13 +224,10 @@ UsdSkelSkinningQuery::ComputeJointInfluences(VtIntArray* indices,
     return false;
 }
 
-
-bool
-UsdSkelSkinningQuery::ComputeVaryingJointInfluences(size_t numPoints,
-                                                    VtIntArray* indices,
-                                                    VtFloatArray* weights,
-                                                    UsdTimeCode time) const
-{
+bool UsdSkelSkinningQuery::ComputeVaryingJointInfluences(size_t numPoints,
+                                                         VtIntArray* indices,
+                                                         VtFloatArray* weights,
+                                                         UsdTimeCode time) const {
     TRACE_FUNCTION();
 
     if (ComputeJointInfluences(indices, weights, time)) {
@@ -293,9 +236,8 @@ UsdSkelSkinningQuery::ComputeVaryingJointInfluences(size_t numPoints,
                 !UsdSkelExpandConstantInfluencesToVarying(weights, numPoints)) {
                 return false;
             }
-            if (!TF_VERIFY(indices->size() == weights->size()))
-                return false;
-        } else if (indices->size() != numPoints*_numInfluencesPerComponent) {
+            if (!TF_VERIFY(indices->size() == weights->size())) return false;
+        } else if (indices->size() != numPoints * _numInfluencesPerComponent) {
             TF_WARN("Unexpected size of jointIndices and jointWeights "
                     "arrays [%zu]: varying influences should be sized to "
                     "numPoints [%zu] * numInfluencesPerComponent [%d].",
@@ -307,13 +249,10 @@ UsdSkelSkinningQuery::ComputeVaryingJointInfluences(size_t numPoints,
     return false;
 }
 
-
 template <typename Matrix4>
-bool
-UsdSkelSkinningQuery::ComputeSkinnedPoints(const VtArray<Matrix4>& xforms,
-                                           VtVec3fArray* points,
-                                           UsdTimeCode time) const
-{
+bool UsdSkelSkinningQuery::ComputeSkinnedPoints(const VtArray<Matrix4>& xforms,
+                                                VtVec3fArray* points,
+                                                UsdTimeCode time) const {
     TRACE_FUNCTION();
 
     if (!points) {
@@ -323,9 +262,7 @@ UsdSkelSkinningQuery::ComputeSkinnedPoints(const VtArray<Matrix4>& xforms,
 
     VtIntArray jointIndices;
     VtFloatArray jointWeights;
-    if (ComputeVaryingJointInfluences(points->size(), &jointIndices,
-                                      &jointWeights, time)) {
-
+    if (ComputeVaryingJointInfluences(points->size(), &jointIndices, &jointWeights, time)) {
         // If the binding site has a custom joint ordering, the query will have
         // a mapper that should be used to reorder transforms
         // (skel order -> binding order)
@@ -338,46 +275,37 @@ UsdSkelSkinningQuery::ComputeSkinnedPoints(const VtArray<Matrix4>& xforms,
 
         const Matrix4 geomBindXform(GetGeomBindTransform(time));
         const TfToken skinningMethod = GetSkinningMethod();
-        return UsdSkelSkinPoints(skinningMethod, geomBindXform, orderedXforms,
-                                 jointIndices, jointWeights,
-                                 _numInfluencesPerComponent,
-                                 *points);
+        return UsdSkelSkinPoints(skinningMethod, geomBindXform, orderedXforms, jointIndices, jointWeights,
+                                 _numInfluencesPerComponent, *points);
     }
     return false;
 }
 
+template USDSKEL_API bool UsdSkelSkinningQuery::ComputeSkinnedPoints(const VtArray<GfMatrix4d>&,
+                                                                     VtVec3fArray*,
+                                                                     UsdTimeCode) const;
 
-template USDSKEL_API bool
-UsdSkelSkinningQuery::ComputeSkinnedPoints(const VtArray<GfMatrix4d>&,
-                                           VtVec3fArray*, UsdTimeCode) const;
-
-template USDSKEL_API bool
-UsdSkelSkinningQuery::ComputeSkinnedPoints(const VtArray<GfMatrix4f>&,
-                                           VtVec3fArray*, UsdTimeCode) const;
-
+template USDSKEL_API bool UsdSkelSkinningQuery::ComputeSkinnedPoints(const VtArray<GfMatrix4f>&,
+                                                                     VtVec3fArray*,
+                                                                     UsdTimeCode) const;
 
 template <class Matrix4>
 struct _Matrix3FromMatrix4 {};
 
 template <>
-struct _Matrix3FromMatrix4<GfMatrix4d>
-{
+struct _Matrix3FromMatrix4<GfMatrix4d> {
     using value_type = GfMatrix3d;
 };
-    
+
 template <>
-struct _Matrix3FromMatrix4<GfMatrix4f>
-{
+struct _Matrix3FromMatrix4<GfMatrix4f> {
     using value_type = GfMatrix3f;
 };
 
-
 template <class Matrix4>
-bool
-UsdSkelSkinningQuery::ComputeSkinnedNormals(const VtArray<Matrix4>& xforms,
-                                            VtVec3fArray* normals,
-                                            UsdTimeCode time) const
-{
+bool UsdSkelSkinningQuery::ComputeSkinnedNormals(const VtArray<Matrix4>& xforms,
+                                                 VtVec3fArray* normals,
+                                                 UsdTimeCode time) const {
     TRACE_FUNCTION();
 
     using Matrix3 = typename _Matrix3FromMatrix4<Matrix4>::value_type;
@@ -389,9 +317,7 @@ UsdSkelSkinningQuery::ComputeSkinnedNormals(const VtArray<Matrix4>& xforms,
 
     VtIntArray jointIndices;
     VtFloatArray jointWeights;
-    if (ComputeVaryingJointInfluences(normals->size(), &jointIndices,
-                                      &jointWeights, time)) {
-
+    if (ComputeVaryingJointInfluences(normals->size(), &jointIndices, &jointWeights, time)) {
         // If the binding site has a custom joint ordering, the query will have
         // a mapper that should be used to reorder transforms
         // (skel order -> binding order)
@@ -408,41 +334,32 @@ UsdSkelSkinningQuery::ComputeSkinnedNormals(const VtArray<Matrix4>& xforms,
         {
             auto dst = TfMakeSpan(invTransposeXforms);
             for (size_t i = 0; i < dst.size(); ++i) {
-                dst[i] = orderedXforms[i].ExtractRotationMatrix()
-                    .GetInverse().GetTranspose();
+                dst[i] = orderedXforms[i].ExtractRotationMatrix().GetInverse().GetTranspose();
             }
         }
 
         const Matrix4 geomBindXform(GetGeomBindTransform(time));
-        const Matrix3 geomBindInvTransposeXform =
-            geomBindXform.ExtractRotationMatrix().GetInverse().GetTranspose();
+        const Matrix3 geomBindInvTransposeXform = geomBindXform.ExtractRotationMatrix().GetInverse().GetTranspose();
         const TfToken skinningMethod = GetSkinningMethod();
 
-        return UsdSkelSkinNormals(skinningMethod, geomBindInvTransposeXform,
-                                  invTransposeXforms,
-                                  jointIndices, jointWeights,
-                                  _numInfluencesPerComponent,
-                                  *normals);
+        return UsdSkelSkinNormals(skinningMethod, geomBindInvTransposeXform, invTransposeXforms, jointIndices,
+                                  jointWeights, _numInfluencesPerComponent, *normals);
     }
     return false;
 }
 
+template USDSKEL_API bool UsdSkelSkinningQuery::ComputeSkinnedNormals(const VtArray<GfMatrix4d>&,
+                                                                      VtVec3fArray*,
+                                                                      UsdTimeCode) const;
 
-template USDSKEL_API bool
-UsdSkelSkinningQuery::ComputeSkinnedNormals(const VtArray<GfMatrix4d>&,
-                                           VtVec3fArray*, UsdTimeCode) const;
-
-template USDSKEL_API bool
-UsdSkelSkinningQuery::ComputeSkinnedNormals(const VtArray<GfMatrix4f>&,
-                                           VtVec3fArray*, UsdTimeCode) const;
-
+template USDSKEL_API bool UsdSkelSkinningQuery::ComputeSkinnedNormals(const VtArray<GfMatrix4f>&,
+                                                                      VtVec3fArray*,
+                                                                      UsdTimeCode) const;
 
 template <typename Matrix4>
-bool
-UsdSkelSkinningQuery::ComputeSkinnedTransform(const VtArray<Matrix4>& xforms,
-                                              Matrix4* xform,
-                                              UsdTimeCode time) const
-{
+bool UsdSkelSkinningQuery::ComputeSkinnedTransform(const VtArray<Matrix4>& xforms,
+                                                   Matrix4* xform,
+                                                   UsdTimeCode time) const {
     TRACE_FUNCTION();
 
     if (!xform) {
@@ -451,15 +368,15 @@ UsdSkelSkinningQuery::ComputeSkinnedTransform(const VtArray<Matrix4>& xforms,
     }
 
     if (!IsRigidlyDeformed()) {
-        TF_CODING_ERROR("Attempted to skin a transform, but "
-                        "joint influences are not constant.");
+        TF_CODING_ERROR(
+                "Attempted to skin a transform, but "
+                "joint influences are not constant.");
         return false;
     }
 
     VtIntArray jointIndices;
     VtFloatArray jointWeights;
     if (ComputeJointInfluences(&jointIndices, &jointWeights, time)) {
-
         // If the binding site has a custom joint ordering, the query will have
         // a mapper that should be used to reorder transforms
         // (skel order -> binding order)
@@ -472,50 +389,37 @@ UsdSkelSkinningQuery::ComputeSkinnedTransform(const VtArray<Matrix4>& xforms,
 
         const Matrix4 geomBindXform(GetGeomBindTransform(time));
         const TfToken skinningMethod = GetSkinningMethod();
-        return UsdSkelSkinTransform(skinningMethod, geomBindXform, orderedXforms,
-                                    jointIndices, jointWeights, xform);
+        return UsdSkelSkinTransform(skinningMethod, geomBindXform, orderedXforms, jointIndices, jointWeights, xform);
     }
     return false;
 }
 
+template USDSKEL_API bool UsdSkelSkinningQuery::ComputeSkinnedTransform(const VtArray<GfMatrix4d>&,
+                                                                        GfMatrix4d*,
+                                                                        UsdTimeCode time) const;
 
-template USDSKEL_API bool
-UsdSkelSkinningQuery::ComputeSkinnedTransform(
-    const VtArray<GfMatrix4d>&, GfMatrix4d*, UsdTimeCode time) const;
-
-template USDSKEL_API bool
-UsdSkelSkinningQuery::ComputeSkinnedTransform(
-    const VtArray<GfMatrix4f>&, GfMatrix4f*, UsdTimeCode time) const;
-
+template USDSKEL_API bool UsdSkelSkinningQuery::ComputeSkinnedTransform(const VtArray<GfMatrix4f>&,
+                                                                        GfMatrix4f*,
+                                                                        UsdTimeCode time) const;
 
 template <typename Matrix4>
-float
-UsdSkelSkinningQuery::ComputeExtentsPadding(
-    const VtArray<Matrix4>& skelRestXforms,
-    const UsdGeomBoundable& boundable) const
-{
+float UsdSkelSkinningQuery::ComputeExtentsPadding(const VtArray<Matrix4>& skelRestXforms,
+                                                  const UsdGeomBoundable& boundable) const {
     // Don't use default time; properties may be keyed (and still unvarying)
     // We do, however, expect the computed quantity to not be time varying.
     const UsdTimeCode time = UsdTimeCode::EarliestTime();
 
     VtVec3fArray boundableExtent;
-    if (boundable && 
-       boundable.GetExtentAttr().Get(&boundableExtent, time) &&
-       boundableExtent.size() == 2) {
-        
+    if (boundable && boundable.GetExtentAttr().Get(&boundableExtent, time) && boundableExtent.size() == 2) {
         GfRange3f jointsRange;
         if (UsdSkelComputeJointsExtent<Matrix4>(skelRestXforms, &jointsRange)) {
-
             // Get the aligned range of the gprim in its bind pose.
-            const GfRange3d gprimRange = 
-                GfBBox3d(GfRange3d(boundableExtent[0], boundableExtent[1]),
-                         GetGeomBindTransform(time))
-                    .ComputeAlignedRange();
+            const GfRange3d gprimRange =
+                    GfBBox3d(GfRange3d(boundableExtent[0], boundableExtent[1]), GetGeomBindTransform(time))
+                            .ComputeAlignedRange();
 
-            const GfVec3f minDiff =
-                jointsRange.GetMin() - GfVec3f(gprimRange.GetMin());
-            const GfVec3f maxDiff =
-                GfVec3f(gprimRange.GetMax()) - jointsRange.GetMax();
+            const GfVec3f minDiff = jointsRange.GetMin() - GfVec3f(gprimRange.GetMin());
+            const GfVec3f maxDiff = GfVec3f(gprimRange.GetMax()) - jointsRange.GetMax();
 
             float padding = 0.0f;
             for (int i = 0; i < 3; ++i) {
@@ -528,51 +432,35 @@ UsdSkelSkinningQuery::ComputeExtentsPadding(
     return 0.0f;
 }
 
+template USDSKEL_API float UsdSkelSkinningQuery::ComputeExtentsPadding(const VtArray<GfMatrix4d>&,
+                                                                       const UsdGeomBoundable&) const;
 
-template USDSKEL_API float
-UsdSkelSkinningQuery::ComputeExtentsPadding(
-    const VtArray<GfMatrix4d>&, const UsdGeomBoundable&) const;
+template USDSKEL_API float UsdSkelSkinningQuery::ComputeExtentsPadding(const VtArray<GfMatrix4f>&,
+                                                                       const UsdGeomBoundable&) const;
 
-template USDSKEL_API float
-UsdSkelSkinningQuery::ComputeExtentsPadding(
-    const VtArray<GfMatrix4f>&, const UsdGeomBoundable&) const;
-
-
-TfToken
-UsdSkelSkinningQuery::GetSkinningMethod() const
-{
+TfToken UsdSkelSkinningQuery::GetSkinningMethod() const {
     // skinning method attr is optional.
     TfToken skinningMethod;
-    if (!_skinningMethodAttr ||
-        !_skinningMethodAttr.Get(&skinningMethod)) {
+    if (!_skinningMethodAttr || !_skinningMethodAttr.Get(&skinningMethod)) {
         skinningMethod = UsdSkelTokens->classicLinear;
     }
     return skinningMethod;
 }
 
-
-GfMatrix4d
-UsdSkelSkinningQuery::GetGeomBindTransform(UsdTimeCode time) const
-{
+GfMatrix4d UsdSkelSkinningQuery::GetGeomBindTransform(UsdTimeCode time) const {
     // Geom bind transform attr is optional.
     GfMatrix4d xform;
-    if (!_geomBindTransformAttr ||
-        !_geomBindTransformAttr.Get(&xform, time)) {
+    if (!_geomBindTransformAttr || !_geomBindTransformAttr.Get(&xform, time)) {
         xform.SetIdentity();
     }
     return xform;
 }
 
-
-std::string
-UsdSkelSkinningQuery::GetDescription() const
-{   
+std::string UsdSkelSkinningQuery::GetDescription() const {
     if (IsValid()) {
-        return TfStringPrintf("UsdSkelSkinningQuery <%s>",
-                              _prim.GetPath().GetText());
+        return TfStringPrintf("UsdSkelSkinningQuery <%s>", _prim.GetPath().GetText());
     }
     return "invalid UsdSkelSkinningQuery";
 }
-
 
 PXR_NAMESPACE_CLOSE_SCOPE

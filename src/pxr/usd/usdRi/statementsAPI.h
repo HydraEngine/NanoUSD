@@ -17,7 +17,6 @@
 
 #include "pxr/usd/usdGeom/primvarsAPI.h"
 
-
 #include "pxr/base/vt/value.h"
 
 #include "pxr/base/gf/vec3d.h"
@@ -38,19 +37,18 @@ class SdfAssetPath;
 /// \class UsdRiStatementsAPI
 ///
 /// Container namespace schema for all renderman statements.
-/// 
+///
 /// \note The longer term goal is for clients to go directly to primvar
 /// or render-attribute API's, instead of using UsdRi StatementsAPI
 /// for inherited attributes.  Anticpating this, StatementsAPI
 /// can smooth the way via a few environment variables:
-/// 
+///
 /// * USDRI_STATEMENTS_READ_OLD_ENCODING: Causes StatementsAPI to read
 /// old-style attributes instead of primvars in the "ri:"
 /// namespace.
-/// 
 ///
-class UsdRiStatementsAPI : public UsdAPISchemaBase
-{
+///
+class UsdRiStatementsAPI : public UsdAPISchemaBase {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -61,18 +59,12 @@ public:
     /// Equivalent to UsdRiStatementsAPI::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdRiStatementsAPI(const UsdPrim& prim=UsdPrim())
-        : UsdAPISchemaBase(prim)
-    {
-    }
+    explicit UsdRiStatementsAPI(const UsdPrim& prim = UsdPrim()) : UsdAPISchemaBase(prim) {}
 
     /// Construct a UsdRiStatementsAPI on the prim held by \p schemaObj .
     /// Should be preferred over UsdRiStatementsAPI(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdRiStatementsAPI(const UsdSchemaBase& schemaObj)
-        : UsdAPISchemaBase(schemaObj)
-    {
-    }
+    explicit UsdRiStatementsAPI(const UsdSchemaBase& schemaObj) : UsdAPISchemaBase(schemaObj) {}
 
     /// Destructor.
     USDRI_API
@@ -82,8 +74,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDRI_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdRiStatementsAPI holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -95,20 +86,18 @@ public:
     /// \endcode
     ///
     USDRI_API
-    static UsdRiStatementsAPI
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdRiStatementsAPI Get(const UsdStagePtr& stage, const SdfPath& path);
 
-
-    /// Returns true if this <b>single-apply</b> API schema can be applied to 
-    /// the given \p prim. If this schema can not be a applied to the prim, 
-    /// this returns false and, if provided, populates \p whyNot with the 
+    /// Returns true if this <b>single-apply</b> API schema can be applied to
+    /// the given \p prim. If this schema can not be a applied to the prim,
+    /// this returns false and, if provided, populates \p whyNot with the
     /// reason it can not be applied.
-    /// 
+    ///
     /// Note that if CanApply returns false, that does not necessarily imply
     /// that calling Apply will fail. Callers are expected to call CanApply
-    /// before calling Apply if they want to ensure that it is valid to 
+    /// before calling Apply if they want to ensure that it is valid to
     /// apply a schema.
-    /// 
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -116,18 +105,17 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDRI_API
-    static bool 
-    CanApply(const UsdPrim &prim, std::string *whyNot=nullptr);
+    static bool CanApply(const UsdPrim& prim, std::string* whyNot = nullptr);
 
     /// Applies this <b>single-apply</b> API schema to the given \p prim.
-    /// This information is stored by adding "StatementsAPI" to the 
+    /// This information is stored by adding "StatementsAPI" to the
     /// token-valued, listOp metadata \em apiSchemas on the prim.
-    /// 
-    /// \return A valid UsdRiStatementsAPI object is returned upon success. 
-    /// An invalid (or empty) UsdRiStatementsAPI object is returned upon 
-    /// failure. See \ref UsdPrim::ApplyAPI() for conditions 
-    /// resulting in failure. 
-    /// 
+    ///
+    /// \return A valid UsdRiStatementsAPI object is returned upon success.
+    /// An invalid (or empty) UsdRiStatementsAPI object is returned upon
+    /// failure. See \ref UsdPrim::ApplyAPI() for conditions
+    /// resulting in failure.
+    ///
     /// \sa UsdPrim::GetAppliedSchemas()
     /// \sa UsdPrim::HasAPI()
     /// \sa UsdPrim::CanApplyAPI()
@@ -135,8 +123,7 @@ public:
     /// \sa UsdPrim::RemoveAPI()
     ///
     USDRI_API
-    static UsdRiStatementsAPI 
-    Apply(const UsdPrim &prim);
+    static UsdRiStatementsAPI Apply(const UsdPrim& prim);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -149,28 +136,28 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDRI_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDRI_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
     // --(BEGIN CUSTOM CODE)--
 
     // --------------------------------------------------------------------- //
-    // CreateRiAttribute 
+    // CreateRiAttribute
     // --------------------------------------------------------------------- //
     /// Create a rib attribute on the prim to which this schema is attached.
     /// A rib attribute consists of an attribute \em "nameSpace" and an
@@ -186,51 +173,39 @@ public:
     /// can be array-valued.  For instance, both "color" and "float[3]"
     /// are valid values for \p riType.
     USDRI_API
-    UsdAttribute
-    CreateRiAttribute(
-        const TfToken &name, 
-        const std::string &riType,
-        const std::string &nameSpace = "user");
+    UsdAttribute CreateRiAttribute(const TfToken& name,
+                                   const std::string& riType,
+                                   const std::string& nameSpace = "user");
 
     /// Creates an attribute of the given \p tfType.
     /// \overload
     USDRI_API
-    UsdAttribute
-    CreateRiAttribute(
-        const TfToken &name, 
-        const TfType &tfType,
-        const std::string &nameSpace = "user");
+    UsdAttribute CreateRiAttribute(const TfToken& name, const TfType& tfType, const std::string& nameSpace = "user");
 
     /// Return a UsdAttribute representing the Ri attribute with the
     /// name \a name, in the namespace \a nameSpace.  The attribute
     /// returned may or may not \b actually exist so it must be
     /// checked for validity.
     USDRI_API
-    UsdAttribute
-    GetRiAttribute(
-        const TfToken &name, 
-        const std::string &nameSpace = "user");
+    UsdAttribute GetRiAttribute(const TfToken& name, const std::string& nameSpace = "user");
 
     // --------------------------------------------------------------------- //
-    // GetRiAttributes 
+    // GetRiAttributes
     // --------------------------------------------------------------------- //
-    /// Return all rib attributes on this prim, or under a specific 
+    /// Return all rib attributes on this prim, or under a specific
     /// namespace (e.g.\ "user").
     ///
-    /// As noted above, rib attributes can be either UsdAttribute or 
-    /// UsdRelationship, and like all UsdProperties, need not have a defined 
+    /// As noted above, rib attributes can be either UsdAttribute or
+    /// UsdRelationship, and like all UsdProperties, need not have a defined
     /// value.
     USDRI_API
-    std::vector<UsdProperty>
-    GetRiAttributes(const std::string &nameSpace = "") const;
+    std::vector<UsdProperty> GetRiAttributes(const std::string& nameSpace = "") const;
     // --------------------------------------------------------------------- //
-    // GetRiAttributeName 
+    // GetRiAttributeName
     // --------------------------------------------------------------------- //
     /// Return the base, most-specific name of the rib attribute.  For example,
     /// the \em name of the rib attribute "cull:backfacing" is "backfacing"
-    inline static TfToken GetRiAttributeName(const UsdProperty &prop) {
-        return prop.GetBaseName();
-    }
+    inline static TfToken GetRiAttributeName(const UsdProperty& prop) { return prop.GetBaseName(); }
 
     // --------------------------------------------------------------------- //
     // GetRiAttributeNameSpace
@@ -238,7 +213,7 @@ public:
     /// Return the containing namespace of the rib attribute (e.g.\ "user").
     ///
     USDRI_API
-    static TfToken GetRiAttributeNameSpace(const UsdProperty &prop);
+    static TfToken GetRiAttributeNameSpace(const UsdProperty& prop);
 
     // --------------------------------------------------------------------- //
     // IsRiAttribute
@@ -246,7 +221,7 @@ public:
     /// Return true if the property is in the "ri:attributes" namespace.
     ///
     USDRI_API
-    static bool IsRiAttribute(const UsdProperty &prop);
+    static bool IsRiAttribute(const UsdProperty& prop);
 
     // --------------------------------------------------------------------- //
     // MakeRiAttributePropertyName
@@ -258,22 +233,22 @@ public:
     ///
     /// Will return empty string if attrName is not a valid property
     /// identifier; otherwise, will return a valid property name
-    /// that identifies the property as an RiAttribute, according to the 
+    /// that identifies the property as an RiAttribute, according to the
     /// following rules:
-    /// \li If \p attrName is already a properly constructed RiAttribute 
-    ///     property name, return it unchanged.  
+    /// \li If \p attrName is already a properly constructed RiAttribute
+    ///     property name, return it unchanged.
     /// \li If \p attrName contains two or more tokens separated by a \em colon,
-    ///     consider the first to be the namespace, and the rest the name, 
+    ///     consider the first to be the namespace, and the rest the name,
     ///     joined by underscores
     /// \li If \p attrName contains two or more tokens separated by a \em period,
-    ///     consider the first to be the namespace, and the rest the name, 
+    ///     consider the first to be the namespace, and the rest the name,
     ///     joined by underscores
     /// \li If \p attrName contains two or more tokens separated by an,
     ///     \em underscore consider the first to be the namespace, and the
     ///     rest the name, joined by underscores
     /// \li else, assume \p attrName is the name, and "user" is the namespace
     USDRI_API
-    static std::string MakeRiAttributePropertyName(const std::string &attrName);
+    static std::string MakeRiAttributePropertyName(const std::string& attrName);
 
     // --------------------------------------------------------------------- //
     // SetCoordinateSystem
@@ -287,7 +262,7 @@ public:
     /// relationship targets will be authored.
     ///
     USDRI_API
-    void SetCoordinateSystem(const std::string &coordSysName);
+    void SetCoordinateSystem(const std::string& coordSysName);
 
     // --------------------------------------------------------------------- //
     // GetCoordinateSystem
@@ -319,7 +294,7 @@ public:
     /// not under a leaf model, no relationship targets will be authored.
     ///
     USDRI_API
-    void SetScopedCoordinateSystem(const std::string &coordSysName);
+    void SetScopedCoordinateSystem(const std::string& coordSysName);
 
     // --------------------------------------------------------------------- //
     // GetScopedCoordinateSystem
@@ -347,7 +322,7 @@ public:
     /// successful.
     ///
     USDRI_API
-    bool GetModelCoordinateSystems(SdfPathVector *targets) const;
+    bool GetModelCoordinateSystems(SdfPathVector* targets) const;
 
     // --------------------------------------------------------------------- //
     // GetModelScopedCoordinateSystems
@@ -357,8 +332,7 @@ public:
     /// successful.
     ///
     USDRI_API
-    bool GetModelScopedCoordinateSystems(SdfPathVector *targets) const;
-
+    bool GetModelScopedCoordinateSystems(SdfPathVector* targets) const;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -20,9 +20,7 @@
 
 #include <memory>
 
-
 PXR_NAMESPACE_OPEN_SCOPE
-
 
 class UsdSkelRoot;
 class UsdSkelAnimation;
@@ -32,13 +30,11 @@ class UsdSkelSkinningQuery;
 
 TF_DECLARE_REF_PTRS(UsdSkelBinding);
 
-
 /// Thread-safe cache for accessing query objects for evaluating skeletal data.
 ///
 /// This provides caching of major structural components, such as skeletal
 /// topology. In a streaming context, this cache is intended to persist.
-class UsdSkelCache
-{
+class UsdSkelCache {
 public:
     USDSKEL_API
     UsdSkelCache();
@@ -53,8 +49,7 @@ public:
     /// UsdSkelBindingAPI, making resolved bindings available through
     /// GetSkinningQuery(), ComputeSkelBinding() and ComputeSkelBindings().
     USDSKEL_API
-    bool Populate(const UsdSkelRoot& root,
-                  Usd_PrimFlagsPredicate predicate) const;
+    bool Populate(const UsdSkelRoot& root, Usd_PrimFlagsPredicate predicate) const;
 
     /// Get a skel query for computing properties of \p skel.
     ///
@@ -107,11 +102,11 @@ public:
 
 private:
     std::shared_ptr<class UsdSkel_CacheImpl> _impl;
- 
+
     friend class UsdSkelAnimQuery;
     friend class UsdSkelSkeletonQuery;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // USDSKEL_EVALCACHE_H
+#endif  // USDSKEL_EVALCACHE_H

@@ -10,10 +10,10 @@
 /// \file usdSemantics/tokens.h
 
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-// 
+//
 // This is an automatically generated file (by usdGenSchema.py).
 // Do not hand-edit!
-// 
+//
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 #include "pxr/pxr.h"
@@ -23,7 +23,6 @@
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
-
 
 /// \class UsdSemanticsTokensType
 ///
@@ -46,15 +45,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 struct UsdSemanticsTokensType {
     USDSEMANTICS_API UsdSemanticsTokensType();
     /// \brief "semantics:labels"
-    /// 
+    ///
     /// Property namespace prefix for the UsdSemanticsLabelsAPI schema.
     const TfToken semanticsLabels;
     /// \brief "semantics:labels:__INSTANCE_NAME__"
-    /// 
+    ///
     /// UsdSemanticsLabelsAPI
     const TfToken semanticsLabels_MultipleApplyTemplate_;
     /// \brief "SemanticsLabelsAPI"
-    /// 
+    ///
     /// Schema identifer and family for UsdSemanticsLabelsAPI
     const TfToken SemanticsLabelsAPI;
     /// A vector of all of the tokens listed above.

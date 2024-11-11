@@ -8,17 +8,11 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-UsdSemanticsTokensType::UsdSemanticsTokensType() :
-    semanticsLabels("semantics:labels", TfToken::Immortal),
-    semanticsLabels_MultipleApplyTemplate_("semantics:labels:__INSTANCE_NAME__", TfToken::Immortal),
-    SemanticsLabelsAPI("SemanticsLabelsAPI", TfToken::Immortal),
-    allTokens({
-        semanticsLabels,
-        semanticsLabels_MultipleApplyTemplate_,
-        SemanticsLabelsAPI
-    })
-{
-}
+UsdSemanticsTokensType::UsdSemanticsTokensType()
+    : semanticsLabels("semantics:labels", TfToken::Immortal),
+      semanticsLabels_MultipleApplyTemplate_("semantics:labels:__INSTANCE_NAME__", TfToken::Immortal),
+      SemanticsLabelsAPI("SemanticsLabelsAPI", TfToken::Immortal),
+      allTokens({semanticsLabels, semanticsLabels_MultipleApplyTemplate_, SemanticsLabelsAPI}) {}
 
 TfStaticData<UsdSemanticsTokensType> UsdSemanticsTokens;
 

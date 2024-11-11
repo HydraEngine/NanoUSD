@@ -28,7 +28,7 @@ set(SRC_FILES
         editContext.cpp
         editTarget.cpp
         errors.cpp
-        examples_usd.cpp
+#        examples_usd.cpp
         flattenUtils.cpp
         inherits.cpp
         instanceCache.cpp

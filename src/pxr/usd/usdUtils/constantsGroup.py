@@ -11,6 +11,7 @@ module, but enum is not available in Python 2's standard library.
 import sys
 import types
 
+
 class _MetaConstantsGroup(type):
     """A meta-class which handles the creation and behavior of ConstantsGroups.
     """
@@ -67,11 +68,13 @@ class _MetaConstantsGroup(type):
         """Iterate over each constant in the group."""
         return iter(self._all)
 
+
 # We want to define a ConstantsGroup class that uses _MetaConstantsGroup
 # as its metaclass.
 class ConstantsGroup(object, metaclass=_MetaConstantsGroup):
     """The base constant group class, intended to be inherited by actual groups
     of constants.
     """
+
     def __new__(cls, *args, **kwargs):
         raise TypeError("ConstantsGroup objects cannot be created.")

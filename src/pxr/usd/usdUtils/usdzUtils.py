@@ -17,17 +17,22 @@ import shutil
 import tempfile
 from contextlib import contextmanager
 
+
 def _Print(msg):
     print(msg)
+
 
 def _Err(msg):
     sys.stderr.write(msg + '\n')
 
+
 def _AllowedUsdzExtensions():
     return [".usdz"]
 
+
 def _AllowedUsdExtensions():
     return [".usd", ".usda", ".usdc"]
+
 
 def ExtractUsdzPackage(usdzFile, extractDir, recurse, verbose, force):
     """
@@ -48,7 +53,7 @@ def ExtractUsdzPackage(usdzFile, extractDir, recurse, verbose, force):
         return False
 
     if force and os.path.isdir(os.path.abspath(extractDir)):
-       shutil.rmtree(os.path.abspath(extractDir))
+        shutil.rmtree(os.path.abspath(extractDir))
 
     if os.path.isdir(extractDir):
         _Print("Extract Dir: \'%s\' already exists." % extractDir)
@@ -58,15 +63,15 @@ def ExtractUsdzPackage(usdzFile, extractDir, recurse, verbose, force):
         with zipfile.ZipFile(zipFile) as usdzArchive:
             if verbose:
                 _Print("Extracting usdz file \'%s\' to \'%s\'" \
-                        %(zipFile, extractedDir))
+                       % (zipFile, extractedDir))
             usdzArchive.extractall(extractedDir)
             if recurse:
                 for item in os.listdir(extractedDir):
                     if item.endswith('.usdz'):
-                        _Print("Extracting item \'%s\'." %item)
+                        _Print("Extracting item \'%s\'." % item)
                         itemPath = os.path.join(extractedDir, item)
-                        _ExtractZip(itemPath, os.path.splitext(itemPath)[0], 
-                                recurse, verbose)
+                        _ExtractZip(itemPath, os.path.splitext(itemPath)[0],
+                                    recurse, verbose)
                         os.remove(os.path.abspath(itemPath))
 
     # Extract to a temp directory then move to extractDir, this makes sure
@@ -80,6 +85,7 @@ def ExtractUsdzPackage(usdzFile, extractDir, recurse, verbose, force):
         shutil.rmtree(tmpExtractPath)
     return True
 
+
 class UsdzAssetIterator(object):
     """
     Class that provides an iterator for usdz assets. Within context, it
@@ -89,6 +95,7 @@ class UsdzAssetIterator(object):
     Note that root layer of the usdz package might not be compliant which can
     cause UsdzAssetIterator to raise an exception while repacking on exit.
     """
+
     def __init__(self, usdzFile, verbose, parentDir=None):
         # If a parentDir is provided extractDir is created under the parent dir,
         # else a temp directory is created which is cleared on exit. This is
@@ -99,17 +106,17 @@ class UsdzAssetIterator(object):
             self._tmpDir = tempfile.mkdtemp()
         usdzFileDir = os.path.splitext(usdzFile)[0]
         self.extractDir = os.path.join(parentDir, usdzFileDir) if parentDir \
-                else os.path.join(self._tmpDir, usdzFileDir)
+            else os.path.join(self._tmpDir, usdzFileDir)
         self.usdzFile = os.path.abspath(usdzFile)
         self.verbose = verbose
         if self.verbose:
             _Print("Initializing UsdzAssetIterator for (%s) with (%s) temp " \
-            "extract dir" %(self.usdzFile, self.extractDir))
+                   "extract dir" % (self.usdzFile, self.extractDir))
 
     def _ExtractedFiles(self):
-            return [os.path.relpath(os.path.join(root, f), self.extractDir) \
-                    for root, dirs, files in os.walk(self.extractDir) \
-                    for f in files]
+        return [os.path.relpath(os.path.join(root, f), self.extractDir) \
+                for root, dirs, files in os.walk(self.extractDir) \
+                for f in files]
 
     # Creates a usdz package under usdzFile
     @staticmethod
@@ -128,15 +135,15 @@ class UsdzAssetIterator(object):
                     usdzWriter.AddFile(f)
                 except Tf.ErrorException as e:
                     _Err('CreateUsdzPackage failed to add file \'%s\' to '
-                        'package. Discarding package.' % f)
+                         'package. Discarding package.' % f)
                     # Raise this to the client
                     raise
             return True
 
     def __enter__(self):
         # unpacks usdz into the extractDir set in the constructor
-        ExtractUsdzPackage(self.usdzFile, self.extractDir, False, self.verbose, 
-                True)
+        ExtractUsdzPackage(self.usdzFile, self.extractDir, False, self.verbose,
+                           True)
         return self
 
     def __exit__(self, excType, excVal, excTB):
@@ -144,14 +151,14 @@ class UsdzAssetIterator(object):
         from pxr import Tf
         # If extraction failed, we won't have a extractDir, exit early
         if not os.path.exists(self.extractDir):
-            return 
+            return
         restoreDir = os.getcwd()
         os.chdir(self.extractDir)
         filesToAdd = self._ExtractedFiles()
         if self.verbose:
             _Print("Packing files [%s] in (%s) directory as (%s) usdz " \
-            "package." %(", ".join(filesToAdd), self.extractDir,
-                self.usdzFile))
+                   "package." % (", ".join(filesToAdd), self.extractDir,
+                                 self.usdzFile))
         # Package creation can error out 
         try:
             if excType is None:
@@ -172,21 +179,21 @@ class UsdzAssetIterator(object):
         # generator that yields all usd, usda, usdz assets from the package
         allowedExtensions = _AllowedUsdzExtensions() + _AllowedUsdExtensions()
         extractedFiles = [f for f in self._ExtractedFiles() if \
-                os.path.splitext(f)[1] in allowedExtensions]
+                          os.path.splitext(f)[1] in allowedExtensions]
         restoreDir = os.getcwd()
         os.chdir(self.extractDir)
         for extractedFile in extractedFiles:
             if os.path.splitext(extractedFile)[1] in _AllowedUsdzExtensions():
                 if self.verbose:
-                    _Print("Iterating nested usdz asset: %s" %extractedFile)
+                    _Print("Iterating nested usdz asset: %s" % extractedFile)
                 # Create another UsdzAssetIterator to handle nested usdz package
                 with UsdzAssetIterator(extractedFile, self.verbose,
-                        self.extractDir) as nestedUsdz:
-                        yield from nestedUsdz.UsdAssets()
+                                       self.extractDir) as nestedUsdz:
+                    yield from nestedUsdz.UsdAssets()
             else:
                 if self.verbose:
-                    _Print("Iterating usd asset: %s" %extractedFile)
-                yield extractedFile 
+                    _Print("Iterating usd asset: %s" % extractedFile)
+                yield extractedFile
         os.chdir(restoreDir)
 
     def AllAssets(self):
@@ -204,12 +211,12 @@ class UsdzAssetIterator(object):
         for extractedFile in extractedFiles:
             if os.path.splitext(extractedFile)[1] in _AllowedUsdzExtensions():
                 if self.verbose:
-                    _Print("Iterating nested usdz asset: %s" %extractedFile)
+                    _Print("Iterating nested usdz asset: %s" % extractedFile)
                 with UsdzAssetIterator(extractedFile, self.verbose,
-                        self.extractDir) as nestedUsdz:
-                            yield from nestedUsdz.AllAssets()
+                                       self.extractDir) as nestedUsdz:
+                    yield from nestedUsdz.AllAssets()
             else:
                 if self.verbose:
-                    _Print("Iterating usd asset: %s" %extractedFile)
-                yield extractedFile 
+                    _Print("Iterating usd asset: %s" % extractedFile)
+                yield extractedFile
         os.chdir(restoreDir)

@@ -38,7 +38,7 @@ class SdfAssetPath;
 /// of FieldBase primitives bound together in this volume. Each
 /// FieldBase primitive is specified as a relationship with a
 /// namespace prefix of "field".
-/// 
+///
 /// The relationship name is used by the renderer to associate
 /// individual fields with the named input parameters on the volume
 /// shader. Using this indirect approach to connecting fields to
@@ -53,8 +53,7 @@ class SdfAssetPath;
 /// by multiple Volumes, a Volume's Field prims should be located
 /// under the Volume in namespace, for enhanced organization.
 ///
-class UsdVolVolume : public UsdGeomGprim
-{
+class UsdVolVolume : public UsdGeomGprim {
 public:
     /// Compile time constant representing what kind of schema this class is.
     ///
@@ -65,18 +64,12 @@ public:
     /// Equivalent to UsdVolVolume::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdVolVolume(const UsdPrim& prim=UsdPrim())
-        : UsdGeomGprim(prim)
-    {
-    }
+    explicit UsdVolVolume(const UsdPrim& prim = UsdPrim()) : UsdGeomGprim(prim) {}
 
     /// Construct a UsdVolVolume on the prim held by \p schemaObj .
     /// Should be preferred over UsdVolVolume(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdVolVolume(const UsdSchemaBase& schemaObj)
-        : UsdGeomGprim(schemaObj)
-    {
-    }
+    explicit UsdVolVolume(const UsdSchemaBase& schemaObj) : UsdGeomGprim(schemaObj) {}
 
     /// Destructor.
     USDVOL_API
@@ -86,8 +79,7 @@ public:
     /// class and all its ancestor classes.  Does not include attributes that
     /// may be authored by custom/extended methods of the schemas involved.
     USDVOL_API
-    static const TfTokenVector &
-    GetSchemaAttributeNames(bool includeInherited=true);
+    static const TfTokenVector& GetSchemaAttributeNames(bool includeInherited = true);
 
     /// Return a UsdVolVolume holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
@@ -99,8 +91,7 @@ public:
     /// \endcode
     ///
     USDVOL_API
-    static UsdVolVolume
-    Get(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdVolVolume Get(const UsdStagePtr& stage, const SdfPath& path);
 
     /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
     /// is defined (according to UsdPrim::IsDefined()) on this stage.
@@ -125,8 +116,7 @@ public:
     /// the opinion at the current EditTarget.
     ///
     USDVOL_API
-    static UsdVolVolume
-    Define(const UsdStagePtr &stage, const SdfPath &path);
+    static UsdVolVolume Define(const UsdStagePtr& stage, const SdfPath& path);
 
 protected:
     /// Returns the kind of schema this class belongs to.
@@ -139,21 +129,21 @@ private:
     // needs to invoke _GetStaticTfType.
     friend class UsdSchemaRegistry;
     USDVOL_API
-    static const TfType &_GetStaticTfType();
+    static const TfType& _GetStaticTfType();
 
     static bool _IsTypedSchema();
 
     // override SchemaBase virtuals.
     USDVOL_API
-    const TfType &_GetTfType() const override;
+    const TfType& _GetTfType() const override;
 
 public:
     // ===================================================================== //
-    // Feel free to add custom code below this line, it will be preserved by 
-    // the code generator. 
+    // Feel free to add custom code below this line, it will be preserved by
+    // the code generator.
     //
-    // Just remember to: 
-    //  - Close the class declaration with }; 
+    // Just remember to:
+    //  - Close the class declaration with };
     //  - Close the namespace with PXR_NAMESPACE_CLOSE_SCOPE
     //  - Close the include guard with #endif
     // ===================================================================== //
@@ -165,7 +155,7 @@ public:
     // --------------------------------------------------------------------- //
 
     typedef std::map<TfToken, SdfPath> FieldMap;
-    
+
     /// Return a map of field relationship names to the fields themselves,
     /// represented as prim paths.  This map provides all the information
     /// that should be needed to tie fields to shader parameters and render
@@ -184,7 +174,7 @@ public:
     /// The name lookup automatically applies the field relationship
     /// namespacing, if it isn't specified in the name token.
     USDVOL_API
-    bool HasFieldRelationship(const TfToken &name) const;
+    bool HasFieldRelationship(const TfToken& name) const;
 
     /// Checks if there is an existing field relationship with a given name,
     /// and if so, returns the path to the Field prim it targets, or else
@@ -193,26 +183,25 @@ public:
     /// The name lookup automatically applies the field relationship
     /// namespacing, if it isn't specified in the name token.
     USDVOL_API
-    SdfPath GetFieldPath(const TfToken &name) const;
+    SdfPath GetFieldPath(const TfToken& name) const;
 
     /// Creates a relationship on this volume that targets the specified field.
     /// If an existing relationship exists with the same name, it is replaced
     /// (since only one target is allowed for each named relationship).
     ///
-    /// Returns \c true if the relationship was successfully created and set - 
+    /// Returns \c true if the relationship was successfully created and set -
     /// it is legal to call this method for a field relationship that already
     /// "exists", i.e. already posesses scene description, as this is the
     /// only method we provide for setting a field relatioonship's value, to help
     /// enforce that field relationships can have only a single (or no) target.
     ///
-    /// \param fieldPath - can be a prim path, or the path of another 
+    /// \param fieldPath - can be a prim path, or the path of another
     ///        relationship, to effect \ref usd_relationship_forwarding
     ///
     /// The name lookup automatically applies the field relationship
     /// namespacing, if it isn't specified in the name token.
     USDVOL_API
-    bool CreateFieldRelationship(const TfToken &name,
-                                 const SdfPath &fieldPath) const;
+    bool CreateFieldRelationship(const TfToken& name, const SdfPath& fieldPath) const;
 
     /// Blocks an existing field relationship on this volume, ensuring it
     /// will not be enumerated by GetFieldPaths().
@@ -223,7 +212,7 @@ public:
     /// The name lookup automatically applies the field relationship
     /// namespacing, if it isn't specified in the name token.
     USDVOL_API
-    bool BlockFieldRelationship(const TfToken &name) const;
+    bool BlockFieldRelationship(const TfToken& name) const;
 
 private:
     /// Return \p name prepended with the field namespace, if it isn't

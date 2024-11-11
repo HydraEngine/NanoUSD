@@ -26,12 +26,9 @@
 #include <atomic>
 #include <mutex>
 
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 TF_DECLARE_WEAK_AND_REF_PTRS(UsdSkel_SkelDefinition);
-
 
 /// \class UsdSkel_SkelDefinition
 ///
@@ -39,8 +36,7 @@ TF_DECLARE_WEAK_AND_REF_PTRS(UsdSkel_SkelDefinition);
 /// A definition is a simple cache of the *validated* structure
 /// of a skeleton, including its topology, bind pose and rest pose.
 /// Skeleton definitions are meant to shared across instances.
-class UsdSkel_SkelDefinition : public TfRefBase, public TfWeakBase
-{
+class UsdSkel_SkelDefinition : public TfRefBase, public TfWeakBase {
 public:
     virtual ~UsdSkel_SkelDefinition() {}
 
@@ -48,13 +44,11 @@ public:
     /// Returns an empty pointer if \p skel or its structure is invalid.
     static UsdSkel_SkelDefinitionRefPtr New(const UsdSkelSkeleton& skel);
 
-    explicit operator bool() const { 
-        return static_cast<bool>(_skel); 
-    }
+    explicit operator bool() const { return static_cast<bool>(_skel); }
 
     const UsdSkelSkeleton& GetSkeleton() const { return _skel; }
 
-    const VtTokenArray&    GetJointOrder() const { return _jointOrder; }
+    const VtTokenArray& GetJointOrder() const { return _jointOrder; }
 
     const UsdSkelTopology& GetTopology() const { return _topology; }
 
@@ -79,10 +73,10 @@ public:
     bool GetJointLocalInverseRestTransforms(VtArray<Matrix4>* xforms);
 
     /// See UsdSkel_SkeletonQuery::HasBindPose()
-    bool HasBindPose ();
+    bool HasBindPose();
 
     /// See UsdSkel_SkeletonQuery::HasRestPose()
-    bool HasRestPose ();
+    bool HasRestPose();
 
 private:
     UsdSkel_SkelDefinition();
@@ -100,7 +94,7 @@ private:
 
     template <int ComputeFlag, typename Matrix4>
     bool _ComputeJointSkelRestTransforms();
-    
+
     template <int ComputeFlag, typename Matrix4>
     bool _ComputeJointWorldInverseBindTransforms();
 
@@ -122,13 +116,13 @@ private:
 
 private:
     UsdSkelSkeleton _skel;
-    VtTokenArray    _jointOrder;
+    VtTokenArray _jointOrder;
     UsdSkelTopology _topology;
     VtMatrix4dArray _jointLocalRestXforms;
     VtMatrix4dArray _jointWorldBindXforms;
     // Properties computed (and cached) on-demand.
     // Different forms of transforms are cached because different
-    // consumption tasks generally require different transforms.    
+    // consumption tasks generally require different transforms.
     // They are cached on the definition in order to provide cache
     // sharing across instanced skeletons.
     _XformHolder _jointSkelRestXforms;
@@ -139,7 +133,6 @@ private:
     std::mutex _mutex;
 };
 
-
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_SKEL_SKEL_DEFINITION_H
+#endif  // PXR_USD_USD_SKEL_SKEL_DEFINITION_H

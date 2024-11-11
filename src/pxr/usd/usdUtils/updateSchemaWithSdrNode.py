@@ -9,6 +9,7 @@
 from pxr import Tf, Sdf, Sdr, Usd, UsdShade, Vt
 from pxr.UsdUtils.constantsGroup import ConstantsGroup
 
+
 class SchemaDefiningKeys(ConstantsGroup):
     API_SCHEMAS_FOR_ATTR_PRUNING = "apiSchemasForAttrPruning"
     API_SCHEMA_AUTO_APPLY_TO = "apiSchemaAutoApplyTo"
@@ -16,13 +17,14 @@ class SchemaDefiningKeys(ConstantsGroup):
     IS_USD_SHADE_CONTAINER = "isUsdShadeContainer"
     SCHEMA_PROPERTY_NS_PREFIX_OVERRIDE = "schemaPropertyNSPrefixOverride"
     PROVIDES_USD_SHADE_CONNECTABLE_API_BEHAVIOR = \
-            "providesUsdShadeConnectableAPIBehavior"
+        "providesUsdShadeConnectableAPIBehavior"
     REQUIRES_USD_SHADE_ENCAPSULATION = "requiresUsdShadeEncapsulation"
     SCHEMA_BASE = "schemaBase"
     SCHEMA_KIND = "schemaKind"
     SCHEMA_NAME = "schemaName"
     TF_TYPENAME_SUFFIX = "tfTypeNameSuffix"
     TYPED_SCHEMA_FOR_ATTR_PRUNING = "typedSchemaForAttrPruning"
+
 
 class SchemaDefiningMiscConstants(ConstantsGroup):
     API_SCHEMA_BASE = "APISchemaBase"
@@ -31,6 +33,7 @@ class SchemaDefiningMiscConstants(ConstantsGroup):
     SINGLE_APPLY_SCHEMA = "singleApply"
     TYPED_SCHEMA = "Typed"
     USD_SOURCE_TYPE = "USD"
+
 
 class PropertyDefiningKeys(ConstantsGroup):
     CONNECTABILITY = "connectability"
@@ -43,17 +46,20 @@ class PropertyDefiningKeys(ConstantsGroup):
     USD_VARIABILITY = "usdVariability"
     WIDGET = "widget"
 
+
 class UserDocConstants(ConstantsGroup):
     USERDOC_FULL = "userDoc"
     USERDOC_BRIEF = "userDocBrief"
     MAX_LENGTH_FOR_BRIEF = 500
 
+
 def _IsNSPrefixConnectableAPICompliant(nsPrefix):
     return (nsPrefix == UsdShade.Tokens.inputs[:1] or \
             nsPrefix == UsdShade.Tokens.outputs[:1])
 
-def _CreateAttrSpecFromNodeAttribute(primSpec, prop, primDefForAttrPruning, 
-        schemaPropertyNSPrefixOverride, isSdrInput=True):
+
+def _CreateAttrSpecFromNodeAttribute(primSpec, prop, primDefForAttrPruning,
+                                     schemaPropertyNSPrefixOverride, isSdrInput=True):
     propMetadata = prop.GetMetadata()
     # Early out if the property should be suppressed from being translated to
     # propertySpec
@@ -73,16 +79,16 @@ def _CreateAttrSpecFromNodeAttribute(primSpec, prop, primDefForAttrPruning,
     if (not isSdrInput and propertyNSPrefixOverride is not None and \
             propertyNSPrefixOverride != UsdShade.Tokens.outputs[:-1]):
         Tf.RaiseRuntimeError("Presence of (%s) output parameter contradicts " \
-            "the presence of propertyNSPrefixOverride (\"%s\"), as it is " \
-            "illegal for non-shader nodes to contain output parameters, or " \
-            "shader nodes' outputs to not have the \"outputs\" namespace " \
-            "prefix." %(propName, propertyNSPrefixOverride))
+                             "the presence of propertyNSPrefixOverride (\"%s\"), as it is " \
+                             "illegal for non-shader nodes to contain output parameters, or " \
+                             "shader nodes' outputs to not have the \"outputs\" namespace " \
+                             "prefix." % (propName, propertyNSPrefixOverride))
 
     attrType = prop.GetTypeAsSdfType().GetSdfType()
-    
+
     if not Sdf.Path.IsValidNamespacedIdentifier(propName):
         Tf.RaiseRuntimeError("Property name (%s) for schema (%s) is an " \
-                "invalid namespace identifier." %(propName, primSpec.name))
+                             "invalid namespace identifier." % (propName, primSpec.name))
 
     # if propertyNSPrefixOverride is provided and we are an output then already
     # thrown exception
@@ -90,7 +96,7 @@ def _CreateAttrSpecFromNodeAttribute(primSpec, prop, primDefForAttrPruning,
     # we need to strip this to be used with JoinIdentifier
     if propertyNSPrefixOverride is None:
         propertyNSPrefixOverride = UsdShade.Tokens.inputs[:-1] if isSdrInput \
-                else UsdShade.Tokens.outputs[:-1]
+            else UsdShade.Tokens.outputs[:-1]
 
     # Apply propertyNSPrefixOverride
     propName = Sdf.Path.JoinIdentifier([propertyNSPrefixOverride, propName])
@@ -104,8 +110,8 @@ def _CreateAttrSpecFromNodeAttribute(primSpec, prop, primDefForAttrPruning,
             if (usdAttrType != attrType):
                 Tf.Warn("Generated schema's property type '%s', "
                         "differs usd schema's property type '%s', for "
-                        "duplicated property '%s'" %(attrType, usdAttrType, 
-                        propName))
+                        "duplicated property '%s'" % (attrType, usdAttrType,
+                                                      propName))
             return
 
     # Copy over property parameters
@@ -114,12 +120,12 @@ def _CreateAttrSpecFromNodeAttribute(primSpec, prop, primDefForAttrPruning,
         attrType = Sdf.ValueTypeNames.Token
 
     attrVariability = Sdf.VariabilityUniform \
-            if ((PropertyDefiningKeys.USD_VARIABILITY in propMetadata) and
-                propMetadata[PropertyDefiningKeys.USD_VARIABILITY] == 
-                    PropertyDefiningKeys.SDF_VARIABILITY_UNIFORM_STRING) \
-                            else Sdf.VariabilityVarying
+        if ((PropertyDefiningKeys.USD_VARIABILITY in propMetadata) and
+            propMetadata[PropertyDefiningKeys.USD_VARIABILITY] ==
+            PropertyDefiningKeys.SDF_VARIABILITY_UNIFORM_STRING) \
+        else Sdf.VariabilityVarying
     attrSpec = Sdf.AttributeSpec(primSpec, propName, attrType,
-            attrVariability)
+                                 attrVariability)
 
     if PropertyDefiningKeys.WIDGET in prop.GetMetadata().keys():
         if (prop.GetMetadata()[PropertyDefiningKeys.WIDGET] == \
@@ -128,7 +134,7 @@ def _CreateAttrSpecFromNodeAttribute(primSpec, prop, primDefForAttrPruning,
 
     if prop.GetHelp():
         _SetSchemaUserDocFields(attrSpec, prop.GetHelp())
-    elif prop.GetLabel(): # fallback documentation can be label
+    elif prop.GetLabel():  # fallback documentation can be label
         _SetSchemaUserDocFields(attrSpec, prop.GetLabel())
     if prop.GetPage():
         attrSpec.displayGroup = prop.GetPage()
@@ -143,33 +149,33 @@ def _CreateAttrSpecFromNodeAttribute(primSpec, prop, primDefForAttrPruning,
             if len(option[1]) == 0:
                 if not hasEmptyValue:
                     Tf.Warn("Property (%s) for schema (%s) has mix of empty " \
-                    "non-empty values for token options (%s)." \
-                    %(propName, primSpec.name, options))
+                            "non-empty values for token options (%s)." \
+                            % (propName, primSpec.name, options))
                 hasEmptyValue = True
                 tokenList.append(option[0])
             else:
                 if hasEmptyValue:
                     Tf.Warn("Property (%s) for schema (%s) has mix of empty " \
-                    "non-empty values for token options (%s)." \
-                    %(propName, primSpec.name, options))
+                            "non-empty values for token options (%s)." \
+                            % (propName, primSpec.name, options))
                 hasEmptyValue = False
                 tokenList.append(option[1])
         attrSpec.allowedTokens = tokenList
 
     defaultValue = prop.GetDefaultValueAsSdfType()
     if (attrType == Sdf.ValueTypeNames.String or
-            attrType == Sdf.ValueTypeNames.Token) and defaultValue is not None:
+        attrType == Sdf.ValueTypeNames.Token) and defaultValue is not None:
         attrSpec.default = defaultValue.replace('"', r'\"')
     else:
         attrSpec.default = defaultValue
-
 
     # The input property should remain connectable (interfaceOnly)
     # even if sdrProperty marks the input as not connectable
     if propertyNSPrefixOverride == UsdShade.Tokens.inputs[:-1] and \
             not prop.IsConnectable():
-        attrSpec.SetInfo(PropertyDefiningKeys.CONNECTABILITY, 
-                UsdShade.Tokens.interfaceOnly)
+        attrSpec.SetInfo(PropertyDefiningKeys.CONNECTABILITY,
+                         UsdShade.Tokens.interfaceOnly)
+
 
 def _SetSchemaUserDocFields(spec, doc):
     """
@@ -192,8 +198,9 @@ def _SetSchemaUserDocFields(spec, doc):
     # (example: https://openusd.org/release/user_guides/schemas/index.html)
     spec.customData[UserDocConstants.USERDOC_FULL] = doc
 
+
 def UpdateSchemaWithSdrNode(schemaLayer, sdrNode, renderContext="",
-        overrideIdentifier=""):
+                            overrideIdentifier=""):
     """
     Updates the given schemaLayer with primSpec and propertySpecs from sdrNode
     metadata. 
@@ -300,20 +307,20 @@ def UpdateSchemaWithSdrNode(schemaLayer, sdrNode, renderContext="",
 
     if SchemaDefiningKeys.SCHEMA_NAME not in sdrNodeMetadata:
         Tf.Warn("Sdr Node (%s) does not define a schema name metadata." \
-                %(sdrNode.GetName()))
+                % (sdrNode.GetName()))
         return
     schemaName = sdrNodeMetadata[SchemaDefiningKeys.SCHEMA_NAME]
     if not Tf.IsValidIdentifier(schemaName):
         Tf.RaiseRuntimeError("schemaName (%s) is an invalid identifier; "
-                "Provide a valid USD identifer for schemaName, example (%s) "
-                %(schemaName, Tf.MakeValidIdentifier(schemaName)))
+                             "Provide a valid USD identifer for schemaName, example (%s) "
+                             % (schemaName, Tf.MakeValidIdentifier(schemaName)))
 
     tfTypeNameSuffix = None
     if SchemaDefiningKeys.TF_TYPENAME_SUFFIX in sdrNodeMetadata:
         tfTypeNameSuffix = sdrNodeMetadata[SchemaDefiningKeys.TF_TYPENAME_SUFFIX]
         if not Tf.IsValidIdentifier(tfTypeNameSuffix):
             Tf.RaiseRuntimeError("tfTypeNameSuffix (%s) is an invalid " \
-                    "identifier" %(tfTypeNameSuffix))
+                                 "identifier" % (tfTypeNameSuffix))
 
     if SchemaDefiningKeys.SCHEMA_KIND not in sdrNodeMetadata:
         schemaKind = SchemaDefiningMiscConstants.TYPED_SCHEMA
@@ -324,23 +331,23 @@ def UpdateSchemaWithSdrNode(schemaLayer, sdrNode, renderContext="",
     isAPI = schemaKind == SchemaDefiningMiscConstants.SINGLE_APPLY_SCHEMA
     # Fix schemaName and warn if needed
     if isAPI and \
-        not schemaName.endswith(SchemaDefiningMiscConstants.API_STRING):
+            not schemaName.endswith(SchemaDefiningMiscConstants.API_STRING):
         Tf.Warn("node metadata implies the generated schema being created is "
-        "an API schema, fixing schemaName to reflect that")
+                "an API schema, fixing schemaName to reflect that")
         schemaName = schemaName + SchemaDefiningMiscConstants.API_STRING
 
     if isAPI and tfTypeNameSuffix and \
-        not tfTypeNameSuffix.endswith(SchemaDefiningMiscConstants.API_STRING):
-            Tf.Warn("node metadata implies the generated schema being created "
-            "is an API schema, fixing tfTypeNameSuffix to reflect that")
-            tfTypeNameSuffix = tfTypeNameSuffix + \
-                    SchemaDefiningMiscConstants.API_STRING
+            not tfTypeNameSuffix.endswith(SchemaDefiningMiscConstants.API_STRING):
+        Tf.Warn("node metadata implies the generated schema being created "
+                "is an API schema, fixing tfTypeNameSuffix to reflect that")
+        tfTypeNameSuffix = tfTypeNameSuffix + \
+                           SchemaDefiningMiscConstants.API_STRING
 
     if SchemaDefiningKeys.SCHEMA_BASE not in sdrNodeMetadata:
         Tf.Warn("No schemaBase specified in node metadata, defaulting to "
                 "APISchemaBase for API schemas else Typed")
         schemaBase = SchemaDefiningMiscConstants.API_SCHEMA_BASE if isAPI \
-                else SchemaDefiningMiscConstants.TYPED_SCHEMA
+            else SchemaDefiningMiscConstants.TYPED_SCHEMA
     else:
         schemaBase = sdrNodeMetadata[SchemaDefiningKeys.SCHEMA_BASE]
 
@@ -361,7 +368,7 @@ def UpdateSchemaWithSdrNode(schemaLayer, sdrNode, renderContext="",
             sdrNodeMetadata:
         providesUsdShadeConnectableAPIBehavior = \
             distutils.util.strtobool(sdrNodeMetadata[SchemaDefiningKeys. \
-                PROVIDES_USD_SHADE_CONNECTABLE_API_BEHAVIOR])
+                                     PROVIDES_USD_SHADE_CONNECTABLE_API_BEHAVIOR])
 
     apiSchemasForAttrPruning = None
     if SchemaDefiningKeys.API_SCHEMAS_FOR_ATTR_PRUNING in sdrNodeMetadata:
@@ -395,7 +402,7 @@ def UpdateSchemaWithSdrNode(schemaLayer, sdrNode, renderContext="",
     # - We also report an error if schemaPropertyNSPrefixOverride is provided 
     # and an output property is found on the node being processed.
     schemaBaseProvidesConnectability = UsdShade.ConnectableAPI. \
-            HasConnectableAPI(usdSchemaReg.GetTypeFromName(schemaBase))
+        HasConnectableAPI(usdSchemaReg.GetTypeFromName(schemaBase))
 
     emitSdrOutput = True
     for outputName in sdrNode.GetOutputNames():
@@ -405,24 +412,24 @@ def UpdateSchemaWithSdrNode(schemaLayer, sdrNode, renderContext="",
             break;
 
     if (emitSdrOutput and \
-        len(sdrNode.GetOutputNames()) > 0 and \
-        schemaPropertyNSPrefixOverride is not None and \
-        not _IsNSPrefixConnectableAPICompliant( \
-                schemaPropertyNSPrefixOverride)):
+            len(sdrNode.GetOutputNames()) > 0 and \
+            schemaPropertyNSPrefixOverride is not None and \
+            not _IsNSPrefixConnectableAPICompliant( \
+                    schemaPropertyNSPrefixOverride)):
         Tf.RaiseRuntimeError("Presence of (%s) output parameters contradicts " \
-            "the presence of schemaPropertyNSPrefixOverride (\"%s\"), as it " \
-            "is illegal for non-connectable nodes to contain output " \
-            "parameters, or shader nodes' outputs to not have the \"outputs\"" \
-            "namespace prefix." %(len(sdrNode.GetOutputNames()), \
-            schemaPropertyNSPrefixOverride))
+                             "the presence of schemaPropertyNSPrefixOverride (\"%s\"), as it " \
+                             "is illegal for non-connectable nodes to contain output " \
+                             "parameters, or shader nodes' outputs to not have the \"outputs\"" \
+                             "namespace prefix." % (len(sdrNode.GetOutputNames()), \
+                                                    schemaPropertyNSPrefixOverride))
 
     if (schemaBaseProvidesConnectability and \
             schemaPropertyNSPrefixOverride is not None and \
             not _IsNSPrefixConnectableAPICompliant( \
-                schemaPropertyNSPrefixOverride)):
+                    schemaPropertyNSPrefixOverride)):
         Tf.Warn("Node %s provides UsdShade-Connectability as it derives from " \
                 "%s, schemaPropertyNSPrefixOverride \"%s\" will not be used." \
-                %(schemaName, schemaBase, schemaPropertyNSPrefixOverride))
+                % (schemaName, schemaBase, schemaPropertyNSPrefixOverride))
         # set schemaPropertyNSPrefixOverride to "inputs", assuming default 
         # UsdShade Connectability namespace prefix
         schemaPropertyNSPrefixOverride = "inputs"
@@ -438,13 +445,13 @@ def UpdateSchemaWithSdrNode(schemaLayer, sdrNode, renderContext="",
             del primSpec.nameRoot.nameChildren[primSpec.name]
 
     primSpec = Sdf.PrimSpec(schemaLayer, schemaName, Sdf.SpecifierClass,
-            "" if isAPI else schemaName)
-    
+                            "" if isAPI else schemaName)
+
     primSpec.inheritPathList.explicitItems = ["/" + schemaBase]
 
     primSpecCustomData = {}
     if isAPI:
-        primSpecCustomData["apiSchemaType"] = schemaKind 
+        primSpecCustomData["apiSchemaType"] = schemaKind
     if tfTypeNameSuffix:
         # Defines this classname for TfType system
         # can help avoid duplicate prefix with domain and className
@@ -462,10 +469,10 @@ def UpdateSchemaWithSdrNode(schemaLayer, sdrNode, renderContext="",
     if providesUsdShadeConnectableAPIBehavior:
         extraPlugInfo = {
             SchemaDefiningKeys.PROVIDES_USD_SHADE_CONNECTABLE_API_BEHAVIOR \
-                    : True
+                : True
         }
         for propKey in [SchemaDefiningKeys.IS_USD_SHADE_CONTAINER, \
-                SchemaDefiningKeys.REQUIRES_USD_SHADE_ENCAPSULATION]:
+                        SchemaDefiningKeys.REQUIRES_USD_SHADE_ENCAPSULATION]:
             if propKey in sdrNodeMetadata:
                 # Since we want to assign the types for these to bool and
                 # because in python boolean type is a subset of int, we need to
@@ -486,21 +493,21 @@ def UpdateSchemaWithSdrNode(schemaLayer, sdrNode, renderContext="",
     primDefForAttrPruning = None
     if apiSchemasForAttrPruning:
         primDefForAttrPruning = usdSchemaReg.BuildComposedPrimDefinition(
-                typedSchemaForAttrPruning, apiSchemasForAttrPruning)
+            typedSchemaForAttrPruning, apiSchemasForAttrPruning)
     else:
         primDefForAttrPruning = \
             usdSchemaReg.FindConcretePrimDefinition(typedSchemaForAttrPruning)
 
     # Create attrSpecs from input parameters
     for propName in sdrNode.GetInputNames():
-        _CreateAttrSpecFromNodeAttribute(primSpec, sdrNode.GetInput(propName), 
-                primDefForAttrPruning, schemaPropertyNSPrefixOverride)
+        _CreateAttrSpecFromNodeAttribute(primSpec, sdrNode.GetInput(propName),
+                                         primDefForAttrPruning, schemaPropertyNSPrefixOverride)
 
     # Create attrSpecs from output parameters
     # Note that we always want outputs: namespace prefix for output attributes.
     for propName in sdrNode.GetOutputNames():
-        _CreateAttrSpecFromNodeAttribute(primSpec, sdrNode.GetOutput(propName), 
-                primDefForAttrPruning, UsdShade.Tokens.outputs[:-1], False)
+        _CreateAttrSpecFromNodeAttribute(primSpec, sdrNode.GetOutput(propName),
+                                         primDefForAttrPruning, UsdShade.Tokens.outputs[:-1], False)
 
     # Create token shaderId attrSpec -- only for shader nodes
     if (schemaBaseProvidesConnectability or \
@@ -515,15 +522,15 @@ def UpdateSchemaWithSdrNode(schemaLayer, sdrNode, renderContext="",
                 sdrNode.GetIdentifier())]
         for node in shaderNodesForShaderIdAttrs:
             shaderIdAttrName = Sdf.Path.JoinIdentifier( \
-                    [renderContext, node.GetContext(), 
-                        PropertyDefiningKeys.SHADER_ID])
+                [renderContext, node.GetContext(),
+                 PropertyDefiningKeys.SHADER_ID])
             shaderIdAttrSpec = Sdf.AttributeSpec(primSpec, shaderIdAttrName,
-                    Sdf.ValueTypeNames.Token, Sdf.VariabilityUniform)
+                                                 Sdf.ValueTypeNames.Token, Sdf.VariabilityUniform)
 
             # Since users shouldn't need to be aware of shaderId attribute, we 
             # put this in "Internal" displayGroup.
             shaderIdAttrSpec.displayGroup = \
-                    PropertyDefiningKeys.INTERNAL_DISPLAY_GROUP
+                PropertyDefiningKeys.INTERNAL_DISPLAY_GROUP
 
             # We are iterating on sdrNodes which are guaranteed to be registered
             # with sdrRegistry and it only makes sense to add shaderId for these
@@ -534,11 +541,11 @@ def UpdateSchemaWithSdrNode(schemaLayer, sdrNode, renderContext="",
     schemaBasePrimDefinition = \
         Usd.SchemaRegistry().FindConcretePrimDefinition(schemaBase)
     if schemaBasePrimDefinition and \
-        SchemaDefiningMiscConstants.NodeDefAPI in \
-        schemaBasePrimDefinition.GetAppliedAPISchemas():
-            infoIdAttrSpec = Sdf.AttributeSpec(primSpec, \
-                    UsdShade.Tokens.infoId, Sdf.ValueTypeNames.Token, \
-                    Sdf.VariabilityUniform)
-            infoIdAttrSpec.default = nodeIdentifier
+            SchemaDefiningMiscConstants.NodeDefAPI in \
+            schemaBasePrimDefinition.GetAppliedAPISchemas():
+        infoIdAttrSpec = Sdf.AttributeSpec(primSpec, \
+                                           UsdShade.Tokens.infoId, Sdf.ValueTypeNames.Token, \
+                                           Sdf.VariabilityUniform)
+        infoIdAttrSpec.default = nodeIdentifier
 
     schemaLayer.Save()

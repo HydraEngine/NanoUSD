@@ -1,33 +1,32 @@
-set(PXR_PREFIX pxr/usd)
-set(PXR_PACKAGE usdRender)
+#  Copyright (c) 2023 Feng Yang
+#
+#  I am making my contributions/submissions to this project solely in my
+#  personal capacity and am not conveying any rights to any intellectual
+#  property of any third parties.
 
-pxr_library(usdRender
-    INCLUDE_SCHEMA_FILES
+# create sample app project
+project(usdRender LANGUAGES C CXX)
 
-    LIBRARIES
-        gf
-        tf
-        usd
-        usdGeom
-        usdShade
-
-    PUBLIC_CLASSES
-        spec
-
-    PUBLIC_HEADERS
-        api.h
-
-    PYTHON_CPPFILES
-        moduleDeps.cpp
-
-    PYMODULE_FILES
-        __init__.py
-
-    DOXYGEN_FILES
-        overview.dox
-        images/aperture.svg
-        images/dataWindow.svg
-        images/nonSquarePixels.svg
-        images/pixelAspectRatio.svg
-        doxygen/renderSettings.usda
+set(SRC_FILES
+        pass.cpp
+        product.cpp
+        settings.cpp
+        settingsBase.cpp
+        spec.cpp
+        tokens.cpp
+        var.cpp
 )
+
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+        ${PXR_INCLUDE_PATH}
+)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC
+        fmt::fmt
+        Eigen3::Eigen
+        TBB::tbb
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)

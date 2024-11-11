@@ -1,47 +1,29 @@
-set(PXR_PREFIX pxr/usd)
-set(PXR_PACKAGE usdUI)
+#  Copyright (c) 2023 Feng Yang
+#
+#  I am making my contributions/submissions to this project solely in my
+#  personal capacity and am not conveying any rights to any intellectual
+#  property of any third parties.
 
-pxr_library(usdUI
-    INCLUDE_SCHEMA_FILES
+# create sample app project
+project(usdUI LANGUAGES C CXX)
 
-    LIBRARIES
-        tf
-        vt
-        sdf
-        usd
-
-    PUBLIC_HEADERS
-        api.h
-
-    PYTHON_CPPFILES
-        moduleDeps.cpp
-    
-    PYMODULE_FILES
-        __init__.py
-
-    DOXYGEN_FILES
-        overview.dox
+set(SRC_FILES
+        backdrop.cpp
+        nodeGraphNodeAPI.cpp
+        sceneGraphPrimAPI.cpp
+        tokens.cpp
 )
 
-pxr_test_scripts(
-    testenv/testUsdUINodeGraphNode.py
-    testenv/testUsdUISceneGraphPrim.py
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+        ${PXR_INCLUDE_PATH}
 )
 
-pxr_install_test_dir(
-    SRC testenv/testUsdUINodeGraphNode
-    DEST testUsdUINodeGraphNode
-)
-pxr_install_test_dir(
-    SRC testenv/testUsdUISceneGraphPrim
-    DEST testUsdUISceneGraphPrim
+target_link_libraries(${PROJECT_NAME} PUBLIC
+        fmt::fmt
+        Eigen3::Eigen
+        TBB::tbb
 )
 
-pxr_register_test(testUsdUINodeGraphNode
-    PYTHON
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdUINodeGraphNode"
-)
-pxr_register_test(testUsdUISceneGraphPrim
-    PYTHON
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdUISceneGraphPrim"
-)
+set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)

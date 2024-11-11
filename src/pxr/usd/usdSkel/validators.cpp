@@ -19,44 +19,29 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-static
-UsdValidationErrorVector
-_SkelBindingApiAppliedValidator(const UsdPrim &usdPrim)
-{
+static UsdValidationErrorVector _SkelBindingApiAppliedValidator(const UsdPrim& usdPrim) {
     UsdValidationErrorVector errors;
 
-    if (!usdPrim.HasAPI<UsdSkelBindingAPI>()){
-        static const std::unordered_set<TfToken, TfHash> skelPropertyNames = 
-            []() {
-                UsdSchemaRegistry& usdSchemaRegistry = 
-                    UsdSchemaRegistry::GetInstance();
-                std::unique_ptr<UsdPrimDefinition> primDef = 
-                    usdSchemaRegistry.BuildComposedPrimDefinition(
-                        TfToken(), {UsdSkelTokens->SkelBindingAPI});
-                const std::vector<TfToken> skelPropertyNamesVector = 
-                    primDef->GetPropertyNames();
-                return std::unordered_set<TfToken, TfHash>(
-                    skelPropertyNamesVector.begin(), 
-                    skelPropertyNamesVector.end());
+    if (!usdPrim.HasAPI<UsdSkelBindingAPI>()) {
+        static const std::unordered_set<TfToken, TfHash> skelPropertyNames = []() {
+            UsdSchemaRegistry& usdSchemaRegistry = UsdSchemaRegistry::GetInstance();
+            std::unique_ptr<UsdPrimDefinition> primDef =
+                    usdSchemaRegistry.BuildComposedPrimDefinition(TfToken(), {UsdSkelTokens->SkelBindingAPI});
+            const std::vector<TfToken> skelPropertyNamesVector = primDef->GetPropertyNames();
+            return std::unordered_set<TfToken, TfHash>(skelPropertyNamesVector.begin(), skelPropertyNamesVector.end());
         }();
 
-        const std::vector<TfToken> primPropertyNames = 
-            usdPrim.GetPropertyNames();
-        for (const TfToken &primToken : primPropertyNames){
-            if (skelPropertyNames.find(primToken) == skelPropertyNames.end()){
+        const std::vector<TfToken> primPropertyNames = usdPrim.GetPropertyNames();
+        for (const TfToken& primToken : primPropertyNames) {
+            if (skelPropertyNames.find(primToken) == skelPropertyNames.end()) {
                 continue;
             }
-            errors.emplace_back(
-                    UsdSkelValidationErrorNameTokens->missingSkelBindingAPI,
-                    UsdValidationErrorType::Error,
-                    UsdValidationErrorSites{
-                            UsdValidationErrorSite(usdPrim.GetStage(),
-                                                   usdPrim.GetPath())
-                    },
-                    TfStringPrintf(("Found a UsdSkelBinding property (%s), "
-                                    "but no SkelBindingAPI applied on the prim "
-                                    "<%s>."), primToken.GetText(), 
-                                   usdPrim.GetPath().GetText()));
+            errors.emplace_back(UsdSkelValidationErrorNameTokens->missingSkelBindingAPI, UsdValidationErrorType::Error,
+                                UsdValidationErrorSites{UsdValidationErrorSite(usdPrim.GetStage(), usdPrim.GetPath())},
+                                TfStringPrintf(("Found a UsdSkelBinding property (%s), "
+                                                "but no SkelBindingAPI applied on the prim "
+                                                "<%s>."),
+                                               primToken.GetText(), usdPrim.GetPath().GetText()));
             break;
         }
     }
@@ -64,10 +49,7 @@ _SkelBindingApiAppliedValidator(const UsdPrim &usdPrim)
     return errors;
 }
 
-static
-UsdValidationErrorVector
-_SkelBindingApiValidator(const UsdPrim &usdPrim)
-{
+static UsdValidationErrorVector _SkelBindingApiValidator(const UsdPrim& usdPrim) {
     UsdValidationErrorVector errors;
 
     if (!usdPrim.HasAPIInFamily(UsdSkelTokens->SkelBindingAPI)) {
@@ -79,38 +61,28 @@ _SkelBindingApiValidator(const UsdPrim &usdPrim)
         while (parentPrim && !parentPrim.IsPseudoRoot()) {
             if (parentPrim.GetTypeName() != UsdSkelTokens->SkelRoot) {
                 parentPrim = parentPrim.GetParent();
-            }
-            else {
+            } else {
                 return errors;
             }
         }
-        errors.emplace_back(
-                UsdSkelValidationErrorNameTokens->invalidSkelBindingAPIApply,
-                UsdValidationErrorType::Error,
-                UsdValidationErrorSites{
-                        UsdValidationErrorSite(usdPrim.GetStage(),
-                                               usdPrim.GetPath())
-                },
-                TfStringPrintf(("UsdSkelBindingAPI applied on prim: <%s>, "
-                                "which is not of type SkelRoot or is not "
-                                "rooted at a prim of type SkelRoot, as "
-                                "required by the UsdSkel schema."), 
-                                usdPrim.GetPath().GetText()));
+        errors.emplace_back(UsdSkelValidationErrorNameTokens->invalidSkelBindingAPIApply, UsdValidationErrorType::Error,
+                            UsdValidationErrorSites{UsdValidationErrorSite(usdPrim.GetStage(), usdPrim.GetPath())},
+                            TfStringPrintf(("UsdSkelBindingAPI applied on prim: <%s>, "
+                                            "which is not of type SkelRoot or is not "
+                                            "rooted at a prim of type SkelRoot, as "
+                                            "required by the UsdSkel schema."),
+                                           usdPrim.GetPath().GetText()));
     }
     return errors;
 }
 
-TF_REGISTRY_FUNCTION(UsdValidationRegistry)
-{
-    UsdValidationRegistry &registry = UsdValidationRegistry::GetInstance();
+TF_REGISTRY_FUNCTION(UsdValidationRegistry) {
+    UsdValidationRegistry& registry = UsdValidationRegistry::GetInstance();
 
-    registry.RegisterPluginValidator(
-            UsdSkelValidatorNameTokens->skelBindingApiAppliedValidator,
-            _SkelBindingApiAppliedValidator);
+    registry.RegisterPluginValidator(UsdSkelValidatorNameTokens->skelBindingApiAppliedValidator,
+                                     _SkelBindingApiAppliedValidator);
 
-    registry.RegisterPluginValidator(
-            UsdSkelValidatorNameTokens->skelBindingApiValidator,
-            _SkelBindingApiValidator);
+    registry.RegisterPluginValidator(UsdSkelValidatorNameTokens->skelBindingApiValidator, _SkelBindingApiValidator);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -1,4 +1,5 @@
 # UsdSemantics : Semantic Labeling for Model Hierarchy {#usd_semantics_overview}
+
 \if ( PIXAR_MFB_BUILD )
 \mainpage UsdSemantics : Semantic Labeling for Model Hierarchy
 \endif
@@ -14,11 +15,13 @@ def Xform "OfficeBookshelf" (apiSchemas = ["SemanticsLabelsAPI:category"])
 ```
 
 ## Inheritance and Comparison to Primvars
+
 Semantic labels have hierarchical inheritance semantics similar
 to primvars. However, instead of descendants strictly overriding
 parents, labels may be accumulated.
 
 Consider the following snippet of scene description.
+
 ```
 def Xform "OfficeBookshelf" (apiSchemas = ["SemanticsLabelsAPI:category"])
 {
@@ -33,7 +36,9 @@ def Xform "OfficeBookshelf" (apiSchemas = ["SemanticsLabelsAPI:category"])
     }
 }
 ```
+
 The labels create two tiers of semantics: direct and inherited labels.
+
 * Direct labels
     * `/OfficeBookshelf` has direct labels `bookcase` and `furniture`
     * `/OfficeBookshelf/TopShelf` has a single direct label `shelf`
@@ -45,11 +50,12 @@ The labels create two tiers of semantics: direct and inherited labels.
       `bookcase`, and `shelf` labels
 
 ## Taxonomy and Comparison to Model Hierarchy
+
 Model hierarchy is a strict hierarchical taxonomy that
-tries to aid discovery of "important" prims in the scene graph. 
+tries to aid discovery of "important" prims in the scene graph.
 Only a single `kind` value may be specified at each prim.
 
-In contrast, multiple instances of semantic labels may be applied, 
+In contrast, multiple instances of semantic labels may be applied,
 as well as multiple values per instance.
 
 ```
@@ -72,12 +78,14 @@ hierarchy. Hierarchy required for downstream consumers may be
 embedded in the token list.
 
 For example, a prim may be labeled for a particular instance with
-`["sedan", "car", "vehicle", "machine"]` capturing the different 
-levels of hierarchy in the array values. All labels are weighted 
+`["sedan", "car", "vehicle", "machine"]` capturing the different
+levels of hierarchy in the array values. All labels are weighted
 equally. There is no implied hierarchy in the order of the labels.
 
 ## Time Varying Considerations
+
 Labels may be used to describe actions or states and may vary over time.
+
 ```
 def Xform "Dog" (
     apiSchemas = ["SemanticsLabelsAPI:state"]
@@ -91,37 +99,44 @@ def Xform "Dog" (
     }
 }
 ```
-Labels may be queried at explicit time samples or over an interval 
+
+Labels may be queried at explicit time samples or over an interval
 (like a shutter window). Queries over a range `[Start, Stop]` will merge
 any time samples explicitly authored in the range with the resolved value
 for `Start`. In the above example, over the interval `[50, 150]`, the `/Dog`'s
 computed set of states are `["walking", "running"]`.
 
 ### Intervals and State Transitions
-If a state transition occurs during an interval, the compute state of an object 
-during that interval may have conflicting labels (say a switch being both `on` 
+
+If a state transition occurs during an interval, the compute state of an object
+during that interval may have conflicting labels (say a switch being both `on`
 and `off`). Downstream consumers should be aware of this and be able to either
 negotiate multiple states over an interval or only query at explicit time
 samples.
 
 ## Filtering and Selection by Label
+
 For workflows involving selection or filtering by label, queries
 can be combined. For example, "select all wheel prims that are part
 of a car prim" could be modeled by filtering the scene graph by prims
 with direct label `wheel` and whose parent has an inherited label `car`.
 
 ## Relationship to Other Domains
+
 ### UsdGeom
+
 The most common application of semantic labels will be to `Gprim`s and their
 ancestral `Scope`s and `Xform`s.
 
 #### Subsets
+
 Consumers of labels should consider `GeomSubset`s as valid targets of semantic
 labels as well. For example `/Human/Face` `Mesh` prim may have a
 `/Human/Face/LeftEar` and `/Human/Face/RightEar` `GeomSubset`s with `["ear"]`
 labels applied.
 
 ### UsdShade
+
 `Material`s may be semantically labeled as well. For example, a `RustyMetal`
 Material could be semantically labeled with both `metal` and `corroded` labels.
 As `usdSemantics` is a domain separate from `UsdGeom` and `UsdShade`, there are
@@ -141,6 +156,7 @@ Additionally, scene index filters may remove bindings or edit materials.
 Materials should not be used for general labeling of geometry.
 
 #### Nested Materials
+
 `Material`s are often nested underneath asset interface prims.
 
 ```
@@ -158,17 +174,20 @@ def Xform "Car" (
     }
 }
 ```
+
 In the above example, it's worth noting that the `/Car/Materials/Metal` prim
 has inherited labels `car` and `vehicle`, as hierarchical labels apply to the
 entire hierarchy.
 
 #### Shaders and Node Graphs
+
 While shaders and node graphs may be semantically labeled for general tagging
-purposes, there's no specification for if or how labels should feed into render 
+purposes, there's no specification for if or how labels should feed into render
 products, as shader nodes and node graphs (unlike `UsdGeomSubset`) generally
 don't yield discrete segmentations.
 
 ### UsdRender (To be proposed and implemented)
+
 A common application of semantics is for downstream labeling and segmentation
 of renderer output. Semantics may make their way into outputs as
 either additional metadata or as matte channels.

@@ -9,8 +9,7 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-TF_WRAP_MODULE
-{
+TF_WRAP_MODULE {
     TF_WRAP(UsdShadeTypes);
     TF_WRAP(UsdShadeUtils);
     TF_WRAP(UsdShadeUdimUtils);
@@ -19,6 +18,6 @@ TF_WRAP_MODULE
     TF_WRAP(UsdShadeShaderDefParser);
     TF_WRAP(UsdShadeShaderDefUtils);
 
-    // Generated Schema classes.  Do not remove or edit the following line.
-    #include "generatedSchema.module.h"
+// Generated Schema classes.  Do not remove or edit the following line.
+#include "generatedSchema.module.h"
 }

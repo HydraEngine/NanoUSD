@@ -15,7 +15,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 /// \class UsdSkelInbetweenShape
 ///
 /// Schema wrapper for UsdAttribute for authoring and introspecting attributes
@@ -30,8 +29,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// shape, while for weight values less than or equal to 0.5, the shape is
 /// resolved by linearly interpolating between the inbetween shape and the
 /// primary shape.
-class UsdSkelInbetweenShape
-{
+class UsdSkelInbetweenShape {
 public:
     /// Default constructor returns an invalid inbetween shape.
     UsdSkelInbetweenShape() {}
@@ -77,14 +75,13 @@ public:
     /// Returns the existing normal offsets attribute if the shape has
     /// normal offsets, or creates a new one.
     USDSKEL_API
-    UsdAttribute
-    CreateNormalOffsetsAttr(const VtValue &defaultValue = VtValue()) const;
+    UsdAttribute CreateNormalOffsetsAttr(const VtValue& defaultValue = VtValue()) const;
 
     /// Get the normal offsets authored for this shape.
     /// Normal offsets are optional, and may be left unspecified.
     USDSKEL_API
     bool GetNormalOffsets(VtVec3fArray* offsets) const;
-    
+
     /// Set the normal offsets authored for this shape.
     USDSKEL_API
     bool SetNormalOffsets(const VtVec3fArray& offsets) const;
@@ -105,10 +102,10 @@ public:
     /// Allow UsdSkelInbetweenShape to auto-convert to UsdAttribute,
     /// so you can pass a UsdSkelInbetweenShape to any function that
     /// accepts a UsdAttribute or const-ref thereto.
-    operator UsdAttribute const& () const { return _attr; }
+    operator UsdAttribute const&() const { return _attr; }
 
     /// Explicit UsdAttribute extractor.
-    UsdAttribute const &GetAttr() const { return _attr; }
+    UsdAttribute const& GetAttr() const { return _attr; }
 
     /// Return true if the wrapped UsdAttribute::IsDefined(), and in
     /// addition the attribute is identified as an Inbetween.
@@ -118,17 +115,11 @@ public:
     /// Return true if this Inbetween is valid for querying and
     /// authoring values and metadata, which is identically equivalent
     /// to IsDefined().
-    explicit operator bool() const {
-       return IsDefined() ? (bool)_attr : 0;
-    }
+    explicit operator bool() const { return IsDefined() ? (bool)_attr : 0; }
 
-    bool operator==(const UsdSkelInbetweenShape& o) const {
-        return _attr == o._attr;
-    }
-    
-    bool operator!=(const UsdSkelInbetweenShape& o) const {
-        return !(*this == o);
-    }
+    bool operator==(const UsdSkelInbetweenShape& o) const { return _attr == o._attr; }
+
+    bool operator!=(const UsdSkelInbetweenShape& o) const { return !(*this == o); }
 
     /// @}
 
@@ -137,8 +128,7 @@ private:
 
     /// Validate that the given \p name is a valid attribute name for
     /// an inbetween.
-    static bool _IsValidInbetweenName(const std::string& name,
-                                      bool quiet=false);
+    static bool _IsValidInbetweenName(const std::string& name, bool quiet = false);
 
     /// Validate that the given \p name contains the inbetweens namespace.
     /// Does not validate \p name as a legal property identifier.
@@ -151,7 +141,7 @@ private:
     /// verify that \p name contains no reserved keywords, and will return
     /// an empty TfToken if it does. If \p quiet is true, the verification
     /// will be silent.
-    static TfToken _MakeNamespaced(const TfToken& name, bool quiet=false);
+    static TfToken _MakeNamespaced(const TfToken& name, bool quiet = false);
 
     static const TfToken& _GetNamespacePrefix();
 
@@ -172,13 +162,11 @@ private:
     /// to create over an existing, compatible attribute.
     ///
     /// \sa UsdPrim::CreateAttribute()
-    static UsdSkelInbetweenShape _Create(const UsdPrim& prim,
-                                         const TfToken& name);
+    static UsdSkelInbetweenShape _Create(const UsdPrim& prim, const TfToken& name);
 
     UsdAttribute _attr;
 };
 
-
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_SKEL_INBETWEEN_SHAPE_H
+#endif  // PXR_USD_USD_SKEL_INBETWEEN_SHAPE_H

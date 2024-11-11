@@ -22,7 +22,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class UsdUtils_DirectoryRemapper {
 public:
-    UsdUtils_DirectoryRemapper() : _nextDirectoryNum(0) { }
+    UsdUtils_DirectoryRemapper() : _nextDirectoryNum(0) {}
 
     // Remap the given file path by replacing the directory with a
     // unique, artifically generated name. The generated directory name
@@ -35,103 +35,72 @@ private:
     std::unordered_map<std::string, std::string> _oldToNewDirectory;
 };
 
-class UsdUtils_AssetLocalizationPackage
-{
+class UsdUtils_AssetLocalizationPackage {
 public:
     UsdUtils_AssetLocalizationPackage()
-    : _delegate(std::bind(
-            &UsdUtils_AssetLocalizationPackage::_ProcessDependency, this, 
-            std::placeholders::_1, std::placeholders::_2, 
-            std::placeholders::_3))
-    {}
+        : _delegate(std::bind(&UsdUtils_AssetLocalizationPackage::_ProcessDependency,
+                              this,
+                              std::placeholders::_1,
+                              std::placeholders::_2,
+                              std::placeholders::_3)) {}
 
     // Sets the original file path for this asset.
     // The path specified should be resolved by AR.
-    inline void SetOriginalRootFilePath(const std::string &origRootFilePath)
-    {
-        _origRootFilePath = origRootFilePath;
-    }
+    inline void SetOriginalRootFilePath(const std::string& origRootFilePath) { _origRootFilePath = origRootFilePath; }
 
     // Sets a list of dependencies to skip during packaging.
     // The paths contained in this array should be resolved by AR.
-    inline void SetDependenciesToSkip(
-        const std::vector<std::string> &dependenciesToSkip) 
-    {
+    inline void SetDependenciesToSkip(const std::vector<std::string>& dependenciesToSkip) {
         _dependenciesToSkip = dependenciesToSkip;
     }
 
     // Controls whether layers are edited in place
     // Refer to UsdUtils_WritableLocalizationDelegate::SetEditLayersInPlace
-    inline void SetEditLayersInPlace(bool editLayersInPlace) {
-        _delegate.SetEditLayersInPlace(editLayersInPlace);
-    }
+    inline void SetEditLayersInPlace(bool editLayersInPlace) { _delegate.SetEditLayersInPlace(editLayersInPlace); }
 
     // Sets the optional user processing function that will be invoked before
     // any directory remapping will take place
-    inline void SetUserProcessingFunc(
-        std::function<UsdUtilsProcessingFunc> processingFunc)
-    {
+    inline void SetUserProcessingFunc(std::function<UsdUtilsProcessingFunc> processingFunc) {
         _userProcessingFunc = processingFunc;
     }
 
-    virtual bool Build(
-        const SdfAssetPath& assetPath, 
-        const std::string &firstLayerName);
+    virtual bool Build(const SdfAssetPath& assetPath, const std::string& firstLayerName);
 
-    virtual bool Write(const std::string &packagePath);
+    virtual bool Write(const std::string& packagePath);
 
-    // Remap the path to an artifically-constructed one so that the source 
+    // Remap the path to an artifically-constructed one so that the source
     // directory structure isn't embedded in the final package.
     // Otherwise, sensitive information (e.g. usernames, movie titles...) in
     // directory names may be inadvertently leaked in the package.
-    inline std::string RemapPath(const std::string &path) {
-        return _directoryRemapper.Remap(path);
-    }
+    inline std::string RemapPath(const std::string& path) { return _directoryRemapper.Remap(path); }
 
 protected:
-    virtual 
-    std::string  _RemapAssetPath(
-        const SdfLayerRefPtr &layer, 
-        const std::string &assetPath,
-        bool isRelativePath);
-    
-    virtual
-    bool _WriteToPackage(
-        const std::string& source,
-        const std::string& dest) = 0;
+    virtual std::string _RemapAssetPath(const SdfLayerRefPtr& layer, const std::string& assetPath, bool isRelativePath);
+
+    virtual bool _WriteToPackage(const std::string& source, const std::string& dest) = 0;
 
 private:
-    std::string _ProcessAssetPath(
-        const SdfLayerRefPtr &layer, 
-        const std::string &refPath, 
-        bool *isRelativePathOut);
+    std::string _ProcessAssetPath(const SdfLayerRefPtr& layer, const std::string& refPath, bool* isRelativePathOut);
 
-    bool _AddLayerToPackage(
-        SdfLayerRefPtr sourceLayer, 
-        const std::string &destPath);
+    bool _AddLayerToPackage(SdfLayerRefPtr sourceLayer, const std::string& destPath);
 
-    bool _AddAssetToPackage(
-        const std::string &srcPath,
-        const std::string &destPath);
+    bool _AddAssetToPackage(const std::string& srcPath, const std::string& destPath);
 
-    UsdUtilsDependencyInfo _ProcessDependency( 
-        const SdfLayerRefPtr &layer, 
-        const UsdUtilsDependencyInfo &dependencyInfo,
-        UsdUtils_DependencyType dependencyType);
+    UsdUtilsDependencyInfo _ProcessDependency(const SdfLayerRefPtr& layer,
+                                              const UsdUtilsDependencyInfo& dependencyInfo,
+                                              UsdUtils_DependencyType dependencyType);
 
-    UsdUtilsDependencyInfo _AddDependenciesToPackage( 
-        const SdfLayerRefPtr &layer, 
-        const UsdUtilsDependencyInfo &depInfo);
+    UsdUtilsDependencyInfo _AddDependenciesToPackage(const SdfLayerRefPtr& layer,
+                                                     const UsdUtilsDependencyInfo& depInfo);
 
-    void _AddDependencyToPackage(
-        const SdfLayerRefPtr &layer, 
-        const std::string &dependency,
-        const std::string &destDirectory);
+    void _AddDependencyToPackage(const SdfLayerRefPtr& layer,
+                                 const std::string& dependency,
+                                 const std::string& destDirectory);
 
     SdfLayerRefPtr _rootLayer;
 
     std::function<UsdUtilsProcessingFunc> _userProcessingFunc;
-    
+
     // The resolved path of the root usd layer
     std::string _rootFilePath;
 
@@ -161,7 +130,6 @@ private:
     UsdUtils_DirectoryRemapper _directoryRemapper;
 };
 
-
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_USD_UTILS_ASSET_LOCALIZATION_PACKAGE
+#endif  // PXR_USD_USD_UTILS_ASSET_LOCALIZATION_PACKAGE
