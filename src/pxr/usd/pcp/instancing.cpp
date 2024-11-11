@@ -13,22 +13,20 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_ENV_SETTING(
-    PCP_OVERRIDE_INSTANCEABLE, -1,
-    "Overrides Pcp's default computation for whether a PrimIndex is "
-    "instanceable:\n"
-    " -1: (the default) computes instanceable only in USD mode\n"
-    "  0: NEVER computes instanceable (always returns false)\n"
-    "  1: always compute instanceable, whether in USD mode or not.");
+TF_DEFINE_ENV_SETTING(PCP_OVERRIDE_INSTANCEABLE,
+                      -1,
+                      "Overrides Pcp's default computation for whether a PrimIndex is "
+                      "instanceable:\n"
+                      " -1: (the default) computes instanceable only in USD mode\n"
+                      "  0: NEVER computes instanceable (always returns false)\n"
+                      "  1: always compute instanceable, whether in USD mode or not.");
 
 // Visitor to determine if a prim index has instanceable data.
 // This essentially checks if a prim index had a direct composition arc
 // (e.g. a reference or class) that could be shared with other prims.
-struct Pcp_FindInstanceableDataVisitor
-{
-    Pcp_FindInstanceableDataVisitor() : hasInstanceableData(false) { }
-    bool Visit(PcpNodeRef node, bool nodeIsInstanceable)
-    {
+struct Pcp_FindInstanceableDataVisitor {
+    Pcp_FindInstanceableDataVisitor() : hasInstanceableData(false) {}
+    bool Visit(PcpNodeRef node, bool nodeIsInstanceable) {
         if (nodeIsInstanceable) {
             hasInstanceableData = true;
         }
@@ -42,26 +40,22 @@ struct Pcp_FindInstanceableDataVisitor
     bool hasInstanceableData;
 };
 
-bool
-Pcp_PrimIndexIsInstanceable(
-    const PcpPrimIndex& primIndex)
-{
+bool Pcp_PrimIndexIsInstanceable(const PcpPrimIndex& primIndex) {
     TRACE_FUNCTION();
 
     // For now, instancing functionality is limited to USD mode,
     // unless the special env var is set for testing.
     static const int instancing(TfGetEnvSetting(PCP_OVERRIDE_INSTANCEABLE));
 
-    if ((instancing == 0) ||
-        ((!primIndex.IsUsd() && (instancing == -1)))) {
+    if ((instancing == 0) || ((!primIndex.IsUsd() && (instancing == -1)))) {
         return false;
     }
 
     // Check if this prim index introduced any instanceable data.
-    // This is a cheap way of determining whether this prim index 
+    // This is a cheap way of determining whether this prim index
     // *could* be instanced without reading any scene description.
     //
-    // Note that this means that a prim that is tagged with 
+    // Note that this means that a prim that is tagged with
     // 'instanceable = true' will not be considered an instance if it does
     // not introduce instanceable data.
     Pcp_FindInstanceableDataVisitor visitor;
@@ -84,7 +78,7 @@ Pcp_PrimIndexIsInstanceable(
         nodesToVisit.pop_back();
         if (node.CanContributeSpecs()) {
             const PcpLayerStackSite& site = node.GetSite();
-            for (SdfLayerRefPtr const& layer: site.layerStack->GetLayers()) {
+            for (SdfLayerRefPtr const& layer : site.layerStack->GetLayers()) {
                 if (layer->HasField(site.path, instanceField, &isInstance)) {
                     opinionFound = true;
                     break;

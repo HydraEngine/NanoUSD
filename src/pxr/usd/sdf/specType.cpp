@@ -28,25 +28,21 @@
 #include <utility>
 #include <vector>
 
-using std::pair;
 using std::make_pair;
+using std::pair;
 using std::vector;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-static constexpr size_t
-_GetBitmaskForSpecType(SdfSpecType specType)
-{
+static constexpr size_t _GetBitmaskForSpecType(SdfSpecType specType) {
     return (size_t(1) << specType);
 }
 
-struct Sdf_SpecTypeInfo
-{
+struct Sdf_SpecTypeInfo {
     // GetInstance() waits until initial registration has completed to support
     // query operations.  Call GetInstanceForRegistration() to do registrations.
     static Sdf_SpecTypeInfo& GetInstance() {
-        Sdf_SpecTypeInfo &instance =
-            TfSingleton<Sdf_SpecTypeInfo>::GetInstance();
+        Sdf_SpecTypeInfo& instance = TfSingleton<Sdf_SpecTypeInfo>::GetInstance();
         while (!instance.initialRegistrationCompleted) {
             std::this_thread::yield();
         }
@@ -55,21 +51,19 @@ struct Sdf_SpecTypeInfo
 
     // Return the instance directly, without waiting for initial registrations.
     // Use this form for doing registrations, and GetInstance() for queries.
-    static Sdf_SpecTypeInfo& GetInstanceForRegistration() { 
-        return TfSingleton<Sdf_SpecTypeInfo>::GetInstance(); 
-    }
+    static Sdf_SpecTypeInfo& GetInstanceForRegistration() { return TfSingleton<Sdf_SpecTypeInfo>::GetInstance(); }
 
     // Mapping from C++ spec type to bitmask indicating the possible source
     // spec types. This table lets us answer the question, "If I have an
     // spec whose SdfSpecType is X, can I create the C++ spec type Y from
-    // that?" For example, a possible entry in this table could be 
+    // that?" For example, a possible entry in this table could be
     // (SdfPrimSpec, SdfSpecTypePrim), indicating that consumers can create
     // an SdfPrimSpec from any spec whose spec type is SdfSpecTypePrim.
     typedef TfHashMap<TfType, size_t, TfHash> SpecTypeToBitmask;
     SpecTypeToBitmask specTypeToBitmask;
-    
+
     // Mapping from schema class to mapping from SdfSpecType to spec class.
-    // In other words, for a given schema and spec type, what is the 
+    // In other words, for a given schema and spec type, what is the
     // corresponding C++ spec class?
     typedef std::vector<TfType> SpecTypeToTfType;
     typedef TfHashMap<TfType, SpecTypeToTfType, TfHash> SchemaTypeToSpecTypes;
@@ -87,12 +81,9 @@ struct Sdf_SpecTypeInfo
 private:
     friend class TfSingleton<Sdf_SpecTypeInfo>;
 
-    Sdf_SpecTypeInfo()
-        : specTypeToBitmask(0)
-        , initialRegistrationCompleted(false)
-    { 
+    Sdf_SpecTypeInfo() : specTypeToBitmask(0), initialRegistrationCompleted(false) {
         TfSingleton<Sdf_SpecTypeInfo>::SetInstanceConstructed(*this);
-        
+
         TfRegistryManager::GetInstance().SubscribeTo<SdfSpecTypeRegistration>();
         // Basic registration is complete.  Note, however that this does not
         // account for registrations from downstream libraries like Sd.  See bug
@@ -104,38 +95,32 @@ private:
 TF_INSTANTIATE_SINGLETON(Sdf_SpecTypeInfo);
 
 // In abstract registrations, specEnumType is SdfSpecTypeUnknown.
-void
-SdfSpecTypeRegistration::_RegisterSpecType(
-    const std::type_info& specCPPType,
-    SdfSpecType specEnumType,
-    const std::type_info& schemaType)
-{
+void SdfSpecTypeRegistration::_RegisterSpecType(const std::type_info& specCPPType,
+                                                SdfSpecType specEnumType,
+                                                const std::type_info& schemaType) {
     const bool isConcrete = specEnumType != SdfSpecTypeUnknown;
-    Sdf_SpecTypeInfo& specTypeInfo =
-        Sdf_SpecTypeInfo::GetInstanceForRegistration();
-    
+    Sdf_SpecTypeInfo& specTypeInfo = Sdf_SpecTypeInfo::GetInstanceForRegistration();
+
     const TfType& schemaTfType = TfType::Find(schemaType);
     if (schemaTfType.IsUnknown()) {
-        TF_CODING_ERROR(
-            "Schema type %s must be registered with the TfType system.",
-            ArchGetDemangled(schemaType).c_str());
+        TF_CODING_ERROR("Schema type %s must be registered with the TfType system.",
+                        ArchGetDemangled(schemaType).c_str());
         return;
     }
 
     const TfType& specTfType = TfType::Find(specCPPType);
     if (specTfType.IsUnknown()) {
-        TF_CODING_ERROR(
-            "Spec type %s must be registered with the TfType system.",
-            ArchGetDemangled(specCPPType).c_str());
+        TF_CODING_ERROR("Spec type %s must be registered with the TfType system.",
+                        ArchGetDemangled(specCPPType).c_str());
         return;
     }
 
     TfBigRWMutex::ScopedLock lock(specTypeInfo.mutex);
-    
+
     Sdf_SpecTypeInfo::SpecTypeToBitmask::iterator specEntry =
-        specTypeInfo.specTypeToBitmask.insert({specTfType, 0}).first;
-    
-    size_t &specAllowedBitmask = specEntry->second;
+            specTypeInfo.specTypeToBitmask.insert({specTfType, 0}).first;
+
+    size_t& specAllowedBitmask = specEntry->second;
 
     // Check every entry currently in the specTypeToBitmask (including the
     // one that was just added above) and indicate whether each spec type
@@ -154,44 +139,32 @@ SdfSpecTypeRegistration::_RegisterSpecType(
     }
 
     if (isConcrete) {
-        Sdf_SpecTypeInfo::SpecTypeToTfType& specTypeToTfType = 
-            specTypeInfo.schemaTypeToSpecTypes[schemaTfType];
+        Sdf_SpecTypeInfo::SpecTypeToTfType& specTypeToTfType = specTypeInfo.schemaTypeToSpecTypes[schemaTfType];
         if (specTypeToTfType.empty()) {
             specTypeToTfType.resize(SdfNumSpecTypes);
         }
         specTypeToTfType[specEnumType] = specTfType;
     }
 
-    Sdf_SpecTypeInfo::SchemaTypes& schemaTypesForSpecType = 
-        specTypeInfo.specTypeToSchemaTypes[specTfType];
-    if (std::find(schemaTypesForSpecType.begin(),
-                  schemaTypesForSpecType.end(), schemaTfType) 
-            == schemaTypesForSpecType.end()) {
+    Sdf_SpecTypeInfo::SchemaTypes& schemaTypesForSpecType = specTypeInfo.specTypeToSchemaTypes[specTfType];
+    if (std::find(schemaTypesForSpecType.begin(), schemaTypesForSpecType.end(), schemaTfType) ==
+        schemaTypesForSpecType.end()) {
         schemaTypesForSpecType.push_back(schemaTfType);
+    } else {
+        TF_CODING_ERROR("Spec type %s already registered for schema type %s", specTfType.GetTypeName().c_str(),
+                        schemaTfType.GetTypeName().c_str());
     }
-    else {
-        TF_CODING_ERROR(
-            "Spec type %s already registered for schema type %s",
-            specTfType.GetTypeName().c_str(), 
-            schemaTfType.GetTypeName().c_str());
-    }        
 }
 
-static bool
-_CanCast(const Sdf_SpecTypeInfo &specTypeInfo,
-         SdfSpecType fromType, const TfType& toType)
-{
+static bool _CanCast(const Sdf_SpecTypeInfo& specTypeInfo, SdfSpecType fromType, const TfType& toType) {
     if (toType.IsUnknown()) {
         return TfType();
     }
-    const size_t allowedBitmask = 
-        TfMapLookupByValue(specTypeInfo.specTypeToBitmask, toType, size_t(0));
+    const size_t allowedBitmask = TfMapLookupByValue(specTypeInfo.specTypeToBitmask, toType, size_t(0));
     return allowedBitmask & _GetBitmaskForSpecType(fromType);
 }
 
-TfType
-Sdf_SpecType::Cast(const SdfSpec& from, const std::type_info& to)
-{
+TfType Sdf_SpecType::Cast(const SdfSpec& from, const std::type_info& to) {
     const Sdf_SpecTypeInfo& specTypeInfo = Sdf_SpecTypeInfo::GetInstance();
 
     const TfType& schemaType = TfType::Find(typeid(from.GetSchema()));
@@ -208,11 +181,11 @@ Sdf_SpecType::Cast(const SdfSpec& from, const std::type_info& to)
         return TfType();
     }
 
-    const Sdf_SpecTypeInfo::SpecTypeToTfType &specTypeToTfType = 
-        *TfMapLookupPtr(specTypeInfo.schemaTypeToSpecTypes, schemaType);
+    const Sdf_SpecTypeInfo::SpecTypeToTfType& specTypeToTfType =
+            *TfMapLookupPtr(specTypeInfo.schemaTypeToSpecTypes, schemaType);
 
     // Allow casting to go through if we're trying to cast from a
-    // variant spec to a prim spec. 
+    // variant spec to a prim spec.
     //
     // XXX: This is required to allow variant specs to be treated as prim
     //      specs. However, if we're going to do that, shouldn't we just make
@@ -227,18 +200,14 @@ Sdf_SpecType::Cast(const SdfSpec& from, const std::type_info& to)
     return specTypeToTfType[fromType];
 }
 
-bool 
-Sdf_SpecType::CanCast(SdfSpecType fromType, const std::type_info& to)
-{
-    const Sdf_SpecTypeInfo &specTypeInfo = Sdf_SpecTypeInfo::GetInstance();
+bool Sdf_SpecType::CanCast(SdfSpecType fromType, const std::type_info& to) {
+    const Sdf_SpecTypeInfo& specTypeInfo = Sdf_SpecTypeInfo::GetInstance();
     TfType toType = TfType::Find(to);
     TfBigRWMutex::ScopedLock lock(specTypeInfo.mutex, /*write=*/false);
     return _CanCast(specTypeInfo, fromType, toType);
 }
 
-bool 
-Sdf_SpecType::CanCast(const SdfSpec& from, const std::type_info& to)
-{
+bool Sdf_SpecType::CanCast(const SdfSpec& from, const std::type_info& to) {
     const Sdf_SpecTypeInfo& specTypeInfo = Sdf_SpecTypeInfo::GetInstance();
 
     const SdfSpecType fromType = from.GetSpecType();
@@ -252,8 +221,7 @@ Sdf_SpecType::CanCast(const SdfSpec& from, const std::type_info& to)
         return false;
     }
 
-    const Sdf_SpecTypeInfo::SchemaTypes* toSchemaTypes = 
-        TfMapLookupPtr(specTypeInfo.specTypeToSchemaTypes, toType);
+    const Sdf_SpecTypeInfo::SchemaTypes* toSchemaTypes = TfMapLookupPtr(specTypeInfo.specTypeToSchemaTypes, toType);
     if (!toSchemaTypes) {
         return false;
     }

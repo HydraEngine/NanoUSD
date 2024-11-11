@@ -39,11 +39,10 @@ class SdfSpec;
 class Sdf_ChangeManager {
     Sdf_ChangeManager(const Sdf_ChangeManager&) = delete;
     Sdf_ChangeManager& operator=(const Sdf_ChangeManager&) = delete;
+
 public:
     SDF_API
-    static Sdf_ChangeManager& Get() {
-        return TfSingleton<Sdf_ChangeManager>::GetInstance();
-    }
+    static Sdf_ChangeManager& Get() { return TfSingleton<Sdf_ChangeManager>::GetInstance(); }
 
     /// Returns the current set of thread local changes that have been
     /// collected by the change manager for \p layer. After this
@@ -53,36 +52,33 @@ public:
     /// block goes out of scope. If there are no changes for \p layer the
     /// returned changelist will be empty.
     SDF_API
-    SdfChangeList ExtractLocalChanges(const SdfLayerHandle &layer);
+    SdfChangeList ExtractLocalChanges(const SdfLayerHandle& layer);
 
     // Queue notifications.
-    void DidReplaceLayerContent(const SdfLayerHandle &layer);
-    void DidReloadLayerContent(const SdfLayerHandle &layer);
-    void DidChangeLayerIdentifier(const SdfLayerHandle &layer,
-                                  const std::string &oldIdentifier);
-    void DidChangeLayerResolvedPath(const SdfLayerHandle &layer);
-    void DidChangeField(const SdfLayerHandle &layer,
-                        const SdfPath & path, const TfToken &field,
-                        VtValue && oldValue, const VtValue & newValue );
-    void DidChangeAttributeTimeSamples(const SdfLayerHandle &layer,
-                                       const SdfPath &attrPath);
+    void DidReplaceLayerContent(const SdfLayerHandle& layer);
+    void DidReloadLayerContent(const SdfLayerHandle& layer);
+    void DidChangeLayerIdentifier(const SdfLayerHandle& layer, const std::string& oldIdentifier);
+    void DidChangeLayerResolvedPath(const SdfLayerHandle& layer);
+    void DidChangeField(const SdfLayerHandle& layer,
+                        const SdfPath& path,
+                        const TfToken& field,
+                        VtValue&& oldValue,
+                        const VtValue& newValue);
+    void DidChangeAttributeTimeSamples(const SdfLayerHandle& layer, const SdfPath& attrPath);
 
     // Spec changes.
-    void DidMoveSpec(const SdfLayerHandle &layer,
-                     const SdfPath & oldPath, const SdfPath & newPath);
-    void DidAddSpec(const SdfLayerHandle &layer, const SdfPath &path, 
-                    bool inert);
-    void DidRemoveSpec(const SdfLayerHandle &layer, const SdfPath &path,
-                       bool inert);
+    void DidMoveSpec(const SdfLayerHandle& layer, const SdfPath& oldPath, const SdfPath& newPath);
+    void DidAddSpec(const SdfLayerHandle& layer, const SdfPath& path, bool inert);
+    void DidRemoveSpec(const SdfLayerHandle& layer, const SdfPath& path, bool inert);
     void RemoveSpecIfInert(const SdfSpec&);
 
 private:
     friend class SdfChangeBlock;
-    
+
     struct _Data {
         _Data();
         SdfLayerChangeListVec changes;
-        SdfChangeBlock const *outermostBlock;
+        SdfChangeBlock const* outermostBlock;
         std::vector<SdfSpec> removeIfInert;
     };
 
@@ -93,21 +89,18 @@ private:
     // outermost change block.  The caller must only call _CloseChangeBlock if
     // _OpenChangeBlock returned a non-null pointer, and pass it back.
     SDF_API
-    void const *_OpenChangeBlock(SdfChangeBlock const *block);
+    void const* _OpenChangeBlock(SdfChangeBlock const* block);
     SDF_API
-    void _CloseChangeBlock(SdfChangeBlock const *block, void const *openKey);
+    void _CloseChangeBlock(SdfChangeBlock const* block, void const* openKey);
 
-    void _SendNoticesForChangeList( const SdfLayerHandle & layer,
-                                    const SdfChangeList & changeList );
-    void _SendNotices(_Data *data);
+    void _SendNoticesForChangeList(const SdfLayerHandle& layer, const SdfChangeList& changeList);
+    void _SendNotices(_Data* data);
 
-    void _ProcessRemoveIfInert(_Data *data);
+    void _ProcessRemoveIfInert(_Data* data);
 
-    SdfChangeList &_GetListFor(SdfLayerChangeListVec &changeList,
-                               SdfLayerHandle const &layer);
+    SdfChangeList& _GetListFor(SdfLayerChangeListVec& changeList, SdfLayerHandle const& layer);
 
 private:
-
     tbb::enumerable_thread_specific<_Data> _data;
 
     friend class TfSingleton<Sdf_ChangeManager>;
@@ -117,4 +110,4 @@ SDF_API_TEMPLATE_CLASS(TfSingleton<Sdf_ChangeManager>);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_CHANGE_MANAGER_H
+#endif  // PXR_USD_SDF_CHANGE_MANAGER_H

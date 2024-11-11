@@ -6,5 +6,4 @@
 //
 /// \file ListProxy.cpp
 
-
 #include "pxr/usd/sdf/listProxy.h"

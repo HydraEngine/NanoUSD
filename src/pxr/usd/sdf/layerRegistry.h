@@ -29,10 +29,10 @@ SDF_DECLARE_HANDLES(SdfLayer);
 /// is inserted into the layer registry. This allows SdfLayer::Find/FindOrOpen
 /// to locate loaded layers.
 ///
-class Sdf_LayerRegistry
-{
+class Sdf_LayerRegistry {
     Sdf_LayerRegistry(const Sdf_LayerRegistry&) = delete;
     Sdf_LayerRegistry& operator=(const Sdf_LayerRegistry&) = delete;
+
 public:
     /// Constructor.
     Sdf_LayerRegistry();
@@ -42,8 +42,7 @@ public:
 
     /// Updates an existing registry entry if an entry is found for the same
     /// layer.
-    void Update(const SdfLayerHandle& layer, const Sdf_AssetInfo& oldInfo,
-                const Sdf_AssetInfo& newInfo);
+    void Update(const SdfLayerHandle& layer, const Sdf_AssetInfo& oldInfo, const Sdf_AssetInfo& newInfo);
 
     /// Erases the layer from the registry, if found.
     void Erase(const SdfLayerHandle& layer, const Sdf_AssetInfo& assetInfo);
@@ -53,8 +52,7 @@ public:
     /// cannot be found, a null layer handle is returned. If the \p layerPath
     /// is relative, it is made absolute by anchoring to the current working
     /// directory.
-    SdfLayerHandle Find(const std::string &layerPath,
-                        const std::string &resolvedPath=std::string()) const;
+    SdfLayerHandle Find(const std::string& layerPath, const std::string& resolvedPath = std::string()) const;
 
     /// Returns all valid layers held in the registry as a set.
     SdfLayerHandleSet GetLayers() const;
@@ -67,14 +65,12 @@ private:
     // Returns a layer from the registry, consulting the by_repository_path
     // index with the \p layerPath as provided.
     SdfLayerHandle _FindByRepositoryPath(const std::string& layerPath) const;
-    
+
     // Returns a layer from the registry, consulting the by_real_path index.  If
     // \p layerPath is an absolute file system path, the index is searched using
     // the input path. Otherwise, \p layerPath is resolved and the resulting
     // path is used to search the index.
-    SdfLayerHandle _FindByRealPath(
-        const std::string& layerPath,
-        const std::string& resolvedPath=std::string()) const;
+    SdfLayerHandle _FindByRealPath(const std::string& layerPath, const std::string& resolvedPath = std::string()) const;
 
     // A wrapper around a set of unordered_maps that maps layers
     // bidirectionally to their various string representations (realPath,
@@ -82,27 +78,19 @@ private:
     class _Layers final {
     public:
         _Layers() = default;
-        using LayersByRealPath =
-            std::unordered_map<std::string, SdfLayerHandle, TfHash>;
-        using LayersByIdentifier =
-            std::unordered_multimap<std::string, SdfLayerHandle, TfHash>;
-        using LayersByRepositoryPath =
-            std::unordered_multimap<std::string, SdfLayerHandle, TfHash>;
+        using LayersByRealPath = std::unordered_map<std::string, SdfLayerHandle, TfHash>;
+        using LayersByIdentifier = std::unordered_multimap<std::string, SdfLayerHandle, TfHash>;
+        using LayersByRepositoryPath = std::unordered_multimap<std::string, SdfLayerHandle, TfHash>;
 
         const LayersByRealPath& ByRealPath() const { return _byRealPath; }
-        const LayersByIdentifier& ByIdentifier() const {
-            return _byIdentifier;
-        }
-        const LayersByRepositoryPath& ByRepositoryPath() const {
-            return _byRepositoryPath;
-        }
+        const LayersByIdentifier& ByIdentifier() const { return _byIdentifier; }
+        const LayersByRepositoryPath& ByRepositoryPath() const { return _byRepositoryPath; }
 
         // Insert the layer.
         // If the insertion is successful, return (the inserted layer, true)
         // If insertion is unsuccessful, return the layer that's occupying one
         // of the layer's entries and false.
-        std::pair<SdfLayerHandle, bool> Insert(const SdfLayerHandle& layer,
-                                               const Sdf_AssetInfo& assetInfo);
+        std::pair<SdfLayerHandle, bool> Insert(const SdfLayerHandle& layer, const Sdf_AssetInfo& assetInfo);
 
         // Update all the aliases (realPath, identifier, repositoryPath)
         // for this layer. The layer should already be stored in the container.
@@ -110,13 +98,10 @@ private:
         // Update operation results in the layer being evicted from the
         // registry, leaving a "dangling layer" outside of registry in user
         // space. This is undesirable but matches legacy behavior.
-        void Update(const SdfLayerHandle& layer,
-                    const Sdf_AssetInfo& oldAssetInfo,
-                    const Sdf_AssetInfo& newAssetInfo);
+        void Update(const SdfLayerHandle& layer, const Sdf_AssetInfo& oldAssetInfo, const Sdf_AssetInfo& newAssetInfo);
 
         // Remove this layer (and its aliases)
-        bool Erase(const SdfLayerHandle& layer,
-                   const Sdf_AssetInfo& assetInfo);
+        bool Erase(const SdfLayerHandle& layer, const Sdf_AssetInfo& assetInfo);
 
     private:
         LayersByRealPath _byRealPath;
@@ -127,9 +112,8 @@ private:
     _Layers _layers;
 };
 
-std::ostream&
-operator<<(std::ostream& ostr, const Sdf_LayerRegistry& registry);
+std::ostream& operator<<(std::ostream& ostr, const Sdf_LayerRegistry& registry);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_LAYER_REGISTRY_H
+#endif  // PXR_USD_SDF_LAYER_REGISTRY_H

@@ -30,18 +30,13 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 ////////////////////////////////////////////////////////////
 
-PcpPropertyIndex::PcpPropertyIndex()
-{
-}
+PcpPropertyIndex::PcpPropertyIndex() {}
 
-bool 
-PcpPropertyIndex::IsEmpty() const
-{
+bool PcpPropertyIndex::IsEmpty() const {
     return _propertyStack.empty();
 }
 
-PcpPropertyIndex::PcpPropertyIndex(const PcpPropertyIndex &rhs)
-{
+PcpPropertyIndex::PcpPropertyIndex(const PcpPropertyIndex& rhs) {
     _propertyStack = rhs._propertyStack;
     if (rhs._localErrors) {
         _localErrors.reset(new PcpErrorVector(*rhs._localErrors.get()));
@@ -50,44 +45,32 @@ PcpPropertyIndex::PcpPropertyIndex(const PcpPropertyIndex &rhs)
     }
 }
 
-void 
-PcpPropertyIndex::Swap(PcpPropertyIndex& index)
-{
+void PcpPropertyIndex::Swap(PcpPropertyIndex& index) {
     _propertyStack.swap(index._propertyStack);
 }
 
-PcpPropertyRange 
-PcpPropertyIndex::GetPropertyRange(bool localOnly) const
-{
+PcpPropertyRange PcpPropertyIndex::GetPropertyRange(bool localOnly) const {
     if (localOnly) {
         size_t startIdx = 0;
         for (; startIdx < _propertyStack.size(); ++startIdx) {
-            if (_propertyStack[startIdx].originatingNode.IsRootNode())
-                break;
+            if (_propertyStack[startIdx].originatingNode.IsRootNode()) break;
         }
 
         size_t endIdx = startIdx;
         for (; endIdx < _propertyStack.size(); ++endIdx) {
-            if (!_propertyStack[endIdx].originatingNode.IsRootNode())
-                break;
+            if (!_propertyStack[endIdx].originatingNode.IsRootNode()) break;
         }
 
         const bool foundLocalSpecs = (startIdx != endIdx);
 
-        return PcpPropertyRange(
-            PcpPropertyIterator(*this, foundLocalSpecs ? startIdx : 0),
-            PcpPropertyIterator(*this, foundLocalSpecs ? endIdx : 0));
-    }
-    else {
-        return PcpPropertyRange(
-            PcpPropertyIterator(*this, 0),
-            PcpPropertyIterator(*this, _propertyStack.size()));
+        return PcpPropertyRange(PcpPropertyIterator(*this, foundLocalSpecs ? startIdx : 0),
+                                PcpPropertyIterator(*this, foundLocalSpecs ? endIdx : 0));
+    } else {
+        return PcpPropertyRange(PcpPropertyIterator(*this, 0), PcpPropertyIterator(*this, _propertyStack.size()));
     }
 }
 
-size_t 
-PcpPropertyIndex::GetNumLocalSpecs() const
-{
+size_t PcpPropertyIndex::GetNumLocalSpecs() const {
     size_t numLocalSpecs = 0;
     for (size_t i = 0; i < _propertyStack.size(); ++i) {
         if (_propertyStack[i].originatingNode.IsRootNode()) {
@@ -100,74 +83,57 @@ PcpPropertyIndex::GetNumLocalSpecs() const
 
 ////////////////////////////////////////////////////////////
 
-struct Pcp_Permissions
-{
-    Pcp_Permissions()
-        : previous(SdfPermissionPublic)
-        , current(SdfPermissionPublic) { }
+struct Pcp_Permissions {
+    Pcp_Permissions() : previous(SdfPermissionPublic), current(SdfPermissionPublic) {}
 
     SdfPermission previous;
     SdfPermission current;
 };
 
-class Pcp_PropertyIndexer
-{
+class Pcp_PropertyIndexer {
 public:
-    Pcp_PropertyIndexer(PcpPropertyIndex *propIndex,
-                        PcpSite propSite,
-                        PcpErrorVector *allErrors)
+    Pcp_PropertyIndexer(PcpPropertyIndex* propIndex, PcpSite propSite, PcpErrorVector* allErrors)
         : _propIndex(propIndex),
           _propSite(propSite),
           _allErrors(allErrors),
           _var(SdfVariabilityVarying),
-          _propType(SdfSpecTypeUnknown)
-    {
-    }
+          _propType(SdfSpecTypeUnknown) {}
 
     void GatherPropertySpecs(const PcpPrimIndex& primIndex, bool usd);
-    void GatherRelationalAttributeSpecs( const PcpPropertyIndex& relIndex,
-                                         bool usd);
+    void GatherRelationalAttributeSpecs(const PcpPropertyIndex& relIndex, bool usd);
 
 private:
     // Returns the property spec with the given name if it is consistent with
     // previously seen specs, otherwise returns NULL.
-    // 
-    SdfPropertySpecHandle _GetPrimProperty(
-        const SdfLayerRefPtr &layer,
-        const SdfPath &owningPrimPath,
-        const TfToken &name,
-        bool usd)
-    {
-        if (!layer->HasSpec(owningPrimPath))
-            return TfNullPtr;
+    //
+    SdfPropertySpecHandle _GetPrimProperty(const SdfLayerRefPtr& layer,
+                                           const SdfPath& owningPrimPath,
+                                           const TfToken& name,
+                                           bool usd) {
+        if (!layer->HasSpec(owningPrimPath)) return TfNullPtr;
 
         const SdfPath propPath = owningPrimPath.AppendProperty(name);
-        if (!layer->HasSpec(propPath))
-            return TfNullPtr;
+        if (!layer->HasSpec(propPath)) return TfNullPtr;
 
         SdfPropertySpecHandle propSpec = layer->GetPropertyAtPath(propPath);
-        if (!propSpec)
-            return TfNullPtr;
+        if (!propSpec) return TfNullPtr;
 
         // See if it's an attribute.
         const SdfSpecType propType = propSpec->GetSpecType();
         if (_propType == SdfSpecTypeUnknown) {
             // First one, just record the property type and layer
             _firstSpec = propSpec;
-            _propType  = propType;
+            _propType = propType;
 
         } else if (_propType != propType) {
             // This property spec is inconsistent with the type of the
             // specs previously seen.
-            PcpErrorInconsistentPropertyTypePtr e =
-                PcpErrorInconsistentPropertyType::New();
+            PcpErrorInconsistentPropertyTypePtr e = PcpErrorInconsistentPropertyType::New();
             e->rootSite = _propSite;
-            e->definingLayerIdentifier = 
-                _firstSpec->GetLayer()->GetIdentifier();
+            e->definingLayerIdentifier = _firstSpec->GetLayer()->GetIdentifier();
             e->definingSpecPath = _firstSpec->GetPath();
             e->definingSpecType = _propType;
-            e->conflictingLayerIdentifier = 
-                propSpec->GetLayer()->GetIdentifier();
+            e->conflictingLayerIdentifier = propSpec->GetLayer()->GetIdentifier();
             e->conflictingSpecPath = propSpec->GetPath();
             e->conflictingSpecType = propType;
             _RecordError(e);
@@ -176,9 +142,7 @@ private:
 
         // For an attribute, check that its type and variability are consistent.
         // We don't care about these mismatches in USD mode.
-        if (!usd && 
-            propType == SdfSpecTypeAttribute &&
-            !_IsConsistentAttribute(propSpec)) {
+        if (!usd && propType == SdfSpecTypeAttribute && !_IsConsistentAttribute(propSpec)) {
             return TfNullPtr;
         }
         return propSpec;
@@ -186,15 +150,11 @@ private:
 
     // Returns the attribute spec with the given name if it is consistent with
     // previously seen specs, otherwise returns NULL.
-    // 
-    SdfPropertySpecHandle _GetRelationalAttribute(
-        const SdfLayerHandle& layer,
-        const SdfPath& relAttrPath)
-    {
+    //
+    SdfPropertySpecHandle _GetRelationalAttribute(const SdfLayerHandle& layer, const SdfPath& relAttrPath) {
         SdfPropertySpecHandle attr = layer->GetAttributeAtPath(relAttrPath);
 
-        if (!attr)
-            return TfNullPtr;
+        if (!attr) return TfNullPtr;
 
         if (!_firstSpec) {
             _firstSpec = attr;
@@ -207,36 +167,31 @@ private:
         return attr;
     }
 
-    bool _IsConsistentAttribute(const SdfPropertySpecHandle &attr)
-    {
+    bool _IsConsistentAttribute(const SdfPropertySpecHandle& attr) {
         TfToken valueType;
         SdfVariability var = SdfVariability();
 
         // This function is performance sensitive, so as an optimization, get
         // the underlying spec pointer to avoid excessive dormancy checks (one
         // per dereference).
-        if (SdfSpec *specPtr = get_pointer(attr)) {
-            SdfLayer *layer = get_pointer(specPtr->GetLayer());
-            SdfPath const &path = specPtr->GetPath();
-            valueType = layer->GetFieldAs<TfToken>(path,
-                                                   SdfFieldKeys->TypeName);
-            var = layer->GetFieldAs<SdfVariability>(
-                path, SdfFieldKeys->Variability);
+        if (SdfSpec* specPtr = get_pointer(attr)) {
+            SdfLayer* layer = get_pointer(specPtr->GetLayer());
+            SdfPath const& path = specPtr->GetPath();
+            valueType = layer->GetFieldAs<TfToken>(path, SdfFieldKeys->TypeName);
+            var = layer->GetFieldAs<SdfVariability>(path, SdfFieldKeys->Variability);
         }
 
         if (_valueType.IsEmpty()) {
             // First one, just record the type and variability.
-            _valueType  = valueType;
-            _var        = var;
+            _valueType = valueType;
+            _var = var;
             return true;
         }
 
         if (_valueType != valueType) {
-            PcpErrorInconsistentAttributeTypePtr e =
-                PcpErrorInconsistentAttributeType::New();
+            PcpErrorInconsistentAttributeTypePtr e = PcpErrorInconsistentAttributeType::New();
             e->rootSite = _propSite;
-            e->definingLayerIdentifier = 
-                _firstSpec->GetLayer()->GetIdentifier();
+            e->definingLayerIdentifier = _firstSpec->GetLayer()->GetIdentifier();
             e->definingSpecPath = _firstSpec->GetPath();
             e->definingValueType = _valueType;
             e->conflictingLayerIdentifier = attr->GetLayer()->GetIdentifier();
@@ -247,11 +202,9 @@ private:
         }
 
         if (_var != var) {
-            PcpErrorInconsistentAttributeVariabilityPtr e =
-                PcpErrorInconsistentAttributeVariability::New();
+            PcpErrorInconsistentAttributeVariabilityPtr e = PcpErrorInconsistentAttributeVariability::New();
             e->rootSite = _propSite;
-            e->definingLayerIdentifier = 
-                _firstSpec->GetLayer()->GetIdentifier();
+            e->definingLayerIdentifier = _firstSpec->GetLayer()->GetIdentifier();
             e->definingSpecPath = _firstSpec->GetPath();
             e->definingVariability = _var;
             e->conflictingLayerIdentifier = attr->GetLayer()->GetIdentifier();
@@ -266,7 +219,7 @@ private:
 
     // Convenience function to record an error both in this property
     // index's local errors vector and the allErrors vector.
-    void _RecordError(const PcpErrorBasePtr &err) {
+    void _RecordError(const PcpErrorBasePtr& err) {
         _allErrors->push_back(err);
         if (!_propIndex->_localErrors) {
             _propIndex->_localErrors.reset(new PcpErrorVector);
@@ -274,41 +227,34 @@ private:
         _propIndex->_localErrors->push_back(err);
     }
 
-    void _AddPropertySpecIfPermitted(
-        const SdfPropertySpecHandle& propSpec,
-        const PcpNodeRef& node,
-        Pcp_Permissions* permissions,
-        std::vector<Pcp_PropertyInfo>* propertyInfo);
+    void _AddPropertySpecIfPermitted(const SdfPropertySpecHandle& propSpec,
+                                     const PcpNodeRef& node,
+                                     Pcp_Permissions* permissions,
+                                     std::vector<Pcp_PropertyInfo>* propertyInfo);
 
-private: // data
-
-    PcpPropertyIndex *_propIndex;
+private:  // data
+    PcpPropertyIndex* _propIndex;
     const PcpSite _propSite;
-    PcpErrorVector *_allErrors;
+    PcpErrorVector* _allErrors;
     SdfPropertySpecHandle _firstSpec;
     TfToken _valueType;
     SdfVariability _var;
     SdfSpecType _propType;
 };
 
-void
-Pcp_PropertyIndexer::_AddPropertySpecIfPermitted(
-    const SdfPropertySpecHandle& propSpec,
-    const PcpNodeRef& node,
-    Pcp_Permissions* permissions,
-    std::vector<Pcp_PropertyInfo>* propertyInfo)
-{
+void Pcp_PropertyIndexer::_AddPropertySpecIfPermitted(const SdfPropertySpecHandle& propSpec,
+                                                      const PcpNodeRef& node,
+                                                      Pcp_Permissions* permissions,
+                                                      std::vector<Pcp_PropertyInfo>* propertyInfo) {
     if (permissions->previous == SdfPermissionPublic) {
         // We're allowed to add this property.
         propertyInfo->push_back(Pcp_PropertyInfo(propSpec, node));
         // Accumulate permission.
-        permissions->current = propSpec->GetFieldAs(SdfFieldKeys->Permission,
-                                                    permissions->current);
+        permissions->current = propSpec->GetFieldAs(SdfFieldKeys->Permission, permissions->current);
     } else {
         // The previous node's property permission was private, and this
         // node also has an opinion about it. This is illegal.
-        PcpErrorPropertyPermissionDeniedPtr err =
-            PcpErrorPropertyPermissionDenied::New();
+        PcpErrorPropertyPermissionDeniedPtr err = PcpErrorPropertyPermissionDenied::New();
         err->rootSite = _propSite;
         err->propPath = propSpec->GetPath();
         err->propType = propSpec->GetSpecType();
@@ -317,17 +263,14 @@ Pcp_PropertyIndexer::_AddPropertySpecIfPermitted(
     }
 }
 
-void
-Pcp_PropertyIndexer::GatherPropertySpecs(const PcpPrimIndex& primIndex,
-                                         bool usd)
-{
-    const TfToken &name = _propSite.path.GetNameToken();
+void Pcp_PropertyIndexer::GatherPropertySpecs(const PcpPrimIndex& primIndex, bool usd) {
+    const TfToken& name = _propSite.path.GetNameToken();
 
     // Add properties in reverse strength order (weak-to-strong).
     std::vector<Pcp_PropertyInfo> propertyInfo;
 
     if (!usd) {
-        // We start with the permission from the last node we visited (or 
+        // We start with the permission from the last node we visited (or
         // SdfPermissionPublic, if this is the first node). If the strongest
         // opinion about the property's permission from this node is private,
         // we are not allowed to add opinions from subsequent nodes.
@@ -342,27 +285,23 @@ Pcp_PropertyIndexer::GatherPropertySpecs(const PcpPrimIndex& primIndex,
             }
 
             const Pcp_SdSiteRef primSite = i.base()._GetSiteRef();
-            if (SdfPropertySpecHandle propSpec = 
-                _GetPrimProperty(primSite.layer, primSite.path, name, usd)) {
-                _AddPropertySpecIfPermitted(
-                    propSpec, curNode, &permissions, &propertyInfo);
+            if (SdfPropertySpecHandle propSpec = _GetPrimProperty(primSite.layer, primSite.path, name, usd)) {
+                _AddPropertySpecIfPermitted(propSpec, curNode, &permissions, &propertyInfo);
             }
         }
 
-        // At this point, the specs have been accumulated in reverse order, 
-        // because we needed to do a weak-to-strong traversal for permissions. 
+        // At this point, the specs have been accumulated in reverse order,
+        // because we needed to do a weak-to-strong traversal for permissions.
         // Here, we reverse the results to give us the correct order.
         std::reverse(propertyInfo.begin(), propertyInfo.end());
     } else {
-        for (PcpNodeRef const& node: primIndex.GetNodeRange()) {
+        for (PcpNodeRef const& node : primIndex.GetNodeRange()) {
             if (!node.CanContributeSpecs()) {
                 continue;
             }
             SdfPath const& nodePath = node.GetPath();
-            for (SdfLayerRefPtr const& layer:
-                 node.GetLayerStack()->GetLayers()) {
-                if (SdfPropertySpecHandle propSpec = 
-                    _GetPrimProperty(layer, nodePath, name, usd)) {
+            for (SdfLayerRefPtr const& layer : node.GetLayerStack()->GetLayers()) {
+                if (SdfPropertySpecHandle propSpec = _GetPrimProperty(layer, nodePath, name, usd)) {
                     propertyInfo.emplace_back(propSpec, node);
                 }
             }
@@ -372,17 +311,14 @@ Pcp_PropertyIndexer::GatherPropertySpecs(const PcpPrimIndex& primIndex,
     _propIndex->_propertyStack.swap(propertyInfo);
 }
 
-void
-Pcp_PropertyIndexer::GatherRelationalAttributeSpecs(
-    const PcpPropertyIndex& relIndex, bool usd)
-{
+void Pcp_PropertyIndexer::GatherRelationalAttributeSpecs(const PcpPropertyIndex& relIndex, bool usd) {
     const SdfPath& relAttrPath = _propSite.path;
     TF_VERIFY(relAttrPath.IsRelationalAttributePath());
 
     // Add relational attributes in reverse strength order (weak-to-strong).
     std::vector<Pcp_PropertyInfo> propertyInfo;
 
-    // We start with the permission from the last node we visited (or 
+    // We start with the permission from the last node we visited (or
     // SdfPermissionPublic, if this is the first node). If the strongest
     // opinion about the property's permission from this node is private,
     // we are not allowed to add opinions from subsequent nodes.
@@ -395,26 +331,20 @@ Pcp_PropertyIndexer::GatherRelationalAttributeSpecs(
     while (relIt != relItEnd) {
         const PcpNodeRef curNode = relIt.GetNode();
 
-        const SdfPath relAttrPathInNodeNS = 
-            PcpTranslatePathFromRootToNode(curNode, relAttrPath);
+        const SdfPath relAttrPathInNodeNS = PcpTranslatePathFromRootToNode(curNode, relAttrPath);
 
         for (; relIt != relItEnd && relIt.GetNode() == curNode; ++relIt) {
-            if (relAttrPathInNodeNS.IsEmpty())
-                continue;
+            if (relAttrPathInNodeNS.IsEmpty()) continue;
 
             const SdfPropertySpecHandle relSpec = *relIt;
-            const SdfPropertySpecHandle relAttrSpec = 
-                _GetRelationalAttribute(relSpec->GetLayer(),
-                                       relAttrPathInNodeNS);
-            if (!relAttrSpec)
-                continue;
+            const SdfPropertySpecHandle relAttrSpec = _GetRelationalAttribute(relSpec->GetLayer(), relAttrPathInNodeNS);
+            if (!relAttrSpec) continue;
 
             if (usd) {
                 // USD does not enforce permissions.
                 propertyInfo.push_back(Pcp_PropertyInfo(relAttrSpec, curNode));
             } else {
-                _AddPropertySpecIfPermitted(
-                    relAttrSpec, curNode, &permissions, &propertyInfo);
+                _AddPropertySpecIfPermitted(relAttrSpec, curNode, &permissions, &propertyInfo);
             }
         }
 
@@ -422,29 +352,30 @@ Pcp_PropertyIndexer::GatherRelationalAttributeSpecs(
         permissions.previous = permissions.current;
     }
 
-    // At this point, the specs have been accumulated in reverse order, 
-    // because we needed to do a weak-to-strong traversal for permissions. 
+    // At this point, the specs have been accumulated in reverse order,
+    // because we needed to do a weak-to-strong traversal for permissions.
     // Here, we reverse the results to give us the correct order.
     std::reverse(propertyInfo.begin(), propertyInfo.end());
 
     _propIndex->_propertyStack.swap(propertyInfo);
 }
 
-void PcpBuildPropertyIndex( const SdfPath &propertyPath,
-                            PcpCache *cache,
-                            PcpPropertyIndex *propertyIndex,
-                            PcpErrorVector *allErrors )
-{
+void PcpBuildPropertyIndex(const SdfPath& propertyPath,
+                           PcpCache* cache,
+                           PcpPropertyIndex* propertyIndex,
+                           PcpErrorVector* allErrors) {
     // Verify that the given path is for a property.
     if (!TF_VERIFY(propertyPath.IsPropertyPath())) {
         return;
     }
     if (!propertyIndex->IsEmpty()) {
-        TF_CODING_ERROR("Cannot build property index for %s with a non-empty "
-                        "property stack.", propertyPath.GetText());
+        TF_CODING_ERROR(
+                "Cannot build property index for %s with a non-empty "
+                "property stack.",
+                propertyPath.GetText());
         return;
     }
-    
+
     SdfPath parentPath = propertyPath.GetParentPath();
     if (parentPath.IsTargetPath()) {
         // Immediate parent is a target path, so this is a relational attribute.
@@ -453,14 +384,9 @@ void PcpBuildPropertyIndex( const SdfPath &propertyPath,
     }
 
     if (parentPath.IsPrimPath()) {
-        PcpBuildPrimPropertyIndex(
-            propertyPath,
-            *cache,
-            cache->ComputePrimIndex(parentPath, allErrors),
-            propertyIndex,
-            allErrors);
-    }
-    else if (parentPath.IsPrimPropertyPath()) {
+        PcpBuildPrimPropertyIndex(propertyPath, *cache, cache->ComputePrimIndex(parentPath, allErrors), propertyIndex,
+                                  allErrors);
+    } else if (parentPath.IsPrimPropertyPath()) {
         const PcpSite propSite(cache->GetLayerStackIdentifier(), propertyPath);
         Pcp_PropertyIndexer indexer(propertyIndex, propSite, allErrors);
         // In USD mode, the PcpCache will not supply any property indexes,
@@ -473,32 +399,27 @@ void PcpBuildPropertyIndex( const SdfPath &propertyPath,
             PcpPropertyIndex relIndex;
             PcpBuildPropertyIndex(parentPath, cache, &relIndex, allErrors);
             indexer.GatherRelationalAttributeSpecs(relIndex, true);
-        }
-        else {
-            const PcpPropertyIndex& relIndex = 
-                cache->ComputePropertyIndex(parentPath, allErrors);
+        } else {
+            const PcpPropertyIndex& relIndex = cache->ComputePropertyIndex(parentPath, allErrors);
             indexer.GatherRelationalAttributeSpecs(relIndex, false);
         }
-    }
-    else {
+    } else {
         // CODE_COVERAGE_OFF
-        // This should not happen.  Owner is not a prim or a 
+        // This should not happen.  Owner is not a prim or a
         // relationship.
         TF_CODING_ERROR(
-            "Error, the property <%s> is owned by something "
-            "that is not a prim or a relationship.", 
-            propertyPath.GetText());
+                "Error, the property <%s> is owned by something "
+                "that is not a prim or a relationship.",
+                propertyPath.GetText());
         // CODE_COVERAGE_ON
     }
 }
 
-void
-PcpBuildPrimPropertyIndex( const SdfPath& propertyPath,
-                           const PcpCache& cache,
-                           const PcpPrimIndex& primIndex,
-                           PcpPropertyIndex *propertyIndex,
-                           PcpErrorVector *allErrors )
-{
+void PcpBuildPrimPropertyIndex(const SdfPath& propertyPath,
+                               const PcpCache& cache,
+                               const PcpPrimIndex& primIndex,
+                               PcpPropertyIndex* propertyIndex,
+                               PcpErrorVector* allErrors) {
     const PcpSite propSite(cache.GetLayerStackIdentifier(), propertyPath);
     Pcp_PropertyIndexer indexer(propertyIndex, propSite, allErrors);
     indexer.GatherPropertySpecs(primIndex, cache.IsUsd());

@@ -29,9 +29,8 @@ class SdfSpec;
 /// It primarily specifies how to map between keys (such as the name of
 /// an object) and values (such as SpecHandles for those objects).
 ///
-template<class ChildPolicy>
-class Sdf_Children
-{
+template <class ChildPolicy>
+class Sdf_Children {
 public:
     typedef typename ChildPolicy::KeyPolicy KeyPolicy;
     typedef typename ChildPolicy::KeyType KeyType;
@@ -43,12 +42,13 @@ public:
     Sdf_Children();
 
     SDF_API
-    Sdf_Children(const Sdf_Children<ChildPolicy> &other);
+    Sdf_Children(const Sdf_Children<ChildPolicy>& other);
 
     SDF_API
-    Sdf_Children(const SdfLayerHandle &layer,
-        const SdfPath &parentPath, const TfToken &childrenKey,
-        const KeyPolicy& keyPolicy = KeyPolicy());
+    Sdf_Children(const SdfLayerHandle& layer,
+                 const SdfPath& parentPath,
+                 const TfToken& childrenKey,
+                 const KeyPolicy& keyPolicy = KeyPolicy());
 
     /// Return whether this object is valid.
     SDF_API
@@ -64,42 +64,42 @@ public:
 
     /// Find the index of the specified key, or return the size if it's not found.
     SDF_API
-    size_t Find(const KeyType &key) const;
-    
+    size_t Find(const KeyType& key) const;
+
     /// Find the key that corresponds to \a value, or return a default
     /// constructed key if it's not found.
     SDF_API
-    KeyType FindKey(const ValueType &value) const;
+    KeyType FindKey(const ValueType& value) const;
 
     /// Return true if this object and \a other are equivalent.
     SDF_API
-    bool IsEqualTo(const This &other) const;
+    bool IsEqualTo(const This& other) const;
 
     /// Replace this object's children with the ones in \a values.
     SDF_API
-    bool Copy(const std::vector<ValueType> & values, const std::string &type);
-    
+    bool Copy(const std::vector<ValueType>& values, const std::string& type);
+
     /// Insert a new child at the specified \a index.
     SDF_API
-    bool Insert(const ValueType& value, size_t index, const std::string &type);
+    bool Insert(const ValueType& value, size_t index, const std::string& type);
 
     /// Erase the child with the specified key.
     SDF_API
-    bool Erase(const KeyType& key, const std::string &type);
+    bool Erase(const KeyType& key, const std::string& type);
 
 private:
     void _UpdateChildNames() const;
-    
+
 private:
     SdfLayerHandle _layer;
     SdfPath _parentPath;
     TfToken _childrenKey;
     KeyPolicy _keyPolicy;
-    
+
     mutable std::vector<FieldType> _childNames;
     mutable bool _childNamesValid;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_CHILDREN_H
+#endif  // PXR_USD_SDF_CHILDREN_H

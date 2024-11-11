@@ -20,11 +20,11 @@ class Sdf_ValueTypeImpl;
 
 struct Sdf_ValueTypePrivate {
 public:
-    struct Empty { };
+    struct Empty {};
 
     // Represents a type/role pair.
     struct CoreType {
-        CoreType() { }
+        CoreType() {}
         CoreType(Empty);
 
         TfType type;
@@ -59,4 +59,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_VALUE_TYPE_PRIVATE_H
+#endif  // PXR_USD_SDF_VALUE_TYPE_PRIVATE_H

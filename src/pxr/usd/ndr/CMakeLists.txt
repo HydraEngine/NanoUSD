@@ -1,74 +1,35 @@
-set(PXR_PREFIX pxr/usd)
-set(PXR_PACKAGE ndr)
+#  Copyright (c) 2023 Feng Yang
+#
+#  I am making my contributions/submissions to this project solely in my
+#  personal capacity and am not conveying any rights to any intellectual
+#  property of any third parties.
 
-pxr_library(ndr
-    LIBRARIES
-        tf
-        plug
-        vt
-        work
-        ar
-        sdf
+# create sample app project
+project(ndr LANGUAGES C CXX)
 
-    PUBLIC_CLASSES
-        debugCodes
-        declare
-        discoveryPlugin
-        filesystemDiscovery
-        filesystemDiscoveryHelpers
-        node
-        parserPlugin
-        property
-        registry
-        sdfTypeIndicator
-
-    PUBLIC_HEADERS
-        api.h
-        nodeDiscoveryResult.h
-
-    PYTHON_CPPFILES
-        moduleDeps.cpp
-
-    PYMODULE_CPPFILES
-        module.cpp
-        wrapDeclare.cpp
-        wrapDiscoveryPlugin.cpp
-        wrapFilesystemDiscovery.cpp
-        wrapFilesystemDiscoveryHelpers.cpp
-        wrapNode.cpp
-        wrapNodeDiscoveryResult.cpp
-        wrapProperty.cpp
-        wrapRegistry.cpp
-        wrapSdfTypeIndicator.cpp
-
-    PYMODULE_FILES
-        __init__.py
-
-    RESOURCE_FILES
-        plugInfo.json
-
-    DOXYGEN_FILES
-        overview.dox
+set(SRC_FILES
+        debugCodes.cpp
+        declare.cpp
+        discoveryPlugin.cpp
+        filesystemDiscovery.cpp
+        filesystemDiscoveryHelpers.cpp
+        node.cpp
+        parserPlugin.cpp
+        property.cpp
+        registry.cpp
+        sdfTypeIndicator.cpp
 )
 
-pxr_test_scripts(
-    testenv/testNdrFilesystemDiscovery.py
-    testenv/testNdrVersion.py
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+        ${PXR_INCLUDE_PATH}
 )
 
-pxr_install_test_dir(
-    SRC testenv/testNdrFilesystemDiscovery.testenv
-    DEST testNdrFilesystemDiscovery
+target_link_libraries(${PROJECT_NAME} PUBLIC
+        fmt::fmt
+        Eigen3::Eigen
+        TBB::tbb
 )
 
-pxr_register_test(testNdrFilesystemDiscovery
-    PYTHON
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testNdrFilesystemDiscovery"
-    EXPECTED_RETURN_CODE 0
-)
-
-pxr_register_test(testNdrVersion
-    PYTHON
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testNdrVersion"
-    EXPECTED_RETURN_CODE 0
-)
+set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)

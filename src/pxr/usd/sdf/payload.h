@@ -45,80 +45,57 @@ public:
     /// and set this payload's asset path to the empty asset path.
     ///
     SDF_API
-    SdfPayload(
-        const std::string &assetPath = std::string(),
-        const SdfPath &primPath = SdfPath(),
-        const SdfLayerOffset &layerOffset = SdfLayerOffset());
+    SdfPayload(const std::string& assetPath = std::string(),
+               const SdfPath& primPath = SdfPath(),
+               const SdfLayerOffset& layerOffset = SdfLayerOffset());
 
     /// Returns the asset path of the layer that the payload uses.
-    const std::string &GetAssetPath() const {
-        return _assetPath;
-    }
+    const std::string& GetAssetPath() const { return _assetPath; }
 
     /// Sets a new asset path for the layer the payload uses.  See SdfAssetPath
     /// for what characters are valid in \p assetPath.  If \p assetPath contains
     /// invalid characters, issue an error and set this payload's asset path to
     /// the empty asset path.
-    void SetAssetPath(const std::string &assetPath) {
+    void SetAssetPath(const std::string& assetPath) {
         // Go through SdfAssetPath() to raise an error if \p assetPath contains
         // illegal characters (i.e. control characters).
         _assetPath = SdfAssetPath(assetPath).GetAssetPath();
     }
 
     /// Returns the scene path of the prim for the payload.
-    const SdfPath &GetPrimPath() const {
-        return _primPath;
-    }
+    const SdfPath& GetPrimPath() const { return _primPath; }
 
     /// Sets a new prim path for the prim that the payload uses.
-    void SetPrimPath(const SdfPath &primPath) {
-        _primPath = primPath;
-    }
+    void SetPrimPath(const SdfPath& primPath) { _primPath = primPath; }
 
     /// Returns the layer offset associated with the payload.
-    const SdfLayerOffset &GetLayerOffset() const {
-        return _layerOffset;
-    }
+    const SdfLayerOffset& GetLayerOffset() const { return _layerOffset; }
 
     /// Sets a new layer offset.
-    void SetLayerOffset(const SdfLayerOffset &layerOffset) {
-        _layerOffset = layerOffset;
-    }
+    void SetLayerOffset(const SdfLayerOffset& layerOffset) { _layerOffset = layerOffset; }
 
     /// Returns whether this payload equals \a rhs.
-    SDF_API bool operator==(const SdfPayload &rhs) const;
+    SDF_API bool operator==(const SdfPayload& rhs) const;
 
     /// \sa SdfPayload::operator==
-    bool operator!=(const SdfPayload& rhs) const {
-        return !(*this == rhs);
-    }
+    bool operator!=(const SdfPayload& rhs) const { return !(*this == rhs); }
 
     /// Returns whether this payload is less than \a rhs.
     /// The meaning of less than is arbitrary but stable.
-    SDF_API bool operator<(const SdfPayload &rhs) const;
+    SDF_API bool operator<(const SdfPayload& rhs) const;
 
     /// \sa SdfPayload::operator<
-    bool operator>(const SdfPayload& rhs) const {
-        return rhs < *this;
-    }
+    bool operator>(const SdfPayload& rhs) const { return rhs < *this; }
 
     /// \sa SdfPayload::operator<
-    bool operator<=(const SdfPayload& rhs) const {
-        return !(rhs < *this);
-    }
+    bool operator<=(const SdfPayload& rhs) const { return !(rhs < *this); }
 
     /// \sa SdfPayload::operator<
-    bool operator>=(const SdfPayload& rhs) const {
-        return !(*this < rhs);
-    }
+    bool operator>=(const SdfPayload& rhs) const { return !(*this < rhs); }
 
 private:
-    friend inline size_t hash_value(const SdfPayload &p) {
-        return TfHash::Combine(
-            p._assetPath,
-            p._primPath,
-            p._layerOffset
-        );
+    friend inline size_t hash_value(const SdfPayload& p) {
+        return TfHash::Combine(p._assetPath, p._primPath, p._layerOffset);
     }
 
     // The asset path to the external layer.
@@ -133,7 +110,7 @@ private:
 
 /// Writes the string representation of \a SdfPayload to \a out.
 SDF_API
-std::ostream & operator<<(std::ostream &out, const SdfPayload &payload);
+std::ostream& operator<<(std::ostream& out, const SdfPayload& payload);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

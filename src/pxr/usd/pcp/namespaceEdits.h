@@ -32,20 +32,18 @@ SDF_DECLARE_HANDLES(SdfSpec);
 
 /// Sites that must respond to a namespace edit.
 struct PcpNamespaceEdits {
-
     /// Types of namespace edits that a given layer stack site could need
     /// to perform to respond to a namespace edit.
     enum EditType {
-        EditPath,        ///< Must namespace edit spec
-        EditInherit,     ///< Must fixup inherits
-        EditSpecializes, ///< Must fixup specializes
-        EditReference,   ///< Must fixup references
-        EditPayload,     ///< Must fixup payload
-        EditRelocate,    ///< Must fixup relocates
+        EditPath,         ///< Must namespace edit spec
+        EditInherit,      ///< Must fixup inherits
+        EditSpecializes,  ///< Must fixup specializes
+        EditReference,    ///< Must fixup references
+        EditPayload,      ///< Must fixup payload
+        EditRelocate,     ///< Must fixup relocates
     };
 
-    void Swap(PcpNamespaceEdits& rhs)
-    {
+    void Swap(PcpNamespaceEdits& rhs) {
         cacheSites.swap(rhs.cacheSites);
         layerStackSites.swap(rhs.layerStackSites);
         invalidLayerStackSites.swap(rhs.invalidLayerStackSites);
@@ -62,12 +60,12 @@ struct PcpNamespaceEdits {
     /// Layer stack site that must respond to a namespace edit.  All
     /// of the specs at the site will respond the same way.
     struct LayerStackSite {
-        size_t cacheIndex;              ///< Index of cache of site.
-        EditType type;                  ///< Type of edit.
-        PcpLayerStackPtr layerStack;    ///< Layer stack needing fix.
-        SdfPath sitePath;               ///< Path of site needing fix.
-        SdfPath oldPath;                ///< Old path.
-        SdfPath newPath;                ///< New path.
+        size_t cacheIndex;            ///< Index of cache of site.
+        EditType type;                ///< Type of edit.
+        PcpLayerStackPtr layerStack;  ///< Layer stack needing fix.
+        SdfPath sitePath;             ///< Path of site needing fix.
+        SdfPath oldPath;              ///< Old path.
+        SdfPath newPath;              ///< New path.
     };
     typedef std::vector<LayerStackSite> LayerStackSites;
 
@@ -113,17 +111,16 @@ struct PcpNamespaceEdits {
 /// index of everything in any existing cache, otherwise you might miss
 /// changes to objects in those caches that use the namespace edited
 /// object.  Using the above example, if a prim with an uncomputed prim
-/// index referenced /A then this method would not report that prim. 
+/// index referenced /A then this method would not report that prim.
 /// As a result that prim would continue to reference /A, which no
 /// longer exists.
 PCP_API
-PcpNamespaceEdits
-PcpComputeNamespaceEdits(const PcpCache *primaryCache,
-                         const std::vector<PcpCache*>& caches,
-                         const SdfPath& curPath,
-                         const SdfPath& newPath,
-                         const SdfLayerHandle& relocatesLayer);
+PcpNamespaceEdits PcpComputeNamespaceEdits(const PcpCache* primaryCache,
+                                           const std::vector<PcpCache*>& caches,
+                                           const SdfPath& curPath,
+                                           const SdfPath& newPath,
+                                           const SdfLayerHandle& relocatesLayer);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_NAMESPACE_EDITS_H
+#endif  // PXR_USD_PCP_NAMESPACE_EDITS_H

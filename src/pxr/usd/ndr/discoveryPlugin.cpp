@@ -10,18 +10,15 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Register this plugin type with Tf
-TF_REGISTRY_FUNCTION(TfType)
-{
+TF_REGISTRY_FUNCTION(TfType) {
     TfType::Define<NdrDiscoveryPlugin>();
 }
 
-NdrDiscoveryPlugin::NdrDiscoveryPlugin()
-{
+NdrDiscoveryPlugin::NdrDiscoveryPlugin() {
     // nothing yet
 }
 
-NdrDiscoveryPlugin::~NdrDiscoveryPlugin()
-{
+NdrDiscoveryPlugin::~NdrDiscoveryPlugin() {
     // nothing yet
 }
 

@@ -36,46 +36,32 @@ public:
 
     /// Special index that means don't move.  It's only meaningful when
     /// renaming.  In other cases implementations may assume \c AtEnd.
-    static const Index Same  = -2;
+    static const Index Same = -2;
 
     /// The default edit maps the empty path to the empty path.
-    SdfNamespaceEdit() : index(AtEnd) { }
+    SdfNamespaceEdit() : index(AtEnd) {}
 
     /// The fully general edit.
-    SdfNamespaceEdit(const Path& currentPath_, const Path& newPath_,
-                     Index index_ = AtEnd) :
-        currentPath(currentPath_), newPath(newPath_), index(index_) { }
+    SdfNamespaceEdit(const Path& currentPath_, const Path& newPath_, Index index_ = AtEnd)
+        : currentPath(currentPath_), newPath(newPath_), index(index_) {}
 
     /// Returns a namespace edit that removes the object at \p currentPath.
-    static This Remove(const Path& currentPath)
-    {
-        return This(currentPath, Path::EmptyPath());
-    }
+    static This Remove(const Path& currentPath) { return This(currentPath, Path::EmptyPath()); }
 
     /// Returns a namespace edit that renames the prim or property at
     /// \p currentPath to \p name
-    static This Rename(const Path& currentPath, const TfToken& name)
-    {
+    static This Rename(const Path& currentPath, const TfToken& name) {
         return This(currentPath, currentPath.ReplaceName(name), Same);
     }
 
     /// Returns a namespace edit to reorder the prim or property at
     /// \p currentPath to index \p index.
-    static This Reorder(const Path& currentPath, Index index)
-    {
-        return This(currentPath, currentPath, index);
-    }
+    static This Reorder(const Path& currentPath, Index index) { return This(currentPath, currentPath, index); }
 
     /// Returns a namespace edit to reparent the prim or property at
     /// \p currentPath to be under \p newParentPath at index \p index.
-    static This Reparent(const Path& currentPath,
-                         const Path& newParentPath,
-                         Index index)
-    {
-        return This(currentPath,
-                    currentPath.ReplacePrefix(currentPath.GetParentPath(),
-                                              newParentPath),
-                    index);
+    static This Reparent(const Path& currentPath, const Path& newParentPath, Index index) {
+        return This(currentPath, currentPath.ReplacePrefix(currentPath.GetParentPath(), newParentPath), index);
     }
 
     /// Returns a namespace edit to reparent the prim or property at
@@ -84,22 +70,18 @@ public:
     static This ReparentAndRename(const Path& currentPath,
                                   const Path& newParentPath,
                                   const TfToken& name,
-                                  Index index)
-    {
+                                  Index index) {
         return This(currentPath,
-                    currentPath.ReplacePrefix(currentPath.GetParentPath(),
-                                              newParentPath).
-                                ReplaceName(name),
-                    index);
+                    currentPath.ReplacePrefix(currentPath.GetParentPath(), newParentPath).ReplaceName(name), index);
     }
 
     SDF_API bool operator==(const This& rhs) const;
     SDF_API bool operator!=(const This& rhs) const;
 
 public:
-    Path currentPath;   ///< Path of the object when this edit starts.
-    Path newPath;       ///< Path of the object when this edit ends.
-    Index index;        ///< Index for prim insertion.
+    Path currentPath;  ///< Path of the object when this edit starts.
+    Path newPath;      ///< Path of the object when this edit ends.
+    Index index;       ///< Index for prim insertion.
 };
 
 /// A sequence of \c SdfNamespaceEdit.
@@ -116,14 +98,13 @@ struct SdfNamespaceEditDetail {
 public:
     /// Validity of an edit.
     enum Result {
-        Error,          ///< Edit will fail.
-        Unbatched,      ///< Edit will succeed but not batched.
-        Okay,           ///< Edit will succeed as a batch.
+        Error,      ///< Edit will fail.
+        Unbatched,  ///< Edit will succeed but not batched.
+        Okay,       ///< Edit will succeed as a batch.
     };
 
     SDF_API SdfNamespaceEditDetail();
-    SDF_API SdfNamespaceEditDetail(Result, const SdfNamespaceEdit& edit,
-                           const std::string& reason);
+    SDF_API SdfNamespaceEditDetail(Result, const SdfNamespaceEdit& edit, const std::string& reason);
 
     SDF_API bool operator==(const SdfNamespaceEditDetail& rhs) const;
     SDF_API bool operator!=(const SdfNamespaceEditDetail& rhs) const;
@@ -141,28 +122,18 @@ SDF_API std::ostream& operator<<(std::ostream&, const SdfNamespaceEditDetail&);
 SDF_API std::ostream& operator<<(std::ostream&, const SdfNamespaceEditDetailVector&);
 
 /// Combine two results, yielding Error over Unbatched over Okay.
-inline
-SdfNamespaceEditDetail::Result
-CombineResult(
-    SdfNamespaceEditDetail::Result lhs,
-    SdfNamespaceEditDetail::Result rhs)
-{
+inline SdfNamespaceEditDetail::Result CombineResult(SdfNamespaceEditDetail::Result lhs,
+                                                    SdfNamespaceEditDetail::Result rhs) {
     return lhs < rhs ? lhs : rhs;
 }
 
 /// Combine a result with Error, yielding Error over Unbatched over Okay.
-inline
-SdfNamespaceEditDetail::Result
-CombineError(SdfNamespaceEditDetail::Result)
-{
+inline SdfNamespaceEditDetail::Result CombineError(SdfNamespaceEditDetail::Result) {
     return SdfNamespaceEditDetail::Error;
 }
 
 /// Combine a result with Unbatched, yielding Error over Unbatched over Okay.
-inline
-SdfNamespaceEditDetail::Result
-CombineUnbatched(SdfNamespaceEditDetail::Result other)
-{
+inline SdfNamespaceEditDetail::Result CombineUnbatched(SdfNamespaceEditDetail::Result other) {
     return CombineResult(other, SdfNamespaceEditDetail::Unbatched);
 }
 
@@ -202,31 +173,24 @@ public:
     SDF_API SdfBatchNamespaceEdit& operator=(const SdfBatchNamespaceEdit&);
 
     /// Add a namespace edit.
-    void Add(const SdfNamespaceEdit& edit)
-    {
-        _edits.push_back(edit);
-    }
+    void Add(const SdfNamespaceEdit& edit) { _edits.push_back(edit); }
 
     /// Add a namespace edit.
     void Add(const SdfNamespaceEdit::Path& currentPath,
              const SdfNamespaceEdit::Path& newPath,
-             SdfNamespaceEdit::Index index = SdfNamespaceEdit::AtEnd)
-    {
+             SdfNamespaceEdit::Index index = SdfNamespaceEdit::AtEnd) {
         Add(SdfNamespaceEdit(currentPath, newPath, index));
     }
 
     /// Returns the edits.
-    const SdfNamespaceEditVector& GetEdits() const
-    {
-        return _edits;
-    }
+    const SdfNamespaceEditVector& GetEdits() const { return _edits; }
 
     /// Functor that returns \c true iff an object exists at the given path.
     typedef std::function<bool(const SdfPath&)> HasObjectAtPath;
 
     /// Functor that returns \c true iff the namespace edit will succeed.
     /// If not it returns \c false and sets the string argument.
-    typedef std::function<bool(const SdfNamespaceEdit&,std::string*)> CanEdit;
+    typedef std::function<bool(const SdfNamespaceEdit&, std::string*)> CanEdit;
 
     /// Validate the edits and generate a possibly more efficient edit
     /// sequence.  Edits are treated as if they were performed one at time
@@ -236,7 +200,7 @@ public:
     /// Editing the descendants of the object in each edit is implied.  If
     /// an object is removed then the new path will be empty.  If an object
     /// is removed after being otherwise edited, the other edits will be
-    /// processed and included in \p processedEdits followed by the removal. 
+    /// processed and included in \p processedEdits followed by the removal.
     /// This allows clients to fixup references to point to the object's
     /// final location prior to removal.
     ///
@@ -279,4 +243,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_NAMESPACE_EDIT_H
+#endif  // PXR_USD_SDF_NAMESPACE_EDIT_H

@@ -16,32 +16,30 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// were determined via a `NdrDiscoveryPlugin`.
 struct NdrNodeDiscoveryResult {
     /// Constructor.
-    NdrNodeDiscoveryResult(
-        const NdrIdentifier& identifier,
-        const NdrVersion& version,
-        const std::string& name,
-        const TfToken& family,
-        const TfToken& discoveryType,
-        const TfToken& sourceType,
-        const std::string& uri,
-        const std::string& resolvedUri,
-        const std::string &sourceCode=std::string(),
-        const NdrTokenMap &metadata=NdrTokenMap(),
-        const std::string& blindData=std::string(),
-        const TfToken& subIdentifier=TfToken()
-    ) : identifier(identifier),
-        version(version),
-        name(name),
-        family(family),
-        discoveryType(discoveryType),
-        sourceType(sourceType),
-        uri(uri),
-        resolvedUri(resolvedUri),
-        sourceCode(sourceCode),
-        metadata(metadata),
-        blindData(blindData),
-        subIdentifier(subIdentifier)
-    { }
+    NdrNodeDiscoveryResult(const NdrIdentifier& identifier,
+                           const NdrVersion& version,
+                           const std::string& name,
+                           const TfToken& family,
+                           const TfToken& discoveryType,
+                           const TfToken& sourceType,
+                           const std::string& uri,
+                           const std::string& resolvedUri,
+                           const std::string& sourceCode = std::string(),
+                           const NdrTokenMap& metadata = NdrTokenMap(),
+                           const std::string& blindData = std::string(),
+                           const TfToken& subIdentifier = TfToken())
+        : identifier(identifier),
+          version(version),
+          name(name),
+          family(family),
+          discoveryType(discoveryType),
+          sourceType(sourceType),
+          uri(uri),
+          resolvedUri(resolvedUri),
+          sourceCode(sourceCode),
+          metadata(metadata),
+          blindData(blindData),
+          subIdentifier(subIdentifier) {}
 
     /// The node's identifier.
     ///
@@ -101,17 +99,17 @@ struct NdrNodeDiscoveryResult {
     std::string resolvedUri;
 
     /// The node's entire source code.
-    ///  
-    /// The source code is parsed (if non-empty) by parser plugins when the 
+    ///
+    /// The source code is parsed (if non-empty) by parser plugins when the
     /// resolvedUri value is empty.
     std::string sourceCode;
 
     /// The node's metadata collected during the discovery process.
-    /// 
+    ///
     /// Additional metadata may be present in the node's source, in the asset
     /// pointed to by resolvedUri or in sourceCode (if resolvedUri is empty).
-    /// In general, parsers should override this data with metadata from the 
-    /// shader source. 
+    /// In general, parsers should override this data with metadata from the
+    /// shader source.
     NdrTokenMap metadata;
 
     /// An optional detail for the parser plugin.  The parser plugin
@@ -133,4 +131,4 @@ typedef std::vector<NdrNodeDiscoveryResult> NdrNodeDiscoveryResultVec;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_NDR_NODE_DISCOVERY_RESULT_H
+#endif  // PXR_USD_NDR_NODE_DISCOVERY_RESULT_H

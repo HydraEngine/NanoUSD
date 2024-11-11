@@ -11,9 +11,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-const std::string&
-SdfAllowed::GetWhyNot() const
-{
+const std::string& SdfAllowed::GetWhyNot() const {
     static std::string empty;
     return _state ? *_state : empty;
 }

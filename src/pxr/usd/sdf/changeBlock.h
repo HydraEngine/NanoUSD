@@ -49,7 +49,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// the best approach is to build a list of necessary changes that
 /// can be performed directly via the Sdf API, then submit those all
 /// inside a changeblock without talking to any downstream libraries.
-/// For example, this is how many mutators in Usd that operate on more 
+/// For example, this is how many mutators in Usd that operate on more
 /// than one field or Spec work.
 ///
 
@@ -62,13 +62,14 @@ public:
             _CloseChangeBlock(_key);
         }
     }
+
 private:
     SDF_API
-    void _CloseChangeBlock(void const *key) const;
-    
-    void const *_key;
+    void _CloseChangeBlock(void const* key) const;
+
+    void const* _key;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_CHANGE_BLOCK_H
+#endif  // PXR_USD_SDF_CHANGE_BLOCK_H

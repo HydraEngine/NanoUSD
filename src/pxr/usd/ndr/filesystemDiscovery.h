@@ -30,8 +30,8 @@ TF_DECLARE_WEAK_AND_REF_PTRS(_NdrFilesystemDiscoveryPlugin);
 /// must be set before the library is loaded):
 ///
 /// PXR_NDR_FS_PLUGIN_SEARCH_PATHS - The paths that should be searched,
-/// recursively, for files that represent nodes. Paths should be separated by 
-/// either a ':' or a ';' depending on your platform (it should mimic the PATH 
+/// recursively, for files that represent nodes. Paths should be separated by
+/// either a ':' or a ';' depending on your platform (it should mimic the PATH
 /// env var on your platform).  See ARCH_PATH_LIST_SEP.
 ///
 /// PXR_NDR_FS_PLUGIN_ALLOWED_EXTS - The extensions on files that define nodes.
@@ -41,8 +41,7 @@ TF_DECLARE_WEAK_AND_REF_PTRS(_NdrFilesystemDiscoveryPlugin);
 /// while walking the search paths. Set to "true" (case sensitive) if they
 /// should be followed.
 ///
-class _NdrFilesystemDiscoveryPlugin final : public NdrDiscoveryPlugin
-{
+class _NdrFilesystemDiscoveryPlugin final : public NdrDiscoveryPlugin {
 public:
     /// A filter for discovered nodes.  If the function returns false
     /// then the discovered node is discarded.  Otherwise the function
@@ -90,4 +89,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_NDR_FILESYSTEM_DISCOVERY_H
+#endif  // PXR_USD_NDR_FILESYSTEM_DISCOVERY_H

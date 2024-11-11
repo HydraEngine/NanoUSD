@@ -27,27 +27,15 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 // Helper structure for deferring the computation of a prim index
 // until needed, then caching the result to avoid multiple lookups
-struct Pcp_TargetIndexContext 
-{
-    Pcp_TargetIndexContext(
-        PcpCache* cache, 
-        PcpErrorVector* allErrors,
-        const SdfPath& targetObjectPath)
-        : _cache(cache)
-        , _allErrors(allErrors)
-        , _targetObjectPath(targetObjectPath)
-        , _index(NULL) { }
+struct Pcp_TargetIndexContext {
+    Pcp_TargetIndexContext(PcpCache* cache, PcpErrorVector* allErrors, const SdfPath& targetObjectPath)
+        : _cache(cache), _allErrors(allErrors), _targetObjectPath(targetObjectPath), _index(NULL) {}
 
-    PcpCache* GetCache()
-    {
-        return _cache;
-    }
+    PcpCache* GetCache() { return _cache; }
 
-    const PcpPrimIndex& GetTargetObjectPrimIndex()
-    {
+    const PcpPrimIndex& GetTargetObjectPrimIndex() {
         if (!_index) {
-            _index = &_cache->ComputePrimIndex(
-                _targetObjectPath.GetPrimPath(), _allErrors);
+            _index = &_cache->ComputePrimIndex(_targetObjectPath.GetPrimPath(), _allErrors);
         }
         return *_index;
     }
@@ -61,12 +49,9 @@ private:
 
 // Helper to determine if the connection path was authored in
 // a class but points to an instance of the class.
-static bool
-_TargetInClassAndTargetsInstance(
-    const SdfPath& connectionPathInNodeNS,
-    const PcpNodeRef& nodeWhereConnectionWasAuthored,
-    Pcp_TargetIndexContext& context)
-{
+static bool _TargetInClassAndTargetsInstance(const SdfPath& connectionPathInNodeNS,
+                                             const PcpNodeRef& nodeWhereConnectionWasAuthored,
+                                             Pcp_TargetIndexContext& context) {
     // Connections authored in an inherited class may not target
     // an object in an instance of that class, as doing so would
     // break reverse path translation.
@@ -77,27 +62,23 @@ _TargetInClassAndTargetsInstance(
     TRACE_FUNCTION();
 
     // If the connection path targets a namespace descendent of the class,
-    // we know we're not pointing at an object in an instance of the 
+    // we know we're not pointing at an object in an instance of the
     // class.
     //
     // Otherwise, we compute the prim index for the target object and
-    // check if it (or an ancestor) inherits from the class where 
+    // check if it (or an ancestor) inherits from the class where
     // the connection was authored. If so, issue an error.
-    const bool connectionPathInsideInheritedClass = 
-        connectionPathInNodeNS.HasPrefix(
-            nodeWhereConnectionWasAuthored.GetPathAtIntroduction());
+    const bool connectionPathInsideInheritedClass =
+            connectionPathInNodeNS.HasPrefix(nodeWhereConnectionWasAuthored.GetPathAtIntroduction());
 
     if (!connectionPathInsideInheritedClass) {
         const PcpPrimIndex& targetPrimIndex = context.GetTargetObjectPrimIndex();
-        const PcpLayerStackPtr& layerStackWhereConnectionWasAuthored = 
-            nodeWhereConnectionWasAuthored.GetLayerStack();
-        const SdfPath inheritedClassPath =
-            nodeWhereConnectionWasAuthored.GetPathAtIntroduction();
+        const PcpLayerStackPtr& layerStackWhereConnectionWasAuthored = nodeWhereConnectionWasAuthored.GetLayerStack();
+        const SdfPath inheritedClassPath = nodeWhereConnectionWasAuthored.GetPathAtIntroduction();
 
-        for (const PcpNodeRef &n: targetPrimIndex.GetNodeRange()) {
-            if (PcpIsInheritArc(n.GetArcType())
-                && (n.GetLayerStack() == layerStackWhereConnectionWasAuthored)
-                && (n.GetPath().HasPrefix(inheritedClassPath))) {
+        for (const PcpNodeRef& n : targetPrimIndex.GetNodeRange()) {
+            if (PcpIsInheritArc(n.GetArcType()) && (n.GetLayerStack() == layerStackWhereConnectionWasAuthored) &&
+                (n.GetPath().HasPrefix(inheritedClassPath))) {
                 return true;
             }
         }
@@ -108,19 +89,12 @@ _TargetInClassAndTargetsInstance(
 
 namespace {
 
-enum Pcp_PathTranslationError
-{
-    NoError = 0,
-    PermissionDenied,
-    InvalidTarget
-};
+enum Pcp_PathTranslationError { NoError = 0, PermissionDenied, InvalidTarget };
 
 }
 
-static Pcp_PathTranslationError
-_CheckTargetPermittedBeneathNode(
-    const SdfPath& connectionPathInRootNS, const PcpNodeRef& node)
-{
+static Pcp_PathTranslationError _CheckTargetPermittedBeneathNode(const SdfPath& connectionPathInRootNS,
+                                                                 const PcpNodeRef& node) {
     const bool targetObjectIsProperty = connectionPathInRootNS.IsPropertyPath();
 
     TF_FOR_ALL(it, Pcp_GetChildrenRange(node)) {
@@ -128,12 +102,11 @@ _CheckTargetPermittedBeneathNode(
 
         // If the prim has been marked private at this node, the
         // target is pointing at a restricted object, which is invalid.
-        if (child.IsRestricted() ||
-            child.GetPermission() == SdfPermissionPrivate) {
+        if (child.IsRestricted() || child.GetPermission() == SdfPermissionPrivate) {
             return PermissionDenied;
         }
 
-        // Translate the path from the root namespace to this child's 
+        // Translate the path from the root namespace to this child's
         // namespace. If the path translation fails, this target is
         // invalid so we return a general 'invalid target' error.
         //
@@ -143,8 +116,7 @@ _CheckTargetPermittedBeneathNode(
         // the case by searching the relocates statements in this node's
         // layer stack for this object, but that is potentially expensive.
         // So for now, we just let this remain a general error.
-        const SdfPath pathInChildNS = 
-            PcpTranslatePathFromRootToNode(child, connectionPathInRootNS);
+        const SdfPath pathInChildNS = PcpTranslatePathFromRootToNode(child, connectionPathInRootNS);
         if (pathInChildNS.IsEmpty()) {
             return InvalidTarget;
         }
@@ -155,14 +127,10 @@ _CheckTargetPermittedBeneathNode(
                 // are marked private. This handles the case where the property
                 // is a relational attribute; in this case, we'd need to check
                 // not only the attribute, but its owning relationship.
-                for (SdfPath p = pathInChildNS; 
-                     !p.IsPrimPath(); p = p.GetParentPath()) {
-
+                for (SdfPath p = pathInChildNS; !p.IsPrimPath(); p = p.GetParentPath()) {
                     if (p.IsPropertyPath()) {
-                        SdfPropertySpecHandle propSpec =
-                            (*layerIt)->GetPropertyAtPath(p);
-                        if (propSpec &&
-                            propSpec->GetPermission() == SdfPermissionPrivate) {
+                        SdfPropertySpecHandle propSpec = (*layerIt)->GetPropertyAtPath(p);
+                        if (propSpec && propSpec->GetPermission() == SdfPermissionPrivate) {
                             return PermissionDenied;
                         }
                     }
@@ -170,13 +138,13 @@ _CheckTargetPermittedBeneathNode(
             }
         }
 
-        const Pcp_PathTranslationError errorUnderChild = 
-            _CheckTargetPermittedBeneathNode(connectionPathInRootNS, child);
+        const Pcp_PathTranslationError errorUnderChild =
+                _CheckTargetPermittedBeneathNode(connectionPathInRootNS, child);
         if (errorUnderChild != NoError) {
             return errorUnderChild;
         }
     }
-    
+
     return NoError;
 }
 
@@ -192,7 +160,7 @@ _CheckTargetPermittedBeneathNode(
 //     /A ---> /B ---> /C
 //
 // If we have a connection authored in /B, it's OK if the targeted object
-// was marked private in /A or /B, but not if it was marked private in /C. 
+// was marked private in /A or /B, but not if it was marked private in /C.
 // See ErrorTargetPermissionDenied for more examples.
 //
 // - Relocates
@@ -201,23 +169,20 @@ _CheckTargetPermittedBeneathNode(
 // is verified indirectly -- see comment in _CheckTargetPermittedBenaethNode.
 // See ErrorInvalidPreRelocateTargetPath for examples.
 //
-static Pcp_PathTranslationError
-_TargetIsPermitted(
-    const SdfPath& connectionPathInRootNS,
-    const SdfPath& connectionPathInNodeNS,
-    const PcpNodeRef& nodeWhereConnectionWasAuthored,
-    Pcp_TargetIndexContext& context)
-{
+static Pcp_PathTranslationError _TargetIsPermitted(const SdfPath& connectionPathInRootNS,
+                                                   const SdfPath& connectionPathInNodeNS,
+                                                   const PcpNodeRef& nodeWhereConnectionWasAuthored,
+                                                   Pcp_TargetIndexContext& context) {
     TRACE_FUNCTION();
 
     // The approach for figuring out where the given connection is valid
-    // is to compute the prim index for the target object in the root layer 
+    // is to compute the prim index for the target object in the root layer
     // stack (i.e., the layer stack for the given cache), find the node
-    // that corresponds to where the connection was authored, then check 
+    // that corresponds to where the connection was authored, then check
     // the subtree beneath that node.
     //
     // An alternative approach would be to compute the index for the target
-    // object in the layer stack where the connection was authored and to 
+    // object in the layer stack where the connection was authored and to
     // use that when checking permissions. This would avoid the need to search
     // for a specific node. However, we wouldn't be able to use the given cache
     // and would have to compute the index from scratch each time, which is
@@ -226,22 +191,21 @@ _TargetIsPermitted(
     const SdfPath owningPrimInRootNS = connectionPathInRootNS.GetPrimPath();
     const PcpPrimIndex& owningPrimIndex = context.GetTargetObjectPrimIndex();
 
-    // If the root node of the prim index is inert, the prim index is an 
-    // invalid prim, typically because it is or is under the source of a 
+    // If the root node of the prim index is inert, the prim index is an
+    // invalid prim, typically because it is or is under the source of a
     // relocation and is therefore prohibited.
     if (owningPrimIndex.GetRootNode().IsInert()) {
         return InvalidTarget;
     }
 
     // Search for the node for the owning prim where the connection was
-    // authored. 
+    // authored.
     const SdfPath owningPrimInNodeNS = connectionPathInNodeNS.GetPrimPath();
-    const PcpLayerStackSite owningPrimSiteWhereConnectionWasAuthored(
-        nodeWhereConnectionWasAuthored.GetLayerStack(),
-        owningPrimInNodeNS);
+    const PcpLayerStackSite owningPrimSiteWhereConnectionWasAuthored(nodeWhereConnectionWasAuthored.GetLayerStack(),
+                                                                     owningPrimInNodeNS);
 
     PcpNodeRef owningPrimNodeWhereConnectionWasAuthored;
-    for (const PcpNodeRef &node: owningPrimIndex.GetNodeRange()) {
+    for (const PcpNodeRef& node : owningPrimIndex.GetNodeRange()) {
         if (node.GetSite() == owningPrimSiteWhereConnectionWasAuthored) {
             owningPrimNodeWhereConnectionWasAuthored = node;
             break;
@@ -262,7 +226,7 @@ _TargetIsPermitted(
     // of each case.
     //
     // In all cases, we permit the connection. This ignores permissions that
-    // usually are inherited down namespace but maintains legacy behavior 
+    // usually are inherited down namespace but maintains legacy behavior
     // from Csd. If we wanted to make the behavior consistent here, we would
     // have to walk up namespace to see if there were other permissions to
     // apply.
@@ -270,32 +234,24 @@ _TargetIsPermitted(
     // If culling is disabled, we definitely expect to find the node, so
     // issue an error if we don't.
     if (!owningPrimNodeWhereConnectionWasAuthored) {
-        TF_VERIFY(context.GetCache()->GetPrimIndexInputs().cull, 
-            "Could not find expected node for site %s in prim index for <%s>",
-            TfStringify(owningPrimSiteWhereConnectionWasAuthored).c_str(),
-            owningPrimInRootNS.GetText());
+        TF_VERIFY(context.GetCache()->GetPrimIndexInputs().cull,
+                  "Could not find expected node for site %s in prim index for <%s>",
+                  TfStringify(owningPrimSiteWhereConnectionWasAuthored).c_str(), owningPrimInRootNS.GetText());
 
         return NoError;
     }
 
-    return _CheckTargetPermittedBeneathNode(
-            connectionPathInRootNS, owningPrimNodeWhereConnectionWasAuthored);
+    return _CheckTargetPermittedBeneathNode(connectionPathInRootNS, owningPrimNodeWhereConnectionWasAuthored);
 }
 
-static void
-_RemoveTargetPathErrorsForPath(
-    const SdfPath& composedTargetPath,
-    PcpErrorVector* targetPathErrors)
-{
+static void _RemoveTargetPathErrorsForPath(const SdfPath& composedTargetPath, PcpErrorVector* targetPathErrors) {
     if (targetPathErrors->empty()) {
         return;
     }
 
-    PcpErrorVector::iterator 
-        it = targetPathErrors->begin(), end = targetPathErrors->end();
+    PcpErrorVector::iterator it = targetPathErrors->begin(), end = targetPathErrors->end();
     while (it != end) {
-        if (const PcpErrorTargetPathBase* targetPathError = 
-            dynamic_cast<const PcpErrorTargetPathBase*>(it->get())) {
+        if (const PcpErrorTargetPathBase* targetPathError = dynamic_cast<const PcpErrorTargetPathBase*>(it->get())) {
             if (targetPathError->composedTargetPath == composedTargetPath) {
                 it = targetPathErrors->erase(it);
                 end = targetPathErrors->end();
@@ -308,23 +264,19 @@ _RemoveTargetPathErrorsForPath(
 
 // Callback used to translate paths as path list operations from
 // various nodes are applied.
-static std::optional<SdfPath>
-_PathTranslateCallback(
-    SdfListOpType opType,
-    const PcpSite &propSite,
-    const PcpNodeRef& node, 
-    const SdfPath& inPath,
-    const SdfPropertySpecHandle& owningProp,
-    const SdfSpecType relOrAttrType,
-    PcpCache* cacheForValidation,
-    SdfPathVector *deletedPaths,
-    PcpErrorVector* targetPathErrors,
-    PcpErrorVector* otherErrors)
-{
+static std::optional<SdfPath> _PathTranslateCallback(SdfListOpType opType,
+                                                     const PcpSite& propSite,
+                                                     const PcpNodeRef& node,
+                                                     const SdfPath& inPath,
+                                                     const SdfPropertySpecHandle& owningProp,
+                                                     const SdfSpecType relOrAttrType,
+                                                     PcpCache* cacheForValidation,
+                                                     SdfPathVector* deletedPaths,
+                                                     PcpErrorVector* targetPathErrors,
+                                                     PcpErrorVector* otherErrors) {
     bool pathIsMappable = false;
 
-    const SdfPath translatedPath = 
-        PcpTranslatePathFromNodeToRoot(node, inPath, &pathIsMappable);
+    const SdfPath translatedPath = PcpTranslatePathFromNodeToRoot(node, inPath, &pathIsMappable);
 
     // If the given path is part of a delete list operation, we don't
     // need to perform any of the validation below. Since the specified
@@ -343,10 +295,9 @@ _PathTranslateCallback(
         }
         return std::optional<SdfPath>();
     }
-    
+
     if (!pathIsMappable) {
-        PcpErrorInvalidExternalTargetPathPtr err =
-            PcpErrorInvalidExternalTargetPath::New();
+        PcpErrorInvalidExternalTargetPathPtr err = PcpErrorInvalidExternalTargetPath::New();
         err->rootSite = propSite;
         err->targetPath = inPath;
         err->owningPath = owningProp->GetPath();
@@ -364,14 +315,12 @@ _PathTranslateCallback(
     }
 
     if (cacheForValidation) {
-        Pcp_TargetIndexContext context(
-            cacheForValidation, otherErrors, translatedPath);
+        Pcp_TargetIndexContext context(cacheForValidation, otherErrors, translatedPath);
 
         // Check if this target has been authored in a class but targets
         // an instance of the class.
         if (_TargetInClassAndTargetsInstance(inPath, node, context)) {
-            PcpErrorInvalidInstanceTargetPathPtr err = 
-                PcpErrorInvalidInstanceTargetPath::New();
+            PcpErrorInvalidInstanceTargetPathPtr err = PcpErrorInvalidInstanceTargetPath::New();
             err->rootSite = propSite;
             err->targetPath = inPath;
             err->owningPath = owningProp->GetPath();
@@ -383,68 +332,60 @@ _PathTranslateCallback(
         }
 
         // Check if the connection is invalid due to permissions or
-        // relocates. We do not do this check for Usd caches, since Usd 
+        // relocates. We do not do this check for Usd caches, since Usd
         // does not use either feature.
         if (!cacheForValidation->IsUsd()) {
-
             switch (_TargetIsPermitted(translatedPath, inPath, node, context)) {
-            case PermissionDenied:
-            {
-                PcpErrorTargetPermissionDeniedPtr err =
-                    PcpErrorTargetPermissionDenied::New();
-                err->rootSite = propSite;
-                err->targetPath = inPath;
-                err->owningPath = owningProp->GetPath();
-                err->ownerSpecType = relOrAttrType;
-                err->layer = owningProp->GetLayer();
-                err->composedTargetPath = translatedPath;
-                targetPathErrors->push_back(err);
-                return std::optional<SdfPath>();
-            }
+                case PermissionDenied: {
+                    PcpErrorTargetPermissionDeniedPtr err = PcpErrorTargetPermissionDenied::New();
+                    err->rootSite = propSite;
+                    err->targetPath = inPath;
+                    err->owningPath = owningProp->GetPath();
+                    err->ownerSpecType = relOrAttrType;
+                    err->layer = owningProp->GetLayer();
+                    err->composedTargetPath = translatedPath;
+                    targetPathErrors->push_back(err);
+                    return std::optional<SdfPath>();
+                }
 
-            case InvalidTarget:
-            {
-                PcpErrorInvalidTargetPathPtr err = 
-                    PcpErrorInvalidTargetPath::New();
-                err->rootSite = propSite;
-                err->targetPath = inPath;
-                err->owningPath = owningProp->GetPath();
-                err->ownerSpecType = relOrAttrType;
-                err->layer = owningProp->GetLayer();
-                err->composedTargetPath = translatedPath;
-                targetPathErrors->push_back(err);
-                return std::optional<SdfPath>();
-            }
+                case InvalidTarget: {
+                    PcpErrorInvalidTargetPathPtr err = PcpErrorInvalidTargetPath::New();
+                    err->rootSite = propSite;
+                    err->targetPath = inPath;
+                    err->owningPath = owningProp->GetPath();
+                    err->ownerSpecType = relOrAttrType;
+                    err->layer = owningProp->GetLayer();
+                    err->composedTargetPath = translatedPath;
+                    targetPathErrors->push_back(err);
+                    return std::optional<SdfPath>();
+                }
 
-            case NoError:
-                // Do nothing.
-                break;
+                case NoError:
+                    // Do nothing.
+                    break;
             }
         }
     }
-    
+
     return translatedPath;
 }
- 
-void
-PcpBuildFilteredTargetIndex(
-    const PcpSite& propSite,
-    const PcpPropertyIndex& propertyIndex,
-    const SdfSpecType relOrAttrType,
-    const bool localOnly,
-    const SdfSpecHandle &stopProperty,
-    const bool includeStopProperty,
-    PcpCache *cacheForValidation,
-    PcpTargetIndex *targetIndex,
-    SdfPathVector *deletedPaths,
-    PcpErrorVector *allErrors)
-{
+
+void PcpBuildFilteredTargetIndex(const PcpSite& propSite,
+                                 const PcpPropertyIndex& propertyIndex,
+                                 const SdfSpecType relOrAttrType,
+                                 const bool localOnly,
+                                 const SdfSpecHandle& stopProperty,
+                                 const bool includeStopProperty,
+                                 PcpCache* cacheForValidation,
+                                 PcpTargetIndex* targetIndex,
+                                 SdfPathVector* deletedPaths,
+                                 PcpErrorVector* allErrors) {
     TRACE_FUNCTION();
 
-    if (!(relOrAttrType == SdfSpecTypeRelationship ||
-             relOrAttrType == SdfSpecTypeAttribute)) {
-        TF_CODING_ERROR("relOrAttrType msut be either SdfSpecTypeRelationship"
-                        " or SdfSpecTypeAttribute");
+    if (!(relOrAttrType == SdfSpecTypeRelationship || relOrAttrType == SdfSpecTypeAttribute)) {
+        TF_CODING_ERROR(
+                "relOrAttrType msut be either SdfSpecTypeRelationship"
+                " or SdfSpecTypeAttribute");
         return;
     }
 
@@ -452,31 +393,25 @@ PcpBuildFilteredTargetIndex(
         return;
     }
 
-    const PcpPropertyRange propertyRange =
-        propertyIndex.GetPropertyRange(localOnly);
+    const PcpPropertyRange propertyRange = propertyIndex.GetPropertyRange(localOnly);
 
     // Verify that the type of object at propSite.path matches what
     // we expect. We only need to check the first spec in the stack since all
     // other specs should have the same type. This is enforced in the
     // population of the property index.
-    if (!TF_VERIFY(
-            (*propertyRange.first)->GetSpecType() == relOrAttrType,
-            "<%s> is not %s", 
-            propSite.path.GetText(),
-            relOrAttrType == SdfSpecTypeAttribute ? 
-                "an attribute" : "a relationship")) {
+    if (!TF_VERIFY((*propertyRange.first)->GetSpecType() == relOrAttrType, "<%s> is not %s", propSite.path.GetText(),
+                   relOrAttrType == SdfSpecTypeAttribute ? "an attribute" : "a relationship")) {
         return;
     }
 
-    const TfToken& fieldName = 
-        relOrAttrType == SdfSpecTypeAttribute ? 
-            SdfFieldKeys->ConnectionPaths : SdfFieldKeys->TargetPaths;
+    const TfToken& fieldName =
+            relOrAttrType == SdfSpecTypeAttribute ? SdfFieldKeys->ConnectionPaths : SdfFieldKeys->TargetPaths;
 
     SdfPathVector paths;
     PcpErrorVector targetPathErrors;
     bool hasTargetOpinions = false;
 
-    // Walk the property stack from weakest to strongest, applying path list 
+    // Walk the property stack from weakest to strongest, applying path list
     // operations with the appropriate path translations to targetPaths.
     TF_REVERSE_FOR_ALL(propIt, propertyRange) {
         const SdfPropertySpecHandle& property = *propIt;
@@ -484,12 +419,10 @@ PcpBuildFilteredTargetIndex(
             break;
         }
         const VtValue& pathValue = property->GetField(fieldName);
-        if (pathValue.IsEmpty() ||
-            !TF_VERIFY(pathValue.IsHolding<SdfPathListOp>())) {
+        if (pathValue.IsEmpty() || !TF_VERIFY(pathValue.IsHolding<SdfPathListOp>())) {
             continue;
         }
-        const SdfPathListOp& pathListOps =
-            pathValue.UncheckedGet<SdfPathListOp>();
+        const SdfPathListOp& pathListOps = pathValue.UncheckedGet<SdfPathListOp>();
         if (pathListOps.HasKeys()) {
             hasTargetOpinions = true;
 
@@ -504,14 +437,10 @@ PcpBuildFilteredTargetIndex(
                 }
             }
 
-            SdfPathListOp::ApplyCallback pathTranslationCallback = 
-                std::bind(&_PathTranslateCallback, 
-                          std::placeholders::_1, std::ref(propSite),
-                          propIt.base().GetNode(), std::placeholders::_2,
-                          std::ref(property), relOrAttrType,
-                          cacheForValidation, 
-                          deletedPaths,
-                          &targetPathErrors, allErrors);
+            SdfPathListOp::ApplyCallback pathTranslationCallback =
+                    std::bind(&_PathTranslateCallback, std::placeholders::_1, std::ref(propSite),
+                              propIt.base().GetNode(), std::placeholders::_2, std::ref(property), relOrAttrType,
+                              cacheForValidation, deletedPaths, &targetPathErrors, allErrors);
             pathListOps.ApplyOperations(&paths, pathTranslationCallback);
         }
         if (property == stopProperty) {
@@ -519,31 +448,24 @@ PcpBuildFilteredTargetIndex(
         }
     }
 
-    allErrors->insert(
-        allErrors->end(), targetPathErrors.begin(), targetPathErrors.end());
+    allErrors->insert(allErrors->end(), targetPathErrors.begin(), targetPathErrors.end());
 
     targetIndex->paths.swap(paths);
     targetIndex->localErrors.swap(targetPathErrors);
     targetIndex->hasTargetOpinions = hasTargetOpinions;
 }
 
-void
-PcpBuildTargetIndex(
-    const PcpSite& propSite,
-    const PcpPropertyIndex& propIndex,
-    const SdfSpecType relOrAttrType,
-    PcpTargetIndex *targetIndex,
-    PcpErrorVector *allErrors)
-{
-    PcpBuildFilteredTargetIndex(
-        propSite, propIndex, relOrAttrType,
-        /* localOnly = */ false,
-        /* stopProperty = */ SdfSpecHandle(),
-        /* includeStopProperty = */ false,
-        /* cacheForValidation = */ 0,
-        targetIndex,
-        /* deletedPaths = */ nullptr,
-        allErrors);
+void PcpBuildTargetIndex(const PcpSite& propSite,
+                         const PcpPropertyIndex& propIndex,
+                         const SdfSpecType relOrAttrType,
+                         PcpTargetIndex* targetIndex,
+                         PcpErrorVector* allErrors) {
+    PcpBuildFilteredTargetIndex(propSite, propIndex, relOrAttrType,
+                                /* localOnly = */ false,
+                                /* stopProperty = */ SdfSpecHandle(),
+                                /* includeStopProperty = */ false,
+                                /* cacheForValidation = */ 0, targetIndex,
+                                /* deletedPaths = */ nullptr, allErrors);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

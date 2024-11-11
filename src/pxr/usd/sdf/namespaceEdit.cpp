@@ -13,7 +13,6 @@
 #include "pxr/base/tf/registryManager.h"
 #include "pxr/base/tf/stringUtils.h"
 
-
 #include <memory>
 #include <ostream>
 #include <set>
@@ -21,8 +20,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfEnum)
-{
+TF_REGISTRY_FUNCTION(TfEnum) {
     TF_ADD_ENUM_NAME(SdfNamespaceEditDetail::Error);
     TF_ADD_ENUM_NAME(SdfNamespaceEditDetail::Unbatched);
     TF_ADD_ENUM_NAME(SdfNamespaceEditDetail::Okay);
@@ -37,9 +35,9 @@ TF_REGISTRY_FUNCTION(TfEnum)
 class SdfNamespaceEdit_Namespace {
     SdfNamespaceEdit_Namespace(const SdfNamespaceEdit_Namespace&) = delete;
     SdfNamespaceEdit_Namespace& operator=(const SdfNamespaceEdit_Namespace&) = delete;
+
 public:
-    SdfNamespaceEdit_Namespace(bool fixBackpointers) :
-        _fixBackpointers(fixBackpointers) { }
+    SdfNamespaceEdit_Namespace(bool fixBackpointers) : _fixBackpointers(fixBackpointers) {}
 
     /// Returns the original path of the "object" currently at \p path.
     /// If this path hasn't yet been edited this returns \p path.  If
@@ -77,7 +75,7 @@ private:
     using _Key = std::variant<_RootKey, TfToken, SdfPath>;
 
     struct _TargetKey {
-        _TargetKey(const SdfPath& path) : key(path) { }
+        _TargetKey(const SdfPath& path) : key(path) {}
         const _Key key;
     };
 
@@ -90,40 +88,33 @@ private:
         _Node(const _Node&) = delete;
         _Node& operator=(const _Node&) = delete;
         struct _PtrCompare {
-            bool operator()(const std::unique_ptr<_Node>& lhs,
-                            const std::unique_ptr<_Node>& rhs) const {
+            bool operator()(const std::unique_ptr<_Node>& lhs, const std::unique_ptr<_Node>& rhs) const {
                 return *lhs < *rhs;
             }
-            bool operator()(const _Node& lhs,
-                            const std::unique_ptr<_Node>& rhs) const {
-                return lhs < *rhs;
-            }
-            bool operator()(const std::unique_ptr<_Node>& lhs,
-                            const _Node& rhs) const {
-                return *lhs < rhs;
-            }
+            bool operator()(const _Node& lhs, const std::unique_ptr<_Node>& rhs) const { return lhs < *rhs; }
+            bool operator()(const std::unique_ptr<_Node>& lhs, const _Node& rhs) const { return *lhs < rhs; }
             // Setting is_transparent allows `std::set::find` to work
             // on `_Node` references even though it stores
             // `std::unique_ptr<_Node>`
             using is_transparent = void;
         };
         using _Children = std::set<std::unique_ptr<_Node>, _PtrCompare>;
+
     public:
         // Create the root node.
-        _Node() : _key(_RootKey()), _parent(nullptr),
-            _children(std::make_unique<_Children>()),
-            _originalPath(SdfPath::AbsoluteRootPath()) { }
+        _Node()
+            : _key(_RootKey()),
+              _parent(nullptr),
+              _children(std::make_unique<_Children>()),
+              _originalPath(SdfPath::AbsoluteRootPath()) {}
 
         // Create key nodes.  These nodes must not be used as children.
-        _Node(const TfToken& name) : _key(name) { }
-        _Node(const _TargetKey& key) : _key(key.key) { }
-        _Node(const SdfPath& path) : _key(_GetKey(path)) { }
+        _Node(const TfToken& name) : _key(name) {}
+        _Node(const _TargetKey& key) : _key(key.key) {}
+        _Node(const SdfPath& path) : _key(_GetKey(path)) {}
 
         // Sort by key.
-        bool operator<(const _Node& rhs) const
-        {
-            return _key < rhs._key;
-        }
+        bool operator<(const _Node& rhs) const { return _key < rhs._key; }
 
         // Get the child that has the last element of \p path as its key.
         _Node* GetChild(const SdfPath& path);
@@ -139,32 +130,19 @@ private:
         // \p originalTarget must be \p target in the original namespace.
         // \p created is set to \c true if the node was created, \c false
         // if it was found.
-        _Node* FindOrCreateChild(const SdfPath& target,
-                                 const SdfPath& originalTarget, bool* created);
+        _Node* FindOrCreateChild(const SdfPath& target, const SdfPath& originalTarget, bool* created);
 
         // Return the node's key.
-        const _Key& GetKey() const
-        {
-            return _key;
-        }
+        const _Key& GetKey() const { return _key; }
 
         // Set the node's key.
-        void SetKey(const _Key& key)
-        {
-            _key = key;
-        }
+        void SetKey(const _Key& key) { _key = key; }
 
         // Return the node's original path.
-        const SdfPath& GetOriginalPath() const
-        {
-            return _originalPath;
-        }
+        const SdfPath& GetOriginalPath() const { return _originalPath; }
 
         // Test if the node was removed.  This returns true for key nodes.
-        bool IsRemoved() const
-        {
-            return !_parent && _key.index() != 0;
-        }
+        bool IsRemoved() const { return !_parent && _key.index() != 0; }
 
         // Remove the node from its parent.  After this call returns \c true
         // the client owns the _Node.  On failure returns \c false, fills in
@@ -176,26 +154,20 @@ private:
         bool Reparent(_Node* node, const SdfPath& path, std::string* whyNot);
 
     private:
-        _Node(_Node* parent, const _Key& key, const SdfPath& originalPath) :
-            _key(key), _parent(parent),
-            _children(std::make_unique<_Children>()),
-            _originalPath(originalPath)
-        {
+        _Node(_Node* parent, const _Key& key, const SdfPath& originalPath)
+            : _key(key), _parent(parent), _children(std::make_unique<_Children>()), _originalPath(originalPath) {
             // Do nothing
         }
 
         // Check that \p path is the path to this node.
-        bool _VerifyPath(const SdfPath& path) const
-        {
+        bool _VerifyPath(const SdfPath& path) const {
             // path must be the path to this node but checking that is
             // expensive so we don't do it.
             return true;
         }
 
-        static _Key _GetKey(const SdfPath& path)
-        {
-            return path.IsTargetPath() ? _Key(path.GetTargetPath())
-                                       : _Key(path.GetNameToken());
+        static _Key _GetKey(const SdfPath& path) {
+            return path.IsTargetPath() ? _Key(path.GetTargetPath()) : _Key(path.GetNameToken());
         }
 
     private:
@@ -228,8 +200,7 @@ private:
     // Move (reparent/rename) the object at \p currentPath to \p newPath.
     // The descendants of the object are moved with the object.  \p newPath
     // must not be empty and an object at the parent path must exist.
-    bool _Move(const SdfPath& currentPath, const SdfPath& newPath,
-               std::string* whyNot);
+    bool _Move(const SdfPath& currentPath, const SdfPath& newPath, std::string* whyNot);
 
     // Adjust the backpointers for \p currentPath to refer to \p newPath.
     void _FixBackpointers(const SdfPath& currentPath, const SdfPath& newPath);
@@ -247,7 +218,7 @@ private:
     void _RemoveDeadspace(const SdfPath& path);
 
     // Move all deadspace descendants from the \p from path to the \p to path.
-    void _MoveDeadspaceDescendants(const SdfPath &from, const SdfPath &to);
+    void _MoveDeadspaceDescendants(const SdfPath& from, const SdfPath& to);
 
     // Returns \c true if \p path is in _deadspace.
     bool _IsDeadspace(const SdfPath& path) const;
@@ -270,9 +241,7 @@ private:
     _BackpointerMap _nodesWithPath;
 };
 
-SdfNamespaceEdit_Namespace::_Node*
-SdfNamespaceEdit_Namespace::_Node::GetChild(const SdfPath& path)
-{
+SdfNamespaceEdit_Namespace::_Node* SdfNamespaceEdit_Namespace::_Node::GetChild(const SdfPath& path) {
     // Make a key node for the path.
     _VerifyPath(path.GetParentPath());
     _Node keyNode(path);
@@ -281,9 +250,7 @@ SdfNamespaceEdit_Namespace::_Node::GetChild(const SdfPath& path)
     return (i == _children->end()) ? nullptr : i->get();
 }
 
-const SdfNamespaceEdit_Namespace::_Node*
-SdfNamespaceEdit_Namespace::_Node::GetChild(const SdfPath& path) const
-{
+const SdfNamespaceEdit_Namespace::_Node* SdfNamespaceEdit_Namespace::_Node::GetChild(const SdfPath& path) const {
     // Make a key node for the path.
     _VerifyPath(path.GetParentPath());
     _Node keyNode(path);
@@ -292,44 +259,34 @@ SdfNamespaceEdit_Namespace::_Node::GetChild(const SdfPath& path) const
     return (i == _children->end()) ? nullptr : i->get();
 }
 
-SdfNamespaceEdit_Namespace::_Node*
-SdfNamespaceEdit_Namespace::_Node::FindOrCreateChild(const SdfPath& path)
-{
+SdfNamespaceEdit_Namespace::_Node* SdfNamespaceEdit_Namespace::_Node::FindOrCreateChild(const SdfPath& path) {
     // Make a key node for the name.
     _VerifyPath(path.GetParentPath());
     _Node keyNode(path.GetNameToken());
 
     _Children::iterator i = _children->find(keyNode);
     if (i == _children->end()) {
-        SdfPath originalPath =
-            path.ReplacePrefix(path.GetParentPath(), GetOriginalPath());
-        i = _children->emplace(new _Node(this, keyNode.GetKey(),
-                                         originalPath)).first;
+        SdfPath originalPath = path.ReplacePrefix(path.GetParentPath(), GetOriginalPath());
+        i = _children->emplace(new _Node(this, keyNode.GetKey(), originalPath)).first;
     }
     return i->get();
 }
 
-SdfNamespaceEdit_Namespace::_Node*
-SdfNamespaceEdit_Namespace::_Node::FindOrCreateChild(
-    const SdfPath& target,
-    const SdfPath& originalTarget,
-    bool* created)
-{
+SdfNamespaceEdit_Namespace::_Node* SdfNamespaceEdit_Namespace::_Node::FindOrCreateChild(const SdfPath& target,
+                                                                                        const SdfPath& originalTarget,
+                                                                                        bool* created) {
     // Make a key node for the path.
     _Node keyNode((_TargetKey(target)));
 
     _Children::iterator i = _children->find(keyNode);
     if ((*created = (i == _children->end()))) {
         SdfPath originalPath = GetOriginalPath().AppendTarget(originalTarget);
-        i = _children->emplace(new _Node(this, keyNode.GetKey(),
-                                         originalPath)).first;
+        i = _children->emplace(new _Node(this, keyNode.GetKey(), originalPath)).first;
     }
     return i->get();
 }
 
-bool
-SdfNamespaceEdit_Namespace::_Node::Remove(std::string* whyNot)
-{
+bool SdfNamespaceEdit_Namespace::_Node::Remove(std::string* whyNot) {
     if (!TF_VERIFY(!IsRemoved())) {
         *whyNot = "Coding error: Node has no parent";
         return false;
@@ -358,12 +315,7 @@ SdfNamespaceEdit_Namespace::_Node::Remove(std::string* whyNot)
     return true;
 }
 
-bool
-SdfNamespaceEdit_Namespace::_Node::Reparent(
-    _Node* node,
-    const SdfPath& path,
-    std::string* whyNot)
-{
+bool SdfNamespaceEdit_Namespace::_Node::Reparent(_Node* node, const SdfPath& path, std::string* whyNot) {
     _VerifyPath(path.GetParentPath());
 
     // Make a key node for the new path.
@@ -396,61 +348,45 @@ SdfNamespaceEdit_Namespace::_Node::Reparent(
     return true;
 }
 
-const SdfPath&
-SdfNamespaceEdit_Namespace::FindOrCreateOriginalPath(const SdfPath& path)
-{
+const SdfPath& SdfNamespaceEdit_Namespace::FindOrCreateOriginalPath(const SdfPath& path) {
     _Node* node = _FindOrCreateNodeAtPath(path);
     return node ? node->GetOriginalPath() : SdfPath::EmptyPath();
 }
 
-SdfPath
-SdfNamespaceEdit_Namespace::GetOriginalPath(const SdfPath& path)
-{
+SdfPath SdfNamespaceEdit_Namespace::GetOriginalPath(const SdfPath& path) {
     if (_IsDeadspace(path)) {
         return SdfPath::EmptyPath();
-    }
-    else {
+    } else {
         return _UneditPath(path);
     }
 }
 
-bool
-SdfNamespaceEdit_Namespace::Apply(
-    const SdfNamespaceEdit& edit,
-    std::string* whyNot)
-{
+bool SdfNamespaceEdit_Namespace::Apply(const SdfNamespaceEdit& edit, std::string* whyNot) {
     // If newPath is empty we want to remove the object.
     if (edit.newPath.IsEmpty()) {
         return _Remove(edit.currentPath, whyNot);
-    }
-    else if (edit.currentPath != edit.newPath) {
+    } else if (edit.currentPath != edit.newPath) {
         return _Move(edit.currentPath, edit.newPath, whyNot);
-    }
-    else {
+    } else {
         // Reorder -- Ignore the reorder in our virtual namespace.
         return true;
     }
 }
 
-SdfPath
-SdfNamespaceEdit_Namespace::_UneditPath(const SdfPath& path) const
-{
+SdfPath SdfNamespaceEdit_Namespace::_UneditPath(const SdfPath& path) const {
     // Walk down to node.
     const _Node* node = &_root;
     for (const auto& prefix : path.GetPrefixes()) {
         const _Node* child = node->GetChild(prefix);
         if (!child) {
-            return path.ReplacePrefix(prefix.GetParentPath(),
-                                      node->GetOriginalPath());
+            return path.ReplacePrefix(prefix.GetParentPath(), node->GetOriginalPath());
         }
         node = child;
     }
     return node->GetOriginalPath();
 }
 
-SdfNamespaceEdit_Namespace::_Node*
-SdfNamespaceEdit_Namespace::_GetNodeAtPath(const SdfPath& path)
-{
+SdfNamespaceEdit_Namespace::_Node* SdfNamespaceEdit_Namespace::_GetNodeAtPath(const SdfPath& path) {
     // Walk down to node.
     _Node* node = &_root;
     for (const auto& prefix : path.GetPrefixes()) {
@@ -462,9 +398,7 @@ SdfNamespaceEdit_Namespace::_GetNodeAtPath(const SdfPath& path)
     return node;
 }
 
-SdfNamespaceEdit_Namespace::_Node*
-SdfNamespaceEdit_Namespace::_FindOrCreateNodeAtPath(const SdfPath& path)
-{
+SdfNamespaceEdit_Namespace::_Node* SdfNamespaceEdit_Namespace::_FindOrCreateNodeAtPath(const SdfPath& path) {
     // Can't find/create in deadspace.
     if (_IsDeadspace(path)) {
         return NULL;
@@ -475,23 +409,20 @@ SdfNamespaceEdit_Namespace::_FindOrCreateNodeAtPath(const SdfPath& path)
     _Node* node = &_root;
     for (const auto& prefix : path.GetPrefixes()) {
         if (prefix.IsTargetPath()) {
-            const SdfPath& target  = prefix.GetTargetPath();
+            const SdfPath& target = prefix.GetTargetPath();
             SdfPath originalTarget = _UneditPath(target);
             node = node->FindOrCreateChild(target, originalTarget, &created);
             if (created && _fixBackpointers) {
                 _AddBackpointer(target, node);
             }
-        }
-        else {
+        } else {
             node = node->FindOrCreateChild(prefix);
         }
     }
     return node;
 }
 
-bool
-SdfNamespaceEdit_Namespace::_Remove(const SdfPath& path, std::string* whyNot)
-{
+bool SdfNamespaceEdit_Namespace::_Remove(const SdfPath& path, std::string* whyNot) {
     // Get the node at path.
     _Node* node = _GetNodeAtPath(path);
     if (!TF_VERIFY(node)) {
@@ -518,12 +449,7 @@ SdfNamespaceEdit_Namespace::_Remove(const SdfPath& path, std::string* whyNot)
     return true;
 }
 
-bool
-SdfNamespaceEdit_Namespace::_Move(
-    const SdfPath& currentPath,
-    const SdfPath& newPath,
-    std::string* whyNot)
-{
+bool SdfNamespaceEdit_Namespace::_Move(const SdfPath& currentPath, const SdfPath& newPath, std::string* whyNot) {
     // Get the node at currentPath.  We want to edit it.
     _Node* node = _GetNodeAtPath(currentPath);
     if (!TF_VERIFY(node)) {
@@ -560,11 +486,7 @@ SdfNamespaceEdit_Namespace::_Move(
     return true;
 }
 
-void
-SdfNamespaceEdit_Namespace::_FixBackpointers(
-    const SdfPath& currentPath,
-    const SdfPath& newPath)
-{
+void SdfNamespaceEdit_Namespace::_FixBackpointers(const SdfPath& currentPath, const SdfPath& newPath) {
     // Find the extent of the subtree with currentPath as a prefix.
     _BackpointerMap::iterator i = _nodesWithPath.lower_bound(currentPath);
     _BackpointerMap::iterator n = i;
@@ -576,9 +498,7 @@ SdfNamespaceEdit_Namespace::_FixBackpointers(
     static const bool fixTargetPaths = true;
     for (_BackpointerMap::iterator j = i; j != n; ++j) {
         for (auto node : j->second) {
-            node->SetKey(
-                std::get<SdfPath>(node->GetKey()).
-                    ReplacePrefix(currentPath, newPath, !fixTargetPaths));
+            node->SetKey(std::get<SdfPath>(node->GetKey()).ReplacePrefix(currentPath, newPath, !fixTargetPaths));
         }
     }
 
@@ -591,25 +511,18 @@ SdfNamespaceEdit_Namespace::_FixBackpointers(
 
     // Put the entries back with the paths modified.
     i = _nodesWithPath.lower_bound(newPath);
-    if (TF_VERIFY(i == _nodesWithPath.end() ||
-                  !i->first.HasPrefix(currentPath),
-                  "Found backpointers under new path")) {
+    if (TF_VERIFY(i == _nodesWithPath.end() || !i->first.HasPrefix(currentPath), "Found backpointers under new path")) {
         for (auto& v : tmp) {
-            _nodesWithPath[v.first.ReplacePrefix(currentPath, newPath)].
-                swap(v.second);
+            _nodesWithPath[v.first.ReplacePrefix(currentPath, newPath)].swap(v.second);
         }
     }
 }
 
-void
-SdfNamespaceEdit_Namespace::_AddBackpointer(const SdfPath& path, _Node* node)
-{
+void SdfNamespaceEdit_Namespace::_AddBackpointer(const SdfPath& path, _Node* node) {
     _nodesWithPath[path].insert(node);
 }
 
-void
-SdfNamespaceEdit_Namespace::_RemoveBackpointers(const SdfPath& path)
-{
+void SdfNamespaceEdit_Namespace::_RemoveBackpointers(const SdfPath& path) {
     // Find the extent of the subtree with path as a prefix.
     _BackpointerMap::iterator i = _nodesWithPath.lower_bound(path);
     _BackpointerMap::iterator n = i;
@@ -621,9 +534,7 @@ SdfNamespaceEdit_Namespace::_RemoveBackpointers(const SdfPath& path)
     _nodesWithPath.erase(i, n);
 }
 
-void
-SdfNamespaceEdit_Namespace::_AddDeadspace(const SdfPath& path)
-{
+void SdfNamespaceEdit_Namespace::_AddDeadspace(const SdfPath& path) {
     // Never add the absolute root path.
     if (!TF_VERIFY(path != SdfPath::AbsoluteRootPath())) {
         return;
@@ -632,9 +543,7 @@ SdfNamespaceEdit_Namespace::_AddDeadspace(const SdfPath& path)
     _deadspace.insert(path);
 }
 
-void
-SdfNamespaceEdit_Namespace::_RemoveDeadspace(const SdfPath& path)
-{
+void SdfNamespaceEdit_Namespace::_RemoveDeadspace(const SdfPath& path) {
     // Never remove the absolute root path.
     if (!TF_VERIFY(path != SdfPath::AbsoluteRootPath())) {
         return;
@@ -642,26 +551,20 @@ SdfNamespaceEdit_Namespace::_RemoveDeadspace(const SdfPath& path)
 
     // Only erase the path given, but keep any descendant paths.
     //
-    // If there's a descendant path in the deadspace set, then that means that 
+    // If there's a descendant path in the deadspace set, then that means that
     // path was previously moved or removed before this path was moved/removed.
-    // If this path were to move back, then the deadspace previously descendant 
+    // If this path were to move back, then the deadspace previously descendant
     // deadspace paths should still exist.
     _deadspace.erase(path);
 }
 
-void 
-SdfNamespaceEdit_Namespace::_MoveDeadspaceDescendants(
-    const SdfPath &from, 
-    const SdfPath &to)
-{
+void SdfNamespaceEdit_Namespace::_MoveDeadspaceDescendants(const SdfPath& from, const SdfPath& to) {
     // Never move to or from the absolute root path.
-    if (!TF_VERIFY(from != SdfPath::AbsoluteRootPath()) ||
-        !TF_VERIFY(to != SdfPath::AbsoluteRootPath())) {
+    if (!TF_VERIFY(from != SdfPath::AbsoluteRootPath()) || !TF_VERIFY(to != SdfPath::AbsoluteRootPath())) {
         return;
     }
 
-    const auto [begin, end] = 
-        SdfPathFindPrefixedRange(_deadspace.begin(), _deadspace.end(), from);
+    const auto [begin, end] = SdfPathFindPrefixedRange(_deadspace.begin(), _deadspace.end(), from);
     SdfPathVector newDeadspacePaths;
     for (auto it = begin; it != end; it++) {
         newDeadspacePaths.push_back(it->ReplacePrefix(from, to));
@@ -671,9 +574,7 @@ SdfNamespaceEdit_Namespace::_MoveDeadspaceDescendants(
     _deadspace.insert(newDeadspacePaths.begin(), newDeadspacePaths.end());
 }
 
-bool
-SdfNamespaceEdit_Namespace::_IsDeadspace(const SdfPath& path) const
-{
+bool SdfNamespaceEdit_Namespace::_IsDeadspace(const SdfPath& path) const {
     SdfPathSet::iterator i = _deadspace.upper_bound(path);
     if (i == _deadspace.begin()) {
         return false;
@@ -685,39 +586,25 @@ SdfNamespaceEdit_Namespace::_IsDeadspace(const SdfPath& path) const
 // SdfNamespaceEdit
 //
 
-bool
-SdfNamespaceEdit::operator==(const SdfNamespaceEdit& rhs) const
-{
-    return currentPath == rhs.currentPath && 
-           newPath     == rhs.newPath     && 
-           index       == rhs.index;
+bool SdfNamespaceEdit::operator==(const SdfNamespaceEdit& rhs) const {
+    return currentPath == rhs.currentPath && newPath == rhs.newPath && index == rhs.index;
 }
 
-bool
-SdfNamespaceEdit::operator!=(const SdfNamespaceEdit& rhs) const
-{
+bool SdfNamespaceEdit::operator!=(const SdfNamespaceEdit& rhs) const {
     return !(*this == rhs);
 }
 
-std::ostream&
-operator<<(std::ostream& s, const SdfNamespaceEdit& x)
-{
+std::ostream& operator<<(std::ostream& s, const SdfNamespaceEdit& x) {
     if (x == SdfNamespaceEdit()) {
         return s << "()";
-    }
-    else {
-        return s << "(" << x.currentPath << ","
-                        << x.newPath << ","
-                        << x.index << ")";
+    } else {
+        return s << "(" << x.currentPath << "," << x.newPath << "," << x.index << ")";
     }
 }
 
-std::ostream&
-operator<<(std::ostream& s, const SdfNamespaceEditVector& x)
-{
+std::ostream& operator<<(std::ostream& s, const SdfNamespaceEditVector& x) {
     std::vector<std::string> edits;
-    std::transform(x.begin(), x.end(), std::back_inserter(edits),
-                   TfStringify<SdfNamespaceEdit>);
+    std::transform(x.begin(), x.end(), std::back_inserter(edits), TfStringify<SdfNamespaceEdit>);
     return s << TfStringJoin(edits, ", ");
 }
 
@@ -725,55 +612,36 @@ operator<<(std::ostream& s, const SdfNamespaceEditVector& x)
 // SdfNamespaceEditDetail
 //
 
-SdfNamespaceEditDetail::SdfNamespaceEditDetail() : result(Okay)
-{
+SdfNamespaceEditDetail::SdfNamespaceEditDetail() : result(Okay) {
     // Do nothing
 }
 
-SdfNamespaceEditDetail::SdfNamespaceEditDetail(
-    Result result_,
-    const SdfNamespaceEdit& edit_,
-    const std::string& reason_) :
-    result(result_),
-    edit(edit_),
-    reason(reason_)
-{
+SdfNamespaceEditDetail::SdfNamespaceEditDetail(Result result_,
+                                               const SdfNamespaceEdit& edit_,
+                                               const std::string& reason_)
+    : result(result_), edit(edit_), reason(reason_) {
     // Do nothing
 }
 
-bool
-SdfNamespaceEditDetail::operator==(const SdfNamespaceEditDetail& rhs) const
-{
-    return result == rhs.result  && 
-           edit   == rhs.edit    &&
-           reason == rhs.reason;
+bool SdfNamespaceEditDetail::operator==(const SdfNamespaceEditDetail& rhs) const {
+    return result == rhs.result && edit == rhs.edit && reason == rhs.reason;
 }
 
-bool
-SdfNamespaceEditDetail::operator!=(const SdfNamespaceEditDetail& rhs) const
-{
+bool SdfNamespaceEditDetail::operator!=(const SdfNamespaceEditDetail& rhs) const {
     return !(*this == rhs);
 }
 
-std::ostream&
-operator<<(std::ostream& s, const SdfNamespaceEditDetail& x)
-{
+std::ostream& operator<<(std::ostream& s, const SdfNamespaceEditDetail& x) {
     if (x == SdfNamespaceEditDetail()) {
         return s << TfEnum::GetName(x.result);
-    }
-    else {
-        return s << "(" << TfEnum::GetName(x.result) << ","
-                        << x.edit << ","
-                        << x.reason << ")";
+    } else {
+        return s << "(" << TfEnum::GetName(x.result) << "," << x.edit << "," << x.reason << ")";
     }
 }
 
-std::ostream&
-operator<<(std::ostream& s, const SdfNamespaceEditDetailVector& x)
-{
+std::ostream& operator<<(std::ostream& s, const SdfNamespaceEditDetailVector& x) {
     std::vector<std::string> edits;
-    std::transform(x.begin(), x.end(), std::back_inserter(edits),
-                   TfStringify<SdfNamespaceEditDetail>);
+    std::transform(x.begin(), x.end(), std::back_inserter(edits), TfStringify<SdfNamespaceEditDetail>);
     return s << TfStringJoin(edits, ", ");
 }
 
@@ -781,43 +649,32 @@ operator<<(std::ostream& s, const SdfNamespaceEditDetailVector& x)
 // SdfBatchNamespaceEdit
 //
 
-SdfBatchNamespaceEdit::SdfBatchNamespaceEdit()
-{
+SdfBatchNamespaceEdit::SdfBatchNamespaceEdit() {
     // Do nothing
 }
 
-SdfBatchNamespaceEdit::SdfBatchNamespaceEdit(const SdfBatchNamespaceEdit& other) :
-    _edits(other._edits)
-{
+SdfBatchNamespaceEdit::SdfBatchNamespaceEdit(const SdfBatchNamespaceEdit& other) : _edits(other._edits) {
     // Do nothing
 }
 
-SdfBatchNamespaceEdit::SdfBatchNamespaceEdit(const SdfNamespaceEditVector& edits) :
-    _edits(edits)
-{
+SdfBatchNamespaceEdit::SdfBatchNamespaceEdit(const SdfNamespaceEditVector& edits) : _edits(edits) {
     // Do nothing
 }
 
-SdfBatchNamespaceEdit::~SdfBatchNamespaceEdit()
-{
+SdfBatchNamespaceEdit::~SdfBatchNamespaceEdit() {
     // Do nothing
 }
 
-SdfBatchNamespaceEdit&
-SdfBatchNamespaceEdit::operator=(const SdfBatchNamespaceEdit& rhs)
-{
+SdfBatchNamespaceEdit& SdfBatchNamespaceEdit::operator=(const SdfBatchNamespaceEdit& rhs) {
     _edits = rhs._edits;
     return *this;
 }
 
-bool
-SdfBatchNamespaceEdit::Process(
-    SdfNamespaceEditVector* processedEdits,
-    const HasObjectAtPath& hasObjectAtPath,
-    const CanEdit& canEdit,
-    SdfNamespaceEditDetailVector* details,
-    bool fixBackpointers) const
-{
+bool SdfBatchNamespaceEdit::Process(SdfNamespaceEditVector* processedEdits,
+                                    const HasObjectAtPath& hasObjectAtPath,
+                                    const CanEdit& canEdit,
+                                    SdfNamespaceEditDetailVector* details,
+                                    bool fixBackpointers) const {
     // Clear the resulting edits -- we'll build up the result as we go.
     if (processedEdits) {
         processedEdits->clear();
@@ -832,26 +689,19 @@ SdfBatchNamespaceEdit::Process(
         bool mismatch = false;
         if (edit.currentPath.IsPrimPath()) {
             mismatch = !edit.newPath.IsPrimPath();
-        }
-        else if (edit.currentPath.IsPropertyPath()) {
+        } else if (edit.currentPath.IsPropertyPath()) {
             mismatch = !edit.newPath.IsPropertyPath();
-        }
-        else {
+        } else {
             // Unsupported path type.
             if (details) {
                 details->push_back(
-                    SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error,
-                                          edit,
-                                          "Unsupported object type"));
+                        SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error, edit, "Unsupported object type"));
             }
             return false;
         }
         if (mismatch && !edit.newPath.IsEmpty()) {
             if (details) {
-                details->push_back(
-                    SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error,
-                                          edit,
-                                          "Path type mismatch"));
+                details->push_back(SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error, edit, "Path type mismatch"));
             }
             return false;
         }
@@ -869,10 +719,7 @@ SdfBatchNamespaceEdit::Process(
                 continue;
             }
             if (details) {
-                details->push_back(
-                    SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error,
-                                          edit,
-                                          "Object was removed"));
+                details->push_back(SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error, edit, "Object was removed"));
             }
             return false;
         }
@@ -881,9 +728,7 @@ SdfBatchNamespaceEdit::Process(
         if (hasObjectAtPath && !hasObjectAtPath(from)) {
             if (details) {
                 details->push_back(
-                    SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error,
-                                          edit,
-                                          "Object does not exist"));
+                        SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error, edit, "Object does not exist"));
             }
             return false;
         }
@@ -892,9 +737,8 @@ SdfBatchNamespaceEdit::Process(
         SdfPath to;
         if (!edit.newPath.IsEmpty()) {
             // Ignore no-op.  Note that this doesn't catch the case where
-            // then index isn't Same but has that effect.  
-            if (edit.currentPath == edit.newPath && 
-                    edit.index == SdfNamespaceEdit::Same) {
+            // then index isn't Same but has that effect.
+            if (edit.currentPath == edit.newPath && edit.index == SdfNamespaceEdit::Same) {
                 continue;
             }
 
@@ -907,9 +751,7 @@ SdfBatchNamespaceEdit::Process(
             if (toParent.IsEmpty()) {
                 if (details) {
                     details->push_back(
-                        SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error,
-                                              edit,
-                                              "New parent was removed"));
+                            SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error, edit, "New parent was removed"));
                 }
                 return false;
             }
@@ -918,9 +760,7 @@ SdfBatchNamespaceEdit::Process(
             if (hasObjectAtPath && !hasObjectAtPath(toParent)) {
                 if (details) {
                     details->push_back(
-                        SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error,
-                                              edit,
-                                              "New parent does not exist"));
+                            SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error, edit, "New parent does not exist"));
                 }
                 return false;
             }
@@ -928,39 +768,29 @@ SdfBatchNamespaceEdit::Process(
             // Check for impossible namespace structure.
             if (edit.currentPath == edit.newPath) {
                 // Ignore reordering.
-            }
-            else if (edit.currentPath.HasPrefix(edit.newPath)) {
+            } else if (edit.currentPath.HasPrefix(edit.newPath)) {
                 // Making object an ancestor of itself.
                 if (details) {
-                    details->push_back(
-                        SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error,
-                                              edit,
-                                              "Object cannot be an ancestor "
-                                              "of itself"));
+                    details->push_back(SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error, edit,
+                                                              "Object cannot be an ancestor "
+                                                              "of itself"));
                 }
                 return false;
-            }
-            else if (edit.newPath.HasPrefix(edit.currentPath)) {
+            } else if (edit.newPath.HasPrefix(edit.currentPath)) {
                 // Making object a descendant of itself.
                 if (details) {
-                    details->push_back(
-                        SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error,
-                                              edit,
-                                              "Object cannot be a descendant "
-                                              "of itself"));
+                    details->push_back(SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error, edit,
+                                                              "Object cannot be a descendant "
+                                                              "of itself"));
                 }
                 return false;
-            }
-            else {
+            } else {
                 // Can't move over an existing object.
                 to = ns.GetOriginalPath(edit.newPath);
-                if (!to.IsEmpty() && 
-                    hasObjectAtPath && hasObjectAtPath(to)) {
+                if (!to.IsEmpty() && hasObjectAtPath && hasObjectAtPath(to)) {
                     if (details) {
                         details->push_back(
-                            SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error,
-                                                  edit,
-                                                  "Object already exists"));
+                                SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error, edit, "Object already exists"));
                     }
                     return false;
                 }
@@ -978,10 +808,8 @@ SdfBatchNamespaceEdit::Process(
                 SdfPath originalPath = ns.GetOriginalPath(targetPath);
                 if (!originalPath.IsEmpty() && originalPath != targetPath) {
                     if (details) {
-                        details->push_back(
-                            SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error,
-                                                  edit,
-                                                  "Current target was edited"));
+                        details->push_back(SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error, edit,
+                                                                  "Current target was edited"));
                     }
                     return false;
                 }
@@ -993,9 +821,7 @@ SdfBatchNamespaceEdit::Process(
                 if (!originalPath.IsEmpty() && originalPath != targetPath) {
                     if (details) {
                         details->push_back(
-                            SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error,
-                                                  edit,
-                                                  "New target was edited"));
+                                SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error, edit, "New target was edited"));
                     }
                     return false;
                 }
@@ -1004,13 +830,9 @@ SdfBatchNamespaceEdit::Process(
 
         // Check if actual edit is allowed.
         std::string whyNot;
-        if (canEdit && !canEdit(SdfNamespaceEdit(from, to, edit.index),
-                                    &whyNot)) {
+        if (canEdit && !canEdit(SdfNamespaceEdit(from, to, edit.index), &whyNot)) {
             if (details) {
-                details->push_back(
-                    SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error,
-                                          edit,
-                                          whyNot));
+                details->push_back(SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error, edit, whyNot));
             }
             return false;
         }
@@ -1018,10 +840,7 @@ SdfBatchNamespaceEdit::Process(
         // Apply edit to state.
         if (!ns.Apply(edit, &whyNot)) {
             if (details) {
-                details->push_back(
-                    SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error,
-                                          edit,
-                                          whyNot));
+                details->push_back(SdfNamespaceEditDetail(SdfNamespaceEditDetail::Error, edit, whyNot));
             }
             return false;
         }

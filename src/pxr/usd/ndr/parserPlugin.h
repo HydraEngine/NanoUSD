@@ -23,12 +23,11 @@ PXR_NAMESPACE_OPEN_SCOPE
 struct NdrNodeDiscoveryResult;
 
 /// Register a parser plugin with the plugin system.
-#define NDR_REGISTER_PARSER_PLUGIN(ParserPluginClass)                   \
-TF_REGISTRY_FUNCTION(TfType)                                            \
-{                                                                       \
-    TfType::Define<ParserPluginClass, TfType::Bases<NdrParserPlugin>>() \
-        .SetFactory<NdrParserPluginFactory<ParserPluginClass>>();       \
-}
+#define NDR_REGISTER_PARSER_PLUGIN(ParserPluginClass)                       \
+    TF_REGISTRY_FUNCTION(TfType) {                                          \
+        TfType::Define<ParserPluginClass, TfType::Bases<NdrParserPlugin>>() \
+                .SetFactory<NdrParserPluginFactory<ParserPluginClass>>();   \
+    }
 
 /// \class NdrParserPlugin
 ///
@@ -105,8 +104,7 @@ TF_REGISTRY_FUNCTION(TfType)                                            \
 ///         the documentation for the `plug` library (in pxr/base).
 ///     </li>
 /// </ul>
-class NdrParserPlugin : public TfWeakBase
-{
+class NdrParserPlugin : public TfWeakBase {
 public:
     NDR_API
     NdrParserPlugin();
@@ -117,8 +115,7 @@ public:
     /// result of the discovery process, and generates a new `NdrNode`.
     /// The node's name, source type, and family must match.
     NDR_API
-    virtual NdrNodeUniquePtr Parse(
-        const NdrNodeDiscoveryResult& discoveryResult) = 0;
+    virtual NdrNodeUniquePtr Parse(const NdrNodeDiscoveryResult& discoveryResult) = 0;
 
     /// Returns the types of nodes that this plugin can parse.
     ///
@@ -146,28 +143,22 @@ public:
     static NdrNodeUniquePtr GetInvalidNode(const NdrNodeDiscoveryResult& dr);
 };
 
-
 /// \cond
 /// Factory classes should be hidden from the documentation.
 
-class NdrParserPluginFactoryBase : public TfType::FactoryBase
-{
+class NdrParserPluginFactoryBase : public TfType::FactoryBase {
 public:
     virtual NdrParserPlugin* New() const = 0;
 };
 
 template <class T>
-class NdrParserPluginFactory : public NdrParserPluginFactoryBase
-{
+class NdrParserPluginFactory : public NdrParserPluginFactoryBase {
 public:
-    virtual NdrParserPlugin* New() const
-    {
-        return new T;
-    }
+    virtual NdrParserPlugin* New() const { return new T; }
 };
 
 /// \endcond
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_NDR_PARSER_PLUGIN_H
+#endif  // PXR_USD_NDR_PARSER_PLUGIN_H

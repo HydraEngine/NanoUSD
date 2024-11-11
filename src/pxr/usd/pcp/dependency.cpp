@@ -14,8 +14,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_REGISTRY_FUNCTION(TfEnum)
-{
+TF_REGISTRY_FUNCTION(TfEnum) {
     TF_ADD_ENUM_NAME(PcpDependencyTypeNone, "non-dependency");
     TF_ADD_ENUM_NAME(PcpDependencyTypeRoot, "root dependency");
     TF_ADD_ENUM_NAME(PcpDependencyTypePurelyDirect, "purely-direct dependency");
@@ -24,48 +23,43 @@ TF_REGISTRY_FUNCTION(TfEnum)
     TF_ADD_ENUM_NAME(PcpDependencyTypeAncestral, "ancestral dependency");
     TF_ADD_ENUM_NAME(PcpDependencyTypeVirtual, "virtual dependency");
     TF_ADD_ENUM_NAME(PcpDependencyTypeNonVirtual, "non-virtual dependency");
-    TF_ADD_ENUM_NAME(PcpDependencyTypeAnyNonVirtual,
-                     "any non-virtual dependency");
+    TF_ADD_ENUM_NAME(PcpDependencyTypeAnyNonVirtual, "any non-virtual dependency");
     TF_ADD_ENUM_NAME(PcpDependencyTypeAnyIncludingVirtual, "any dependency");
 }
 
-bool 
-PcpNodeIntroducesDependency(const PcpNodeRef &node)
-{
+bool PcpNodeIntroducesDependency(const PcpNodeRef& node) {
     if (node.IsInert()) {
-        switch(node.GetArcType()) {
-        case PcpArcTypeSpecialize:
-            // Every specializes node that is not introduced under the root
-            // node will be inert and have a copy propagated to the root
-            // node, so specializes nodes that aren't under the root
-            // do not represent dependencies.
-            if (node.GetParentNode() != node.GetRootNode()) {
-                return false;
-            }
-            // Fall through
-        case PcpArcTypeInherit:
-            // Special case: inert, propagated class-based arcs do not
-            // represent dependencies.
-            if (node.GetOriginNode() != node.GetParentNode()) {
-                return false;
-            }
-            // Fall through
-        default:
-            break;
+        switch (node.GetArcType()) {
+            case PcpArcTypeSpecialize:
+                // Every specializes node that is not introduced under the root
+                // node will be inert and have a copy propagated to the root
+                // node, so specializes nodes that aren't under the root
+                // do not represent dependencies.
+                if (node.GetParentNode() != node.GetRootNode()) {
+                    return false;
+                }
+                // Fall through
+            case PcpArcTypeInherit:
+                // Special case: inert, propagated class-based arcs do not
+                // represent dependencies.
+                if (node.GetOriginNode() != node.GetParentNode()) {
+                    return false;
+                }
+                // Fall through
+            default:
+                break;
         }
     }
     return true;
 }
 
-PcpDependencyFlags
-PcpClassifyNodeDependency(const PcpNodeRef &node)
-{
+PcpDependencyFlags PcpClassifyNodeDependency(const PcpNodeRef& node) {
     if (node.GetArcType() == PcpArcTypeRoot) {
         return PcpDependencyTypeRoot;
     }
 
     int flags = 0;
-    
+
     // Inert nodes can represent virtual dependencies even though
     // they do not contribute the scene description at their site.
     //
@@ -120,9 +114,7 @@ PcpClassifyNodeDependency(const PcpNodeRef &node)
     return flags;
 }
 
-std::string
-PcpDependencyFlagsToString(const PcpDependencyFlags depFlags)
-{
+std::string PcpDependencyFlagsToString(const PcpDependencyFlags depFlags) {
     std::set<std::string> tags;
     if (depFlags == PcpDependencyTypeNone) {
         tags.insert("none");

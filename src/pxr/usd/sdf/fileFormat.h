@@ -35,8 +35,7 @@ SDF_DECLARE_HANDLES(SdfSpec);
 TF_DECLARE_WEAK_AND_REF_PTRS(SdfAbstractData);
 TF_DECLARE_WEAK_AND_REF_PTRS(SdfFileFormat);
 
-#define SDF_FILE_FORMAT_TOKENS   \
-    ((TargetArg, "target"))
+#define SDF_FILE_FORMAT_TOKENS ((TargetArg, "target"))
 
 TF_DECLARE_PUBLIC_TOKENS(SdfFileFormatTokens, SDF_API, SDF_FILE_FORMAT_TOKENS);
 
@@ -44,10 +43,7 @@ TF_DECLARE_PUBLIC_TOKENS(SdfFileFormatTokens, SDF_API, SDF_FILE_FORMAT_TOKENS);
 ///
 /// Base class for file format implementations.
 ///
-class SdfFileFormat
-    : public TfRefBase
-    , public TfWeakBase
-{
+class SdfFileFormat : public TfRefBase, public TfWeakBase {
 public:
     SdfFileFormat(const SdfFileFormat&) = delete;
     SdfFileFormat& operator=(const SdfFileFormat&) = delete;
@@ -67,7 +63,7 @@ public:
     /// Returns the current version of this file format.
     SDF_API const TfToken& GetVersionString() const;
 
-    /// Returns true if this file format is the primary format for the 
+    /// Returns true if this file format is the primary format for the
     /// extensions it handles.
     SDF_API bool IsPrimaryFormatForExtensions() const;
 
@@ -84,18 +80,17 @@ public:
 
     /// Returns true if this file format is a package containing other
     /// assets.
-    SDF_API 
+    SDF_API
     virtual bool IsPackage() const;
 
     /// Returns the path of the "root" layer contained in the package
-    /// layer at \p resolvedPath produced by this file format. If this 
+    /// layer at \p resolvedPath produced by this file format. If this
     /// file format is not a package, returns the empty string.
     ///
-    /// The package root layer is the layer in the package layer that 
+    /// The package root layer is the layer in the package layer that
     /// is used when that package is opened via SdfLayer.
     SDF_API
-    virtual std::string GetPackageRootLayerPath(
-        const std::string& resolvedPath) const;
+    virtual std::string GetPackageRootLayerPath(const std::string& resolvedPath) const;
 
     /// Type for specifying additional file format-specific arguments
     /// to the various API below.
@@ -108,49 +103,46 @@ public:
     virtual FileFormatArguments GetDefaultFileFormatArguments() const;
 
     /// This method allows the file format to bind to whatever data container is
-    /// appropriate. 
+    /// appropriate.
     ///
     /// Returns a shared pointer to an SdfAbstractData implementation.
     SDF_API
-    virtual SdfAbstractDataRefPtr
-    InitData(const FileFormatArguments& args) const;
+    virtual SdfAbstractDataRefPtr InitData(const FileFormatArguments& args) const;
 
     /// Returns a new SdfAbstractData providing access to the layer's data.
     /// This data object is detached from any underlying storage.
     SDF_API
-    SdfAbstractDataRefPtr InitDetachedData(
-        const FileFormatArguments& args) const;
+    SdfAbstractDataRefPtr InitDetachedData(const FileFormatArguments& args) const;
 
     /// Instantiate a layer.
-    SDF_API 
-    SdfLayerRefPtr NewLayer(const SdfFileFormatConstPtr &fileFormat,
-                            const std::string &identifier,
-                            const std::string &realPath,
+    SDF_API
+    SdfLayerRefPtr NewLayer(const SdfFileFormatConstPtr& fileFormat,
+                            const std::string& identifier,
+                            const std::string& realPath,
                             const ArAssetInfo& assetInfo,
-                            const FileFormatArguments &args) const;
+                            const FileFormatArguments& args) const;
 
     /// Return true if this file format prefers to skip reloading anonymous
     /// layers.
     SDF_API bool ShouldSkipAnonymousReload() const;
 
-    /// Returns true if anonymous layer identifiers should be passed to Read 
+    /// Returns true if anonymous layer identifiers should be passed to Read
     /// when a layer is opened or reloaded.
-    /// 
+    ///
     /// Anonymous layers will not have an asset backing and thus for most
-    /// file formats there is nothing that can be read for an anonymous layer. 
-    /// However, there are file formats that use Read to generate dynamic layer 
+    /// file formats there is nothing that can be read for an anonymous layer.
+    /// However, there are file formats that use Read to generate dynamic layer
     /// content without reading any data from the resolved asset associated with
-    /// the layer's identifier. 
-    /// 
-    /// For these types of file formats it is useful to be able to open 
+    /// the layer's identifier.
+    ///
+    /// For these types of file formats it is useful to be able to open
     /// anonymous layers and allow Read to populate them to avoid requiring a
     /// placeholder asset to exist just so Read can populate the layer.
     SDF_API bool ShouldReadAnonymousLayers() const;
 
     /// Returns true if \p file can be read by this format.
     SDF_API
-    virtual bool CanRead(
-        const std::string& file) const = 0;
+    virtual bool CanRead(const std::string& file) const = 0;
 
     /// Reads scene description from the asset specified by \p resolvedPath
     /// into the layer \p layer.
@@ -163,10 +155,7 @@ public:
     /// Returns true if the asset is successfully read into \p layer,
     /// false otherwise.
     SDF_API
-    virtual bool Read(
-        SdfLayer* layer,
-        const std::string& resolvedPath,
-        bool metadataOnly) const = 0;
+    virtual bool Read(SdfLayer* layer, const std::string& resolvedPath, bool metadataOnly) const = 0;
 
     /// Reads scene description from the asset specified by \p resolvedPath
     /// into the detached layer \p layer. After reading is completed,
@@ -181,10 +170,7 @@ public:
     /// false if the the asset could not be read or if the resulting
     /// layer is not detached.
     SDF_API
-    bool ReadDetached(
-        SdfLayer* layer,
-        const std::string& resolvedPath,
-        bool metadataOnly) const;
+    bool ReadDetached(SdfLayer* layer, const std::string& resolvedPath, bool metadataOnly) const;
 
     /// Writes the content in \p layer into the file at \p filePath. If the
     /// content is successfully written, this method returns true. Otherwise,
@@ -199,11 +185,10 @@ public:
     /// store, this distinction can be important.  In that case, additionally
     /// override the member function SaveToFile() to take different action.
     SDF_API
-    virtual bool WriteToFile(
-        const SdfLayer& layer,
-        const std::string& filePath,
-        const std::string& comment = std::string(),
-        const FileFormatArguments& args = FileFormatArguments()) const;
+    virtual bool WriteToFile(const SdfLayer& layer,
+                             const std::string& filePath,
+                             const std::string& comment = std::string(),
+                             const FileFormatArguments& args = FileFormatArguments()) const;
 
     /// Write the content in \p layer to the file at \p filePath, which is the
     /// backing store for \p layer itself.  If the content is successfully
@@ -218,52 +203,43 @@ public:
     /// typically override only WriteToFile(), but formats that do not may need
     /// to take different action on "Save" vs "Export".
     SDF_API
-    virtual bool SaveToFile(
-        const SdfLayer& layer,
-        const std::string& filePath,
-        const std::string& comment = std::string(),
-        const FileFormatArguments& args = FileFormatArguments()) const;
+    virtual bool SaveToFile(const SdfLayer& layer,
+                            const std::string& filePath,
+                            const std::string& comment = std::string(),
+                            const FileFormatArguments& args = FileFormatArguments()) const;
 
     /// Reads data in the string \p str into the layer \p layer. If
     /// the file is successfully read, this method returns true. Otherwise,
     /// false is returned and errors are posted.
     SDF_API
-    virtual bool ReadFromString(
-        SdfLayer* layer,
-        const std::string& str) const;
+    virtual bool ReadFromString(SdfLayer* layer, const std::string& str) const;
 
     /// Write the provided \p spec to \p out indented \p indent levels.
     SDF_API
-    virtual bool WriteToStream(
-        const SdfSpecHandle &spec,
-        std::ostream& out,
-        size_t indent) const;
+    virtual bool WriteToStream(const SdfSpecHandle& spec, std::ostream& out, size_t indent) const;
 
     /// Writes the content in \p layer to the string \p str. This function
     /// should write a textual representation of \p layer to the stream
     /// that can be read back in via ReadFromString.
     SDF_API
-    virtual bool WriteToString(
-        const SdfLayer& layer,
-        std::string* str,
-        const std::string& comment = std::string()) const;
+    virtual bool WriteToString(const SdfLayer& layer,
+                               std::string* str,
+                               const std::string& comment = std::string()) const;
 
-    /// Returns the set of resolved paths to external asset file dependencies 
-    /// for the given \p layer. These are additional dependencies, specific to 
+    /// Returns the set of resolved paths to external asset file dependencies
+    /// for the given \p layer. These are additional dependencies, specific to
     /// the file format, that are needed when generating the layer's contents
     /// and would not otherwise be discoverable through composition dependencies
-    /// (i.e. sublayers, references, and payloads). 
+    /// (i.e. sublayers, references, and payloads).
     ///
-    /// The default implementation returns an empty set. Derived file formats 
-    /// that depend on external assets to read and generate layer content 
+    /// The default implementation returns an empty set. Derived file formats
+    /// that depend on external assets to read and generate layer content
     /// should implement this function to return the external asset paths.
     ///
     /// \sa SdfLayer::GetExternalAssetDependencies
     /// \sa SdfLayer::Reload
     SDF_API
-    virtual std::set<std::string> GetExternalAssetDependencies(
-        const SdfLayer& layer) const;
-
+    virtual std::set<std::string> GetExternalAssetDependencies(const SdfLayer& layer) const;
 
     /// Returns true if this file format supports reading.
     /// This is a convenience method for invoking \ref FormatSupportsReading
@@ -284,7 +260,7 @@ public:
     /// leading dot character.
     SDF_API static std::string GetFileExtension(const std::string& s);
 
-    /// Returns a set containing the extension(s) corresponding to 
+    /// Returns a set containing the extension(s) corresponding to
     /// all registered file formats.
     SDF_API static std::set<std::string> FindAllFileFormatExtensions();
 
@@ -292,65 +268,55 @@ public:
     /// all registered file formats that derive from \p baseType.
     ///
     /// \p baseType must derive from SdfFileFormat.
-    SDF_API static std::set<std::string> FindAllDerivedFileFormatExtensions(
-        const TfType& baseType);
+    SDF_API static std::set<std::string> FindAllDerivedFileFormatExtensions(const TfType& baseType);
 
     /// Returns true if the file format for the supplied \p extension and
     /// \p target pair supports reading.
-    /// This method will not load the plugin that provides the specified 
+    /// This method will not load the plugin that provides the specified
     /// file format.
     /// If the extension and target pair is invalid, this method will
     /// return false.
     /// \sa FormatSupportsWriting \sa FormatSupportsEditing
     SDF_API
-    static bool FormatSupportsReading(
-        const std::string& extension,
-        const std::string& target = std::string());
+    static bool FormatSupportsReading(const std::string& extension, const std::string& target = std::string());
 
-    /// Returns true if the file format for the supplied \p extension and 
+    /// Returns true if the file format for the supplied \p extension and
     /// \p target pair supports writing.
-    /// This method will not load the plugin that provides the specified 
+    /// This method will not load the plugin that provides the specified
     /// file format.
     /// If the extension and target pair is invalid, this method will return
     /// false.
     /// \sa FormatSupportsReading \sa FormatSupportsEditing
     SDF_API
-    static bool FormatSupportsWriting(
-        const std::string& extension,
-        const std::string& target = std::string());
+    static bool FormatSupportsWriting(const std::string& extension, const std::string& target = std::string());
 
-    /// Returns true if the file format for the supplied \p extension and 
+    /// Returns true if the file format for the supplied \p extension and
     /// \p target pair supports editing.
-    /// This method will not load the plugin that provides the specified 
+    /// This method will not load the plugin that provides the specified
     /// file format.
     /// If the extension and target pair is invalid, this method will return
     /// false.
     /// \sa FormatSupportsReading \sa FormatSupportsWriting
     SDF_API
-    static bool FormatSupportsEditing(
-        const std::string& extension,
-        const std::string& target = std::string());
+    static bool FormatSupportsEditing(const std::string& extension, const std::string& target = std::string());
 
     /// Returns the file format instance with the specified \p formatId
     /// identifier. If a format with a matching identifier is not found, this
     /// returns a null file format pointer.
-    SDF_API 
-    static SdfFileFormatConstPtr FindById(
-        const TfToken& formatId);
+    SDF_API
+    static SdfFileFormatConstPtr FindById(const TfToken& formatId);
 
     /// Returns the file format instance that supports the extension for
     /// \p path.  If a format with a matching extension is not found, this
     /// returns a null file format pointer.
     ///
     /// An extension may be handled by multiple file formats, but each
-    /// with a different target. In such cases, if no \p target is specified, 
+    /// with a different target. In such cases, if no \p target is specified,
     /// the file format that is registered as the primary plugin will be
     /// returned. Otherwise, the file format whose target matches \p target
     /// will be returned.
     SDF_API
-    static SdfFileFormatConstPtr FindByExtension(
-        const std::string& path,
-        const std::string& target = std::string());
+    static SdfFileFormatConstPtr FindByExtension(const std::string& path, const std::string& target = std::string());
 
     /// Returns a file format instance that supports the extension for \p
     /// path and whose target matches one of those specified by the given
@@ -359,84 +325,73 @@ public:
     /// matching extension is not found, this returns a null file format
     /// pointer.
     SDF_API
-    static SdfFileFormatConstPtr FindByExtension(
-        const std::string& path,
-        const FileFormatArguments& args);
+    static SdfFileFormatConstPtr FindByExtension(const std::string& path, const FileFormatArguments& args);
 
 protected:
     /// Constructor.
-    SDF_API SdfFileFormat(
-        const TfToken& formatId,
-        const TfToken& versionString,
-        const TfToken& target,
-        const std::string& extension);
+    SDF_API SdfFileFormat(const TfToken& formatId,
+                          const TfToken& versionString,
+                          const TfToken& target,
+                          const std::string& extension);
 
     /// Constructor.
     /// \p schema must remain valid for the lifetime of this file format.
-    SDF_API SdfFileFormat(
-        const TfToken& formatId,
-        const TfToken& versionString,
-        const TfToken& target,
-        const std::string& extension,
-        const SdfSchemaBase& schema);
+    SDF_API SdfFileFormat(const TfToken& formatId,
+                          const TfToken& versionString,
+                          const TfToken& target,
+                          const std::string& extension,
+                          const SdfSchemaBase& schema);
 
     /// Disallow temporary SdfSchemaBase objects being passed to the c'tor.
-    SdfFileFormat(
-        const TfToken& formatId,
-        const TfToken& versionString,
-        const TfToken& target,
-        const std::string& extension,
-        const SdfSchemaBase&& schema) = delete;
+    SdfFileFormat(const TfToken& formatId,
+                  const TfToken& versionString,
+                  const TfToken& target,
+                  const std::string& extension,
+                  const SdfSchemaBase&& schema) = delete;
 
     /// Constructor.
-    SDF_API SdfFileFormat(
-        const TfToken& formatId,
-        const TfToken& versionString,
-        const TfToken& target,
-        const std::vector<std::string> &extensions);
+    SDF_API SdfFileFormat(const TfToken& formatId,
+                          const TfToken& versionString,
+                          const TfToken& target,
+                          const std::vector<std::string>& extensions);
 
     /// Constructor.
     /// \p schema must remain valid for the lifetime of this file format.
-    SDF_API SdfFileFormat(
-        const TfToken& formatId,
-        const TfToken& versionString,
-        const TfToken& target,
-        const std::vector<std::string> &extensions,
-        const SdfSchemaBase& schema);
+    SDF_API SdfFileFormat(const TfToken& formatId,
+                          const TfToken& versionString,
+                          const TfToken& target,
+                          const std::vector<std::string>& extensions,
+                          const SdfSchemaBase& schema);
 
     /// Disallow temporary SdfSchemaBase objects being passed to the c'tor.
-    SdfFileFormat(
-        const TfToken& formatId,
-        const TfToken& versionString,
-        const TfToken& target,
-        const std::vector<std::string> &extensions,
-        const SdfSchemaBase&& schema) = delete;
+    SdfFileFormat(const TfToken& formatId,
+                  const TfToken& versionString,
+                  const TfToken& target,
+                  const std::vector<std::string>& extensions,
+                  const SdfSchemaBase&& schema) = delete;
 
     /// Destructor.
     SDF_API virtual ~SdfFileFormat();
 
     //
     // Minimally break layer encapsulation with the following methods.  These
-    // methods are also intended to limit the need for SdfLayer friendship with 
+    // methods are also intended to limit the need for SdfLayer friendship with
     // SdfFileFormat child classes.
     //
 
     /// Set the internal data for \p layer to \p data, possibly transferring
     /// ownership of \p data.
-    /// 
+    ///
     /// Existing layer hints are reset to the default hints.
     SDF_API
-    static void _SetLayerData(
-        SdfLayer* layer, SdfAbstractDataRefPtr& data);
+    static void _SetLayerData(SdfLayer* layer, SdfAbstractDataRefPtr& data);
 
     /// Set the internal data for \p layer to \p data, possibly transferring
     /// ownership of \p data.
     ///
     /// Existing layer hints are replaced with \p hints.
     SDF_API
-    static void _SetLayerData(
-        SdfLayer* layer, SdfAbstractDataRefPtr& data,
-        SdfLayerHints hints);
+    static void _SetLayerData(SdfLayer* layer, SdfAbstractDataRefPtr& data, SdfLayerHints hints);
 
     /// Get the internal data for \p layer.
     SDF_API
@@ -457,20 +412,18 @@ protected:
     ///
     /// Returns true if Read was successful, false otherwise.
     SDF_API
-    bool _ReadAndCopyLayerDataToMemory(
-        SdfLayer* layer,
-        const std::string& resolvedPath,
-        bool metadataOnly,
-        bool* didCopyData = nullptr) const;
+    bool _ReadAndCopyLayerDataToMemory(SdfLayer* layer,
+                                       const std::string& resolvedPath,
+                                       bool metadataOnly,
+                                       bool* didCopyData = nullptr) const;
 
 protected:
     SDF_API
-    virtual SdfLayer *_InstantiateNewLayer(
-        const SdfFileFormatConstPtr &fileFormat,
-        const std::string &identifier,
-        const std::string &realPath,
-        const ArAssetInfo& assetInfo,
-        const FileFormatArguments &args) const;
+    virtual SdfLayer* _InstantiateNewLayer(const SdfFileFormatConstPtr& fileFormat,
+                                           const std::string& identifier,
+                                           const std::string& realPath,
+                                           const ArAssetInfo& assetInfo,
+                                           const FileFormatArguments& args) const;
 
     // File format subclasses may override this if they prefer not to skip
     // reloading anonymous layers.  Default implementation returns true.
@@ -481,7 +434,7 @@ protected:
     /// Read should be called when creating, opening, or reloading an anonymous
     /// layer of this format.
     /// Default implementation returns false.
-    SDF_API 
+    SDF_API
     virtual bool _ShouldReadAnonymousLayers() const;
 
     /// \see InitDetachedData
@@ -491,8 +444,7 @@ protected:
     ///
     /// The default implementation returns an SdfData object.
     SDF_API
-    virtual SdfAbstractDataRefPtr _InitDetachedData(
-        const FileFormatArguments& args) const;
+    virtual SdfAbstractDataRefPtr _InitDetachedData(const FileFormatArguments& args) const;
 
     /// \see ReadDetached
     ///
@@ -506,10 +458,7 @@ protected:
     /// subclasses can just call _ReadAndCopyLayerDataToMemory to do the same
     /// thing but without the warning.
     SDF_API
-    virtual bool _ReadDetached(
-        SdfLayer* layer,
-        const std::string& resolvedPath,
-        bool metadataOnly) const;
+    virtual bool _ReadDetached(SdfLayer* layer, const std::string& resolvedPath, bool metadataOnly) const;
 
 private:
     const SdfSchemaBase& _schema;
@@ -532,20 +481,17 @@ public:
 template <typename T>
 class Sdf_FileFormatFactory : public Sdf_FileFormatFactoryBase {
 public:
-    virtual SdfFileFormatRefPtr New() const
-    {
-        return TfCreateRefPtr(new T);
-    }
+    virtual SdfFileFormatRefPtr New() const { return TfCreateRefPtr(new T); }
 };
 
 /// \def SDF_DEFINE_FILE_FORMAT
 ///
 /// Performs registrations needed for the specified file format class to be
 /// discovered by Sdf. This typically would be invoked in a TF_REGISTRY_FUNCTION
-/// in the source file defining the file format. 
+/// in the source file defining the file format.
 ///
-/// The first argument is the name of the file format class being registered. 
-/// Subsequent arguments list the base classes of the file format. Since all 
+/// The first argument is the name of the file format class being registered.
+/// Subsequent arguments list the base classes of the file format. Since all
 /// file formats must ultimately derive from SdfFileFormat, there should be
 /// at least one base class specified.
 ///
@@ -564,13 +510,12 @@ public:
 #else
 #define SDF_DEFINE_FILE_FORMAT(...) SdfDefineFileFormat<__VA_ARGS__>()
 
-template <class FileFormat, class ...BaseFormats>
-void SdfDefineFileFormat()
-{
+template <class FileFormat, class... BaseFormats>
+void SdfDefineFileFormat() {
     TfType::Define<FileFormat, TfType::Bases<BaseFormats...>>()
-        .template SetFactory<Sdf_FileFormatFactory<FileFormat>>();
+            .template SetFactory<Sdf_FileFormatFactory<FileFormat>>();
 }
-#endif // doxygen
+#endif  // doxygen
 
 /// \def SDF_DEFINE_ABSTRACT_FILE_FORMAT
 ///
@@ -579,7 +524,7 @@ void SdfDefineFileFormat()
 /// for other concrete file format classes used by Sdf.
 ///
 /// The first argument is the name of the file format class being registered.
-/// Subsequent arguments list the base classes of the file format. Since all 
+/// Subsequent arguments list the base classes of the file format. Since all
 /// file formats must ultimately derive from SdfFileFormat, there should be
 /// at least one base class specified.
 ///
@@ -596,15 +541,13 @@ void SdfDefineFileFormat()
 #ifdef doxygen
 #define SDF_DEFINE_ABSTRACT_FILE_FORMAT(FileFormatClass, BaseClass1, ...)
 #else
-#define SDF_DEFINE_ABSTRACT_FILE_FORMAT(...) \
-    SdfDefineAbstractFileFormat<__VA_ARGS__>()
+#define SDF_DEFINE_ABSTRACT_FILE_FORMAT(...) SdfDefineAbstractFileFormat<__VA_ARGS__>()
 
-template <class FileFormat, class ...BaseFormats>
-void SdfDefineAbstractFileFormat()
-{
+template <class FileFormat, class... BaseFormats>
+void SdfDefineAbstractFileFormat() {
     TfType::Define<FileFormat, TfType::Bases<BaseFormats...>>();
 }
-#endif //doxygen
+#endif  // doxygen
 
 /// \def SDF_FILE_FORMAT_FACTORY_ACCESS
 ///
@@ -613,7 +556,7 @@ void SdfDefineAbstractFileFormat()
 /// concrete file format classes.
 ///
 /// For example:
-/// 
+///
 /// \code
 /// // in MyFileFormat.h
 /// class MyFileFormat : public SdfFileFormat
@@ -627,8 +570,9 @@ void SdfDefineAbstractFileFormat()
 #define SDF_FILE_FORMAT_FACTORY_ACCESS
 #else
 #define SDF_FILE_FORMAT_FACTORY_ACCESS \
-    template<typename T> friend class Sdf_FileFormatFactory
-#endif //doxygen
+    template <typename T>              \
+    friend class Sdf_FileFormatFactory
+#endif  // doxygen
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

@@ -33,8 +33,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Every SdfPrimSpec object is defined in a layer.  It is identified by its
 /// path (SdfPath class) in the namespace hierarchy of its layer.  SdfPrimSpecs
 /// can be created using the New() method as children of either the containing
-/// SdfLayer itself (for "root level" prims), or as children of other 
-/// SdfPrimSpec objects to extend a hierarchy.  The helper function 
+/// SdfLayer itself (for "root level" prims), or as children of other
+/// SdfPrimSpec objects to extend a hierarchy.  The helper function
 /// SdfCreatePrimInLayer() can be used to quickly create a hierarchy of
 /// primSpecs.
 ///
@@ -54,8 +54,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \li Insert doc about references and inherits here.
 /// \li Should have validate... methods for name, children, properties
 ///
-class SdfPrimSpec : public SdfSpec
-{
+class SdfPrimSpec : public SdfSpec {
     SDF_DECLARE_SPEC(SdfPrimSpec, SdfSpec);
 
 public:
@@ -73,10 +72,10 @@ public:
     /// Creates a prim spec with a \p name, \p specifier and \p typeName as a
     /// root prim in the given layer.
     SDF_API
-    static SdfPrimSpecHandle
-    New(const SdfLayerHandle& parentLayer,
-        const std::string& name, SdfSpecifier spec,
-        const std::string& typeName = std::string());
+    static SdfPrimSpecHandle New(const SdfLayerHandle& parentLayer,
+                                 const std::string& name,
+                                 SdfSpecifier spec,
+                                 const std::string& typeName = std::string());
 
     /// Create a prim spec.
     ///
@@ -86,10 +85,10 @@ public:
     /// \sa SdfCreatePrimInLayer() to create a PrimSpec with all required
     /// ancestor specs as SdfSpecifierOver.
     SDF_API
-    static SdfPrimSpecHandle
-    New(const SdfPrimSpecHandle& parentPrim,
-        const std::string& name, SdfSpecifier spec,
-        const std::string& typeName = std::string());
+    static SdfPrimSpecHandle New(const SdfPrimSpecHandle& parentPrim,
+                                 const std::string& name,
+                                 SdfSpecifier spec,
+                                 const std::string& typeName = std::string());
 
     /// \name Name
     /// @{
@@ -387,7 +386,7 @@ public:
 
     /// Sets whether this prim spec will be hidden in browsers.
     SDF_API
-    void SetHidden( bool value );
+    void SetHidden(bool value);
 
     /// Returns this prim spec's kind.
     ///
@@ -481,14 +480,14 @@ public:
     SdfDictionaryProxy GetCustomData() const;
 
     /// Returns the asset info dictionary for this prim.
-    /// 
-    /// The default value is an empty dictionary. 
-    /// 
-    /// The asset info dictionary is used to annotate prims representing the 
-    /// root-prims of assets (generally organized as models) with various 
+    ///
+    /// The default value is an empty dictionary.
+    ///
+    /// The asset info dictionary is used to annotate prims representing the
+    /// root-prims of assets (generally organized as models) with various
     /// data related to asset management. For example, asset name, root layer
     /// identifier, asset version etc.
-    /// 
+    ///
     SDF_API
     SdfDictionaryProxy GetAssetInfo() const;
 
@@ -501,7 +500,7 @@ public:
     /// Sets a asset info entry for this prim.
     ///
     /// If \p value is empty, then this removes the given asset info entry.
-    /// 
+    ///
     /// \sa GetAssetInfo()
     ///
     SDF_API
@@ -673,12 +672,11 @@ public:
 
     /// Sets the variant selected for the given variant set.
     /// If \p variantName is empty, then this removes the variant
-    /// selection opinion for the variant set \p variantSetName. To 
+    /// selection opinion for the variant set \p variantSetName. To
     /// explicitly set the variant selection to be empty, use
     /// BlockVariantSelection instead.
     SDF_API
-    void SetVariantSelection(const std::string& variantSetName,
-                             const std::string& variantName);
+    void SetVariantSelection(const std::string& variantSetName, const std::string& variantName);
 
     /// Blocks the variant selected for the given variant set by setting
     /// the variant selection to empty.
@@ -701,7 +699,7 @@ public:
     /// added.
     SDF_API
     SdfRelocatesMapProxy GetRelocates() const;
-    
+
     /// Set the entire map of namespace relocations specified on this prim.
     /// Use the editing proxy for modifying single paths in the map.
     SDF_API
@@ -713,7 +711,7 @@ public:
     /// (no opinion).
     SDF_API
     bool HasRelocates() const;
-    
+
     /// Clears the relocates opinion for this prim.
     SDF_API
     void ClearRelocates();
@@ -734,10 +732,10 @@ private:
     bool _ValidateEdit(const TfToken& key) const;
 
 private:
-    static SdfPrimSpecHandle
-    _New(const SdfPrimSpecHandle &parentPrim,
-         const TfToken &name, SdfSpecifier spec,
-         const TfToken &typeName);
+    static SdfPrimSpecHandle _New(const SdfPrimSpecHandle& parentPrim,
+                                  const TfToken& name,
+                                  SdfSpecifier spec,
+                                  const TfToken& typeName);
 };
 
 /// Convenience function to create a prim at the given path, and any
@@ -748,12 +746,10 @@ private:
 ///
 /// The new specs are created with SdfSpecifierOver and an empty type.
 /// primPath must be a valid prim path.
-SDF_API 
-SdfPrimSpecHandle SdfCreatePrimInLayer(const SdfLayerHandle& layer,
-                                       const SdfPath& primPath);
+SDF_API
+SdfPrimSpecHandle SdfCreatePrimInLayer(const SdfLayerHandle& layer, const SdfPath& primPath);
 
-
-/// Convenience function to create a prim at the given path, and any 
+/// Convenience function to create a prim at the given path, and any
 /// necessary parent prims, in the given layer.
 ///
 /// If a prim already exists at the given path, do nothing and return true.
@@ -761,10 +757,9 @@ SdfPrimSpecHandle SdfCreatePrimInLayer(const SdfLayerHandle& layer,
 /// Any newly created specs have SdfSpecifierOver and an empty type.  primPath
 /// must be a valid prim path.  Return false and issue an error if we fail to
 /// author the required scene description.
-SDF_API 
-bool SdfJustCreatePrimInLayer(const SdfLayerHandle& layer,
-                              const SdfPath& primPath);
+SDF_API
+bool SdfJustCreatePrimInLayer(const SdfLayerHandle& layer, const SdfPath& primPath);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_PRIM_SPEC_H
+#endif  // PXR_USD_SDF_PRIM_SPEC_H

@@ -28,8 +28,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// nodes can be created that derive from `NdrNode`; those specialized nodes can
 /// add their own domain-specific data and methods.
 ///
-class NdrNode
-{
+class NdrNode {
 public:
     /// Constructor.
     NDR_API
@@ -43,7 +42,7 @@ public:
             const std::string& implementationURI,
             NdrPropertyUniquePtrVec&& properties,
             const NdrTokenMap& metadata = NdrTokenMap(),
-            const std::string &sourceCode = std::string());
+            const std::string& sourceCode = std::string());
 
     /// Destructor.
     NDR_API
@@ -107,26 +106,26 @@ public:
     /// \sa NdrNode::GetResolvedDefinitionURI()
     const std::string& GetResolvedImplementationURI() const { return _implementationURI; }
 
-    /// Returns  the source code for this node. This will be empty for most 
-    /// nodes. It will be non-empty only for the nodes that are constructed 
-    /// using \ref NdrRegistry::GetNodeFromSourceCode(), in which case, the 
-    /// source code has not been parsed (or even compiled) yet. 
-    /// 
-    /// An unparsed node with non-empty source-code but no properties is 
-    /// considered to be invalid. Once the node is parsed and the relevant 
-    /// properties and metadata are extracted from the source code, the node 
+    /// Returns  the source code for this node. This will be empty for most
+    /// nodes. It will be non-empty only for the nodes that are constructed
+    /// using \ref NdrRegistry::GetNodeFromSourceCode(), in which case, the
+    /// source code has not been parsed (or even compiled) yet.
+    ///
+    /// An unparsed node with non-empty source-code but no properties is
+    /// considered to be invalid. Once the node is parsed and the relevant
+    /// properties and metadata are extracted from the source code, the node
     /// becomes valid.
-    /// 
+    ///
     /// \sa NdrNode::IsValid
-    const std::string &GetSourceCode() const { return _sourceCode; }
+    const std::string& GetSourceCode() const { return _sourceCode; }
 
     /// Whether or not this node is valid. A node that is valid indicates that
     /// the parser plugin was able to successfully parse the contents of this
     /// node.
     ///
-    /// Note that if a node is not valid, some data like its name, URI, source 
-    /// code etc. could still be available (data that was obtained during the 
-    /// discovery process). However, other data that must be gathered from the 
+    /// Note that if a node is not valid, some data like its name, URI, source
+    /// code etc. could still be available (data that was obtained during the
+    /// discovery process). However, other data that must be gathered from the
     /// parsing process will NOT be available (eg, inputs and outputs).
     NDR_API
     virtual bool IsValid() const { return _isValid; }
@@ -137,7 +136,6 @@ public:
     virtual std::string GetInfoString() const;
 
     /// @}
-
 
     /// \name Inputs and Outputs
     /// An input or output is also generically referred to as a "property".
@@ -162,7 +160,6 @@ public:
     NdrPropertyConstPtr GetOutput(const TfToken& outputName) const;
 
     /// @}
-
 
     /// \name Metadata
     /// The metadata returned here is a direct result of what the parser plugin
@@ -203,4 +200,4 @@ protected:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_NDR_NODE_H
+#endif  // PXR_USD_NDR_NODE_H

@@ -38,28 +38,26 @@ class SdfPathAncestorsRange;
 
 using Sdf_PathNodeConstRefPtr = TfDelegatedCountPtr<const Sdf_PathNode>;
 
-void TfDelegatedCountIncrement(Sdf_PathNode const *) noexcept;
-void TfDelegatedCountDecrement(Sdf_PathNode const *) noexcept;
+void TfDelegatedCountIncrement(Sdf_PathNode const*) noexcept;
+void TfDelegatedCountDecrement(Sdf_PathNode const*) noexcept;
 
 // Tags used for the pools of path nodes.
 struct Sdf_PathPrimTag;
 struct Sdf_PathPropTag;
 
 // These are validated below.
-static constexpr size_t Sdf_SizeofPrimPathNode = sizeof(void *) * 3;
-static constexpr size_t Sdf_SizeofPropPathNode = sizeof(void *) * 3;
+static constexpr size_t Sdf_SizeofPrimPathNode = sizeof(void*) * 3;
+static constexpr size_t Sdf_SizeofPropPathNode = sizeof(void*) * 3;
 
-using Sdf_PathPrimPartPool = Sdf_Pool<
-    Sdf_PathPrimTag, Sdf_SizeofPrimPathNode, /*regionBits=*/8>;
+using Sdf_PathPrimPartPool = Sdf_Pool<Sdf_PathPrimTag, Sdf_SizeofPrimPathNode, /*regionBits=*/8>;
 
-using Sdf_PathPropPartPool = Sdf_Pool<
-    Sdf_PathPropTag, Sdf_SizeofPropPathNode, /*regionBits=*/8>;
+using Sdf_PathPropPartPool = Sdf_Pool<Sdf_PathPropTag, Sdf_SizeofPropPathNode, /*regionBits=*/8>;
 
 using Sdf_PathPrimHandle = Sdf_PathPrimPartPool::Handle;
 using Sdf_PathPropHandle = Sdf_PathPropPartPool::Handle;
 
 // This handle class wraps up the raw Prim/PropPartPool handles.
-template <class Handle, bool Counted, class PathNode=Sdf_PathNode const>
+template <class Handle, bool Counted, class PathNode = Sdf_PathNode const>
 struct Sdf_PathNodeHandleImpl {
 private:
     typedef Sdf_PathNodeHandleImpl this_type;
@@ -69,24 +67,20 @@ public:
 
     constexpr Sdf_PathNodeHandleImpl() noexcept {};
 
-    explicit
-    Sdf_PathNodeHandleImpl(Sdf_PathNode const *p, bool add_ref = true)
-        : _poolHandle(Handle::GetHandle(reinterpret_cast<char const *>(p))) {
+    explicit Sdf_PathNodeHandleImpl(Sdf_PathNode const* p, bool add_ref = true)
+        : _poolHandle(Handle::GetHandle(reinterpret_cast<char const*>(p))) {
         if (p && add_ref) {
             _AddRef(p);
         }
     }
 
-    explicit
-    Sdf_PathNodeHandleImpl(Handle h, bool add_ref = true)
-        : _poolHandle(h) {
+    explicit Sdf_PathNodeHandleImpl(Handle h, bool add_ref = true) : _poolHandle(h) {
         if (h && add_ref) {
             _AddRef();
         }
     }
 
-    Sdf_PathNodeHandleImpl(Sdf_PathNodeHandleImpl const &rhs) noexcept
-        : _poolHandle(rhs._poolHandle) {
+    Sdf_PathNodeHandleImpl(Sdf_PathNodeHandleImpl const& rhs) noexcept : _poolHandle(rhs._poolHandle) {
         if (_poolHandle) {
             _AddRef();
         }
@@ -98,8 +92,7 @@ public:
         }
     }
 
-    Sdf_PathNodeHandleImpl &
-    operator=(Sdf_PathNodeHandleImpl const &rhs) {
+    Sdf_PathNodeHandleImpl& operator=(Sdf_PathNodeHandleImpl const& rhs) {
         if (Counted && *this == rhs) {
             return *this;
         }
@@ -107,70 +100,44 @@ public:
         return *this;
     }
 
-    Sdf_PathNodeHandleImpl(Sdf_PathNodeHandleImpl &&rhs) noexcept
-        : _poolHandle(rhs._poolHandle) {
+    Sdf_PathNodeHandleImpl(Sdf_PathNodeHandleImpl&& rhs) noexcept : _poolHandle(rhs._poolHandle) {
         rhs._poolHandle = nullptr;
     }
 
-    Sdf_PathNodeHandleImpl &
-    operator=(Sdf_PathNodeHandleImpl &&rhs) noexcept {
+    Sdf_PathNodeHandleImpl& operator=(Sdf_PathNodeHandleImpl&& rhs) noexcept {
         this_type(std::move(rhs)).swap(*this);
         return *this;
     }
 
-    Sdf_PathNodeHandleImpl &
-    operator=(Sdf_PathNode const *rhs) noexcept {
+    Sdf_PathNodeHandleImpl& operator=(Sdf_PathNode const* rhs) noexcept {
         this_type(rhs).swap(*this);
         return *this;
     }
 
-    void reset() noexcept {
-        _poolHandle = Handle { nullptr };
-    }
+    void reset() noexcept { _poolHandle = Handle{nullptr}; }
 
-    inline Sdf_PathNode const *
-    get() const noexcept {
-        return reinterpret_cast<Sdf_PathNode *>(_poolHandle.GetPtr());
-    }
+    inline Sdf_PathNode const* get() const noexcept { return reinterpret_cast<Sdf_PathNode*>(_poolHandle.GetPtr()); }
 
-    Sdf_PathNode const &
-    operator*() const {
-        return *get();
-    }
+    Sdf_PathNode const& operator*() const { return *get(); }
 
-    Sdf_PathNode const *
-    operator->() const {
-        return get();
-    }
+    Sdf_PathNode const* operator->() const { return get(); }
 
-    explicit operator bool() const noexcept {
-        return static_cast<bool>(_poolHandle);
-    }
+    explicit operator bool() const noexcept { return static_cast<bool>(_poolHandle); }
 
-    void swap(Sdf_PathNodeHandleImpl &rhs) noexcept {
-        _poolHandle.swap(rhs._poolHandle);
-    }
+    void swap(Sdf_PathNodeHandleImpl& rhs) noexcept { _poolHandle.swap(rhs._poolHandle); }
 
-    inline bool operator==(Sdf_PathNodeHandleImpl const &rhs) const noexcept {
-        return _poolHandle == rhs._poolHandle;
-    }
-    inline bool operator!=(Sdf_PathNodeHandleImpl const &rhs) const noexcept {
-        return _poolHandle != rhs._poolHandle;
-    }
-    inline bool operator<(Sdf_PathNodeHandleImpl const &rhs) const noexcept {
-        return _poolHandle < rhs._poolHandle;
-    }
+    inline bool operator==(Sdf_PathNodeHandleImpl const& rhs) const noexcept { return _poolHandle == rhs._poolHandle; }
+    inline bool operator!=(Sdf_PathNodeHandleImpl const& rhs) const noexcept { return _poolHandle != rhs._poolHandle; }
+    inline bool operator<(Sdf_PathNodeHandleImpl const& rhs) const noexcept { return _poolHandle < rhs._poolHandle; }
+
 private:
-
-    inline void _AddRef(Sdf_PathNode const *p) const {
+    inline void _AddRef(Sdf_PathNode const* p) const {
         if (Counted) {
             TfDelegatedCountIncrement(p);
         }
     }
 
-    inline void _AddRef() const {
-        _AddRef(get());
-    }
+    inline void _AddRef() const { _AddRef(get()); }
 
     inline void _DecRef() const {
         if (Counted) {
@@ -178,15 +145,12 @@ private:
         }
     }
 
-    Handle _poolHandle { nullptr };
+    Handle _poolHandle{nullptr};
 };
 
-using Sdf_PathPrimNodeHandle =
-    Sdf_PathNodeHandleImpl<Sdf_PathPrimHandle, /*Counted=*/true>;
+using Sdf_PathPrimNodeHandle = Sdf_PathNodeHandleImpl<Sdf_PathPrimHandle, /*Counted=*/true>;
 
-using Sdf_PathPropNodeHandle =
-    Sdf_PathNodeHandleImpl<Sdf_PathPropHandle, /*Counted=*/false>;
-
+using Sdf_PathPropNodeHandle = Sdf_PathNodeHandleImpl<Sdf_PathPropHandle, /*Counted=*/false>;
 
 /// A set of SdfPaths.
 typedef std::set<class SdfPath> SdfPathSet;
@@ -196,7 +160,7 @@ typedef std::vector<class SdfPath> SdfPathVector;
 // Tell VtValue that SdfPath is cheap to copy.
 VT_TYPE_IS_CHEAP_TO_COPY(class SdfPath);
 
-/// \class SdfPath 
+/// \class SdfPath
 ///
 /// A path value used to locate objects in layers or scenegraphs.
 ///
@@ -270,22 +234,21 @@ VT_TYPE_IS_CHEAP_TO_COPY(class SdfPath);
 /// the number of values created (since it requires synchronized access to
 /// this table) or copied (since it requires atomic ref-counting operations).
 ///
-class SdfPath
-{
+class SdfPath {
 public:
     /// The empty path value, equivalent to SdfPath().
-    SDF_API static const SdfPath & EmptyPath();
+    SDF_API static const SdfPath& EmptyPath();
 
     /// The absolute path representing the top of the
     /// namespace hierarchy.
-    SDF_API static const SdfPath & AbsoluteRootPath();
+    SDF_API static const SdfPath& AbsoluteRootPath();
 
     /// The relative path representing "self".
-    SDF_API static const SdfPath & ReflexiveRelativePath();
+    SDF_API static const SdfPath& ReflexiveRelativePath();
 
     /// \name Constructors
-    /// @{ 
-    
+    /// @{
+
     /// Constructs the default, empty path.
     ///
     SdfPath() noexcept = default;
@@ -306,11 +269,11 @@ public:
     // XXX  We may want to revisit the behavior when constructing
     // a path with an empty string ("") to accept it without error and
     // return EmptyPath.
-    SDF_API explicit SdfPath(const std::string &path);
+    SDF_API explicit SdfPath(const std::string& path);
 
     /// @}
 
-    /// \name Querying paths 
+    /// \name Querying paths
     /// @{
 
     /// Returns the number of path elements in this path.
@@ -362,15 +325,13 @@ public:
     /// Returns whether the path or any of its parent paths identifies
     /// a variant selection for a prim.
     SDF_API bool ContainsPrimVariantSelection() const;
-    
+
     /// Return true if this path contains any property elements, false
     /// otherwise.  A false return indicates a prim-like path, specifically a
     /// root path, a prim path, or a prim variant selection path.  A true return
     /// indicates a property-like path: a prim property path, a target path, a
     /// relational attribute path, etc.
-    bool ContainsPropertyElements() const {
-        return static_cast<bool>(_propPart);
-    }
+    bool ContainsPropertyElements() const { return static_cast<bool>(_propPart); }
 
     /// Return true if this path is or has a prefix that's a target path or a
     /// mapper path.
@@ -398,7 +359,7 @@ public:
     inline bool IsEmpty() const noexcept {
         // No need to check _propPart, because it can only be non-null if
         // _primPart is non-null.
-        return !_primPart; 
+        return !_primPart;
     }
 
     /// Return the string representation of this path as a TfToken.
@@ -417,7 +378,7 @@ public:
     /// This function is recommended only for human-readable or diagnostic
     /// output.  Use the SdfPath API to manipulate paths.  It is less
     /// error-prone and has better performance.
-    SDF_API TfToken const &GetToken() const;
+    SDF_API TfToken const& GetToken() const;
 
     /// Return the string representation of this path as a std::string.
     ///
@@ -435,7 +396,7 @@ public:
     /// This function is recommended only for human-readable or diagnostic
     /// output.  Use the SdfPath API to manipulate paths.  It is less
     /// error-prone and has better performance.
-    SDF_API const std::string &GetString() const;
+    SDF_API const std::string& GetString() const;
 
     /// Returns the string representation of this path as a c string.
     ///
@@ -447,7 +408,7 @@ public:
     /// This function is recommended only for human-readable or diagnostic
     /// output.  Use the SdfPath API to manipulate paths.  It is less
     /// error-prone and has better performance.
-    SDF_API const char *GetText() const;
+    SDF_API const char* GetText() const;
 
     /// Returns the prefix paths of this path.
     ///
@@ -469,7 +430,7 @@ public:
     SDF_API SdfPathVector GetPrefixes(size_t numPrefixes) const;
 
     /// Fills prefixes with prefixes of this path.
-    /// 
+    ///
     /// This avoids copy constructing the return value.
     ///
     /// Prefixes are returned in order of shortest to longest.  The path
@@ -477,17 +438,17 @@ public:
     /// Note that if the prefix order does not need to be from shortest to
     /// longest, it is more efficient to use GetAncestorsRange(), which
     /// produces an equivalent set of paths, ordered from longest to shortest.
-    SDF_API void GetPrefixes(SdfPathVector *prefixes) const;
+    SDF_API void GetPrefixes(SdfPathVector* prefixes) const;
 
     /// Fill \p prefixes with up to \p numPrefixes prefixes of this path.
-    /// 
+    ///
     /// Prefixes are filled in order of shortest to longest.  The path itself is
     /// included as the last prefix.  Note that if the prefix order does not
     /// need to be from shortest to longest, it can be more efficient to use
     /// GetAncestorsRange(), which produces an equivalent set of paths, ordered
     /// from longest to shortest.  If \p numPrefixes is 0 or greater than the
     /// number of this path's prefixes, fill all prefixes.
-    SDF_API void GetPrefixes(SdfPathVector *prefixes, size_t numPrefixes) const;
+    SDF_API void GetPrefixes(SdfPathVector* prefixes, size_t numPrefixes) const;
 
     /// Fill \p prefixes with up to \p prefixes.size() prefixes of this path.
     /// Return the subspan of prefixes filled.
@@ -520,12 +481,12 @@ public:
     ///     <li>Returns "." for ReflexiveRelativePath.</li>
     ///     <li>Returns ".." for a path ending in ParentPathElement.</li>
     /// </ul>
-    SDF_API const std::string &GetName() const;
+    SDF_API const std::string& GetName() const;
 
     /// Returns the name of the prim, property or relational
     /// attribute identified by the path, as a token.
-    SDF_API const TfToken &GetNameToken() const;
-    
+    SDF_API const TfToken& GetNameToken() const;
+
     /// Returns an ascii representation of the "terminal" element
     /// of this path, which can be used to reconstruct the path using
     /// \c AppendElementString() on its parent.
@@ -540,7 +501,7 @@ public:
     /// representation of the element, for all element types.
     ///
     /// Also note that whereas \c GetName(), \c GetNameToken(), \c GetText(),
-    /// \c GetString(), and \c GetTargetPath() return cached results, 
+    /// \c GetString(), and \c GetTargetPath() return cached results,
     /// \c GetElementString() always performs some amount of string
     /// manipulation, which you should keep in mind if performance is a concern.
     SDF_API std::string GetElementString() const;
@@ -567,7 +528,7 @@ public:
     /// ReplaceName('/Merida.tx', 'ty') -> '/Merida.ty'
     /// ReplaceName('/Merida.tx[targ].tx', 'ty') -> '/Merida.tx[targ].ty'
     ///
-    SDF_API SdfPath ReplaceName(TfToken const &newName) const;
+    SDF_API SdfPath ReplaceName(TfToken const& newName) const;
 
     /// Returns the relational attribute or mapper target path
     /// for this path.
@@ -581,7 +542,7 @@ public:
     /// as the target of the relational attribute.  In these cases, the
     /// "deepest" or right-most target path will be returned (the connection
     /// target in this example).
-    SDF_API const SdfPath &GetTargetPath() const;
+    SDF_API const SdfPath& GetTargetPath() const;
 
     /// Returns all the relationship target or connection target
     /// paths contained in this path, and recursively all the target paths
@@ -590,18 +551,18 @@ public:
     /// For example, given the path: '/A/B.a[/C/D.a[/E/F.a]].a[/A/B.a[/C/D.a]]'
     /// this method produces: '/A/B.a[/C/D.a]', '/C/D.a', '/C/D.a[/E/F.a]',
     /// '/E/F.a'
-    SDF_API void GetAllTargetPathsRecursively(SdfPathVector *result) const;
+    SDF_API void GetAllTargetPathsRecursively(SdfPathVector* result) const;
 
     /// Returns the variant selection for this path, if this is a variant
     /// selection path.
     /// Returns a pair of empty strings if this path is not a variant
     /// selection path.
-    SDF_API 
+    SDF_API
     std::pair<std::string, std::string> GetVariantSelection() const;
 
     /// Return true if both this path and \a prefix are not the empty
     /// path and this path has \a prefix as a prefix.  Return false otherwise.
-    SDF_API bool HasPrefix( const SdfPath &prefix ) const;
+    SDF_API bool HasPrefix(const SdfPath& prefix) const;
 
     /// @}
 
@@ -670,59 +631,58 @@ public:
     ///
     /// If the newSuffix is a prim property path, then this path must be
     /// a prim path or the ReflexiveRelativePath.
-    SDF_API SdfPath AppendPath(const SdfPath &newSuffix) const;
+    SDF_API SdfPath AppendPath(const SdfPath& newSuffix) const;
 
     /// Creates a path by appending an element for \p childName
     /// to this path.
     ///
     /// This path must be a prim path, the AbsoluteRootPath
     /// or the ReflexiveRelativePath.
-    SDF_API SdfPath AppendChild(TfToken const &childName) const;
+    SDF_API SdfPath AppendChild(TfToken const& childName) const;
 
     /// Creates a path by appending an element for \p propName
     /// to this path.
     ///
     /// This path must be a prim path or the ReflexiveRelativePath.
-    SDF_API SdfPath AppendProperty(TfToken const &propName) const;
+    SDF_API SdfPath AppendProperty(TfToken const& propName) const;
 
     /// Creates a path by appending an element for \p variantSet
     /// and \p variant to this path.
     ///
     /// This path must be a prim path.
-    SDF_API 
-    SdfPath AppendVariantSelection(const std::string &variantSet,
-                                   const std::string &variant) const;
+    SDF_API
+    SdfPath AppendVariantSelection(const std::string& variantSet, const std::string& variant) const;
 
     /// Creates a path by appending an element for
     /// \p targetPath.
     ///
     /// This path must be a prim property or relational attribute path.
-    SDF_API SdfPath AppendTarget(const SdfPath &targetPath) const;
+    SDF_API SdfPath AppendTarget(const SdfPath& targetPath) const;
 
     /// Creates a path by appending an element for
     /// \p attrName to this path.
     ///
     /// This path must be a target path.
-    SDF_API 
-    SdfPath AppendRelationalAttribute(TfToken const &attrName) const;
+    SDF_API
+    SdfPath AppendRelationalAttribute(TfToken const& attrName) const;
 
     /// Replaces the relational attribute's target path
     ///
     /// The path must be a relational attribute path.
-    SDF_API 
-    SdfPath ReplaceTargetPath( const SdfPath &newTargetPath ) const;
+    SDF_API
+    SdfPath ReplaceTargetPath(const SdfPath& newTargetPath) const;
 
     /// Creates a path by appending a mapper element for
     /// \p targetPath.
     ///
     /// This path must be a prim property or relational attribute path.
-    SDF_API SdfPath AppendMapper(const SdfPath &targetPath) const;
+    SDF_API SdfPath AppendMapper(const SdfPath& targetPath) const;
 
     /// Creates a path by appending an element for
     /// \p argName.
     ///
     /// This path must be a mapper path.
-    SDF_API SdfPath AppendMapperArg(TfToken const &argName) const;
+    SDF_API SdfPath AppendMapperArg(TfToken const& argName) const;
 
     /// Creates a path by appending an expression element.
     ///
@@ -738,10 +698,10 @@ public:
     ///
     /// May also fail and return EmptyPath if this path's type cannot
     /// possess a child of the type encoded in \p element.
-    SDF_API SdfPath AppendElementString(const std::string &element) const;
+    SDF_API SdfPath AppendElementString(const std::string& element) const;
 
     /// Like AppendElementString() but take the element as a TfToken.
-    SDF_API SdfPath AppendElementToken(const TfToken &elementTok) const;
+    SDF_API SdfPath AppendElementToken(const TfToken& elementTok) const;
 
     /// Returns a path with all occurrences of the prefix path
     /// \p oldPrefix replaced with the prefix path \p newPrefix.
@@ -752,14 +712,12 @@ public:
     /// If this is not a target, relational attribute or mapper path this
     /// will do zero or one path prefix replacements, if not the number of
     /// replacements can be greater than one.
-    SDF_API 
-    SdfPath ReplacePrefix(const SdfPath &oldPrefix,
-                          const SdfPath &newPrefix,
-                          bool fixTargetPaths=true) const;
+    SDF_API
+    SdfPath ReplacePrefix(const SdfPath& oldPrefix, const SdfPath& newPrefix, bool fixTargetPaths = true) const;
 
     /// Returns a path with maximal length that is a prefix path of
     /// both this path and \p path.
-    SDF_API SdfPath GetCommonPrefix(const SdfPath &path) const;
+    SDF_API SdfPath GetCommonPrefix(const SdfPath& path) const;
 
     /// Find and remove the longest common suffix from two paths.
     ///
@@ -776,12 +734,10 @@ public:
     /// then the result would be /A and /.  Similarly paths /A/B/C and
     /// /B/C would return /A/B and /B if \p stopAtRootPrim is \c true but
     /// /A and / if it's \c false.
-    SDF_API 
-    std::pair<SdfPath, SdfPath>
-    RemoveCommonSuffix(const SdfPath& otherPath,
-                       bool stopAtRootPrim = false) const;
+    SDF_API
+    std::pair<SdfPath, SdfPath> RemoveCommonSuffix(const SdfPath& otherPath, bool stopAtRootPrim = false) const;
 
-    /// Returns the absolute form of this path using \p anchor 
+    /// Returns the absolute form of this path using \p anchor
     /// as the relative basis.
     ///
     /// \p anchor must be an absolute prim path.
@@ -790,7 +746,7 @@ public:
     /// relative basis.
     ///
     /// If this path is already an absolute path, just return a copy.
-    SDF_API SdfPath MakeAbsolutePath(const SdfPath & anchor) const;
+    SDF_API SdfPath MakeAbsolutePath(const SdfPath& anchor) const;
 
     /// Returns the relative form of this path using \p anchor
     /// as the relative basis.
@@ -804,7 +760,7 @@ public:
     /// path to the absolute path given by \p anchor.  (The optimal
     /// relative path from a given prim path is the relative path
     /// with the least leading dot-dots.
-    SDF_API SdfPath MakeRelativePath(const SdfPath & anchor) const;
+    SDF_API SdfPath MakeRelativePath(const SdfPath& anchor) const;
 
     /// @}
 
@@ -813,80 +769,77 @@ public:
 
     /// Returns whether \p name is a legal identifier for any
     /// path component.
-    SDF_API static bool IsValidIdentifier(const std::string &name);
+    SDF_API static bool IsValidIdentifier(const std::string& name);
 
     /// Returns whether \p name is a legal namespaced identifier.
     /// This returns \c true if IsValidIdentifier() does.
-    SDF_API static bool IsValidNamespacedIdentifier(const std::string &name);
+    SDF_API static bool IsValidNamespacedIdentifier(const std::string& name);
 
     /// Tokenizes \p name by the namespace delimiter.
     /// Returns the empty vector if \p name is not a valid namespaced
     /// identifier.
-    SDF_API static std::vector<std::string> TokenizeIdentifier(const std::string &name);
+    SDF_API static std::vector<std::string> TokenizeIdentifier(const std::string& name);
 
     /// Tokenizes \p name by the namespace delimiter.
     /// Returns the empty vector if \p name is not a valid namespaced
     /// identifier.
     SDF_API
-    static TfTokenVector TokenizeIdentifierAsTokens(const std::string &name);
+    static TfTokenVector TokenizeIdentifierAsTokens(const std::string& name);
 
     /// Join \p names into a single identifier using the namespace delimiter.
     /// Any empty strings present in \p names are ignored when joining.
-    SDF_API 
-    static std::string JoinIdentifier(const std::vector<std::string> &names);
+    SDF_API
+    static std::string JoinIdentifier(const std::vector<std::string>& names);
 
     /// Join \p names into a single identifier using the namespace delimiter.
     /// Any empty strings present in \p names are ignored when joining.
-    SDF_API 
+    SDF_API
     static std::string JoinIdentifier(const TfTokenVector& names);
 
     /// Join \p lhs and \p rhs into a single identifier using the
     /// namespace delimiter.
     /// Returns \p lhs if \p rhs is empty and vice verse.
     /// Returns an empty string if both \p lhs and \p rhs are empty.
-    SDF_API 
-    static std::string JoinIdentifier(const std::string &lhs,
-                                      const std::string &rhs);
+    SDF_API
+    static std::string JoinIdentifier(const std::string& lhs, const std::string& rhs);
 
     /// Join \p lhs and \p rhs into a single identifier using the
     /// namespace delimiter.
     /// Returns \p lhs if \p rhs is empty and vice verse.
     /// Returns an empty string if both \p lhs and \p rhs are empty.
-    SDF_API 
-    static std::string JoinIdentifier(const TfToken &lhs, const TfToken &rhs);
+    SDF_API
+    static std::string JoinIdentifier(const TfToken& lhs, const TfToken& rhs);
 
     /// Returns \p name stripped of any namespaces.
     /// This does not check the validity of the name;  it just attempts
     /// to remove anything that looks like a namespace.
     SDF_API
-    static std::string StripNamespace(const std::string &name);
+    static std::string StripNamespace(const std::string& name);
 
     /// Returns \p name stripped of any namespaces.
     /// This does not check the validity of the name;  it just attempts
     /// to remove anything that looks like a namespace.
     SDF_API
-    static TfToken StripNamespace(const TfToken &name);
+    static TfToken StripNamespace(const TfToken& name);
 
     /// Returns (\p name, \c true) where \p name is stripped of the prefix
     /// specified by \p matchNamespace if \p name indeed starts with
-    /// \p matchNamespace. Returns (\p name, \c false) otherwise, with \p name 
+    /// \p matchNamespace. Returns (\p name, \c false) otherwise, with \p name
     /// unmodified.
     ///
     /// This function deals with both the case where \p matchNamespace contains
     /// the trailing namespace delimiter ':' or not.
     ///
     SDF_API
-    static std::pair<std::string, bool> 
-    StripPrefixNamespace(const std::string &name, 
-                         const std::string &matchNamespace);
+    static std::pair<std::string, bool> StripPrefixNamespace(const std::string& name,
+                                                             const std::string& matchNamespace);
 
     /// Return true if \p pathString is a valid path string, meaning that
     /// passing the string to the \a SdfPath constructor will result in a valid,
     /// non-empty SdfPath.  Otherwise, return false and if \p errMsg is not NULL,
     /// set the pointed-to string to the parse error.
     SDF_API
-    static bool IsValidPathString(const std::string &pathString,
-                                  std::string *errMsg = 0);
+    static bool IsValidPathString(const std::string& pathString, std::string* errMsg = 0);
 
     /// @}
 
@@ -894,20 +847,16 @@ public:
     /// @{
 
     /// Equality operator.
-    inline bool operator==(const SdfPath &rhs) const {
-        return _AsInt() == rhs._AsInt();
-    }
+    inline bool operator==(const SdfPath& rhs) const { return _AsInt() == rhs._AsInt(); }
 
     /// Inequality operator.
-    inline bool operator!=(const SdfPath &rhs) const {
-        return !(*this == rhs);
-    }
+    inline bool operator!=(const SdfPath& rhs) const { return !(*this == rhs); }
 
     /// Comparison operator.
     ///
     /// This orders paths lexicographically, aka dictionary-style.
     ///
-    inline bool operator<(const SdfPath &rhs) const {
+    inline bool operator<(const SdfPath& rhs) const {
         if (_AsInt() == rhs._AsInt()) {
             return false;
         }
@@ -920,24 +869,18 @@ public:
 
     /// Greater than operator.
     /// \sa SdfPath::operator<(const SdfPath&)
-    inline bool operator>(const SdfPath& rhs) const {
-        return rhs < *this;
-    }
+    inline bool operator>(const SdfPath& rhs) const { return rhs < *this; }
 
     /// Less than or equal operator.
     /// \sa SdfPath::operator<(const SdfPath&)
-    inline bool operator<=(const SdfPath& rhs) const {
-        return !(rhs < *this);
-    }
+    inline bool operator<=(const SdfPath& rhs) const { return !(rhs < *this); }
 
     /// Greater than or equal operator.
     /// \sa SdfPath::operator<(const SdfPath&)
-    inline bool operator>=(const SdfPath& rhs) const {
-        return !(*this < rhs);
-    }
+    inline bool operator>=(const SdfPath& rhs) const { return !(*this < rhs); }
 
     template <class HashState>
-    friend void TfHashAppend(HashState &h, SdfPath const &path) {
+    friend void TfHashAppend(HashState& h, SdfPath const& path) {
         // The hash function is pretty sensitive performance-wise.  Be
         // careful making changes here, and run tests.
         uint32_t primPart, propPart;
@@ -949,21 +892,15 @@ public:
 
     // For hash maps and sets
     struct Hash {
-        inline size_t operator()(const SdfPath& path) const {
-            return TfHash()(path);
-        }
+        inline size_t operator()(const SdfPath& path) const { return TfHash()(path); }
     };
 
-    inline size_t GetHash() const {
-        return Hash()(*this);
-    }
+    inline size_t GetHash() const { return Hash()(*this); }
 
     // For cases where an unspecified total order that is not stable from
     // run-to-run is needed.
     struct FastLessThan {
-        inline bool operator()(const SdfPath& a, const SdfPath& b) const {
-            return a._AsInt() < b._AsInt();
-        }
+        inline bool operator()(const SdfPath& a, const SdfPath& b) const { return a._AsInt() < b._AsInt(); }
     };
 
     /// @}
@@ -977,64 +914,49 @@ public:
     /// GetConciseRelativePaths requires a vector of absolute paths. It
     /// finds a set of relative paths such that each relative path is
     /// unique.
-    SDF_API static SdfPathVector
-    GetConciseRelativePaths(const SdfPathVector& paths);
+    SDF_API static SdfPathVector GetConciseRelativePaths(const SdfPathVector& paths);
 
     /// Remove all elements of \a paths that are prefixed by other
     /// elements in \a paths.  As a side-effect, the result is left in sorted
     /// order.
-    SDF_API static void RemoveDescendentPaths(SdfPathVector *paths);
+    SDF_API static void RemoveDescendentPaths(SdfPathVector* paths);
 
     /// Remove all elements of \a paths that prefix other elements in
     /// \a paths.  As a side-effect, the result is left in sorted order.
-    SDF_API static void RemoveAncestorPaths(SdfPathVector *paths);
+    SDF_API static void RemoveAncestorPaths(SdfPathVector* paths);
 
     /// @}
 
 private:
-
     // This is used for all internal path construction where we do operations
     // via nodes and then want to return a new path with a resulting prim and
     // property parts.
 
     // Accept rvalues.
-    explicit SdfPath(Sdf_PathPrimNodeHandle &&primNode)
-        : _primPart(std::move(primNode)) {}
+    explicit SdfPath(Sdf_PathPrimNodeHandle&& primNode) : _primPart(std::move(primNode)) {}
 
-    SdfPath(Sdf_PathPrimNodeHandle &&primPart,
-            Sdf_PathPropNodeHandle &&propPart)
-        : _primPart(std::move(primPart))
-        , _propPart(std::move(propPart)) {}
+    SdfPath(Sdf_PathPrimNodeHandle&& primPart, Sdf_PathPropNodeHandle&& propPart)
+        : _primPart(std::move(primPart)), _propPart(std::move(propPart)) {}
 
     // Construct from prim & prop parts.
-    SdfPath(Sdf_PathPrimNodeHandle const &primPart,
-            Sdf_PathPropNodeHandle const &propPart)
-        : _primPart(primPart)
-        , _propPart(propPart) {}
+    SdfPath(Sdf_PathPrimNodeHandle const& primPart, Sdf_PathPropNodeHandle const& propPart)
+        : _primPart(primPart), _propPart(propPart) {}
 
     // Construct from prim & prop node pointers.
-    SdfPath(Sdf_PathNode const *primPart,
-            Sdf_PathNode const *propPart)
-        : _primPart(primPart)
-        , _propPart(propPart) {}
+    SdfPath(Sdf_PathNode const* primPart, Sdf_PathNode const* propPart) : _primPart(primPart), _propPart(propPart) {}
 
     friend class Sdf_PathNode;
     friend class Sdfext_PathAccess;
     friend class SdfPathAncestorsRange;
 
-    SdfPath _ReplacePrimPrefix(SdfPath const &oldPrefix,
-                               SdfPath const &newPrefix) const;
+    SdfPath _ReplacePrimPrefix(SdfPath const& oldPrefix, SdfPath const& newPrefix) const;
 
-    SdfPath _ReplaceTargetPathPrefixes(SdfPath const &oldPrefix,
-                                       SdfPath const &newPrefix) const;
+    SdfPath _ReplaceTargetPathPrefixes(SdfPath const& oldPrefix, SdfPath const& newPrefix) const;
 
-    SdfPath _ReplacePropPrefix(SdfPath const &oldPrefix,
-                               SdfPath const &newPrefix,
-                               bool fixTargetPaths) const;
+    SdfPath _ReplacePropPrefix(SdfPath const& oldPrefix, SdfPath const& newPrefix, bool fixTargetPaths) const;
 
     // Helper to implement the uninlined portion of operator<.
-    SDF_API static bool
-    _LessThanInternal(SdfPath const &lhs, SdfPath const &rhs);
+    SDF_API static bool _LessThanInternal(SdfPath const& lhs, SdfPath const& rhs);
 
     inline uint64_t _AsInt() const {
         static_assert(sizeof(*this) == sizeof(uint64_t), "");
@@ -1043,19 +965,16 @@ private:
         return ret;
     }
 
-    friend void swap(SdfPath &lhs, SdfPath &rhs) {
+    friend void swap(SdfPath& lhs, SdfPath& rhs) {
         lhs._primPart.swap(rhs._primPart);
         lhs._propPart.swap(rhs._propPart);
     }
 
-    SDF_API friend char const *
-    Sdf_PathGetDebuggerPathText(SdfPath const &);
+    SDF_API friend char const* Sdf_PathGetDebuggerPathText(SdfPath const&);
 
     Sdf_PathPrimNodeHandle _primPart;
     Sdf_PathPropNodeHandle _propPart;
-
 };
-
 
 /// \class SdfPathAncestorsRange
 ///
@@ -1073,12 +992,9 @@ private:
 /// represents paths `../a/b`, `../a` and `..`.
 /// This represents the same of set of `prefix` paths as SdfPath::GetPrefixes,
 /// but in reverse order.
-class SdfPathAncestorsRange
-{
+class SdfPathAncestorsRange {
 public:
-
-    SdfPathAncestorsRange(const SdfPath& path)
-        : _path(path) {}
+    SdfPathAncestorsRange(const SdfPath& path) : _path(path) {}
 
     const SdfPath& GetPath() const { return _path; }
 
@@ -1099,7 +1015,7 @@ public:
         const SdfPath& operator*() const { return _path; }
 
         const SdfPath* operator->() const { return &_path; }
-        
+
         bool operator==(const iterator& o) const { return _path == o._path; }
 
         bool operator!=(const iterator& o) const { return _path != o._path; }
@@ -1107,8 +1023,7 @@ public:
         /// Return the distance between two iterators.
         /// It is only valid to compute the distance between paths
         /// that share a common prefix.
-        SDF_API friend difference_type  
-        distance(const iterator& first, const iterator& last);
+        SDF_API friend difference_type distance(const iterator& first, const iterator& last);
 
     private:
         SdfPath _path;
@@ -1122,22 +1037,18 @@ private:
     SdfPath _path;
 };
 
-
 // Overload hash_value for SdfPath.  Used by things like boost::hash.
-inline size_t hash_value(SdfPath const &path)
-{
+inline size_t hash_value(SdfPath const& path) {
     return path.GetHash();
 }
 
 /// Writes the string representation of \p path to \p out.
-SDF_API std::ostream & operator<<( std::ostream &out, const SdfPath &path );
+SDF_API std::ostream& operator<<(std::ostream& out, const SdfPath& path);
 
 // Helper for SdfPathFindPrefixedRange & SdfPathFindLongestPrefix.  A function
 // object that returns an SdfPath const & unchanged.
 struct Sdf_PathIdentity {
-    inline SdfPath const &operator()(SdfPath const &arg) const {
-        return arg;
-    }
+    inline SdfPath const& operator()(SdfPath const& arg) const { return arg; }
 };
 
 /// Find the subrange of the sorted range [\a begin, \a end) that includes all
@@ -1147,19 +1058,16 @@ struct Sdf_PathIdentity {
 /// can pass a function to extract the path from the dereferenced iterator in
 /// \p getPath.
 template <class ForwardIterator, class GetPathFn = Sdf_PathIdentity>
-std::pair<ForwardIterator, ForwardIterator>
-SdfPathFindPrefixedRange(ForwardIterator begin, ForwardIterator end,
-                         SdfPath const &prefix,
-                         GetPathFn const &getPath = GetPathFn()) {
-    using IterRef = 
-        typename std::iterator_traits<ForwardIterator>::reference;
+std::pair<ForwardIterator, ForwardIterator> SdfPathFindPrefixedRange(ForwardIterator begin,
+                                                                     ForwardIterator end,
+                                                                     SdfPath const& prefix,
+                                                                     GetPathFn const& getPath = GetPathFn()) {
+    using IterRef = typename std::iterator_traits<ForwardIterator>::reference;
 
     struct Compare {
-        Compare(GetPathFn const &getPath) : _getPath(getPath) {}
-        GetPathFn const &_getPath;
-        bool operator()(IterRef a, SdfPath const &b) const {
-            return _getPath(a) < b;
-        }
+        Compare(GetPathFn const& getPath) : _getPath(getPath) {}
+        GetPathFn const& _getPath;
+        bool operator()(IterRef a, SdfPath const& b) const { return _getPath(a) < b; }
     };
 
     std::pair<ForwardIterator, ForwardIterator> result;
@@ -1169,31 +1077,25 @@ SdfPathFindPrefixedRange(ForwardIterator begin, ForwardIterator end,
 
     // Next, find end of range starting from the lower bound, using the
     // prefixing condition to define the boundary.
-    result.second = TfFindBoundary(result.first, end,
-                                   [&prefix, &getPath](IterRef iterRef) {
-                                       return getPath(iterRef).HasPrefix(prefix);
-                                   });
+    result.second = TfFindBoundary(result.first, end, [&prefix, &getPath](IterRef iterRef) {
+        return getPath(iterRef).HasPrefix(prefix);
+    });
 
     return result;
 }
 
 template <class RandomAccessIterator, class GetPathFn>
-RandomAccessIterator
-Sdf_PathFindLongestPrefixImpl(RandomAccessIterator begin,
-                              RandomAccessIterator end,
-                              SdfPath const &path,
-                              bool strictPrefix,
-                              GetPathFn const &getPath)
-{
-    using IterRef = 
-        typename std::iterator_traits<RandomAccessIterator>::reference;
+RandomAccessIterator Sdf_PathFindLongestPrefixImpl(RandomAccessIterator begin,
+                                                   RandomAccessIterator end,
+                                                   SdfPath const& path,
+                                                   bool strictPrefix,
+                                                   GetPathFn const& getPath) {
+    using IterRef = typename std::iterator_traits<RandomAccessIterator>::reference;
 
     struct Compare {
-        Compare(GetPathFn const &getPath) : _getPath(getPath) {}
-        GetPathFn const &_getPath;
-        bool operator()(IterRef a, SdfPath const &b) const {
-            return _getPath(a) < b;
-        }
+        Compare(GetPathFn const& getPath) : _getPath(getPath) {}
+        GetPathFn const& _getPath;
+        bool operator()(IterRef a, SdfPath const& b) const { return _getPath(a) < b; }
     };
 
     // Search for the path in [begin, end).  If present, return it.  If not,
@@ -1202,8 +1104,7 @@ Sdf_PathFindLongestPrefixImpl(RandomAccessIterator begin,
     // element and path and recurse.
 
     // If empty sequence, return.
-    if (begin == end)
-        return end;
+    if (begin == end) return end;
 
     Compare comp(getPath);
 
@@ -1255,23 +1156,16 @@ Sdf_PathFindLongestPrefixImpl(RandomAccessIterator begin,
 /// but you can obtain SdfPaths from them (e.g. vector<pair<SdfPath,
 /// X>>::iterator), you can pass a function to extract the path from the
 /// dereferenced iterator in \p getPath.
-template <class RandomAccessIterator, class GetPathFn = Sdf_PathIdentity,
+template <class RandomAccessIterator,
+          class GetPathFn = Sdf_PathIdentity,
           class = typename std::enable_if<
-              std::is_base_of<
-                  std::random_access_iterator_tag,
-                  typename std::iterator_traits<
-                      RandomAccessIterator>::iterator_category
-                  >::value
-              >::type
-          >
-RandomAccessIterator
-SdfPathFindLongestPrefix(RandomAccessIterator begin,
-                         RandomAccessIterator end,
-                         SdfPath const &path,
-                         GetPathFn const &getPath = GetPathFn())
-{
-    return Sdf_PathFindLongestPrefixImpl(
-        begin, end, path, /*strictPrefix=*/false, getPath);
+                  std::is_base_of<std::random_access_iterator_tag,
+                                  typename std::iterator_traits<RandomAccessIterator>::iterator_category>::value>::type>
+RandomAccessIterator SdfPathFindLongestPrefix(RandomAccessIterator begin,
+                                              RandomAccessIterator end,
+                                              SdfPath const& path,
+                                              GetPathFn const& getPath = GetPathFn()) {
+    return Sdf_PathFindLongestPrefixImpl(begin, end, path, /*strictPrefix=*/false, getPath);
 }
 
 /// Return an iterator to the element of [\a begin, \a end) that is the longest
@@ -1281,31 +1175,23 @@ SdfPathFindLongestPrefix(RandomAccessIterator begin,
 /// but you can obtain SdfPaths from them (e.g. vector<pair<SdfPath,
 /// X>>::iterator), you can pass a function to extract the path from the
 /// dereferenced iterator in \p getPath.
-template <class RandomAccessIterator, class GetPathFn = Sdf_PathIdentity,
+template <class RandomAccessIterator,
+          class GetPathFn = Sdf_PathIdentity,
           class = typename std::enable_if<
-              std::is_base_of<
-                  std::random_access_iterator_tag,
-                  typename std::iterator_traits<
-                      RandomAccessIterator>::iterator_category
-                  >::value
-              >::type
-          >
-RandomAccessIterator
-SdfPathFindLongestStrictPrefix(RandomAccessIterator begin,
-                               RandomAccessIterator end,
-                               SdfPath const &path,
-                               GetPathFn const &getPath = GetPathFn())
-{
-    return Sdf_PathFindLongestPrefixImpl(
-        begin, end, path, /*strictPrefix=*/true, getPath);
+                  std::is_base_of<std::random_access_iterator_tag,
+                                  typename std::iterator_traits<RandomAccessIterator>::iterator_category>::value>::type>
+RandomAccessIterator SdfPathFindLongestStrictPrefix(RandomAccessIterator begin,
+                                                    RandomAccessIterator end,
+                                                    SdfPath const& path,
+                                                    GetPathFn const& getPath = GetPathFn()) {
+    return Sdf_PathFindLongestPrefixImpl(begin, end, path, /*strictPrefix=*/true, getPath);
 }
 
 template <class Iter, class MapParam, class GetPathFn = Sdf_PathIdentity>
-Iter
-Sdf_PathFindLongestPrefixImpl(
-    MapParam map, SdfPath const &path, bool strictPrefix,
-    GetPathFn const &getPath = GetPathFn())
-{
+Iter Sdf_PathFindLongestPrefixImpl(MapParam map,
+                                   SdfPath const& path,
+                                   bool strictPrefix,
+                                   GetPathFn const& getPath = GetPathFn()) {
     // Search for the path in map.  If present, return it.  If not, examine
     // prior element in map.  If none, return end.  Else, is it a prefix of
     // path?  If so, return it.  Else find common prefix of that element and
@@ -1314,94 +1200,71 @@ Sdf_PathFindLongestPrefixImpl(
     const Iter mapEnd = map.end();
 
     // If empty, return.
-    if (map.empty())
-        return mapEnd;
+    if (map.empty()) return mapEnd;
 
     // Search for where this path would lexicographically appear in the range.
     Iter result = map.lower_bound(path);
 
     // If we didn't get the end, check to see if we got the path exactly if
     // we're not looking for a strict prefix.
-    if (!strictPrefix && result != mapEnd && getPath(*result) == path)
-        return result;
+    if (!strictPrefix && result != mapEnd && getPath(*result) == path) return result;
 
     // If we got begin (and didn't match in the case of a non-strict prefix)
     // then there's no prefix.
-    if (result == map.begin())
-        return mapEnd;
+    if (result == map.begin()) return mapEnd;
 
     // If the prior element is a prefix, we're done.
-    if (path.HasPrefix(getPath(*--result)))
-        return result;
+    if (path.HasPrefix(getPath(*--result))) return result;
 
     // Otherwise, find the common prefix of the lexicographical predecessor and
     // recurse looking for it or its longest prefix in the preceding range.  We
     // always pass strictPrefix=false, since now we're operating on prefixes of
     // the original caller's path.
-    return Sdf_PathFindLongestPrefixImpl<Iter, MapParam>(
-        map, path.GetCommonPrefix(getPath(*result)), /*strictPrefix=*/false,
-        getPath);
+    return Sdf_PathFindLongestPrefixImpl<Iter, MapParam>(map, path.GetCommonPrefix(getPath(*result)),
+                                                         /*strictPrefix=*/false, getPath);
 }
 
 /// Return an iterator pointing to the element of \a set whose key is the
 /// longest prefix of the given path (including the path itself).  If there is
 /// no such element, return \a set.end().
 SDF_API
-typename std::set<SdfPath>::const_iterator
-SdfPathFindLongestPrefix(std::set<SdfPath> const &set, SdfPath const &path);
+typename std::set<SdfPath>::const_iterator SdfPathFindLongestPrefix(std::set<SdfPath> const& set, SdfPath const& path);
 
 /// Return an iterator pointing to the element of \a map whose key is the
 /// longest prefix of the given path (including the path itself).  If there is
 /// no such element, return \a map.end().
 template <class T>
-typename std::map<SdfPath, T>::const_iterator
-SdfPathFindLongestPrefix(std::map<SdfPath, T> const &map, SdfPath const &path)
-{
-    return Sdf_PathFindLongestPrefixImpl<
-        typename std::map<SdfPath, T>::const_iterator,
-        std::map<SdfPath, T> const &>(map, path, /*strictPrefix=*/false,
-                                      TfGet<0>());
+typename std::map<SdfPath, T>::const_iterator SdfPathFindLongestPrefix(std::map<SdfPath, T> const& map,
+                                                                       SdfPath const& path) {
+    return Sdf_PathFindLongestPrefixImpl<typename std::map<SdfPath, T>::const_iterator, std::map<SdfPath, T> const&>(
+            map, path, /*strictPrefix=*/false, TfGet<0>());
 }
 template <class T>
-typename std::map<SdfPath, T>::iterator
-SdfPathFindLongestPrefix(std::map<SdfPath, T> &map, SdfPath const &path)
-{
-    return Sdf_PathFindLongestPrefixImpl<
-        typename std::map<SdfPath, T>::iterator,
-        std::map<SdfPath, T> &>(map, path, /*strictPrefix=*/false,
-                                TfGet<0>());
+typename std::map<SdfPath, T>::iterator SdfPathFindLongestPrefix(std::map<SdfPath, T>& map, SdfPath const& path) {
+    return Sdf_PathFindLongestPrefixImpl<typename std::map<SdfPath, T>::iterator, std::map<SdfPath, T>&>(
+            map, path, /*strictPrefix=*/false, TfGet<0>());
 }
 
 /// Return an iterator pointing to the element of \a set whose key is the
 /// longest prefix of the given path (excluding the path itself).  If there is
 /// no such element, return \a set.end().
 SDF_API
-typename std::set<SdfPath>::const_iterator
-SdfPathFindLongestStrictPrefix(std::set<SdfPath> const &set,
-                               SdfPath const &path);
+typename std::set<SdfPath>::const_iterator SdfPathFindLongestStrictPrefix(std::set<SdfPath> const& set,
+                                                                          SdfPath const& path);
 
 /// Return an iterator pointing to the element of \a map whose key is the
 /// longest prefix of the given path (excluding the path itself).  If there is
 /// no such element, return \a map.end().
 template <class T>
-typename std::map<SdfPath, T>::const_iterator
-SdfPathFindLongestStrictPrefix(
-    std::map<SdfPath, T> const &map, SdfPath const &path)
-{
-    return Sdf_PathFindLongestPrefixImpl<
-        typename std::map<SdfPath, T>::const_iterator,
-        std::map<SdfPath, T> const &>(map, path, /*strictPrefix=*/true,
-                                      TfGet<0>());
+typename std::map<SdfPath, T>::const_iterator SdfPathFindLongestStrictPrefix(std::map<SdfPath, T> const& map,
+                                                                             SdfPath const& path) {
+    return Sdf_PathFindLongestPrefixImpl<typename std::map<SdfPath, T>::const_iterator, std::map<SdfPath, T> const&>(
+            map, path, /*strictPrefix=*/true, TfGet<0>());
 }
 template <class T>
-typename std::map<SdfPath, T>::iterator
-SdfPathFindLongestStrictPrefix(
-    std::map<SdfPath, T> &map, SdfPath const &path)
-{
-    return Sdf_PathFindLongestPrefixImpl<
-        typename std::map<SdfPath, T>::iterator,
-        std::map<SdfPath, T> &>(map, path, /*strictPrefix=*/true,
-                                TfGet<0>());
+typename std::map<SdfPath, T>::iterator SdfPathFindLongestStrictPrefix(std::map<SdfPath, T>& map, SdfPath const& path) {
+    return Sdf_PathFindLongestPrefixImpl<typename std::map<SdfPath, T>::iterator, std::map<SdfPath, T>&>(
+            map, path, /*strictPrefix=*/true, TfGet<0>());
 }
 
 // A helper function for debugger pretty-printers, etc.  This function is *not*
@@ -1410,8 +1273,7 @@ SdfPathFindLongestStrictPrefix(
 // calls.  If the given path's string representation exceeds the static buffer
 // size, return a pointer to a message indicating so.
 SDF_API
-char const *
-Sdf_PathGetDebuggerPathText(SdfPath const &);
+char const* Sdf_PathGetDebuggerPathText(SdfPath const&);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
@@ -1427,4 +1289,4 @@ static_assert(Sdf_SizeofPropPathNode == sizeof(Sdf_PrimPropertyPathNode), "");
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_PATH_H
+#endif  // PXR_USD_SDF_PATH_H

@@ -6,5 +6,4 @@
 //
 /// \file PyChildrenProxy.cpp
 
-
 #include "pxr/usd/sdf/pyChildrenProxy.h"

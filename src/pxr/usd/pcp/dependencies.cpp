@@ -24,28 +24,20 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-Pcp_Dependencies::
-ConcurrentPopulationContext::ConcurrentPopulationContext(Pcp_Dependencies &deps)
-    : _deps(deps)
-{
+Pcp_Dependencies::ConcurrentPopulationContext::ConcurrentPopulationContext(Pcp_Dependencies& deps) : _deps(deps) {
     TF_AXIOM(!_deps._concurrentPopulationContext);
     _deps._concurrentPopulationContext = this;
 }
 
-Pcp_Dependencies::ConcurrentPopulationContext::~ConcurrentPopulationContext()
-{
+Pcp_Dependencies::ConcurrentPopulationContext::~ConcurrentPopulationContext() {
     _deps._concurrentPopulationContext = nullptr;
 }
 
-Pcp_Dependencies::Pcp_Dependencies()
-    : _layerStacksRevision(0)
-    , _concurrentPopulationContext(nullptr)
-{
+Pcp_Dependencies::Pcp_Dependencies() : _layerStacksRevision(0), _concurrentPopulationContext(nullptr) {
     // Do nothing
 }
 
-Pcp_Dependencies::~Pcp_Dependencies()
-{
+Pcp_Dependencies::~Pcp_Dependencies() {
     // Do nothing
 }
 
@@ -57,44 +49,34 @@ Pcp_Dependencies::~Pcp_Dependencies()
 // be easily synthesized. Specifically, it does not store arcs
 // introduced purely ancestrally, nor does it store arcs for root nodes
 // (PcpDependencyTypeRoot).
-inline static bool
-_ShouldStoreDependency(PcpDependencyFlags depFlags)
-{
+inline static bool _ShouldStoreDependency(PcpDependencyFlags depFlags) {
     return depFlags & PcpDependencyTypeDirect;
 }
 
-void
-Pcp_Dependencies::Add(
-    const PcpPrimIndex &primIndex,
-    PcpCulledDependencyVector &&culledDependencies,
-    PcpDynamicFileFormatDependencyData &&fileFormatDependencyData,
-    PcpExpressionVariablesDependencyData &&exprVarDependencyData)
-{
+void Pcp_Dependencies::Add(const PcpPrimIndex& primIndex,
+                           PcpCulledDependencyVector&& culledDependencies,
+                           PcpDynamicFileFormatDependencyData&& fileFormatDependencyData,
+                           PcpExpressionVariablesDependencyData&& exprVarDependencyData) {
     TfAutoMallocTag2 tag("Pcp", "Pcp_Dependencies::Add");
     if (!primIndex.GetRootNode()) {
         return;
     }
     const SdfPath& primIndexPath = primIndex.GetRootNode().GetPath();
-    TF_DEBUG(PCP_DEPENDENCIES)
-        .Msg("Pcp_Dependencies: Adding deps for index <%s>:\n",
-             primIndexPath.GetText());
+    TF_DEBUG(PCP_DEPENDENCIES).Msg("Pcp_Dependencies: Adding deps for index <%s>:\n", primIndexPath.GetText());
 
-    auto addDependency = [this, &primIndexPath](
-        const PcpLayerStackRefPtr& layerStack,
-        const SdfPath& path)
-    {
+    auto addDependency = [this, &primIndexPath](const PcpLayerStackRefPtr& layerStack, const SdfPath& path) {
         auto iresult = _deps.emplace(layerStack, _SiteDepMap());
-        _SiteDepMap &siteDepMap = iresult.first->second;
+        _SiteDepMap& siteDepMap = iresult.first->second;
         if (iresult.second) {
             // If we inserted a new entry, bump the revision count.
             ++_layerStacksRevision;
         }
-        std::vector<SdfPath> &deps = siteDepMap[path];
+        std::vector<SdfPath>& deps = siteDepMap[path];
         deps.push_back(primIndexPath);
     };
 
-    int nodeIndex=0, count=0;
-    for (const PcpNodeRef &n: primIndex.GetNodeRange()) {
+    int nodeIndex = 0, count = 0;
+    for (const PcpNodeRef& n : primIndex.GetNodeRange()) {
         const int curNodeIndex = nodeIndex++;
         const PcpDependencyFlags depFlags = PcpClassifyNodeDependency(n);
         if (_ShouldStoreDependency(depFlags)) {
@@ -108,12 +90,9 @@ Pcp_Dependencies::Add(
             }
 
             TF_DEBUG(PCP_DEPENDENCIES)
-                .Msg(" - Node %i (%s %s): <%s> %s\n",
-                     curNodeIndex,
-                     PcpDependencyFlagsToString(depFlags).c_str(),
-                     TfEnum::GetDisplayName(n.GetArcType()).c_str(),
-                     n.GetPath().GetText(),
-                     TfStringify(n.GetLayerStack()->GetIdentifier()).c_str());
+                    .Msg(" - Node %i (%s %s): <%s> %s\n", curNodeIndex, PcpDependencyFlagsToString(depFlags).c_str(),
+                         TfEnum::GetDisplayName(n.GetArcType()).c_str(), n.GetPath().GetText(),
+                         TfStringify(n.GetLayerStack()->GetIdentifier()).c_str());
         }
     }
 
@@ -131,15 +110,12 @@ Pcp_Dependencies::Add(
 
             count += culledDependencies.size();
 
-            PcpCulledDependencyVector& deps =
-                _culledDependenciesMap[primIndexPath];
+            PcpCulledDependencyVector& deps = _culledDependenciesMap[primIndexPath];
             if (deps.empty()) {
                 deps = std::move(culledDependencies);
-            }
-            else {
-                deps.insert(deps.begin(),
-                    std::make_move_iterator(culledDependencies.begin()),
-                    std::make_move_iterator(culledDependencies.end()));
+            } else {
+                deps.insert(deps.begin(), std::make_move_iterator(culledDependencies.begin()),
+                            std::make_move_iterator(culledDependencies.end()));
             }
 
             insertedDeps = &deps;
@@ -148,10 +124,8 @@ Pcp_Dependencies::Add(
         if (TfDebug::IsEnabled(PCP_DEPENDENCIES)) {
             for (const PcpCulledDependency& dep : *insertedDeps) {
                 TF_DEBUG(PCP_DEPENDENCIES)
-                    .Msg(" - Node (culled) (%s): <%s> %s\n",
-                        PcpDependencyFlagsToString(dep.flags).c_str(),
-                        dep.sitePath.GetText(),
-                        TfStringify(dep.layerStack->GetIdentifier()).c_str());
+                        .Msg(" - Node (culled) (%s): <%s> %s\n", PcpDependencyFlagsToString(dep.flags).c_str(),
+                             dep.sitePath.GetText(), TfStringify(dep.layerStack->GetIdentifier()).c_str());
             }
         }
     }
@@ -159,8 +133,8 @@ Pcp_Dependencies::Add(
     // Store the prim index's dynamic file format dependency of the prim index
     // if possible
     if (!fileFormatDependencyData.IsEmpty()) {
-        // Update the caches of field names and attribute names that are are 
-        // possible dynamic file format argument dependencies by incrementing 
+        // Update the caches of field names and attribute names that are are
+        // possible dynamic file format argument dependencies by incrementing
         // their reference counts, adding them to the appropriate cache if not
         // already there.
         tbb::spin_mutex::scoped_lock lock;
@@ -168,22 +142,18 @@ Pcp_Dependencies::Add(
             lock.acquire(_concurrentPopulationContext->_mutex);
         }
 
-        auto addNamesToDepMapFn = [](
-            _FileFormatArgumentFieldDepMap &depMap, const TfToken::Set &names)
-        {
-            for (const TfToken &name : names) {
+        auto addNamesToDepMapFn = [](_FileFormatArgumentFieldDepMap& depMap, const TfToken::Set& names) {
+            for (const TfToken& name : names) {
                 auto it = depMap.emplace(name, 0);
                 it.first->second++;
             }
         };
-        addNamesToDepMapFn(_possibleDynamicFileFormatArgumentFields,
-            fileFormatDependencyData.GetRelevantFieldNames());
+        addNamesToDepMapFn(_possibleDynamicFileFormatArgumentFields, fileFormatDependencyData.GetRelevantFieldNames());
         addNamesToDepMapFn(_possibleDynamicFileFormatArgumentAttributes,
-            fileFormatDependencyData.GetRelevantAttributeNames());
-       
+                           fileFormatDependencyData.GetRelevantAttributeNames());
+
         // Take and store the dependency data.
-        _fileFormatArgumentDependencyMap[primIndexPath] = 
-            std::move(fileFormatDependencyData);
+        _fileFormatArgumentDependencyMap[primIndexPath] = std::move(fileFormatDependencyData);
     }
 
     if (!exprVarDependencyData.IsEmpty()) {
@@ -193,15 +163,11 @@ Pcp_Dependencies::Add(
         }
 
         exprVarDependencyData.ForEachDependency(
-            [&, this](
-                const PcpLayerStackPtr& layerStack,
-                const std::unordered_set<std::string>&)
-            {
-                _layerStackExprVarsMap[layerStack].push_back(primIndexPath);
-            });
+                [&, this](const PcpLayerStackPtr& layerStack, const std::unordered_set<std::string>&) {
+                    _layerStackExprVarsMap[layerStack].push_back(primIndexPath);
+                });
 
-        _exprVarsDependencyMap[primIndexPath] = 
-            std::move(exprVarDependencyData);
+        _exprVarsDependencyMap[primIndexPath] = std::move(exprVarDependencyData);
     }
 
     if (count == 0) {
@@ -209,28 +175,21 @@ Pcp_Dependencies::Add(
     }
 }
 
-void
-Pcp_Dependencies::Remove(const PcpPrimIndex &primIndex, PcpLifeboat *lifeboat)
-{
+void Pcp_Dependencies::Remove(const PcpPrimIndex& primIndex, PcpLifeboat* lifeboat) {
     if (!primIndex.GetRootNode()) {
         return;
     }
     const SdfPath& primIndexPath = primIndex.GetRootNode().GetPath();
-    TF_DEBUG(PCP_DEPENDENCIES)
-        .Msg("Pcp_Dependencies: Removing deps for index <%s>\n",
-             primIndexPath.GetText());
+    TF_DEBUG(PCP_DEPENDENCIES).Msg("Pcp_Dependencies: Removing deps for index <%s>\n", primIndexPath.GetText());
 
-    auto removeDependency = [this, &primIndexPath, &lifeboat](
-        const PcpLayerStackRefPtr& layerStack,
-        const SdfPath& path)
-    {
-        _SiteDepMap &siteDepMap = _deps[layerStack];
-        std::vector<SdfPath> &deps = siteDepMap[path];
+    auto removeDependency = [this, &primIndexPath, &lifeboat](const PcpLayerStackRefPtr& layerStack,
+                                                              const SdfPath& path) {
+        _SiteDepMap& siteDepMap = _deps[layerStack];
+        std::vector<SdfPath>& deps = siteDepMap[path];
 
         // Swap with last element, then remove that.
         // We are using the vector as an unordered set.
-        std::vector<SdfPath>::iterator i =
-            std::find(deps.begin(), deps.end(), primIndexPath);
+        std::vector<SdfPath>::iterator i = std::find(deps.begin(), deps.end(), primIndexPath);
         if (!TF_VERIFY(i != deps.end())) {
             return;
         }
@@ -247,22 +206,18 @@ Pcp_Dependencies::Remove(const PcpPrimIndex &primIndex, PcpLifeboat *lifeboat)
             // Scan children to see if we can remove this subtree.
             _SiteDepMap::iterator i, iBegin, iEnd;
             std::tie(iBegin, iEnd) = siteDepMap.FindSubtreeRange(path);
-            for (i = iBegin; i != iEnd && i->second.empty(); ++i) {}
+            for (i = iBegin; i != iEnd && i->second.empty(); ++i) {
+            }
             bool subtreeIsEmpty = i == iEnd;
             if (subtreeIsEmpty) {
                 siteDepMap.erase(iBegin);
                 TF_DEBUG(PCP_DEPENDENCIES).Msg("      No subtree deps\n");
 
                 // Now scan upwards to reap parent entries.
-                for (SdfPath p = path.GetParentPath();
-                     !p.IsEmpty(); p = p.GetParentPath()) {
+                for (SdfPath p = path.GetParentPath(); !p.IsEmpty(); p = p.GetParentPath()) {
                     std::tie(iBegin, iEnd) = siteDepMap.FindSubtreeRange(p);
-                    if (iBegin != iEnd
-                        && std::next(iBegin) == iEnd
-                        && iBegin->second.empty()) {
-                    TF_DEBUG(PCP_DEPENDENCIES)
-                        .Msg("    Removing empty parent entry <%s>\n",
-                             p.GetText());
+                    if (iBegin != iEnd && std::next(iBegin) == iEnd && iBegin->second.empty()) {
+                        TF_DEBUG(PCP_DEPENDENCIES).Msg("    Removing empty parent entry <%s>\n", p.GetText());
                         siteDepMap.erase(iBegin);
                     } else {
                         break;
@@ -278,17 +233,14 @@ Pcp_Dependencies::Remove(const PcpPrimIndex &primIndex, PcpLifeboat *lifeboat)
                     ++_layerStacksRevision;
 
                     TF_DEBUG(PCP_DEPENDENCIES)
-                        .Msg("    Removed last dep on %s\n",
-                             TfStringify(layerStack
-                                         ->GetIdentifier()).c_str());
+                            .Msg("    Removed last dep on %s\n", TfStringify(layerStack->GetIdentifier()).c_str());
                 }
             }
         }
-
     };
 
-    int nodeIndex=0;
-    for (const PcpNodeRef &n: primIndex.GetNodeRange()) {
+    int nodeIndex = 0;
+    for (const PcpNodeRef& n : primIndex.GetNodeRange()) {
         const int curNodeIndex = nodeIndex++;
         const PcpDependencyFlags depFlags = PcpClassifyNodeDependency(n);
         if (!_ShouldStoreDependency(depFlags)) {
@@ -296,12 +248,9 @@ Pcp_Dependencies::Remove(const PcpPrimIndex &primIndex, PcpLifeboat *lifeboat)
         }
 
         TF_DEBUG(PCP_DEPENDENCIES)
-            .Msg(" - Node %i (%s %s): <%s> %s\n",
-                 curNodeIndex,
-                 PcpDependencyFlagsToString(depFlags).c_str(),
-                 TfEnum::GetDisplayName(n.GetArcType()).c_str(),
-                 n.GetPath().GetText(),
-                 TfStringify(n.GetLayerStack()->GetIdentifier()).c_str());
+                .Msg(" - Node %i (%s %s): <%s> %s\n", curNodeIndex, PcpDependencyFlagsToString(depFlags).c_str(),
+                     TfEnum::GetDisplayName(n.GetArcType()).c_str(), n.GetPath().GetText(),
+                     TfStringify(n.GetLayerStack()->GetIdentifier()).c_str());
 
         removeDependency(n.GetLayerStack(), n.GetPath());
     }
@@ -310,10 +259,8 @@ Pcp_Dependencies::Remove(const PcpPrimIndex &primIndex, PcpLifeboat *lifeboat)
     if (culledDepIt != _culledDependenciesMap.end()) {
         for (const PcpCulledDependency& dep : culledDepIt->second) {
             TF_DEBUG(PCP_DEPENDENCIES)
-                .Msg(" - Node (culled) (%s): <%s> %s\n",
-                    PcpDependencyFlagsToString(dep.flags).c_str(),
-                    dep.sitePath.GetText(),
-                    TfStringify(dep.layerStack->GetIdentifier()).c_str());
+                    .Msg(" - Node (culled) (%s): <%s> %s\n", PcpDependencyFlagsToString(dep.flags).c_str(),
+                         dep.sitePath.GetText(), TfStringify(dep.layerStack->GetIdentifier()).c_str());
 
             removeDependency(dep.layerStack, dep.sitePath);
         }
@@ -326,15 +273,12 @@ Pcp_Dependencies::Remove(const PcpPrimIndex &primIndex, PcpLifeboat *lifeboat)
     auto it = _fileFormatArgumentDependencyMap.find(primIndexPath);
     if (it != _fileFormatArgumentDependencyMap.end()) {
         if (TF_VERIFY(!it->second.IsEmpty())) {
-
-            auto removeNamesFromDepMapFn = [](
-                _FileFormatArgumentFieldDepMap &depMap, const TfToken::Set &names)
-            {
-                for (const auto &name : names) {
+            auto removeNamesFromDepMapFn = [](_FileFormatArgumentFieldDepMap& depMap, const TfToken::Set& names) {
+                for (const auto& name : names) {
                     auto depMapIt = depMap.find(name);
                     if (TF_VERIFY(depMapIt != depMap.end())) {
-                        // If the reference count will drop to 0, we need to 
-                        // remove it completely as the 
+                        // If the reference count will drop to 0, we need to
+                        // remove it completely as the
                         // IsPossibleDynamicFileFormatArgument... functions only
                         // test for existence of the name in the map.
                         if (depMapIt->second <= 1) {
@@ -346,13 +290,12 @@ Pcp_Dependencies::Remove(const PcpPrimIndex &primIndex, PcpLifeboat *lifeboat)
                 }
             };
 
-            // We need to also update the reference counts for the 
+            // We need to also update the reference counts for the
             // dependency's relevant fields and attributes in their respective
             // name caches.
-            removeNamesFromDepMapFn(_possibleDynamicFileFormatArgumentFields,
-                it->second.GetRelevantFieldNames());
+            removeNamesFromDepMapFn(_possibleDynamicFileFormatArgumentFields, it->second.GetRelevantFieldNames());
             removeNamesFromDepMapFn(_possibleDynamicFileFormatArgumentAttributes,
-                it->second.GetRelevantAttributeNames());
+                                    it->second.GetRelevantAttributeNames());
         }
         // Remove the dependency data.
         _fileFormatArgumentDependencyMap.erase(it);
@@ -361,33 +304,24 @@ Pcp_Dependencies::Remove(const PcpPrimIndex &primIndex, PcpLifeboat *lifeboat)
     auto exprVarIt = _exprVarsDependencyMap.find(primIndexPath);
     if (exprVarIt != _exprVarsDependencyMap.end()) {
         exprVarIt->second.ForEachDependency(
-            [&, this](
-                const PcpLayerStackPtr& layerStack,
-                const std::unordered_set<std::string>&)
-            {
-                auto layerStackIt = _layerStackExprVarsMap.find(layerStack);
-                if (TF_VERIFY(layerStackIt != _layerStackExprVarsMap.end())) {
-                    SdfPathVector& primIndexPaths = layerStackIt->second;
-                    primIndexPaths.erase(
-                        std::remove(
-                            primIndexPaths.begin(), primIndexPaths.end(),
-                            primIndexPath),
-                        primIndexPaths.end());
-                    if (primIndexPaths.empty()) {
-                        _layerStackExprVarsMap.erase(layerStackIt);
+                [&, this](const PcpLayerStackPtr& layerStack, const std::unordered_set<std::string>&) {
+                    auto layerStackIt = _layerStackExprVarsMap.find(layerStack);
+                    if (TF_VERIFY(layerStackIt != _layerStackExprVarsMap.end())) {
+                        SdfPathVector& primIndexPaths = layerStackIt->second;
+                        primIndexPaths.erase(std::remove(primIndexPaths.begin(), primIndexPaths.end(), primIndexPath),
+                                             primIndexPaths.end());
+                        if (primIndexPaths.empty()) {
+                            _layerStackExprVarsMap.erase(layerStackIt);
+                        }
                     }
-                }
-            });
+                });
 
         _exprVarsDependencyMap.erase(exprVarIt);
     }
 }
 
-void
-Pcp_Dependencies::RemoveAll(PcpLifeboat* lifeboat)
-{
-    TF_DEBUG(PCP_DEPENDENCIES).Msg(
-        "Pcp_Dependencies::RemoveAll: Clearing all dependencies\n");
+void Pcp_Dependencies::RemoveAll(PcpLifeboat* lifeboat) {
+    TF_DEBUG(PCP_DEPENDENCIES).Msg("Pcp_Dependencies::RemoveAll: Clearing all dependencies\n");
 
     // Retain all layerstacks in the lifeboat.
     if (lifeboat) {
@@ -406,9 +340,7 @@ Pcp_Dependencies::RemoveAll(PcpLifeboat* lifeboat)
     _layerStackExprVarsMap.clear();
 }
 
-SdfLayerHandleSet 
-Pcp_Dependencies::GetUsedLayers() const
-{
+SdfLayerHandleSet Pcp_Dependencies::GetUsedLayers() const {
     SdfLayerHandleSet reachedLayers;
 
     TF_FOR_ALL(layerStack, _deps) {
@@ -419,75 +351,54 @@ Pcp_Dependencies::GetUsedLayers() const
     return reachedLayers;
 }
 
-SdfLayerHandleSet 
-Pcp_Dependencies::GetUsedRootLayers() const
-{
+SdfLayerHandleSet Pcp_Dependencies::GetUsedRootLayers() const {
     SdfLayerHandleSet reachedRootLayers;
 
     TF_FOR_ALL(i, _deps) {
         const PcpLayerStackPtr& layerStack = i->first;
-        reachedRootLayers.insert(layerStack->GetIdentifier().rootLayer );
+        reachedRootLayers.insert(layerStack->GetIdentifier().rootLayer);
     }
 
     return reachedRootLayers;
 }
 
-bool 
-Pcp_Dependencies::UsesLayerStack(const PcpLayerStackPtr& layerStack) const
-{
+bool Pcp_Dependencies::UsesLayerStack(const PcpLayerStackPtr& layerStack) const {
     return _deps.find(layerStack) != _deps.end();
 }
 
-const PcpCulledDependencyVector&
-Pcp_Dependencies::GetCulledDependencies(const SdfPath &primIndexPath) const
-{
+const PcpCulledDependencyVector& Pcp_Dependencies::GetCulledDependencies(const SdfPath& primIndexPath) const {
     static const PcpCulledDependencyVector empty;
     auto it = _culledDependenciesMap.find(primIndexPath);
     return it == _culledDependenciesMap.end() ? empty : it->second;
 }
 
-const PcpCulledDependencyVector&
-Pcp_Dependencies::GetCulledDependencies(
-    const PcpCache& cache, const SdfPath &primIndexPath)
-{
+const PcpCulledDependencyVector& Pcp_Dependencies::GetCulledDependencies(const PcpCache& cache,
+                                                                         const SdfPath& primIndexPath) {
     return cache._primDependencies->GetCulledDependencies(primIndexPath);
 }
 
-bool 
-Pcp_Dependencies::HasAnyDynamicFileFormatArgumentFieldDependencies() const
-{
+bool Pcp_Dependencies::HasAnyDynamicFileFormatArgumentFieldDependencies() const {
     return !_possibleDynamicFileFormatArgumentFields.empty();
 }
 
-bool 
-Pcp_Dependencies::
-HasAnyDynamicFileFormatArgumentAttributeDependencies() const
-{
+bool Pcp_Dependencies::HasAnyDynamicFileFormatArgumentAttributeDependencies() const {
     return !_possibleDynamicFileFormatArgumentAttributes.empty();
 }
 
-bool 
-Pcp_Dependencies::IsPossibleDynamicFileFormatArgumentField(
-    const TfToken &field) const
-{
+bool Pcp_Dependencies::IsPossibleDynamicFileFormatArgumentField(const TfToken& field) const {
     // Any field in the map will have at least one prim index dependency logged
     // for it.
     return _possibleDynamicFileFormatArgumentFields.count(field) > 0;
 }
 
-bool 
-Pcp_Dependencies::IsPossibleDynamicFileFormatArgumentAttribute(
-    const TfToken &attributeName) const
-{
-    // Any attribute name in the map will have at least one prim index 
+bool Pcp_Dependencies::IsPossibleDynamicFileFormatArgumentAttribute(const TfToken& attributeName) const {
+    // Any attribute name in the map will have at least one prim index
     // dependency logged for it.
     return _possibleDynamicFileFormatArgumentAttributes.count(attributeName) > 0;
 }
 
-const PcpDynamicFileFormatDependencyData &
-Pcp_Dependencies::GetDynamicFileFormatArgumentDependencyData(
-    const SdfPath &primIndexPath) const
-{
+const PcpDynamicFileFormatDependencyData& Pcp_Dependencies::GetDynamicFileFormatArgumentDependencyData(
+        const SdfPath& primIndexPath) const {
     static const PcpDynamicFileFormatDependencyData empty;
     auto it = _fileFormatArgumentDependencyMap.find(primIndexPath);
     if (it == _fileFormatArgumentDependencyMap.end()) {
@@ -496,40 +407,28 @@ Pcp_Dependencies::GetDynamicFileFormatArgumentDependencyData(
     return it->second;
 }
 
-const SdfPathVector&
-Pcp_Dependencies::GetPrimsUsingExpressionVariablesFromLayerStack(
-    const PcpLayerStackPtr& layerStack) const
-{
+const SdfPathVector& Pcp_Dependencies::GetPrimsUsingExpressionVariablesFromLayerStack(
+        const PcpLayerStackPtr& layerStack) const {
     static const SdfPathVector empty;
 
-    const SdfPathVector* primIndexPaths = 
-        TfMapLookupPtr(_layerStackExprVarsMap, layerStack);
+    const SdfPathVector* primIndexPaths = TfMapLookupPtr(_layerStackExprVarsMap, layerStack);
     return primIndexPaths ? *primIndexPaths : empty;
 }
 
-const std::unordered_set<std::string>&
-Pcp_Dependencies::GetExpressionVariablesFromLayerStackUsedByPrim(
-    const SdfPath &primIndexPath,
-    const PcpLayerStackPtr &layerStack) const
-{
+const std::unordered_set<std::string>& Pcp_Dependencies::GetExpressionVariablesFromLayerStackUsedByPrim(
+        const SdfPath& primIndexPath, const PcpLayerStackPtr& layerStack) const {
     static const std::unordered_set<std::string> empty;
-    
-    const PcpExpressionVariablesDependencyData* exprVarDeps =
-        TfMapLookupPtr(_exprVarsDependencyMap, primIndexPath);
+
+    const PcpExpressionVariablesDependencyData* exprVarDeps = TfMapLookupPtr(_exprVarsDependencyMap, primIndexPath);
     if (!exprVarDeps) {
         return empty;
     }
 
-    const std::unordered_set<std::string>* usedExprVars =
-        exprVarDeps->GetDependenciesForLayerStack(layerStack);
+    const std::unordered_set<std::string>* usedExprVars = exprVarDeps->GetDependenciesForLayerStack(layerStack);
     return usedExprVars ? *usedExprVars : empty;
 }
 
-void
-Pcp_AddCulledDependency(
-    const PcpNodeRef& node,
-    PcpCulledDependencyVector* culledDeps)
-{
+void Pcp_AddCulledDependency(const PcpNodeRef& node, PcpCulledDependencyVector* culledDeps) {
     const PcpDependencyFlags depFlags = PcpClassifyNodeDependency(node);
     if (!_ShouldStoreDependency(depFlags)) {
         return;
@@ -544,12 +443,12 @@ Pcp_AddCulledDependency(
         // See _ProcessDependentNode in pcp/cache.cpp for the similar code
         // we use to handle non-culled dependency
         //
-        // Relocates require special handling.  Because a relocate node's map 
+        // Relocates require special handling.  Because a relocate node's map
         // function is always identity, mapping the node's path to root will
-        // not map the effects of the relocate. We must manually map the node 
-        // path a across the relocates node so that we have a path that will 
-        // then correctly be translated by this node's map function. We must 
-        // map across all consecutive relocate nodes since they all only hold 
+        // not map the effects of the relocate. We must manually map the node
+        // path a across the relocates node so that we have a path that will
+        // then correctly be translated by this node's map function. We must
+        // map across all consecutive relocate nodes since they all only hold
         // the identity mapping. Once we hit a non-relocates node, any relocates
         // above that will be accounted for in the map to root function
         PcpNodeRef parent = node.GetParentNode();

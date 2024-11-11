@@ -36,8 +36,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// For information on shapes, see the VtShape class reference in the C++
 /// documentation.
 ///
-class SdfAttributeSpec : public SdfPropertySpec
-{
+class SdfAttributeSpec : public SdfPropertySpec {
     SDF_DECLARE_SPEC(SdfAttributeSpec, SdfPropertySpec);
 
 public:
@@ -53,11 +52,11 @@ public:
     /// Creates and returns a new attribute for the given prim.
     /// The \p owner will own the newly created attribute.
     SDF_API
-    static SdfAttributeSpecHandle
-    New(const SdfPrimSpecHandle& owner,
-        const std::string& name, const SdfValueTypeName& typeName,
-        SdfVariability variability = SdfVariabilityVarying,
-        bool custom = false);
+    static SdfAttributeSpecHandle New(const SdfPrimSpecHandle& owner,
+                                      const std::string& name,
+                                      const SdfValueTypeName& typeName,
+                                      SdfVariability variability = SdfVariabilityVarying,
+                                      bool custom = false);
 
     /// @}
 
@@ -101,7 +100,7 @@ public:
 
     /// Clears the allowed tokens metadata for this attribute.
     SDF_API
-    void ClearAllowedTokens(); 
+    void ClearAllowedTokens();
 
     /// Returns the display unit of the attribute.
     SDF_API
@@ -119,15 +118,15 @@ public:
     SDF_API
     void ClearDisplayUnit();
 
-    /// Returns the color-space in which a color or texture valued attribute 
+    /// Returns the color-space in which a color or texture valued attribute
     /// is authored.
     SDF_API
     TfToken GetColorSpace() const;
 
-    /// Sets the color-space in which a color or texture valued attribute is 
+    /// Sets the color-space in which a color or texture valued attribute is
     /// authored.
     SDF_API
-    void SetColorSpace(const TfToken &colorSpace);
+    void SetColorSpace(const TfToken& colorSpace);
 
     /// Returns true if this attribute has a colorSpace value authored.
     SDF_API
@@ -136,7 +135,7 @@ public:
     /// Clears the colorSpace metadata value set on this attribute.
     SDF_API
     void ClearColorSpace();
-    
+
     /// @}
     /// \name Spec properties
     /// @{
@@ -162,24 +161,21 @@ public:
     size_t GetNumTimeSamples() const;
 
     SDF_API
-    bool GetBracketingTimeSamples(double time, double* tLower,
-                                  double* tUpper) const;
+    bool GetBracketingTimeSamples(double time, double* tLower, double* tUpper) const;
 
     SDF_API
-    bool QueryTimeSample(double time, VtValue *value=NULL) const;
+    bool QueryTimeSample(double time, VtValue* value = NULL) const;
     SDF_API
-    bool QueryTimeSample(double time, SdfAbstractDataValue *value) const;
+    bool QueryTimeSample(double time, SdfAbstractDataValue* value) const;
 
     template <class T>
-    bool QueryTimeSample(double time, T* data) const
-    {
+    bool QueryTimeSample(double time, T* data) const {
         if (!data) {
             return QueryTimeSample(time);
         }
 
         SdfAbstractDataTypedValue<T> outValue(data);
-        const bool hasValue = QueryTimeSample(
-            time, static_cast<SdfAbstractDataValue *>(&outValue));
+        const bool hasValue = QueryTimeSample(time, static_cast<SdfAbstractDataValue*>(&outValue));
 
         if (std::is_same<T, SdfValueBlock>::value) {
             return hasValue && outValue.isValueBlock;
@@ -189,13 +185,12 @@ public:
     }
 
     SDF_API
-    void SetTimeSample(double time, const VtValue & value);
+    void SetTimeSample(double time, const VtValue& value);
     SDF_API
     void SetTimeSample(double time, const SdfAbstractDataConstValue& value);
 
     template <class T>
-    void SetTimeSample(double time, const T& value)
-    {
+    void SetTimeSample(double time, const T& value) {
         const SdfAbstractDataConstTypedValue<T> inValue(&value);
         const SdfAbstractDataConstValue& untypedInValue = inValue;
         return SetTimeSample(time, untypedInValue);
@@ -218,14 +213,12 @@ public:
 /// property path (see SdfPath::IsPrimPropertyPath()).  Return false and issue
 /// an error if we fail to author the required scene description.
 SDF_API
-bool
-SdfJustCreatePrimAttributeInLayer(
-    const SdfLayerHandle &layer,
-    const SdfPath &attrPath,
-    const SdfValueTypeName &typeName,
-    SdfVariability variability = SdfVariabilityVarying,
-    bool isCustom = false);
+bool SdfJustCreatePrimAttributeInLayer(const SdfLayerHandle& layer,
+                                       const SdfPath& attrPath,
+                                       const SdfValueTypeName& typeName,
+                                       SdfVariability variability = SdfVariabilityVarying,
+                                       bool isCustom = false);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_ATTRIBUTE_SPEC_H
+#endif  // PXR_USD_SDF_ATTRIBUTE_SPEC_H

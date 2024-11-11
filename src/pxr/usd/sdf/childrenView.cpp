@@ -6,5 +6,4 @@
 //
 /// \file ChildrenView.cpp
 
-
 #include "pxr/usd/sdf/childrenView.h"

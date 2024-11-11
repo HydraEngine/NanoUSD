@@ -22,14 +22,13 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// If an exact mapping exists from Ndr Property type to Sdf type, HasSdfType()
 /// will return true, and GetSdfType() will return the Sdf type resulting from
-/// the conversion. GetNdrType() will return the original Ndr Property type. 
+/// the conversion. GetNdrType() will return the original Ndr Property type.
 ///
 /// If a mapping doesn't exist from Ndr Property type to Sdf type, HasSdfType()
 /// will return false, and GetSdfType() will return either
 /// SdfValueTypeNames->TokenArray or SdfValueTypeNames->Token. GetNdrType()
 /// will return the original Ndr Property type.
-class NdrSdfTypeIndicator
-{
+class NdrSdfTypeIndicator {
 public:
     /// Default constructor.
     NDR_API
@@ -38,10 +37,7 @@ public:
     /// Constructor. The sdfType must be TokenArray or Token if hasSdfTypeMapping
     /// is set to false.
     NDR_API
-    NdrSdfTypeIndicator(
-        const SdfValueTypeName& sdfType,
-        const TfToken& ndrType,
-        bool hasSdfTypeMapping = true);
+    NdrSdfTypeIndicator(const SdfValueTypeName& sdfType, const TfToken& ndrType, bool hasSdfTypeMapping = true);
 
     /// Gets the original Ndr property type associated with the represented
     /// Ndr property type to Sdf type mapping.
@@ -61,11 +57,11 @@ public:
 
     /// Equality operation
     NDR_API
-    bool operator==(const NdrSdfTypeIndicator &rhs) const;
+    bool operator==(const NdrSdfTypeIndicator& rhs) const;
 
     /// Inequality operation
     NDR_API
-    bool operator!=(const NdrSdfTypeIndicator &rhs) const;
+    bool operator!=(const NdrSdfTypeIndicator& rhs) const;
 
 private:
     SdfValueTypeName _sdfType;
@@ -75,4 +71,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_NDR_SDF_TYPE_INDICATOR_H
+#endif  // PXR_USD_NDR_SDF_TYPE_INDICATOR_H

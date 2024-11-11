@@ -5,4 +5,3 @@
 // https://openusd.org/license.
 //
 #include "pxr/usd/sdf/listOpListEditor.h"
-

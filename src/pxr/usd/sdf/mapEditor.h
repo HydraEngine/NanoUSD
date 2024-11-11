@@ -26,10 +26,10 @@ class TfToken;
 template <class MapType>
 class Sdf_MapEditor {
 public:
-    typedef typename MapType::key_type    key_type;
+    typedef typename MapType::key_type key_type;
     typedef typename MapType::mapped_type mapped_type;
-    typedef typename MapType::value_type  value_type;
-    typedef typename MapType::iterator    iterator;
+    typedef typename MapType::value_type value_type;
+    typedef typename MapType::iterator iterator;
 
     virtual ~Sdf_MapEditor() noexcept;
 
@@ -46,12 +46,12 @@ public:
     /// Returns const pointer to map being edited.
     virtual const MapType* GetData() const = 0;
 
-    /// Returns non-const pointer to map being edited. 
+    /// Returns non-const pointer to map being edited.
     /// All edits to the map should be done using the editing functions below.
     /// This function is primarily here for convenience. Ideally, only the
     /// const version of this function would exist.
     virtual MapType* GetData() = 0;
-    
+
     /// \name Editing Operations
     /// @{
 
@@ -67,13 +67,11 @@ public:
 
 protected:
     Sdf_MapEditor();
-
 };
 
 template <class T>
-std::unique_ptr<Sdf_MapEditor<T> > 
-Sdf_CreateMapEditor(const SdfSpecHandle& owner, const TfToken& field);
+std::unique_ptr<Sdf_MapEditor<T>> Sdf_CreateMapEditor(const SdfSpecHandle& owner, const TfToken& field);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_MAP_EDITOR_H
+#endif  // PXR_USD_SDF_MAP_EDITOR_H

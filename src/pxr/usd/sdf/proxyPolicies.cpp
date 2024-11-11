@@ -15,11 +15,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 // SdfRelocatesMapProxyValuePolicy
 //
 
-SdfRelocatesMapProxyValuePolicy::Type
-SdfRelocatesMapProxyValuePolicy::CanonicalizeType(
-    const SdfSpecHandle& spec,
-    const Type& x)
-{
+SdfRelocatesMapProxyValuePolicy::Type SdfRelocatesMapProxyValuePolicy::CanonicalizeType(const SdfSpecHandle& spec,
+                                                                                        const Type& x) {
     if (!TF_VERIFY(spec)) {
         return x;
     }
@@ -27,49 +24,36 @@ SdfRelocatesMapProxyValuePolicy::CanonicalizeType(
     SdfPath anchor = spec->GetPath();
     Type result;
     TF_FOR_ALL(i, x) {
-        result[i->first.MakeAbsolutePath(anchor)] =
-            i->second.MakeAbsolutePath(anchor);
+        result[i->first.MakeAbsolutePath(anchor)] = i->second.MakeAbsolutePath(anchor);
     }
     return result;
 }
 
-SdfRelocatesMapProxyValuePolicy::key_type
-SdfRelocatesMapProxyValuePolicy::CanonicalizeKey(
-    const SdfSpecHandle& spec,
-    const key_type& x)
-{
+SdfRelocatesMapProxyValuePolicy::key_type SdfRelocatesMapProxyValuePolicy::CanonicalizeKey(const SdfSpecHandle& spec,
+                                                                                           const key_type& x) {
     return (TF_VERIFY(spec) ? x.MakeAbsolutePath(spec->GetPath()) : x);
 }
 
-SdfRelocatesMapProxyValuePolicy::mapped_type
-SdfRelocatesMapProxyValuePolicy::CanonicalizeValue(
-    const SdfSpecHandle& spec,
-    const mapped_type& x)
-{
+SdfRelocatesMapProxyValuePolicy::mapped_type SdfRelocatesMapProxyValuePolicy::CanonicalizeValue(
+        const SdfSpecHandle& spec, const mapped_type& x) {
     return (TF_VERIFY(spec) ? x.MakeAbsolutePath(spec->GetPath()) : x);
 }
 
-SdfRelocatesMapProxyValuePolicy::value_type
-SdfRelocatesMapProxyValuePolicy::CanonicalizePair(
-    const SdfSpecHandle& spec,
-    const value_type& x)
-{
+SdfRelocatesMapProxyValuePolicy::value_type SdfRelocatesMapProxyValuePolicy::CanonicalizePair(const SdfSpecHandle& spec,
+                                                                                              const value_type& x) {
     if (!TF_VERIFY(spec)) {
         return x;
     }
 
     SdfPath anchor = spec->GetPath();
-    return value_type(x.first.MakeAbsolutePath(anchor),
-                      x.second.MakeAbsolutePath(anchor));
+    return value_type(x.first.MakeAbsolutePath(anchor), x.second.MakeAbsolutePath(anchor));
 }
 
 //
 // SdfAttributeViewPredicate
 //
 
-SdfAttributeViewPredicate::SdfAttributeViewPredicate() :
-    SdfGenericSpecViewPredicate(SdfSpecTypeAttribute)
-{
+SdfAttributeViewPredicate::SdfAttributeViewPredicate() : SdfGenericSpecViewPredicate(SdfSpecTypeAttribute) {
     // Do nothing.
 }
 
@@ -77,9 +61,7 @@ SdfAttributeViewPredicate::SdfAttributeViewPredicate() :
 // SdfRelationshipViewPredicate
 //
 
-SdfRelationshipViewPredicate::SdfRelationshipViewPredicate() :
-    SdfGenericSpecViewPredicate(SdfSpecTypeRelationship)
-{
+SdfRelationshipViewPredicate::SdfRelationshipViewPredicate() : SdfGenericSpecViewPredicate(SdfSpecTypeRelationship) {
     // Do nothing.
 }
 

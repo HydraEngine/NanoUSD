@@ -26,30 +26,27 @@ SDF_DECLARE_HANDLES(SdfSpec);
 /// When the last Sdf_CleanupEnabler goes out of scope, the specs are removed
 /// from the layer if they are inert.
 ///
-class Sdf_CleanupTracker : public TfWeakBase
-{
+class Sdf_CleanupTracker : public TfWeakBase {
 public:
-    
     /// Retrieves singleton instance.
-    static Sdf_CleanupTracker &GetInstance();
+    static Sdf_CleanupTracker& GetInstance();
 
     /// Adds the spec to the vector of tracked specs if there is at least one
     /// Sdf_CleanupEnabler on the stack.
-    void AddSpecIfTracking(SdfSpecHandle const &spec);
+    void AddSpecIfTracking(SdfSpecHandle const& spec);
 
     /// Return the authoring monitor identified by the index
     void CleanupSpecs();
 
 private:
-    
     Sdf_CleanupTracker();
     ~Sdf_CleanupTracker();
 
     std::vector<SdfSpecHandle> _specs;
-    
+
     friend class TfSingleton<Sdf_CleanupTracker>;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_CLEANUP_TRACKER_H
+#endif  // PXR_USD_SDF_CLEANUP_TRACKER_H

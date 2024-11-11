@@ -13,40 +13,28 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-struct Sdf_ToStringVisitor
-{
+struct Sdf_ToStringVisitor {
     template <typename T>
-    std::string operator () (const T &value)
-    {
+    std::string operator()(const T& value) {
         return TfStringify(value);
     }
 
-    std::string operator () (const std::string &value)
-    {
-        return Sdf_FileIOUtility::Quote(value);
-    }
+    std::string operator()(const std::string& value) { return Sdf_FileIOUtility::Quote(value); }
 };
 
-static void ReportCodingError(const std::string &text)
-{
+static void ReportCodingError(const std::string& text) {
     TF_CODING_ERROR(text);
 }
 
-Sdf_ParserValueContext::Sdf_ParserValueContext() :
-    valueTypeIsValid(false),
-    valueIsShaped(false),
-    errorReporter(ReportCodingError)
-{
+Sdf_ParserValueContext::Sdf_ParserValueContext()
+    : valueTypeIsValid(false), valueIsShaped(false), errorReporter(ReportCodingError) {
     Clear();
 }
 
-bool
-Sdf_ParserValueContext::SetupFactory(const std::string &typeName)
-{
+bool Sdf_ParserValueContext::SetupFactory(const std::string& typeName) {
     if (typeName != lastTypeName) {
-        const Sdf_ParserHelpers::ValueFactory &factory =
-            Sdf_ParserHelpers::GetValueFactoryForMenvaName(
-                typeName, &valueTypeIsValid);
+        const Sdf_ParserHelpers::ValueFactory& factory =
+                Sdf_ParserHelpers::GetValueFactoryForMenvaName(typeName, &valueTypeIsValid);
 
         valueTypeName = typeName;
 
@@ -54,8 +42,7 @@ Sdf_ParserValueContext::SetupFactory(const std::string &typeName)
             valueFunc = Sdf_ParserHelpers::ValueFactoryFunc();
             valueIsShaped = false;
             valueTupleDimensions = SdfTupleDimensions();
-        }
-        else {
+        } else {
             valueFunc = factory.func;
             valueIsShaped = factory.isShaped;
             valueTupleDimensions = factory.dimensions;
@@ -67,21 +54,17 @@ Sdf_ParserValueContext::SetupFactory(const std::string &typeName)
     return valueTypeIsValid;
 }
 
-VtValue
-Sdf_ParserValueContext::ProduceValue(std::string *errStrPtr)
-{
+VtValue Sdf_ParserValueContext::ProduceValue(std::string* errStrPtr) {
     VtValue ret;
     if (_isRecordingString) {
         ret = SdfUnregisteredValue(GetRecordedString());
-    }
-    else {
+    } else {
         if (!valueFunc) {
             // CODE_COVERAGE_OFF
             // We will already have detected a bad typename as we tried to
             // create the attribute for this value.  We should not hit this
             // here.
-            errorReporter(TfStringPrintf("Unrecognized type name '%s'",
-                                         valueTypeName.c_str()).c_str());
+            errorReporter(TfStringPrintf("Unrecognized type name '%s'", valueTypeName.c_str()).c_str());
             return VtValue();
             // CODE_COVERAGE_ON
         }
@@ -94,9 +77,7 @@ Sdf_ParserValueContext::ProduceValue(std::string *errStrPtr)
     return ret;
 }
 
-void
-Sdf_ParserValueContext::Clear()
-{
+void Sdf_ParserValueContext::Clear() {
     dim = 0;
     pushDim = -1;
     shape.clear();
@@ -105,17 +86,17 @@ Sdf_ParserValueContext::Clear()
     // calls Clear().
     //
     // Note that we're NOT resetting the following variables here:
-    // 
-    // valueTypeName 
+    //
+    // valueTypeName
     // valueTypeIsValid
     // valueFunc
     // valueIsShaped
     // valueTupleDimensions
     //
-    // This is because we often parse several values in a row 
+    // This is because we often parse several values in a row
     // (e.g. AnimSpline keyframes), and we don't want the extra overhead of
-    // resetting the above variables just so that we can set them again 
-    // before parsing the next value. Instead, whenever we parse a new 
+    // resetting the above variables just so that we can set them again
+    // before parsing the next value. Instead, whenever we parse a new
     // attribute type, we call SetupFactory() which caches these variables.
     // This allows us to skip over them here.
 
@@ -127,9 +108,7 @@ Sdf_ParserValueContext::Clear()
     _needComma = false;
 }
 
-void
-Sdf_ParserValueContext::AppendValue(const Value& value)
-{
+void Sdf_ParserValueContext::AppendValue(const Value& value) {
     if (_isRecordingString) {
         if (_needComma) {
             _recordedString += ", ";
@@ -137,8 +116,7 @@ Sdf_ParserValueContext::AppendValue(const Value& value)
         Sdf_ToStringVisitor v;
         _recordedString += value.ApplyVisitor(v);
         _needComma = true;
-    }
-    else {
+    } else {
         vars.push_back(value);
     }
 
@@ -152,21 +130,18 @@ Sdf_ParserValueContext::AppendValue(const Value& value)
     }
 
     // if inside a list (dim>0) and not inside a tuple (tupleDepth==0)
-    if (tupleDepth == 0 && dim)
-        workingShape[dim-1] += 1;
+    if (tupleDepth == 0 && dim) workingShape[dim - 1] += 1;
 
     // If we're at the deepest level of the tuple, keep track of the number of
     // elements added along the current dimension so that EndTuple() can
     // validate the completed tuple dimensions with the correct tuple
     // dimensions from the factory.
     if (tupleDepth && static_cast<size_t>(tupleDepth) == valueTupleDimensions.size) {
-        --tupleDimensions.d[tupleDepth-1];
+        --tupleDimensions.d[tupleDepth - 1];
     }
 }
 
-void
-Sdf_ParserValueContext::BeginList()
-{
+void Sdf_ParserValueContext::BeginList() {
     if (_isRecordingString) {
         if (_needComma) {
             _needComma = false;
@@ -184,9 +159,7 @@ Sdf_ParserValueContext::BeginList()
     }
 }
 
-void
-Sdf_ParserValueContext::EndList()
-{
+void Sdf_ParserValueContext::EndList() {
     if (_isRecordingString) {
         _recordedString += ']';
         _needComma = true;
@@ -199,13 +172,12 @@ Sdf_ParserValueContext::EndList()
         return;
         // CODE_COVERAGE_ON
     }
-    if(shape[dim-1] == 0) {
+    if (shape[dim - 1] == 0) {
         // This is the first time we've completed a run in this
         // dimension, so store the size of this dimension into
         // our discovered shape vector.
-        shape[dim-1] =
-            workingShape[dim-1];
-        if (shape[dim-1] == 0) {
+        shape[dim - 1] = workingShape[dim - 1];
+        if (shape[dim - 1] == 0) {
             // CODE_COVERAGE_OFF
             // This can't happen unless there's a bug in the parser
             errorReporter("Shaped value with a zero dimension");
@@ -215,8 +187,7 @@ Sdf_ParserValueContext::EndList()
     } else {
         // We've seen a run in this dimension before, so check
         // that the size is the same as before.
-        if (shape[dim-1] !=
-            workingShape[dim-1]) {
+        if (shape[dim - 1] != workingShape[dim - 1]) {
             errorReporter("Non-square shaped value");
             return;
         }
@@ -226,17 +197,14 @@ Sdf_ParserValueContext::EndList()
     if (dim) {
         // Reset our counter for the dimension we just finished
         // parsing
-        workingShape[dim-1] = 0;
+        workingShape[dim - 1] = 0;
         --dim;
         // And increment the tally for the containing dimension.
-        if (dim > 0)
-            ++workingShape[dim-1];
+        if (dim > 0) ++workingShape[dim - 1];
     }
 }
 
-void
-Sdf_ParserValueContext::BeginTuple()
-{
+void Sdf_ParserValueContext::BeginTuple() {
     if (_isRecordingString) {
         if (_needComma) {
             _needComma = false;
@@ -246,20 +214,18 @@ Sdf_ParserValueContext::BeginTuple()
     }
 
     if (static_cast<size_t>(tupleDepth) >= valueTupleDimensions.size) {
-        errorReporter(TfStringPrintf("Tuple nesting too deep! Should not be "
-            "deeper than %d for attribute of type %s.",
-            tupleDepth, valueTypeName.c_str()));
+        errorReporter(
+                TfStringPrintf("Tuple nesting too deep! Should not be "
+                               "deeper than %d for attribute of type %s.",
+                               tupleDepth, valueTypeName.c_str()));
         return;
     }
-    tupleDimensions.d[tupleDepth] =
-        valueTupleDimensions.d[tupleDepth];
+    tupleDimensions.d[tupleDepth] = valueTupleDimensions.d[tupleDepth];
 
     ++tupleDepth;
 }
 
-void
-Sdf_ParserValueContext::EndTuple()
-{
+void Sdf_ParserValueContext::EndTuple() {
     if (_isRecordingString) {
         _recordedString += ')';
         _needComma = true;
@@ -268,8 +234,10 @@ Sdf_ParserValueContext::EndTuple()
     if (tupleDepth == 0) {
         // CODE_COVERAGE_OFF
         // This can't happen unless there's a bug in the parser
-        errorReporter(TfStringPrintf("Mismatched ( ) for attribute "
-                                     "of type %s.", valueTypeName.c_str()));
+        errorReporter(
+                TfStringPrintf("Mismatched ( ) for attribute "
+                               "of type %s.",
+                               valueTypeName.c_str()));
         return;
         // CODE_COVERAGE_ON
     }
@@ -277,49 +245,39 @@ Sdf_ParserValueContext::EndTuple()
     --tupleDepth;
 
     if (tupleDimensions.d[tupleDepth] != 0) {
-        errorReporter(TfStringPrintf("Tuple dimensions error for "
-            "attribute of type %s.",
-            valueTypeName.c_str()));
+        errorReporter(
+                TfStringPrintf("Tuple dimensions error for "
+                               "attribute of type %s.",
+                               valueTypeName.c_str()));
         return;
     }
     if (tupleDepth > 0) {
-        --tupleDimensions.d[tupleDepth-1];
+        --tupleDimensions.d[tupleDepth - 1];
     }
     // If we're working on a shaped type and we popped out of a tuple,
     // add another element to the working shape here.
-    if (tupleDepth == 0 && dim)
-        ++workingShape[dim-1];
+    if (tupleDepth == 0 && dim) ++workingShape[dim - 1];
 }
 
-void
-Sdf_ParserValueContext::StartRecordingString()
-{
+void Sdf_ParserValueContext::StartRecordingString() {
     _needComma = false;
     _isRecordingString = true;
     _recordedString.clear();
 }
 
-void 
-Sdf_ParserValueContext::StopRecordingString()
-{
+void Sdf_ParserValueContext::StopRecordingString() {
     _isRecordingString = false;
 }
 
-bool 
-Sdf_ParserValueContext::IsRecordingString() const
-{
+bool Sdf_ParserValueContext::IsRecordingString() const {
     return _isRecordingString;
 }
 
-std::string
-Sdf_ParserValueContext::GetRecordedString() const
-{
+std::string Sdf_ParserValueContext::GetRecordedString() const {
     return _recordedString;
 }
 
-void
-Sdf_ParserValueContext::SetRecordedString(const std::string &text)
-{
+void Sdf_ParserValueContext::SetRecordedString(const std::string& text) {
     _recordedString = text;
 }
 

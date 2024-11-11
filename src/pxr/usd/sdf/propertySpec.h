@@ -39,8 +39,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// NOTE: Do not use Python reserved words and keywords as attribute names.
 /// This will cause attribute resolution to fail.
 ///
-class SdfPropertySpec : public SdfSpec
-{
+class SdfPropertySpec : public SdfSpec {
     SDF_DECLARE_ABSTRACT_SPEC(SdfPropertySpec, SdfSpec);
 
 public:
@@ -50,7 +49,7 @@ public:
 
     /// Returns the property's name.
     SDF_API
-    const std::string &GetName() const;
+    const std::string& GetName() const;
 
     /// Returns the property's name, as a token.
     SDF_API
@@ -62,7 +61,7 @@ public:
     /// Returns false if it won't, and sets \p whyNot with a string
     /// describing why not.
     SDF_API
-    bool CanSetName(const std::string &newName, std::string *whyNot) const;
+    bool CanSetName(const std::string& newName, std::string* whyNot) const;
 
     /// Sets the property's name.
     ///
@@ -72,13 +71,13 @@ public:
     /// Setting \p validate to false, will skip validation of the newName
     /// (that is, CanSetName will not be called).
     SDF_API
-    bool SetName(const std::string &newName, bool validate = true);
+    bool SetName(const std::string& newName, bool validate = true);
 
     /// Returns true if the given name is considered a valid name for a
     /// property.  A valid name is not empty, and does not use invalid
     /// characters (such as '/', '[', or '.').
     SDF_API
-    static bool IsValidName(const std::string &name);
+    static bool IsValidName(const std::string& name);
 
     /// @}
     /// \name Ownership
@@ -107,17 +106,17 @@ public:
     SdfDictionaryProxy GetCustomData() const;
 
     /// Returns the asset info dictionary for this property.
-    /// 
-    /// The default value is an empty dictionary. 
-    /// 
-    /// The asset info dictionary is used to annotate SdfAssetPath-valued 
-    /// attributes pointing to the root-prims of assets (generally organized 
-    /// as models) with various data related to asset management. For example, 
+    ///
+    /// The default value is an empty dictionary.
+    ///
+    /// The asset info dictionary is used to annotate SdfAssetPath-valued
+    /// attributes pointing to the root-prims of assets (generally organized
+    /// as models) with various data related to asset management. For example,
     /// asset name, root layer identifier, asset version etc.
-    /// 
-    /// \note It is only valid to author assetInfo on attributes that are of 
+    ///
+    /// \note It is only valid to author assetInfo on attributes that are of
     /// type SdfAssetPath.
-    /// 
+    ///
     SDF_API
     SdfDictionaryProxy GetAssetInfo() const;
 
@@ -125,12 +124,12 @@ public:
     ///
     /// If \p value is empty, then this removes the given custom data entry.
     SDF_API
-    void SetCustomData(const std::string &name, const VtValue &value);
+    void SetCustomData(const std::string& name, const VtValue& value);
 
     /// Sets a asset info entry for this property.
     ///
     /// If \p value is empty, then this removes the given asset info entry.
-    /// 
+    ///
     /// \sa GetAssetInfo()
     ///
     SDF_API
@@ -144,7 +143,7 @@ public:
 
     /// Sets the displayGroup string for this property spec.
     SDF_API
-    void SetDisplayGroup(const std::string &value);
+    void SetDisplayGroup(const std::string& value);
 
     /// Returns the displayName string for this property spec.
     ///
@@ -154,7 +153,7 @@ public:
 
     /// Sets the displayName string for this property spec.
     SDF_API
-    void SetDisplayName(const std::string &value);
+    void SetDisplayName(const std::string& value);
 
     /// Returns the documentation string for this property spec.
     ///
@@ -164,7 +163,7 @@ public:
 
     /// Sets the documentation string for this property spec.
     SDF_API
-    void SetDocumentation(const std::string &value);
+    void SetDocumentation(const std::string& value);
 
     /// Returns whether this property spec will be hidden in browsers.
     ///
@@ -194,7 +193,7 @@ public:
 
     /// Sets the prefix string for this property spec.
     SDF_API
-    void SetPrefix(const std::string &value);
+    void SetPrefix(const std::string& value);
 
     /// Returns the suffix string for this property spec.
     ///
@@ -204,7 +203,7 @@ public:
 
     /// Sets the suffix string for this property spec.
     SDF_API
-    void SetSuffix(const std::string &value);
+    void SetSuffix(const std::string& value);
 
     /// Returns the property's symmetric peer.
     ///
@@ -217,7 +216,7 @@ public:
     /// If \p peerName is empty, then this removes any symmetric peer for the
     /// given property.
     SDF_API
-    void SetSymmetricPeer(const std::string &peerName);
+    void SetSymmetricPeer(const std::string& peerName);
 
     /// Returns the property's symmetry arguments.
     ///
@@ -230,7 +229,7 @@ public:
     /// If \p value is empty, then this removes the argument with the given
     /// \p name.
     SDF_API
-    void SetSymmetryArgument(const std::string &name, const VtValue &value);
+    void SetSymmetryArgument(const std::string& name, const VtValue& value);
 
     /// Returns the property's symmetry function.
     ///
@@ -243,7 +242,7 @@ public:
     /// If \p functionName is empty, then this removes any symmetry function
     /// for the given property.
     SDF_API
-    void SetSymmetryFunction(const TfToken &functionName);
+    void SetSymmetryFunction(const TfToken& functionName);
 
     /// @}
     /// \name Property value API
@@ -278,7 +277,7 @@ public:
     /// Returns true if successful, false otherwise.  Fails if \p defaultValue
     /// has wrong type.
     SDF_API
-    bool SetDefaultValue(const VtValue &defaultValue);
+    bool SetDefaultValue(const VtValue& defaultValue);
 
     /// Returns true if a default value is set for this attribute.
     SDF_API
@@ -300,7 +299,7 @@ public:
 
     /// Sets the comment string for this property spec.
     SDF_API
-    void SetComment(const std::string &value);
+    void SetComment(const std::string& value);
 
     /// Returns true if this spec declares a custom property
     SDF_API
@@ -343,13 +342,13 @@ public:
 
     /// Returns true if this PropertySpec has no significant data other than
     /// just what is necessary for instantiation.
-    /// 
+    ///
     /// For example, "double foo" has only required fields, but "double foo = 3"
     /// has more than just what is required.
-    /// 
-    /// This is similar to IsInert except that IsInert will always return false 
-    /// even for properties that have only required fields; PropertySpecs are 
-    /// never considered inert because even a spec with only required fields 
+    ///
+    /// This is similar to IsInert except that IsInert will always return false
+    /// even for properties that have only required fields; PropertySpecs are
+    /// never considered inert because even a spec with only required fields
     /// will cause instantiation of on-demand properties.
     ///
     SDF_API

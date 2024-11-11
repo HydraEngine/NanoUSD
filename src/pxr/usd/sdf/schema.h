@@ -45,6 +45,7 @@ TF_DECLARE_WEAK_PTRS(PlugPlugin);
 class SdfSchemaBase : public TfWeakBase {
     SdfSchemaBase(const SdfSchemaBase&) = delete;
     SdfSchemaBase& operator=(const SdfSchemaBase&) = delete;
+
 protected:
     class _SpecDefiner;
 
@@ -55,12 +56,9 @@ public:
     ///
     class FieldDefinition {
     public:
-        FieldDefinition(
-            const SdfSchemaBase& schema,
-            const TfToken& name, 
-            const VtValue& fallbackValue);
+        FieldDefinition(const SdfSchemaBase& schema, const TfToken& name, const VtValue& fallbackValue);
 
-        typedef std::vector< std::pair<TfToken, JsValue> > InfoVec;
+        typedef std::vector<std::pair<TfToken, JsValue>> InfoVec;
 
         SDF_API const TfToken& GetName() const;
         SDF_API const VtValue& GetFallbackValue() const;
@@ -69,41 +67,29 @@ public:
         SDF_API bool IsPlugin() const;
         SDF_API bool IsReadOnly() const;
         SDF_API bool HoldsChildren() const;
-        
+
         /// Validation functions that return true if a given value passes
         /// the registered validator or if no validator has been set.
         /// @{
-        
+
         template <class T>
-        SdfAllowed IsValidValue(const T& value) const
-        {
-            return (_valueValidator ? 
-                    _valueValidator(_schema, VtValue(value)) : 
-                    SdfAllowed(true));
+        SdfAllowed IsValidValue(const T& value) const {
+            return (_valueValidator ? _valueValidator(_schema, VtValue(value)) : SdfAllowed(true));
         }
 
         template <class T>
-        SdfAllowed IsValidListValue(const T& value) const
-        {
-            return (_listValueValidator ? 
-                    _listValueValidator(_schema, VtValue(value)) : 
-                    SdfAllowed(true));
+        SdfAllowed IsValidListValue(const T& value) const {
+            return (_listValueValidator ? _listValueValidator(_schema, VtValue(value)) : SdfAllowed(true));
         }
 
         template <class T>
-        SdfAllowed IsValidMapKey(const T& value) const
-        {
-            return (_mapKeyValidator ? 
-                    _mapKeyValidator(_schema, VtValue(value)) : 
-                    SdfAllowed(true));
+        SdfAllowed IsValidMapKey(const T& value) const {
+            return (_mapKeyValidator ? _mapKeyValidator(_schema, VtValue(value)) : SdfAllowed(true));
         }
 
         template <class T>
-        SdfAllowed IsValidMapValue(const T& value) const
-        {
-            return (_mapValueValidator ? 
-                    _mapValueValidator(_schema, VtValue(value)) : 
-                    SdfAllowed(true));
+        SdfAllowed IsValidMapValue(const T& value) const {
+            return (_mapValueValidator ? _mapValueValidator(_schema, VtValue(value)) : SdfAllowed(true));
         }
 
         /// @}
@@ -118,8 +104,7 @@ public:
         FieldDefinition& ReadOnly();
         FieldDefinition& AddInfo(const TfToken& tok, const JsValue& val);
 
-        using Validator =
-            SdfAllowed (*) (const SdfSchemaBase&, const VtValue&);
+        using Validator = SdfAllowed (*)(const SdfSchemaBase&, const VtValue&);
         FieldDefinition& ValueValidator(Validator v);
         FieldDefinition& ListValueValidator(Validator v);
         FieldDefinition& MapKeyValidator(Validator v);
@@ -146,7 +131,7 @@ public:
     // Structure containing information about a field as it pertains to the
     // spec this object defines.
     struct _FieldInfo {
-        _FieldInfo(): required(false), metadata(false) { }
+        _FieldInfo() : required(false), metadata(false) {}
         bool required;
         bool metadata;
         TfToken metadataDisplayGroup;
@@ -164,9 +149,7 @@ public:
         SDF_API TfTokenVector GetFields() const;
 
         /// Returns all value fields marked as required for this spec.
-        TfTokenVector const &GetRequiredFields() const {
-            return _requiredFields;
-        }
+        TfTokenVector const& GetRequiredFields() const { return _requiredFields; }
 
         /// Returns all value fields marked as metadata for this spec.
         SDF_API TfTokenVector GetMetadataFields() const;
@@ -180,18 +163,16 @@ public:
         /// Returns the display group for this metadata field.  Returns the
         /// empty token if this field is not a metadata field or if this
         /// metadata field has no display group.
-        SDF_API 
+        SDF_API
         TfToken GetMetadataFieldDisplayGroup(const TfToken& name) const;
 
         /// Returns whether the given field is required for this spec.
         SDF_API bool IsRequiredField(const TfToken& name) const;
 
-
     private:
-        typedef TfHashMap<TfToken, _FieldInfo, TfToken::HashFunctor> 
-            _FieldMap;
+        typedef TfHashMap<TfToken, _FieldInfo, TfToken::HashFunctor> _FieldMap;
         _FieldMap _fields;
-        
+
         // A separate vector of required field names from _fields.  Access to
         // these is in a hot path, so we cache them separately.
         TfTokenVector _requiredFields;
@@ -201,24 +182,21 @@ public:
         void _AddField(const TfToken& name, const _FieldInfo& fieldInfo);
     };
 
-    /// Returns the field definition for the given field. 
+    /// Returns the field definition for the given field.
     /// Returns NULL if no definition exists for given field.
-    SDF_API 
-    const FieldDefinition* GetFieldDefinition(const TfToken &fieldKey) const;
-    
+    SDF_API
+    const FieldDefinition* GetFieldDefinition(const TfToken& fieldKey) const;
+
     /// Returns the spec definition for the given spec type.
     /// Returns NULL if no definition exists for the given spec type.
     inline const SpecDefinition* GetSpecDefinition(SdfSpecType specType) const {
-    #ifdef PXR_PREFER_SAFETY_OVER_SPEED
-        if (ARCH_UNLIKELY(specType < SdfSpecTypeUnknown || 
-                          specType >= SdfNumSpecTypes))
-        {
+#ifdef PXR_PREFER_SAFETY_OVER_SPEED
+        if (ARCH_UNLIKELY(specType < SdfSpecTypeUnknown || specType >= SdfNumSpecTypes)) {
             return _IssueErrorForInvalidSpecType(specType);
         }
-    #endif // PXR_PREFER_SAFETY_OVER_SPEED
+#endif  // PXR_PREFER_SAFETY_OVER_SPEED
 
-        return _specDefinitions[specType].second ?
-            &_specDefinitions[specType].first : nullptr;
+        return _specDefinitions[specType].second ? &_specDefinitions[specType].first : nullptr;
     }
 
     /// Convenience functions for accessing specific field information.
@@ -226,26 +204,26 @@ public:
 
     /// Return whether the specified field has been registered. Also
     /// optionally return the fallback value.
-    SDF_API 
-    bool IsRegistered(const TfToken &fieldKey, VtValue *fallback=NULL) const;
+    SDF_API
+    bool IsRegistered(const TfToken& fieldKey, VtValue* fallback = NULL) const;
 
     /// Returns whether the given field is a 'children' field -- that is, it
     /// indexes certain children beneath the owning spec.
-    SDF_API 
-    bool HoldsChildren(const TfToken &fieldKey) const;
+    SDF_API
+    bool HoldsChildren(const TfToken& fieldKey) const;
 
     /// Return the fallback value for the specified \p fieldKey or the
     /// empty value if \p fieldKey is not registered.
-    SDF_API 
-    const VtValue& GetFallback(const TfToken &fieldKey) const;
+    SDF_API
+    const VtValue& GetFallback(const TfToken& fieldKey) const;
 
     /// Coerce \p value to the correct type for the specified field.
-    SDF_API 
-    VtValue CastToTypeOf(const TfToken &fieldKey, const VtValue &value) const;
+    SDF_API
+    VtValue CastToTypeOf(const TfToken& fieldKey, const VtValue& value) const;
 
     /// Return whether the given field is valid for the given spec type.
-    SDF_API 
-    bool IsValidFieldForSpec(const TfToken &fieldKey, SdfSpecType specType) const;
+    SDF_API
+    bool IsValidFieldForSpec(const TfToken& fieldKey, SdfSpecType specType) const;
 
     /// Returns all fields registered for the given spec type.
     SDF_API TfTokenVector GetFields(SdfSpecType specType) const;
@@ -256,19 +234,18 @@ public:
     /// Return the metadata field display group for metadata \a metadataField on
     /// \a specType.  Return the empty token if \a metadataField is not a
     /// metadata field, or if it has no display group.
-    SDF_API 
-    TfToken GetMetadataFieldDisplayGroup(SdfSpecType specType,
-                                         TfToken const &metadataField) const;
+    SDF_API
+    TfToken GetMetadataFieldDisplayGroup(SdfSpecType specType, TfToken const& metadataField) const;
 
     /// Returns all required fields registered for the given spec type.
-    SDF_API const TfTokenVector &GetRequiredFields(SdfSpecType specType) const;
+    SDF_API const TfTokenVector& GetRequiredFields(SdfSpecType specType) const;
 
     /// Return true if \p fieldName is a required field name for at least one
     /// spec type, return false otherwise.  The main use of this function is to
     /// quickly rule out field names that aren't required (and thus don't need
     /// special handling).
-    inline bool IsRequiredFieldName(const TfToken &fieldName) const {
-        for (TfToken const &fname: _requiredFieldNames) {
+    inline bool IsRequiredFieldName(const TfToken& fieldName) const {
+        for (TfToken const& fname : _requiredFieldNames) {
             if (fname == fieldName) {
                 return true;
             }
@@ -283,31 +260,31 @@ public:
     /// used directly.
     /// @{
 
-    SDF_API 
+    SDF_API
     static SdfAllowed IsValidAttributeConnectionPath(const SdfPath& path);
-    SDF_API 
+    SDF_API
     static SdfAllowed IsValidIdentifier(const std::string& name);
-    SDF_API 
+    SDF_API
     static SdfAllowed IsValidNamespacedIdentifier(const std::string& name);
-    SDF_API 
+    SDF_API
     static SdfAllowed IsValidInheritPath(const SdfPath& path);
-    SDF_API 
+    SDF_API
     static SdfAllowed IsValidPayload(const SdfPayload& payload);
-    SDF_API 
+    SDF_API
     static SdfAllowed IsValidReference(const SdfReference& ref);
-    SDF_API 
+    SDF_API
     static SdfAllowed IsValidRelationshipTargetPath(const SdfPath& path);
-    SDF_API 
+    SDF_API
     static SdfAllowed IsValidRelocatesSourcePath(const SdfPath& path);
-    SDF_API 
+    SDF_API
     static SdfAllowed IsValidRelocatesTargetPath(const SdfPath& path);
-    SDF_API 
+    SDF_API
     static SdfAllowed IsValidRelocate(const SdfRelocate& relocate);
-    SDF_API 
+    SDF_API
     static SdfAllowed IsValidSpecializesPath(const SdfPath& path);
-    SDF_API 
+    SDF_API
     static SdfAllowed IsValidSubLayer(const std::string& sublayer);
-    SDF_API 
+    SDF_API
     static SdfAllowed IsValidVariantIdentifier(const std::string& name);
     SDF_API
     static SdfAllowed IsValidVariantSelection(const std::string& sel);
@@ -330,24 +307,22 @@ public:
     std::vector<SdfValueTypeName> GetAllTypes() const;
 
     /// Return the type name object for the given type name token.
-    SDF_API 
+    SDF_API
     SdfValueTypeName FindType(const TfToken& typeName) const;
     /// \overload
     SDF_API
-    SdfValueTypeName FindType(const char *typeName) const;
+    SdfValueTypeName FindType(const char* typeName) const;
     /// \overload
     SDF_API
-    SdfValueTypeName FindType(std::string const &typeName) const;
+    SdfValueTypeName FindType(std::string const& typeName) const;
 
     /// Return the type name object for the given type and optional role.
-    SDF_API 
-    SdfValueTypeName FindType(const TfType& type,
-                              const TfToken& role = TfToken()) const;
+    SDF_API
+    SdfValueTypeName FindType(const TfType& type, const TfToken& role = TfToken()) const;
 
     /// Return the type name object for the value's type and optional role.
-    SDF_API 
-    SdfValueTypeName FindType(const VtValue& value,
-                              const TfToken& role = TfToken()) const;
+    SDF_API
+    SdfValueTypeName FindType(const VtValue& value, const TfToken& role = TfToken()) const;
 
     /// Return the type name object for the given type name string if it
     /// exists otherwise create a temporary type name object.  Clients
@@ -367,25 +342,19 @@ protected:
         /// Functions for setting spec attributes during registration
         /// @{
 
-        _SpecDefiner& Field(
-            const TfToken& name, bool required = false);
-        _SpecDefiner& MetadataField(
-            const TfToken& name, bool required = false);
-        _SpecDefiner& MetadataField(
-            const TfToken& name, const TfToken& displayGroup,
-            bool required = false);
+        _SpecDefiner& Field(const TfToken& name, bool required = false);
+        _SpecDefiner& MetadataField(const TfToken& name, bool required = false);
+        _SpecDefiner& MetadataField(const TfToken& name, const TfToken& displayGroup, bool required = false);
 
-        _SpecDefiner &CopyFrom(const SpecDefinition &other);
+        _SpecDefiner& CopyFrom(const SpecDefinition& other);
 
         /// @}
     private:
         friend class SdfSchemaBase;
-        explicit _SpecDefiner(SdfSchemaBase *schema, SpecDefinition *definition)
-            : _schema(schema)
-            , _definition(definition)
-            {}
-        SdfSchemaBase *_schema;
-        SpecDefinition *_definition;
+        explicit _SpecDefiner(SdfSchemaBase* schema, SpecDefinition* definition)
+            : _schema(schema), _definition(definition) {}
+        SdfSchemaBase* _schema;
+        SpecDefinition* _definition;
     };
 
     /// A helper for registering value types.
@@ -393,8 +362,7 @@ protected:
     public:
         explicit _ValueTypeRegistrar(Sdf_ValueTypeRegistry*);
 
-        class Type
-        {
+        class Type {
         public:
             ~Type();
 
@@ -402,13 +370,10 @@ protected:
             // array value of VtArray<T>.
             template <class T>
             Type(const TfToken& name, const T& defaultValue)
-                : Type(name, VtValue(defaultValue), VtValue(VtArray<T>()))
-            { }
+                : Type(name, VtValue(defaultValue), VtValue(VtArray<T>())) {}
             template <class T>
-            Type(char const *name, const T& defaultValue)
-                : Type(TfToken(name),
-                       VtValue(defaultValue), VtValue(VtArray<T>()))
-            { }
+            Type(char const* name, const T& defaultValue)
+                : Type(TfToken(name), VtValue(defaultValue), VtValue(VtArray<T>())) {}
 
             // Specify a type with the given name and underlying C++ type.
             // No default value or array value will be registered.
@@ -431,9 +396,7 @@ protected:
             Type& NoArrays();
 
         private:
-            Type(const TfToken& name, 
-                 const VtValue& defaultValue, 
-                 const VtValue& defaultArrayValue);
+            Type(const TfToken& name, const VtValue& defaultValue, const VtValue& defaultArrayValue);
 
             class _Impl;
             std::unique_ptr<_Impl> _impl;
@@ -449,7 +412,7 @@ protected:
     };
 
     SdfSchemaBase();
-    
+
     /// Construct an SdfSchemaBase but does not populate it with standard
     /// fields and types.
     class EmptyTag {};
@@ -465,13 +428,11 @@ protected:
     /// It is a fatal error to call this function with a key that has already
     /// been used for another field.
     template <class T>
-    FieldDefinition& _RegisterField(
-        const TfToken &fieldKey, const T &fallback, bool plugin = false)
-    {
+    FieldDefinition& _RegisterField(const TfToken& fieldKey, const T& fallback, bool plugin = false) {
         return _CreateField(fieldKey, VtValue(fallback), plugin);
     }
 
-    /// Registers the given spec \p type with this schema and return a 
+    /// Registers the given spec \p type with this schema and return a
     /// _SpecDefiner for specifying additional fields.
     _SpecDefiner _Define(SdfSpecType type) {
         // Mark the definition as valid and return a pointer to it.
@@ -502,17 +463,14 @@ protected:
     /// Factory function for creating a default value for a metadata
     /// field. The parameters are the value type name and default
     /// value (if any) specified in the defining plugin.
-    typedef std::function<VtValue(const std::string&, const JsValue&)>
-        _DefaultValueFactoryFn;
+    typedef std::function<VtValue(const std::string&, const JsValue&)> _DefaultValueFactoryFn;
 
     /// Registers all metadata fields specified in the given plugins
     /// under the given metadata tag.
-    const std::vector<const SdfSchemaBase::FieldDefinition *>
-    _UpdateMetadataFromPlugins(const PlugPluginPtrVector& plugins,
-                                    const std::string& metadataTag = 
-                                        std::string(),
-                                    const _DefaultValueFactoryFn& defFactory = 
-                                        _DefaultValueFactoryFn());
+    const std::vector<const SdfSchemaBase::FieldDefinition*> _UpdateMetadataFromPlugins(
+            const PlugPluginPtrVector& plugins,
+            const std::string& metadataTag = std::string(),
+            const _DefaultValueFactoryFn& defFactory = _DefaultValueFactoryFn());
 
 private:
     friend class _SpecDefiner;
@@ -520,11 +478,9 @@ private:
     void _OnDidRegisterPlugins(const PlugNotice::DidRegisterPlugins& n);
 
     // Return a _SpecDefiner for an existing spec definition, \p local.
-    _SpecDefiner _Define(SpecDefinition *local) {
-        return _SpecDefiner(this, local);
-    }
+    _SpecDefiner _Define(SpecDefinition* local) { return _SpecDefiner(this, local); }
 
-    void _AddRequiredFieldName(const TfToken &name);
+    void _AddRequiredFieldName(const TfToken& name);
 
     const SpecDefinition* _CheckAndGetSpecDefinition(SdfSpecType type) const;
 
@@ -532,27 +488,21 @@ private:
     const SpecDefinition* _IssueErrorForInvalidSpecType(SdfSpecType specType) const;
 
     friend struct Sdf_SchemaFieldTypeRegistrar;
-    FieldDefinition& _CreateField(
-        const TfToken &fieldKey, const VtValue &fallback, bool plugin = false);
+    FieldDefinition& _CreateField(const TfToken& fieldKey, const VtValue& fallback, bool plugin = false);
 
     template <class T>
-    FieldDefinition& _DoRegisterField(const TfToken &fieldKey, const T &fallback)
-    {
+    FieldDefinition& _DoRegisterField(const TfToken& fieldKey, const T& fallback) {
         return _DoRegisterField(fieldKey, VtValue(fallback));
     }
 
-    FieldDefinition& _DoRegisterField(
-        const TfToken &fieldKey, const VtValue &fallback);
+    FieldDefinition& _DoRegisterField(const TfToken& fieldKey, const VtValue& fallback);
 
 private:
-    typedef TfHashMap<TfToken, SdfSchemaBase::FieldDefinition, 
-                                 TfToken::HashFunctor> 
-        _FieldDefinitionMap;
+    typedef TfHashMap<TfToken, SdfSchemaBase::FieldDefinition, TfToken::HashFunctor> _FieldDefinitionMap;
     _FieldDefinitionMap _fieldDefinitions;
-    
+
     // Pair of definition and flag indicating validity.
-    std::pair<SdfSchemaBase::SpecDefinition, bool>
-    _specDefinitions[SdfNumSpecTypes];
+    std::pair<SdfSchemaBase::SpecDefinition, bool> _specDefinitions[SdfNumSpecTypes];
 
     std::unique_ptr<Sdf_ValueTypeRegistry> _valueTypeRegistry;
     TfTokenVector _requiredFieldNames;
@@ -560,16 +510,13 @@ private:
 
 /// \class SdfSchema
 ///
-/// Class that provides information about the various scene description 
+/// Class that provides information about the various scene description
 /// fields.
 ///
 class SdfSchema : public SdfSchemaBase {
 public:
     SDF_API
-    static const SdfSchema& GetInstance()
-    {
-        return TfSingleton<SdfSchema>::GetInstance();
-    }
+    static const SdfSchema& GetInstance() { return TfSingleton<SdfSchema>::GetInstance(); }
 
 private:
     friend class TfSingleton<SdfSchema>;
@@ -580,86 +527,44 @@ private:
 SDF_API_TEMPLATE_CLASS(TfSingleton<SdfSchema>);
 
 ///
-/// The following fields are pre-registered by Sdf. 
+/// The following fields are pre-registered by Sdf.
 /// \showinitializer
-#define SDF_FIELD_KEYS                                       \
-    ((Active, "active"))                                     \
-    ((AllowedTokens, "allowedTokens"))                       \
-    ((AssetInfo, "assetInfo"))                               \
-    ((ColorConfiguration, "colorConfiguration"))             \
-    ((ColorManagementSystem, "colorManagementSystem"))       \
-    ((ColorSpace, "colorSpace"))                             \
-    ((Comment, "comment"))                                   \
-    ((ConnectionPaths, "connectionPaths"))                   \
-    ((Custom, "custom"))                                     \
-    ((CustomData, "customData"))                             \
-    ((CustomLayerData, "customLayerData"))                   \
-    ((Default, "default"))                                   \
-    ((DefaultPrim, "defaultPrim"))                           \
-    ((DisplayGroup, "displayGroup"))                         \
-    ((DisplayGroupOrder, "displayGroupOrder"))               \
-    ((DisplayName, "displayName"))                           \
-    ((DisplayUnit, "displayUnit"))                           \
-    ((Documentation, "documentation"))                       \
-    ((EndTimeCode, "endTimeCode"))                           \
-    ((ExpressionVariables, "expressionVariables"))           \
-    ((FramePrecision, "framePrecision"))                     \
-    ((FramesPerSecond, "framesPerSecond"))                   \
-    ((Hidden, "hidden"))                                     \
-    ((HasOwnedSubLayers, "hasOwnedSubLayers"))               \
-    ((InheritPaths, "inheritPaths"))                         \
-    ((Instanceable, "instanceable"))                         \
-    ((Kind, "kind"))                                         \
-    ((LayerRelocates, "layerRelocates"))                     \
-    ((PrimOrder, "primOrder"))                               \
-    ((NoLoadHint, "noLoadHint"))                             \
-    ((Owner, "owner"))                                       \
-    ((Payload, "payload"))                                   \
-    ((Permission, "permission"))                             \
-    ((Prefix, "prefix"))                                     \
-    ((PrefixSubstitutions, "prefixSubstitutions"))           \
-    ((PropertyOrder, "propertyOrder"))                       \
-    ((References, "references"))                             \
-    ((Relocates, "relocates"))                               \
-    ((SessionOwner, "sessionOwner"))                         \
-    ((Specializes, "specializes"))                           \
-    ((Specifier, "specifier"))                               \
-    ((Spline, "spline"))                                     \
-    ((StartTimeCode, "startTimeCode"))                       \
-    ((SubLayers, "subLayers"))                               \
-    ((SubLayerOffsets, "subLayerOffsets"))                   \
-    ((Suffix, "suffix"))                                     \
-    ((SuffixSubstitutions, "suffixSubstitutions"))           \
-    ((SymmetricPeer, "symmetricPeer"))                       \
-    ((SymmetryArgs, "symmetryArgs"))                         \
-    ((SymmetryArguments, "symmetryArguments"))               \
-    ((SymmetryFunction, "symmetryFunction"))                 \
-    ((TargetPaths, "targetPaths"))                           \
-    ((TimeSamples, "timeSamples"))                           \
-    ((TimeCodesPerSecond, "timeCodesPerSecond"))             \
-    ((TypeName, "typeName"))                                 \
-    ((VariantSelection, "variantSelection"))                 \
-    ((Variability, "variability"))                           \
-    ((VariantSetNames, "variantSetNames"))                   \
-                                                             \
-    /* XXX: These fields should move into Sd. See bug 123508. */ \
-    ((EndFrame, "endFrame"))                                 \
-    ((StartFrame, "startFrame"))
+#define SDF_FIELD_KEYS                                                                                                 \
+    ((Active, "active"))((AllowedTokens, "allowedTokens"))((AssetInfo, "assetInfo"))(                                  \
+            (ColorConfiguration, "colorConfiguration"))((ColorManagementSystem, "colorManagementSystem"))(             \
+            (ColorSpace, "colorSpace"))((Comment, "comment"))((ConnectionPaths, "connectionPaths"))(                   \
+            (Custom, "custom"))((CustomData, "customData"))((CustomLayerData, "customLayerData"))(                     \
+            (Default, "default"))((DefaultPrim, "defaultPrim"))((DisplayGroup, "displayGroup"))(                       \
+            (DisplayGroupOrder, "displayGroupOrder"))((DisplayName, "displayName"))((DisplayUnit, "displayUnit"))(     \
+            (Documentation, "documentation"))((EndTimeCode, "endTimeCode"))(                                           \
+            (ExpressionVariables, "expressionVariables"))((FramePrecision, "framePrecision"))(                         \
+            (FramesPerSecond, "framesPerSecond"))((Hidden, "hidden"))((HasOwnedSubLayers, "hasOwnedSubLayers"))(       \
+            (InheritPaths, "inheritPaths"))((Instanceable, "instanceable"))((Kind, "kind"))(                           \
+            (LayerRelocates, "layerRelocates"))((PrimOrder, "primOrder"))((NoLoadHint, "noLoadHint"))(                 \
+            (Owner, "owner"))((Payload, "payload"))((Permission, "permission"))((Prefix, "prefix"))(                   \
+            (PrefixSubstitutions, "prefixSubstitutions"))((PropertyOrder, "propertyOrder"))(                           \
+            (References, "references"))((Relocates, "relocates"))((SessionOwner, "sessionOwner"))(                     \
+            (Specializes, "specializes"))((Specifier, "specifier"))((Spline, "spline"))(                               \
+            (StartTimeCode, "startTimeCode"))((SubLayers, "subLayers"))((SubLayerOffsets, "subLayerOffsets"))(         \
+            (Suffix, "suffix"))((SuffixSubstitutions, "suffixSubstitutions"))((SymmetricPeer, "symmetricPeer"))(       \
+            (SymmetryArgs, "symmetryArgs"))((SymmetryArguments, "symmetryArguments"))(                                 \
+            (SymmetryFunction, "symmetryFunction"))((TargetPaths, "targetPaths"))((TimeSamples, "timeSamples"))(       \
+            (TimeCodesPerSecond, "timeCodesPerSecond"))((TypeName, "typeName"))((                                      \
+            VariantSelection, "variantSelection"))((Variability, "variability"))((VariantSetNames, "variantSetNames")) \
+                                                                                                                       \
+            /* XXX: These fields should move into Sd. See bug 123508. */                                               \
+            ((EndFrame, "endFrame"))((StartFrame, "startFrame"))
 
-#define SDF_CHILDREN_KEYS                                    \
-    ((ConnectionChildren, "connectionChildren"))             \
-    ((ExpressionChildren, "expressionChildren"))             \
-    ((MapperArgChildren, "mapperArgChildren"))               \
-    ((MapperChildren, "mapperChildren"))                     \
-    ((PrimChildren, "primChildren"))                         \
-    ((PropertyChildren, "properties"))                       \
-    ((RelationshipTargetChildren, "targetChildren"))         \
-    ((VariantChildren, "variantChildren"))                   \
-    ((VariantSetChildren, "variantSetChildren"))
+#define SDF_CHILDREN_KEYS                                                                          \
+    ((ConnectionChildren, "connectionChildren"))((ExpressionChildren, "expressionChildren"))(      \
+            (MapperArgChildren, "mapperArgChildren"))((MapperChildren, "mapperChildren"))(         \
+            (PrimChildren, "primChildren"))((PropertyChildren, "properties"))(                     \
+            (RelationshipTargetChildren, "targetChildren"))((VariantChildren, "variantChildren"))( \
+            (VariantSetChildren, "variantSetChildren"))
 
 TF_DECLARE_PUBLIC_TOKENS(SdfFieldKeys, SDF_API, SDF_FIELD_KEYS);
 TF_DECLARE_PUBLIC_TOKENS(SdfChildrenKeys, SDF_API, SDF_CHILDREN_KEYS);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_SCHEMA_H
+#endif  // PXR_USD_SDF_SCHEMA_H

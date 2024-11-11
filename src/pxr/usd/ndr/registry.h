@@ -44,8 +44,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Some methods in this library may allow for a "family" to be provided. A
 /// family is simply a generic grouping which is optional.
 ///
-class NdrRegistry : public TfWeakBase
-{
+class NdrRegistry : public TfWeakBase {
 public:
     using DiscoveryPluginRefPtrVec = NdrDiscoveryPluginRefPtrVector;
 
@@ -97,14 +96,14 @@ public:
 
     /// Parses the given \p asset, constructs a NdrNode from it and adds it to
     /// the registry.
-    /// 
-    /// Nodes created from an asset using this API can be looked up by the 
-    /// unique identifier and sourceType of the returned node, or by URI, 
+    ///
+    /// Nodes created from an asset using this API can be looked up by the
+    /// unique identifier and sourceType of the returned node, or by URI,
     /// which will be set to the unresolved asset path value.
-    /// 
-    /// \p metadata contains additional metadata needed for parsing and 
+    ///
+    /// \p metadata contains additional metadata needed for parsing and
     /// compiling the source code in the file pointed to by \p asset correctly.
-    /// This metadata supplements the metadata available in the asset and 
+    /// This metadata supplements the metadata available in the asset and
     /// overrides it in cases where there are key collisions.
     ///
     /// \p subidentifier is optional, and it would be used to indicate a
@@ -115,33 +114,33 @@ public:
     /// particular type if the asset file is capable of representing a node
     /// definition of multiple source types.
     ///
-    /// Returns a valid node if the asset is parsed successfully using one 
+    /// Returns a valid node if the asset is parsed successfully using one
     /// of the registered parser plugins.
     NDR_API
-    NdrNodeConstPtr GetNodeFromAsset(const SdfAssetPath &asset,
-                                     const NdrTokenMap &metadata,
-                                     const TfToken &subIdentifier=TfToken(),
-                                     const TfToken &sourceType=TfToken());
+    NdrNodeConstPtr GetNodeFromAsset(const SdfAssetPath& asset,
+                                     const NdrTokenMap& metadata,
+                                     const TfToken& subIdentifier = TfToken(),
+                                     const TfToken& sourceType = TfToken());
 
-    /// Parses the given \p sourceCode string, constructs a NdrNode from it and 
-    /// adds it to the registry. The parser to be used is determined by the 
+    /// Parses the given \p sourceCode string, constructs a NdrNode from it and
+    /// adds it to the registry. The parser to be used is determined by the
     /// specified \p sourceType.
-    /// 
-    /// Nodes created from source code using this API can be looked up by the 
+    ///
+    /// Nodes created from source code using this API can be looked up by the
     /// unique identifier and sourceType of the returned node.
-    /// 
-    /// \p metadata contains additional metadata needed for parsing and 
-    /// compiling the source code correctly. This metadata supplements the 
-    /// metadata available in \p sourceCode and overrides it cases where there 
+    ///
+    /// \p metadata contains additional metadata needed for parsing and
+    /// compiling the source code correctly. This metadata supplements the
+    /// metadata available in \p sourceCode and overrides it cases where there
     /// are key collisions.
-    /// 
-    /// Returns a valid node if the given source code is parsed successfully 
-    /// using the parser plugins that is registered for the specified 
+    ///
+    /// Returns a valid node if the given source code is parsed successfully
+    /// using the parser plugins that is registered for the specified
     /// \p sourceType.
     NDR_API
-    NdrNodeConstPtr GetNodeFromSourceCode(const std::string &sourceCode,
-                                          const TfToken &sourceType,
-                                          const NdrTokenMap &metadata);
+    NdrNodeConstPtr GetNodeFromSourceCode(const std::string& sourceCode,
+                                          const TfToken& sourceType,
+                                          const NdrTokenMap& metadata);
 
     /// Get the locations where the registry is searching for nodes.
     ///
@@ -158,10 +157,8 @@ public:
     /// to that family and a filter can be specified to get just the default
     /// version (the default) or all versions of the node.
     NDR_API
-    NdrIdentifierVec
-    GetNodeIdentifiers(const TfToken& family = TfToken(),
-                       NdrVersionFilter filter =
-                           NdrVersionFilterDefaultOnly) const;
+    NdrIdentifierVec GetNodeIdentifiers(const TfToken& family = TfToken(),
+                                        NdrVersionFilter filter = NdrVersionFilterDefaultOnly) const;
 
     /// Get the names of all the nodes that the registry is aware of.
     ///
@@ -176,14 +173,14 @@ public:
     /// \p sourceTypePriority list specifying the set of node SOURCE types (see
     /// `NdrNode::GetSourceType()`) that should be searched.
     ///
-    /// If no sourceTypePriority is specified, the first encountered node with 
+    /// If no sourceTypePriority is specified, the first encountered node with
     /// the specified identifier will be returned (first is arbitrary) if found.
-    /// 
-    /// If a sourceTypePriority list is specified, then this will iterate 
+    ///
+    /// If a sourceTypePriority list is specified, then this will iterate
     /// through each source type and try to find a node matching by identifier.
-    /// This is equivalent to calling NdrRegistry::GetNodeByIdentifierAndType 
+    /// This is equivalent to calling NdrRegistry::GetNodeByIdentifierAndType
     /// for each source type until a node is found.
-    /// 
+    ///
     /// Nodes of the same identifier but different source type can exist
     /// in the registry. If a node 'Foo' with source types 'abc' and 'xyz'
     /// exist in the registry, and you want to make sure the 'abc' version
@@ -194,13 +191,12 @@ public:
     /// Returns `nullptr` if a node matching the arguments can't be found.
     NDR_API
     NdrNodeConstPtr GetNodeByIdentifier(const NdrIdentifier& identifier,
-                        const NdrTokenVec& sourceTypePriority = NdrTokenVec());
+                                        const NdrTokenVec& sourceTypePriority = NdrTokenVec());
 
-    /// Get the node with the specified \p identifier and \p sourceType. 
+    /// Get the node with the specified \p identifier and \p sourceType.
     /// If there is no matching node for the sourceType, nullptr is returned.
     NDR_API
-    NdrNodeConstPtr GetNodeByIdentifierAndType(const NdrIdentifier& identifier,
-                                               const TfToken& sourceType);
+    NdrNodeConstPtr GetNodeByIdentifierAndType(const NdrIdentifier& identifier, const TfToken& sourceType);
 
     /// Get the node with the specified name.  An optional priority list
     /// specifies the set of node SOURCE types (\sa NdrNode::GetSourceType())
@@ -213,8 +209,8 @@ public:
     /// \sa GetNodeByIdentifier().
     NDR_API
     NdrNodeConstPtr GetNodeByName(const std::string& name,
-                        const NdrTokenVec& sourceTypePriority = NdrTokenVec(),
-                        NdrVersionFilter filter = NdrVersionFilterDefaultOnly);
+                                  const NdrTokenVec& sourceTypePriority = NdrTokenVec(),
+                                  NdrVersionFilter filter = NdrVersionFilterDefaultOnly);
 
     /// A convenience wrapper around \c GetNodeByName(). Instead of
     /// providing a priority list, an exact type is specified, and
@@ -227,8 +223,7 @@ public:
     NDR_API
     NdrNodeConstPtr GetNodeByNameAndType(const std::string& name,
                                          const TfToken& sourceType,
-                                         NdrVersionFilter filter =
-                                             NdrVersionFilterDefaultOnly);
+                                         NdrVersionFilter filter = NdrVersionFilterDefaultOnly);
 
     /// Get all nodes matching the specified identifier (multiple nodes of
     /// the same identifier, but different source types, may exist). If no nodes
@@ -241,9 +236,7 @@ public:
     /// to get just the default version (the default) or all versions of the
     /// node.  If no nodes match an empty vector is returned.
     NDR_API
-    NdrNodeConstPtrVec GetNodesByName(const std::string& name,
-                                      NdrVersionFilter filter =
-                                          NdrVersionFilterDefaultOnly);
+    NdrNodeConstPtrVec GetNodesByName(const std::string& name, NdrVersionFilter filter = NdrVersionFilterDefaultOnly);
 
     /// Get all nodes from the registry, optionally restricted to the nodes
     /// that fall under a specified family and/or the default version.
@@ -253,8 +246,7 @@ public:
     /// the first time it is called.
     NDR_API
     NdrNodeConstPtrVec GetNodesByFamily(const TfToken& family = TfToken(),
-                                        NdrVersionFilter filter =
-                                            NdrVersionFilterDefaultOnly);
+                                        NdrVersionFilter filter = NdrVersionFilterDefaultOnly);
 
     /// Get a sorted list of all node source types that may be present on the
     /// nodes in the registry.
@@ -284,8 +276,7 @@ private:
     class _DiscoveryContext;
     friend class _DiscoveryContext;
 
-    using _TypeToParserPluginMap = 
-        std::unordered_map<TfToken, NdrParserPlugin*, TfToken::HashFunctor>;
+    using _TypeToParserPluginMap = std::unordered_map<TfToken, NdrParserPlugin*, TfToken::HashFunctor>;
 
     // Node cache data structure, stored NdrNodes keyed by identifier and source
     // type.
@@ -294,20 +285,16 @@ private:
 
     // Discovery results data structure, NdrNodeDiscoveryResults multimap keyed
     // by identifier
-    using _DiscoveryResultsByIdentifier = std::unordered_multimap<
-        TfToken, NdrNodeDiscoveryResult, TfHash>;
-    using _DiscoveryResultsByIdentifierRange = 
-        std::pair<_DiscoveryResultsByIdentifier::const_iterator,
-                  _DiscoveryResultsByIdentifier::const_iterator>;
+    using _DiscoveryResultsByIdentifier = std::unordered_multimap<TfToken, NdrNodeDiscoveryResult, TfHash>;
+    using _DiscoveryResultsByIdentifierRange =
+            std::pair<_DiscoveryResultsByIdentifier::const_iterator, _DiscoveryResultsByIdentifier::const_iterator>;
 
-    // Discovery results data structure: a multimap of raw pointers to 
-    // NdrNodeDiscoveryResults (i.e. pointers to the discovery results stored 
+    // Discovery results data structure: a multimap of raw pointers to
+    // NdrNodeDiscoveryResults (i.e. pointers to the discovery results stored
     // in a _DiscoveryResultsByIdentifier) keyed by name.
-    using _DiscoveryResultPtrsByName = std::unordered_multimap<
-        std::string, const NdrNodeDiscoveryResult *, TfHash>;
-    using _DiscoveryResultPtrsByNameRange = 
-        std::pair<_DiscoveryResultPtrsByName::const_iterator,
-                  _DiscoveryResultPtrsByName::const_iterator>;
+    using _DiscoveryResultPtrsByName = std::unordered_multimap<std::string, const NdrNodeDiscoveryResult*, TfHash>;
+    using _DiscoveryResultPtrsByNameRange =
+            std::pair<_DiscoveryResultPtrsByName::const_iterator, _DiscoveryResultPtrsByName::const_iterator>;
 
     // The discovery result data structures are not concurrent and must be kept
     // in sync, thus they need some locking infrastructure.
@@ -339,41 +326,38 @@ private:
     // able and adds the discovery result to the discovery result maps. Intended
     // for the GetNodeFromAsset and GetNodeFromSourceCode APIs which can add
     // nodes that don't already appear in the discovery results.
-    NdrNodeConstPtr _ParseNodeFromAssetOrSourceCode(
-        NdrParserPlugin &parser, NdrNodeDiscoveryResult &&dr);
+    NdrNodeConstPtr _ParseNodeFromAssetOrSourceCode(NdrParserPlugin& parser, NdrNodeDiscoveryResult&& dr);
 
-    // Implementation helper for getting the first node of the given sourceType 
+    // Implementation helper for getting the first node of the given sourceType
     // in the range of node discovery results for a paricular identifier.
-    NdrNodeConstPtr _GetNodeInIdentifierRangeWithSourceType(
-        _DiscoveryResultsByIdentifierRange range, const TfToken& sourceType);
+    NdrNodeConstPtr _GetNodeInIdentifierRangeWithSourceType(_DiscoveryResultsByIdentifierRange range,
+                                                            const TfToken& sourceType);
 
-    // Implementation helper for getting the first node of the given sourceType 
-    // and matching the given version filter in the range of node discovery 
+    // Implementation helper for getting the first node of the given sourceType
+    // and matching the given version filter in the range of node discovery
     // results for a paricular name.
-    NdrNodeConstPtr _GetNodeInNameRangeWithSourceType(
-        _DiscoveryResultPtrsByNameRange range, const TfToken& sourceType,
-        NdrVersionFilter filter);
+    NdrNodeConstPtr _GetNodeInNameRangeWithSourceType(_DiscoveryResultPtrsByNameRange range,
+                                                      const TfToken& sourceType,
+                                                      NdrVersionFilter filter);
 
     // Thread-safe find of a node in the cache by key.
-    NdrNodeConstPtr _FindNodeInCache(const _NodeMapKey &key) const;
+    NdrNodeConstPtr _FindNodeInCache(const _NodeMapKey& key) const;
 
-    // Thread-safe insertion of a node into the cache with a given key. If a 
+    // Thread-safe insertion of a node into the cache with a given key. If a
     // node with the same key already exists in the cache, the pointer to the
     // existing node will be returned, otherwise the pointer to pointer to the
     // inserted node is returned.
-    NdrNodeConstPtr _InsertNodeInCache(
-        _NodeMapKey &&key, NdrNodeUniquePtr &&node);
+    NdrNodeConstPtr _InsertNodeInCache(_NodeMapKey&& key, NdrNodeUniquePtr&& node);
 
     // Finds an existing node in the node cache for the discovery result if one
     // exists. Otherwise it parses the new node, inserts it into the cache, and
-    // returns it. If there was an error parsing or validating the node, 
+    // returns it. If there was an error parsing or validating the node,
     // `nullptr` will be returned.
     NdrNodeConstPtr _FindOrParseNodeInCache(const NdrNodeDiscoveryResult& dr);
 
-    // Return the parser plugin for a discovery type. Returns null if no parser 
+    // Return the parser plugin for a discovery type. Returns null if no parser
     // plugin has that discovery type.
-    NdrParserPlugin*
-    _GetParserForDiscoveryType(const TfToken& discoveryType) const;
+    NdrParserPlugin* _GetParserForDiscoveryType(const TfToken& discoveryType) const;
 
     // The discovery plugins that were found through libplug and/or provided by
     // the client
@@ -386,14 +370,14 @@ private:
     // The parser plugins.  This has ownership of the plugin objects.
     std::vector<std::unique_ptr<NdrParserPlugin>> _parserPlugins;
 
-    // The preliminary discovery results prior to parsing. These are stored 
+    // The preliminary discovery results prior to parsing. These are stored
     // in a multimap by identifier and a multimap by name. If accessing or
     // mutating, _discoveryResultMutex should be used.
     _DiscoveryResultsByIdentifier _discoveryResultsByIdentifier;
     _DiscoveryResultPtrsByName _discoveryResultPtrsByName;
 
     // Set of all possible source types as determined by the existing discovery
-    // results. Populated along with the discovery result multimaps. If 
+    // results. Populated along with the discovery result multimaps. If
     // accessing or mutating, _discoveryResultMutex should be used.
     TfToken::Set _allSourceTypes;
 
@@ -404,4 +388,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_NDR_REGISTRY_H
+#endif  // PXR_USD_NDR_REGISTRY_H

@@ -22,12 +22,7 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 /// \hideinitializer
-#define KIND_TOKENS \
-    (model) \
-        (component) \
-        (group) \
-            (assembly) \
-    (subcomponent)
+#define KIND_TOKENS (model)(component)(group)(assembly)(subcomponent)
 
 /// \anchor KindTokens
 /// Provides static, efficient TfToken's for built-in Kinds
@@ -45,15 +40,15 @@ TF_DECLARE_PUBLIC_TOKENS(KindTokens, KIND_API, KIND_TOKENS);
 ///
 /// KindRegistry serves performance-critical clients that operate under the
 /// stl threading model, and therefore itself follows that model in order
-/// to avoid locking during HasKind() and IsA() queries. 
+/// to avoid locking during HasKind() and IsA() queries.
 ///
 /// To make this robust, KindRegistry exposes no means to mutate the registry.
 /// All extensions must be accomplished via plugInfo.json files, which are
 /// consumed once during the registry initialization (See \ref kind_extensions )
-class KindRegistry : public TfWeakBase
-{
+class KindRegistry : public TfWeakBase {
     KindRegistry(const KindRegistry&) = delete;
     KindRegistry& operator=(const KindRegistry&) = delete;
+
 public:
     /// Return the single \c KindRegistry instance.
     KIND_API static KindRegistry& GetInstance();
@@ -64,7 +59,7 @@ public:
     /// Return the base kind of the given kind.
     /// If there is no base, the result will be an empty token.
     /// Issues a coding error if \a kind is unknown to the registry.
-    KIND_API static TfToken GetBaseKind(const TfToken &kind);
+    KIND_API static TfToken GetBaseKind(const TfToken& kind);
 
     /// Test whether \a derivedKind is the same as \a baseKind or
     /// has it as a base kind (either directly or indirectly).
@@ -75,10 +70,10 @@ public:
     /// will simply return false.
     ///
     /// Therefore this method will not raise any errors.
-    KIND_API static bool IsA(const TfToken& derivedKind, const TfToken &baseKind);
+    KIND_API static bool IsA(const TfToken& derivedKind, const TfToken& baseKind);
 
     /// Return an unordered vector of all kinds known to the registry.
-    KIND_API static std::vector<TfToken>  GetAllKinds();
+    KIND_API static std::vector<TfToken> GetAllKinds();
 
     /// Returns true if \p kind IsA model kind
     KIND_API static bool IsModel(const TfToken& kind);
@@ -100,20 +95,19 @@ private:
 
     KindRegistry();
     virtual ~KindRegistry();
- 
+
     bool _HasKind(const TfToken& kind) const;
 
-    TfToken _GetBaseKind(const TfToken &kind) const;
+    TfToken _GetBaseKind(const TfToken& kind) const;
 
-    bool _IsA(const TfToken& derivedKind, const TfToken &baseKind) const;
+    bool _IsA(const TfToken& derivedKind, const TfToken& baseKind) const;
 
     std::vector<TfToken> _GetAllKinds() const;
 
     /// Register the given \a kind with the given \a baseKind.
     /// It is valid for \a baseKind to be empty (the default),
     /// in which case \a kind represents a root of the kind hierarchy.
-    void _Register(const TfToken& kind,
-                   const TfToken& baseKind = TfToken());
+    void _Register(const TfToken& kind, const TfToken& baseKind = TfToken());
 
     void _RegisterDefaults();
 
@@ -121,8 +115,7 @@ private:
         TfToken baseKind;
     };
 
-    typedef std::unordered_map<TfToken, _KindData, TfToken::HashFunctor>
-        _KindMap;
+    typedef std::unordered_map<TfToken, _KindData, TfToken::HashFunctor> _KindMap;
 
 private:
     _KindMap _kindMap;
@@ -132,4 +125,4 @@ KIND_API_TEMPLATE_CLASS(TfSingleton<KindRegistry>);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_KIND_REGISTRY_H
+#endif  // PXR_USD_KIND_REGISTRY_H

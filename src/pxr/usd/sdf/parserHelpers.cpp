@@ -46,121 +46,103 @@ using std::string;
 using std::vector;
 
 // Check that there are enough values to parse so we don't overflow
-#define CHECK_BOUNDS(count, name)                                          \
-    if (index + count > vars.size()) {                                     \
-        TF_CODING_ERROR("Not enough values to parse value of type %s",     \
-                        name);                                             \
-        throw std::bad_variant_access();                                            \
+#define CHECK_BOUNDS(count, name)                                             \
+    if (index + count > vars.size()) {                                        \
+        TF_CODING_ERROR("Not enough values to parse value of type %s", name); \
+        throw std::bad_variant_access();                                      \
     }
 
-inline void
-MakeScalarValueImpl(string *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(string* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(1, "string");
     *out = vars[index++].Get<std::string>();
 }
 
-inline void
-MakeScalarValueImpl(TfToken *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(TfToken* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(1, "token");
     *out = TfToken(vars[index++].Get<std::string>());
 }
 
-inline void
-MakeScalarValueImpl(double *out,
-                                vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(double* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(1, "double");
     *out = vars[index++].Get<double>();
 }
 
-inline void
-MakeScalarValueImpl(float *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(float* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(1, "float");
     *out = vars[index++].Get<float>();
 }
 
-inline void
-MakeScalarValueImpl(GfHalf *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(GfHalf* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(1, "half");
     *out = GfHalf(vars[index++].Get<float>());
 }
 
-inline void
-MakeScalarValueImpl(
-    SdfTimeCode *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(SdfTimeCode* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(1, "timecode");
     *out = SdfTimeCode(vars[index++].Get<double>());
 }
 
 template <class Int>
-inline std::enable_if_t<std::is_integral<Int>::value>
-MakeScalarValueImpl(Int *out, vector<Value> const &vars, size_t &index) {
+inline std::enable_if_t<std::is_integral<Int>::value> MakeScalarValueImpl(Int* out,
+                                                                          vector<Value> const& vars,
+                                                                          size_t& index) {
     CHECK_BOUNDS(1, ArchGetDemangled<Int>().c_str());
     *out = vars[index++].Get<Int>();
 }
 
-inline void
-MakeScalarValueImpl(GfVec2d *out,
-                                vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(GfVec2d* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(2, "Vec2d");
     (*out)[0] = vars[index++].Get<double>();
     (*out)[1] = vars[index++].Get<double>();
 }
 
-inline void
-MakeScalarValueImpl(GfVec2f *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(GfVec2f* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(2, "Vec2f");
     (*out)[0] = vars[index++].Get<float>();
     (*out)[1] = vars[index++].Get<float>();
 }
 
-inline void
-MakeScalarValueImpl(GfVec2h *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(GfVec2h* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(2, "Vec2h");
     (*out)[0] = GfHalf(vars[index++].Get<float>());
     (*out)[1] = GfHalf(vars[index++].Get<float>());
 }
 
-inline void
-MakeScalarValueImpl(GfVec2i *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(GfVec2i* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(2, "Vec2i");
     (*out)[0] = vars[index++].Get<int>();
     (*out)[1] = vars[index++].Get<int>();
 }
 
-inline void
-MakeScalarValueImpl(GfVec3d *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(GfVec3d* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(3, "Vec3d");
     (*out)[0] = vars[index++].Get<double>();
     (*out)[1] = vars[index++].Get<double>();
     (*out)[2] = vars[index++].Get<double>();
 }
 
-inline void
-MakeScalarValueImpl(GfVec3f *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(GfVec3f* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(3, "Vec3f");
     (*out)[0] = vars[index++].Get<float>();
     (*out)[1] = vars[index++].Get<float>();
     (*out)[2] = vars[index++].Get<float>();
 }
 
-inline void
-MakeScalarValueImpl(GfVec3h *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(GfVec3h* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(3, "Vec3h");
     (*out)[0] = GfHalf(vars[index++].Get<float>());
     (*out)[1] = GfHalf(vars[index++].Get<float>());
     (*out)[2] = GfHalf(vars[index++].Get<float>());
 }
 
-inline void
-MakeScalarValueImpl(GfVec3i *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(GfVec3i* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(3, "Vec3i");
     (*out)[0] = vars[index++].Get<int>();
     (*out)[1] = vars[index++].Get<int>();
     (*out)[2] = vars[index++].Get<int>();
 }
 
-inline void
-MakeScalarValueImpl(GfVec4d *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(GfVec4d* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(4, "Vec4d");
     (*out)[0] = vars[index++].Get<double>();
     (*out)[1] = vars[index++].Get<double>();
@@ -168,8 +150,7 @@ MakeScalarValueImpl(GfVec4d *out, vector<Value> const &vars, size_t &index) {
     (*out)[3] = vars[index++].Get<double>();
 }
 
-inline void
-MakeScalarValueImpl(GfVec4f *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(GfVec4f* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(4, "Vec4f");
     (*out)[0] = vars[index++].Get<float>();
     (*out)[1] = vars[index++].Get<float>();
@@ -177,8 +158,7 @@ MakeScalarValueImpl(GfVec4f *out, vector<Value> const &vars, size_t &index) {
     (*out)[3] = vars[index++].Get<float>();
 }
 
-inline void
-MakeScalarValueImpl(GfVec4h *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(GfVec4h* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(4, "Vec4h");
     (*out)[0] = GfHalf(vars[index++].Get<float>());
     (*out)[1] = GfHalf(vars[index++].Get<float>());
@@ -186,8 +166,7 @@ MakeScalarValueImpl(GfVec4h *out, vector<Value> const &vars, size_t &index) {
     (*out)[3] = GfHalf(vars[index++].Get<float>());
 }
 
-inline void
-MakeScalarValueImpl(GfVec4i *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(GfVec4i* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(4, "Vec4i");
     (*out)[0] = vars[index++].Get<int>();
     (*out)[1] = vars[index++].Get<int>();
@@ -195,8 +174,7 @@ MakeScalarValueImpl(GfVec4i *out, vector<Value> const &vars, size_t &index) {
     (*out)[3] = vars[index++].Get<int>();
 }
 
-inline void
-MakeScalarValueImpl(GfMatrix2d *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(GfMatrix2d* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(4, "Matrix2d");
     (*out)[0][0] = vars[index++].Get<double>();
     (*out)[0][1] = vars[index++].Get<double>();
@@ -204,8 +182,7 @@ MakeScalarValueImpl(GfMatrix2d *out, vector<Value> const &vars, size_t &index) {
     (*out)[1][1] = vars[index++].Get<double>();
 }
 
-inline void
-MakeScalarValueImpl(GfMatrix3d *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(GfMatrix3d* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(9, "Matrix3d");
     (*out)[0][0] = vars[index++].Get<double>();
     (*out)[0][1] = vars[index++].Get<double>();
@@ -218,8 +195,7 @@ MakeScalarValueImpl(GfMatrix3d *out, vector<Value> const &vars, size_t &index) {
     (*out)[2][2] = vars[index++].Get<double>();
 }
 
-inline void
-MakeScalarValueImpl(GfMatrix4d *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(GfMatrix4d* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(16, "Matrix4d");
     (*out)[0][0] = vars[index++].Get<double>();
     (*out)[0][1] = vars[index++].Get<double>();
@@ -239,89 +215,83 @@ MakeScalarValueImpl(GfMatrix4d *out, vector<Value> const &vars, size_t &index) {
     (*out)[3][3] = vars[index++].Get<double>();
 }
 
-inline void
-MakeScalarValueImpl(GfQuatd *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(GfQuatd* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(4, "Quatd");
     // Values in order are re, i, j, k.
-    GfVec3d imag; double re;
+    GfVec3d imag;
+    double re;
     MakeScalarValueImpl(&re, vars, index);
     out->SetReal(re);
     MakeScalarValueImpl(&imag, vars, index);
     out->SetImaginary(imag);
 }
 
-inline void
-MakeScalarValueImpl(GfQuatf *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(GfQuatf* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(4, "Quatf");
     // Values in order are re, i, j, k.
-    GfVec3f imag; float re;
+    GfVec3f imag;
+    float re;
     MakeScalarValueImpl(&re, vars, index);
     out->SetReal(re);
     MakeScalarValueImpl(&imag, vars, index);
     out->SetImaginary(imag);
 }
 
-inline void
-MakeScalarValueImpl(GfQuath *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(GfQuath* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(4, "Quath");
     // Values in order are re, i, j, k.
-    GfVec3h imag; GfHalf re;
+    GfVec3h imag;
+    GfHalf re;
     MakeScalarValueImpl(&re, vars, index);
     out->SetReal(re);
     MakeScalarValueImpl(&imag, vars, index);
     out->SetImaginary(imag);
 }
 
-inline void
-MakeScalarValueImpl(
-    SdfAssetPath *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(SdfAssetPath* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(1, "asset");
     *out = vars[index++].Get<SdfAssetPath>();
 }
 
-inline void
-MakeScalarValueImpl(
-    SdfPathExpression *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(SdfPathExpression* out, vector<Value> const& vars, size_t& index) {
     CHECK_BOUNDS(1, "pathExpression");
     *out = SdfPathExpression(vars[index++].Get<std::string>());
 }
 
-inline void
-MakeScalarValueImpl(
-    SdfOpaqueValue *out, vector<Value> const &vars, size_t &index) {
+inline void MakeScalarValueImpl(SdfOpaqueValue* out, vector<Value> const& vars, size_t& index) {
     TF_CODING_ERROR("Found authored opinion for opaque attribute");
     throw std::bad_variant_access();
 }
 
 template <typename T>
-inline VtValue
-MakeScalarValueTemplate(vector<unsigned int> const &,
-                        vector<Value> const &vars, size_t &index,
-                        string *errStrPtr) {
+inline VtValue MakeScalarValueTemplate(vector<unsigned int> const&,
+                                       vector<Value> const& vars,
+                                       size_t& index,
+                                       string* errStrPtr) {
     T t;
     size_t origIndex = index;
     try {
         MakeScalarValueImpl(&t, vars, index);
-    } catch (const std::bad_variant_access &) {
-        *errStrPtr = TfStringPrintf("Failed to parse value (at sub-part %zd "
-                                    "if there are multiple parts)",
-                                    (index - origIndex) - 1);
+    } catch (const std::bad_variant_access&) {
+        *errStrPtr = TfStringPrintf(
+                "Failed to parse value (at sub-part %zd "
+                "if there are multiple parts)",
+                (index - origIndex) - 1);
         return VtValue();
     }
     return VtValue(t);
 }
 
 template <typename T>
-inline VtValue
-MakeShapedValueTemplate(vector<unsigned int> const &shape,
-                        vector<Value> const &vars, size_t &index,
-                        string *errStrPtr) {
-    if (shape.empty())
-        return VtValue(VtArray<T>());
-//    TF_AXIOM(shape.size() == 1);
+inline VtValue MakeShapedValueTemplate(vector<unsigned int> const& shape,
+                                       vector<Value> const& vars,
+                                       size_t& index,
+                                       string* errStrPtr) {
+    if (shape.empty()) return VtValue(VtArray<T>());
+    //    TF_AXIOM(shape.size() == 1);
     unsigned int size = 1;
     TF_FOR_ALL(i, shape)
-        size *= *i;
+    size *= *i;
 
     VtArray<T> array(size);
     size_t shapeIndex = 0;
@@ -331,11 +301,12 @@ MakeShapedValueTemplate(vector<unsigned int> const &shape,
             MakeScalarValueImpl(&(*i), vars, index);
             shapeIndex++;
         }
-    } catch (const std::bad_variant_access &) {
-        *errStrPtr = TfStringPrintf("Failed to parse at element %zd "
-                                    "(at sub-part %zd if there are "
-                                    "multiple parts)", shapeIndex,
-                                    (index - origIndex) - 1);
+    } catch (const std::bad_variant_access&) {
+        *errStrPtr = TfStringPrintf(
+                "Failed to parse at element %zd "
+                "(at sub-part %zd if there are "
+                "multiple parts)",
+                shapeIndex, (index - origIndex) - 1);
         return VtValue();
     }
     return VtValue(array);
@@ -345,32 +316,23 @@ typedef std::map<std::string, ValueFactory> _ValueFactoryMap;
 
 // Walk through types and register factories.
 struct _MakeFactoryMap {
-
-    explicit _MakeFactoryMap(_ValueFactoryMap *factories) :
-        _factories(factories) {}
+    explicit _MakeFactoryMap(_ValueFactoryMap* factories) : _factories(factories) {}
 
     template <class CppType>
-    void add(const SdfValueTypeName& scalar, const char* alias = NULL)
-    {
+    void add(const SdfValueTypeName& scalar, const char* alias = NULL) {
         static const bool isShaped = true;
 
         const SdfValueTypeName array = scalar.GetArrayType();
 
-        const std::string scalarName =
-            alias ? std::string(alias)        : scalar.GetAsToken().GetString();
-        const std::string arrayName =
-            alias ? std::string(alias) + "[]" : array.GetAsToken().GetString();
+        const std::string scalarName = alias ? std::string(alias) : scalar.GetAsToken().GetString();
+        const std::string arrayName = alias ? std::string(alias) + "[]" : array.GetAsToken().GetString();
 
-        _ValueFactoryMap &f = *_factories;
-        f[scalarName] = ValueFactory(
-            scalarName, scalar.GetDimensions(), !isShaped,
-            MakeScalarValueTemplate<CppType>);
-        f[arrayName] = ValueFactory(
-            arrayName, array.GetDimensions(), isShaped,
-            MakeShapedValueTemplate<CppType>);
+        _ValueFactoryMap& f = *_factories;
+        f[scalarName] = ValueFactory(scalarName, scalar.GetDimensions(), !isShaped, MakeScalarValueTemplate<CppType>);
+        f[arrayName] = ValueFactory(arrayName, array.GetDimensions(), isShaped, MakeShapedValueTemplate<CppType>);
     }
-    
-    _ValueFactoryMap *_factories;
+
+    _ValueFactoryMap* _factories;
 };
 
 TF_MAKE_STATIC_DATA(_ValueFactoryMap, _valueFactories) {
@@ -489,65 +451,47 @@ TF_MAKE_STATIC_DATA(_ValueFactoryMap, _valueFactories) {
     builder.add<TfToken>(SdfValueTypeNames->Token, "Schema");
 
     // Set up the special None factory.
-    (*_valueFactories)[std::string("None")] = ValueFactory(
-        std::string(""), SdfTupleDimensions(), false, NULL);
-
+    (*_valueFactories)[std::string("None")] = ValueFactory(std::string(""), SdfTupleDimensions(), false, NULL);
 }
 
-ValueFactory const &GetValueFactoryForMenvaName(std::string const &name,
-                                                bool *found)
-{
+ValueFactory const& GetValueFactoryForMenvaName(std::string const& name, bool* found) {
     _ValueFactoryMap::const_iterator it = _valueFactories->find(name);
     if (it != _valueFactories->end()) {
         *found = true;
         return it->second;
     }
-    
+
     // No factory for given name.
     static ValueFactory const& none = (*_valueFactories)[std::string("None")];
     *found = false;
     return none;
 }
 
-} // namespace Sdf_ParserHelpers
+}  // namespace Sdf_ParserHelpers
 
-bool
-Sdf_BoolFromString( const std::string &str, bool *parseOk )
-{
-    if (parseOk)
-        *parseOk = true;
+bool Sdf_BoolFromString(const std::string& str, bool* parseOk) {
+    if (parseOk) *parseOk = true;
 
     std::string s = str;
     std::transform(s.begin(), s.end(), s.begin(), ::tolower);
 
-    if (strcmp(s.c_str(), "false") == 0)
-        return false;
-    if (strcmp(s.c_str(), "true") == 0)
-        return true;
-    if (strcmp(s.c_str(), "no") == 0)
-        return false;
-    if (strcmp(s.c_str(), "yes") == 0)
-        return true;
+    if (strcmp(s.c_str(), "false") == 0) return false;
+    if (strcmp(s.c_str(), "true") == 0) return true;
+    if (strcmp(s.c_str(), "no") == 0) return false;
+    if (strcmp(s.c_str(), "yes") == 0) return true;
 
-    if (strcmp(s.c_str(), "0") == 0)
-        return false;
-    if (strcmp(s.c_str(), "1") == 0)
-        return true;
+    if (strcmp(s.c_str(), "0") == 0) return false;
+    if (strcmp(s.c_str(), "1") == 0) return true;
 
-    if (parseOk)
-        *parseOk = false;
+    if (parseOk) *parseOk = false;
     return true;
 }
 
-std::string
-Sdf_EvalQuotedString(const char* x, size_t n, size_t trimBothSides, 
-                     unsigned int* numLines)
-{
+std::string Sdf_EvalQuotedString(const char* x, size_t n, size_t trimBothSides, unsigned int* numLines) {
     std::string ret;
 
     // Handle empty strings
-    if (n <= 2 * trimBothSides)
-        return ret;
+    if (n <= 2 * trimBothSides) return ret;
 
     n -= 2 * trimBothSides;
 
@@ -556,20 +500,19 @@ Sdf_EvalQuotedString(const char* x, size_t n, size_t trimBothSides,
     // but we can live with it to avoid traversing the string twice)
     static const size_t LocalSize = 2048;
     char localBuf[LocalSize];
-    char *buf = n <= LocalSize ? localBuf : (char *)malloc(n);
+    char* buf = n <= LocalSize ? localBuf : (char*)malloc(n);
 
-    char *s = buf;
+    char* s = buf;
 
-    const char *p = x + trimBothSides;
-    const char * const end = x + trimBothSides + n;
+    const char* p = x + trimBothSides;
+    const char* const end = x + trimBothSides + n;
 
     while (p < end) {
-        const char *escOrEnd =
-            static_cast<const char *>(memchr(p, '\\', std::distance(p, end)));
+        const char* escOrEnd = static_cast<const char*>(memchr(p, '\\', std::distance(p, end)));
         if (!escOrEnd) {
             escOrEnd = end;
         }
-               
+
         const size_t nchars = std::distance(p, escOrEnd);
         memcpy(s, p, nchars);
         s += nchars;
@@ -582,7 +525,7 @@ Sdf_EvalQuotedString(const char* x, size_t n, size_t trimBothSides,
     }
 
     // Trim to final length.
-    std::string(buf, s-buf).swap(ret);
+    std::string(buf, s - buf).swap(ret);
     if (buf != localBuf) {
         free(buf);
     }
@@ -590,16 +533,14 @@ Sdf_EvalQuotedString(const char* x, size_t n, size_t trimBothSides,
     if (numLines) {
         *numLines = std::count(ret.begin(), ret.end(), '\n');
     }
-    
+
     return ret;
 }
 
-std::string 
-Sdf_EvalAssetPath(const char* x, size_t n, bool tripleDelimited)
-{
+std::string Sdf_EvalAssetPath(const char* x, size_t n, bool tripleDelimited) {
     // See _StringFromAssetPath for the code that writes asset paths.
 
-    // Asset paths are assumed to only contain printable characters and 
+    // Asset paths are assumed to only contain printable characters and
     // no escape sequences except for the "@@@" delimiter.
     const int numDelimiters = tripleDelimited ? 3 : 1;
     std::string ret(x + numDelimiters, n - (2 * numDelimiters));

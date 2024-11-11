@@ -40,11 +40,8 @@ public:
     ///
     class BaseLayersDidChange {
     public:
-        BaseLayersDidChange(const SdfLayerChangeListVec &changeVec,
-                            size_t serialNumber)
-            : _vec(&changeVec)
-            , _serialNumber(serialNumber)
-            {}
+        BaseLayersDidChange(const SdfLayerChangeListVec& changeVec, size_t serialNumber)
+            : _vec(&changeVec), _serialNumber(serialNumber) {}
 
         using const_iterator = SdfLayerChangeListVec::const_iterator;
         using iterator = const_iterator;
@@ -54,30 +51,26 @@ public:
         SdfLayerHandleVector GetLayers() const;
 
         /// A list of layers and the changes that occurred to them.
-        const SdfLayerChangeListVec &GetChangeListVec() const { return *_vec; }
+        const SdfLayerChangeListVec& GetChangeListVec() const { return *_vec; }
 
         const_iterator begin() const { return _vec->begin(); }
         const_iterator cbegin() const { return _vec->cbegin(); }
-        const_iterator end() const { return _vec->end(); } 
+        const_iterator end() const { return _vec->end(); }
         const_iterator cend() const { return _vec->cend(); }
 
-        const_iterator find(SdfLayerHandle const &layer) const {
-            return std::find_if(
-                begin(), end(),
-                [&layer](SdfLayerChangeListVec::value_type const &p) {
-                    return p.first == layer;
-                });
+        const_iterator find(SdfLayerHandle const& layer) const {
+            return std::find_if(begin(), end(), [&layer](SdfLayerChangeListVec::value_type const& p) {
+                return p.first == layer;
+            });
         }
-       
-        bool count(SdfLayerHandle const &layer) const {
-            return find(layer) != end();
-        }
+
+        bool count(SdfLayerHandle const& layer) const { return find(layer) != end(); }
 
         /// The serial number for this round of change processing.
         size_t GetSerialNumber() const { return _serialNumber; }
 
     private:
-        const SdfLayerChangeListVec *_vec;
+        const SdfLayerChangeListVec* _vec;
         const size_t _serialNumber;
     };
 
@@ -90,11 +83,9 @@ public:
     /// can listen to notices from only the set of layers they care about rather
     /// than listening to the global LayersDidChange notice.
     ///
-    class LayersDidChangeSentPerLayer 
-        : public Base, public BaseLayersDidChange {
+    class LayersDidChangeSentPerLayer : public Base, public BaseLayersDidChange {
     public:
-        LayersDidChangeSentPerLayer(const SdfLayerChangeListVec &changeVec,
-                                    size_t serialNumber)
+        LayersDidChangeSentPerLayer(const SdfLayerChangeListVec& changeVec, size_t serialNumber)
             : BaseLayersDidChange(changeVec, serialNumber) {}
         SDF_API virtual ~LayersDidChangeSentPerLayer();
     };
@@ -103,11 +94,9 @@ public:
     ///
     /// Global notice sent to indicate that layer contents have changed.
     ///
-    class LayersDidChange
-        : public Base, public BaseLayersDidChange {
+    class LayersDidChange : public Base, public BaseLayersDidChange {
     public:
-        LayersDidChange(const SdfLayerChangeListVec &changeVec,
-                        size_t serialNumber)
+        LayersDidChange(const SdfLayerChangeListVec& changeVec, size_t serialNumber)
             : BaseLayersDidChange(changeVec, serialNumber) {}
         SDF_API virtual ~LayersDidChange();
     };
@@ -118,12 +107,12 @@ public:
     ///
     class LayerInfoDidChange : public Base {
     public:
-        LayerInfoDidChange( const TfToken &key ) :
-            _key(key) {}
+        LayerInfoDidChange(const TfToken& key) : _key(key) {}
         SDF_API ~LayerInfoDidChange();
 
         /// Return the key affected.
-        const TfToken & key() const { return _key; }
+        const TfToken& key() const { return _key; }
+
     private:
         TfToken _key;
     };
@@ -135,8 +124,7 @@ public:
     class LayerIdentifierDidChange : public Base {
     public:
         SDF_API
-        LayerIdentifierDidChange(const std::string& oldIdentifier,
-                                 const std::string& newIdentifier);
+        LayerIdentifierDidChange(const std::string& oldIdentifier, const std::string& newIdentifier);
         SDF_API
         ~LayerIdentifierDidChange();
 
@@ -150,7 +138,7 @@ public:
         std::string _oldId;
         std::string _newId;
     };
-    
+
     /// \class LayerDidReplaceContent
     ///
     /// Sent after a layer has been loaded from a file.
@@ -166,7 +154,7 @@ public:
     public:
         SDF_API virtual ~LayerDidReloadContent();
     };
-    
+
     /// \class LayerDidSaveLayerToFile
     ///
     /// Sent after a layer is saved to file.
@@ -195,9 +183,7 @@ public:
     class LayerMutenessChanged : public Base {
     public:
         LayerMutenessChanged(const std::string& layerPath, bool wasMuted)
-            : _layerPath(layerPath)
-            , _wasMuted(wasMuted)
-        { }
+            : _layerPath(layerPath), _wasMuted(wasMuted) {}
 
         SDF_API ~LayerMutenessChanged();
 
@@ -215,4 +201,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_NOTICE_H
+#endif  // PXR_USD_SDF_NOTICE_H

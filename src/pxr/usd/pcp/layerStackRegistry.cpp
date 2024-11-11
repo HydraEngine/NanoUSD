@@ -23,35 +23,29 @@
 #include <unordered_map>
 #include <utility>
 
-using std::pair;
 using std::make_pair;
+using std::pair;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 class Pcp_LayerStackRegistryData {
 public:
-    Pcp_LayerStackRegistryData(
-        const PcpLayerStackIdentifier& rootLayerStackId_,
-        const std::string& fileFormatTarget_, bool isUsd) 
-        : rootLayerStackId(rootLayerStackId_)
-        , fileFormatTarget(fileFormatTarget_)
-        , isUsd(isUsd)
-        , mutedLayers(fileFormatTarget_)
-    { }
+    Pcp_LayerStackRegistryData(const PcpLayerStackIdentifier& rootLayerStackId_,
+                               const std::string& fileFormatTarget_,
+                               bool isUsd)
+        : rootLayerStackId(rootLayerStackId_),
+          fileFormatTarget(fileFormatTarget_),
+          isUsd(isUsd),
+          mutedLayers(fileFormatTarget_) {}
 
     typedef SdfLayerHandleVector Layers;
     typedef PcpLayerStackPtrVector LayerStacks;
-    typedef std::unordered_map<PcpLayerStackIdentifier, PcpLayerStackPtr,
-                               TfHash> IdentifierToLayerStack;
-    typedef std::unordered_map<SdfLayerHandle, LayerStacks, TfHash>
-        LayerToLayerStacks;
-    typedef std::unordered_map<PcpLayerStackPtr, Layers, TfHash>
-        LayerStackToLayers;
+    typedef std::unordered_map<PcpLayerStackIdentifier, PcpLayerStackPtr, TfHash> IdentifierToLayerStack;
+    typedef std::unordered_map<SdfLayerHandle, LayerStacks, TfHash> LayerToLayerStacks;
+    typedef std::unordered_map<PcpLayerStackPtr, Layers, TfHash> LayerStackToLayers;
 
-    typedef std::unordered_map<std::string, LayerStacks, TfHash>
-        MutedLayerIdentifierToLayerStacks;
-    typedef std::unordered_map<PcpLayerStackPtr, std::set<std::string>, TfHash>
-        LayerStackToMutedLayerIdentifiers;
+    typedef std::unordered_map<std::string, LayerStacks, TfHash> MutedLayerIdentifierToLayerStacks;
+    typedef std::unordered_map<PcpLayerStackPtr, std::set<std::string>, TfHash> LayerStackToMutedLayerIdentifiers;
 
     IdentifierToLayerStack identifierToLayerStack;
     LayerToLayerStacks layerToLayerStacks;
@@ -69,67 +63,47 @@ public:
     tbb::queuing_rw_mutex mutex;
 };
 
-Pcp_LayerStackRegistryRefPtr
-Pcp_LayerStackRegistry::New(
-    const PcpLayerStackIdentifier& rootLayerStackId,
-    const std::string& fileFormatTarget, bool isUsd)
-{
-    return TfCreateRefPtr(
-        new Pcp_LayerStackRegistry(rootLayerStackId, fileFormatTarget, isUsd));
+Pcp_LayerStackRegistryRefPtr Pcp_LayerStackRegistry::New(const PcpLayerStackIdentifier& rootLayerStackId,
+                                                         const std::string& fileFormatTarget,
+                                                         bool isUsd) {
+    return TfCreateRefPtr(new Pcp_LayerStackRegistry(rootLayerStackId, fileFormatTarget, isUsd));
 }
 
-Pcp_LayerStackRegistry::Pcp_LayerStackRegistry(
-    const PcpLayerStackIdentifier& rootLayerStackId,
-    const std::string& fileFormatTarget, bool isUsd)
-    : _data(new Pcp_LayerStackRegistryData(
-            rootLayerStackId, fileFormatTarget, isUsd))
-{
+Pcp_LayerStackRegistry::Pcp_LayerStackRegistry(const PcpLayerStackIdentifier& rootLayerStackId,
+                                               const std::string& fileFormatTarget,
+                                               bool isUsd)
+    : _data(new Pcp_LayerStackRegistryData(rootLayerStackId, fileFormatTarget, isUsd)) {
     // Do nothing
 }
 
-Pcp_LayerStackRegistry::~Pcp_LayerStackRegistry()
-{
+Pcp_LayerStackRegistry::~Pcp_LayerStackRegistry() {
     // Do nothing
 }
 
-void 
-Pcp_LayerStackRegistry::MuteAndUnmuteLayers(
-    const SdfLayerHandle& anchorLayer,
-    std::vector<std::string>* layersToMute,
-    std::vector<std::string>* layersToUnmute)
-{
-    _data->mutedLayers.MuteAndUnmuteLayers(
-        anchorLayer, layersToMute, layersToUnmute);
+void Pcp_LayerStackRegistry::MuteAndUnmuteLayers(const SdfLayerHandle& anchorLayer,
+                                                 std::vector<std::string>* layersToMute,
+                                                 std::vector<std::string>* layersToUnmute) {
+    _data->mutedLayers.MuteAndUnmuteLayers(anchorLayer, layersToMute, layersToUnmute);
 }
 
-const std::vector<std::string>& 
-Pcp_LayerStackRegistry::GetMutedLayers() const
-{
+const std::vector<std::string>& Pcp_LayerStackRegistry::GetMutedLayers() const {
     return _data->mutedLayers.GetMutedLayers();
 }
 
-bool 
-Pcp_LayerStackRegistry::IsLayerMuted(const SdfLayerHandle& anchorLayer,
-                                     const std::string& layerIdentifier,
-                                     std::string* canonicalSublayerId) const
-{
-    return _data->mutedLayers.IsLayerMuted(
-        anchorLayer, layerIdentifier, canonicalSublayerId);
+bool Pcp_LayerStackRegistry::IsLayerMuted(const SdfLayerHandle& anchorLayer,
+                                          const std::string& layerIdentifier,
+                                          std::string* canonicalSublayerId) const {
+    return _data->mutedLayers.IsLayerMuted(anchorLayer, layerIdentifier, canonicalSublayerId);
 }
 
-const PcpLayerStackPtrVector&
-Pcp_LayerStackRegistry::FindAllUsingMutedLayer(const std::string& layerId) const
-{
+const PcpLayerStackPtrVector& Pcp_LayerStackRegistry::FindAllUsingMutedLayer(const std::string& layerId) const {
     tbb::queuing_rw_mutex::scoped_lock lock(_data->mutex, /*write=*/false);
     const auto i = _data->mutedLayerIdentifierToLayerStacks.find(layerId);
-    return i != _data->mutedLayerIdentifierToLayerStacks.end() ? 
-        i->second : _data->empty;
+    return i != _data->mutedLayerIdentifierToLayerStacks.end() ? i->second : _data->empty;
 }
 
-PcpLayerStackRefPtr
-Pcp_LayerStackRegistry::FindOrCreate(const PcpLayerStackIdentifier& identifier,
-                                     PcpErrorVector *allErrors)
-{
+PcpLayerStackRefPtr Pcp_LayerStackRegistry::FindOrCreate(const PcpLayerStackIdentifier& identifier,
+                                                         PcpErrorVector* allErrors) {
     // Can only create layer stacks for valid identifiers so if the identifier
     // is invalid we can't have an entry for it.
     if (!identifier) {
@@ -140,19 +114,18 @@ Pcp_LayerStackRegistry::FindOrCreate(const PcpLayerStackIdentifier& identifier,
     tbb::queuing_rw_mutex::scoped_lock lock(_data->mutex, /*write=*/false);
     PcpLayerStackRefPtr refLayerStack;
 
-    if (const PcpLayerStackPtr & layerStack = _Find(identifier)) {
+    if (const PcpLayerStackPtr& layerStack = _Find(identifier)) {
         refLayerStack = TfCreateRefPtrFromProtectedWeakPtr(layerStack);
     }
     if (!refLayerStack) {
         lock.release();
 
-        PcpLayerStackRefPtr createdLayerStack =
-            TfCreateRefPtr(new PcpLayerStack(identifier, *this));
+        PcpLayerStackRefPtr createdLayerStack = TfCreateRefPtr(new PcpLayerStack(identifier, *this));
 
         // Take the lock and check again for an existing layer stack, or
         // install the one we just created.
         lock.acquire(_data->mutex);
-        if (const PcpLayerStackPtr & layerStack = _Find(identifier)) {
+        if (const PcpLayerStackPtr& layerStack = _Find(identifier)) {
             refLayerStack = TfCreateRefPtrFromProtectedWeakPtr(layerStack);
         }
         if (!refLayerStack) {
@@ -175,31 +148,22 @@ Pcp_LayerStackRegistry::FindOrCreate(const PcpLayerStackIdentifier& identifier,
     return refLayerStack;
 }
 
-PcpLayerStackPtr
-Pcp_LayerStackRegistry::Find(const PcpLayerStackIdentifier& identifier) const
-{
+PcpLayerStackPtr Pcp_LayerStackRegistry::Find(const PcpLayerStackIdentifier& identifier) const {
     tbb::queuing_rw_mutex::scoped_lock lock(_data->mutex, /*write=*/false);
     return _Find(identifier);
 }
 
-PcpLayerStackPtr
-Pcp_LayerStackRegistry::_Find(const PcpLayerStackIdentifier& identifier) const
-{
+PcpLayerStackPtr Pcp_LayerStackRegistry::_Find(const PcpLayerStackIdentifier& identifier) const {
     auto iter = _data->identifierToLayerStack.find(identifier);
-    return (iter != _data->identifierToLayerStack.end()) ?
-        iter->second : PcpLayerStackPtr();
+    return (iter != _data->identifierToLayerStack.end()) ? iter->second : PcpLayerStackPtr();
 }
 
-bool
-Pcp_LayerStackRegistry::Contains(const PcpLayerStackPtr& layerStack) const
-{
+bool Pcp_LayerStackRegistry::Contains(const PcpLayerStackPtr& layerStack) const {
     auto ptr = get_pointer(layerStack);
     return ptr && get_pointer(ptr->_registry) == this;
 }
 
-const PcpLayerStackPtrVector&
-Pcp_LayerStackRegistry::FindAllUsingLayer(const SdfLayerHandle& layer) const
-{
+const PcpLayerStackPtrVector& Pcp_LayerStackRegistry::FindAllUsingLayer(const SdfLayerHandle& layer) const {
     tbb::queuing_rw_mutex::scoped_lock lock(_data->mutex, /*write=*/false);
 
     auto layerStackOverrides = _data->layerToLayerStackOverrides.find(layer);
@@ -211,40 +175,29 @@ Pcp_LayerStackRegistry::FindAllUsingLayer(const SdfLayerHandle& layer) const
     return i != _data->layerToLayerStacks.end() ? i->second : _data->empty;
 }
 
-void
-Pcp_LayerStackRegistry::SetLayerStackVectorOverride(
-    const SdfLayerHandle& layer, 
-    const PcpLayerStackPtrVector& layerStacks)
-{
+void Pcp_LayerStackRegistry::SetLayerStackVectorOverride(const SdfLayerHandle& layer,
+                                                         const PcpLayerStackPtrVector& layerStacks) {
     tbb::queuing_rw_mutex::scoped_lock lock(_data->mutex, /*write=*/true);
     _data->layerToLayerStackOverrides[layer] = layerStacks;
 }
 
-void 
-Pcp_LayerStackRegistry::ClearLayerStackVectorOverrides()
-{
+void Pcp_LayerStackRegistry::ClearLayerStackVectorOverrides() {
     tbb::queuing_rw_mutex::scoped_lock lock(_data->mutex, /*write=*/true);
     _data->layerToLayerStackOverrides.clear();
 }
 
-std::vector<PcpLayerStackPtr>
-Pcp_LayerStackRegistry::GetAllLayerStacks() const
-{
+std::vector<PcpLayerStackPtr> Pcp_LayerStackRegistry::GetAllLayerStacks() const {
     tbb::queuing_rw_mutex::scoped_lock lock(_data->mutex, /*write=*/false);
     std::vector<PcpLayerStackPtr> result;
     result.reserve(_data->identifierToLayerStack.size());
     TF_FOR_ALL(i, _data->identifierToLayerStack) {
-        TF_VERIFY(i->second, "Unexpected dead layer stack %s",
-                  TfStringify(i->first).c_str());
+        TF_VERIFY(i->second, "Unexpected dead layer stack %s", TfStringify(i->first).c_str());
         result.push_back(i->second);
     }
     return result;
 }
 
-void 
-Pcp_LayerStackRegistry::ForEachLayerStack(
-    const TfFunctionRef<void(const PcpLayerStackPtr&)>& fn)
-{
+void Pcp_LayerStackRegistry::ForEachLayerStack(const TfFunctionRef<void(const PcpLayerStackPtr&)>& fn) {
     // Copy all layer stacks so that we can run the callback
     // without holding a read lock on the layer registry.
     const std::vector<PcpLayerStackPtr> layerStacks = GetAllLayerStacks();
@@ -256,15 +209,12 @@ Pcp_LayerStackRegistry::ForEachLayerStack(
 ////////////////////////////////////////////////////////////////////////
 // Private helper methods.
 
-void
-Pcp_LayerStackRegistry::_SetLayersAndRemove(
-    const PcpLayerStackIdentifier& identifier,
-    const PcpLayerStack *layerStack)
-{
+void Pcp_LayerStackRegistry::_SetLayersAndRemove(const PcpLayerStackIdentifier& identifier,
+                                                 const PcpLayerStack* layerStack) {
     tbb::queuing_rw_mutex::scoped_lock lock(_data->mutex, /*write=*/true);
 
     Pcp_LayerStackRegistryData::IdentifierToLayerStack::const_iterator i =
-        _data->identifierToLayerStack.find(identifier);
+            _data->identifierToLayerStack.find(identifier);
     // It's possible that layerStack has already been removed from the
     // map if a FindOrCreate call intercedes between the moment when the
     // layer stack's ref count drops to zero and the time the layer stack
@@ -274,28 +224,22 @@ Pcp_LayerStackRegistry::_SetLayersAndRemove(
     // same identifier has already been added to the identifierToLayerStack
     // map.
     _SetLayers(layerStack);
-    if (i != _data->identifierToLayerStack.end() &&
-        i->second.operator->() == layerStack) {
+    if (i != _data->identifierToLayerStack.end() && i->second.operator->() == layerStack) {
         _data->identifierToLayerStack.erase(identifier);
     }
 }
 
-void
-Pcp_LayerStackRegistry::_SetLayers(const PcpLayerStack* layerStack)
-{
+void Pcp_LayerStackRegistry::_SetLayers(const PcpLayerStack* layerStack) {
     PcpLayerStackPtr layerStackPtr = TfCreateNonConstWeakPtr(layerStack);
 
     // Get the layers for the layer stack.
-    Pcp_LayerStackRegistryData::Layers& layers =
-        _data->layerStackToLayers[layerStackPtr];
+    Pcp_LayerStackRegistryData::Layers& layers = _data->layerStackToLayers[layerStackPtr];
 
     // Remove layer stack from the table entry for each layer in
     // the layer stack.
     for (const auto& layer : layers) {
-        Pcp_LayerStackRegistryData::LayerStacks& layerStacks =
-            _data->layerToLayerStacks[layer];
-        layerStacks.erase(std::find(layerStacks.begin(),
-                                    layerStacks.end(), layerStackPtr));
+        Pcp_LayerStackRegistryData::LayerStacks& layerStacks = _data->layerToLayerStacks[layer];
+        layerStacks.erase(std::find(layerStacks.begin(), layerStacks.end(), layerStackPtr));
     }
 
     // Save the layers for the layer stack.
@@ -303,22 +247,18 @@ Pcp_LayerStackRegistry::_SetLayers(const PcpLayerStack* layerStack)
     if (newLayers.empty()) {
         // Don't leave empty entries hanging around.
         _data->layerStackToLayers.erase(layerStackPtr);
-        
+
         // If this empty entry is currently a part of an override list,
         // It should be removed from it as well.
-        for (auto it = _data->layerToLayerStackOverrides.begin(); 
-                  it !=  _data->layerToLayerStackOverrides.end();) 
-        {
+        for (auto it = _data->layerToLayerStackOverrides.begin(); it != _data->layerToLayerStackOverrides.end();) {
             Pcp_LayerStackRegistryData::LayerStacks& overrides = it->second;
-            auto result = std::find(
-                overrides.begin(), overrides.end(), layerStackPtr);
-            
+            auto result = std::find(overrides.begin(), overrides.end(), layerStackPtr);
+
             if (result != overrides.end()) {
                 overrides.erase(result);
             }
 
-            it = overrides.empty() ? 
-                _data->layerToLayerStackOverrides.erase(it) : std::next(it); 
+            it = overrides.empty() ? _data->layerToLayerStackOverrides.erase(it) : std::next(it);
         }
     } else {
         layers.assign(newLayers.begin(), newLayers.end());
@@ -331,15 +271,13 @@ Pcp_LayerStackRegistry::_SetLayers(const PcpLayerStack* layerStack)
 
     // Also store mappings from layer stack <-> muted layers in
     // the layer stack.
-    std::set<std::string>* mutedLayerIdentifiers = TfMapLookupPtr(
-        _data->layerStackToMutedLayerIdentifiers, layerStackPtr);
+    std::set<std::string>* mutedLayerIdentifiers =
+            TfMapLookupPtr(_data->layerStackToMutedLayerIdentifiers, layerStackPtr);
 
     if (mutedLayerIdentifiers) {
         for (const auto& layerId : *mutedLayerIdentifiers) {
-            Pcp_LayerStackRegistryData::LayerStacks& layerStacks =
-                _data->mutedLayerIdentifierToLayerStacks[layerId];
-            layerStacks.erase(std::find(layerStacks.begin(),
-                                        layerStacks.end(), layerStackPtr));
+            Pcp_LayerStackRegistryData::LayerStacks& layerStacks = _data->mutedLayerIdentifierToLayerStacks[layerId];
+            layerStacks.erase(std::find(layerStacks.begin(), layerStacks.end(), layerStackPtr));
         }
     }
 
@@ -349,52 +287,37 @@ Pcp_LayerStackRegistry::_SetLayers(const PcpLayerStack* layerStack)
             // Don't leave empty entries hanging around.
             _data->layerStackToMutedLayerIdentifiers.erase(layerStackPtr);
         }
-    }
-    else {
+    } else {
         if (!mutedLayerIdentifiers) {
-            mutedLayerIdentifiers = 
-                &_data->layerStackToMutedLayerIdentifiers[layerStackPtr];
+            mutedLayerIdentifiers = &_data->layerStackToMutedLayerIdentifiers[layerStackPtr];
         }
-        *mutedLayerIdentifiers = std::set<std::string>(
-            newMutedLayers.begin(), newMutedLayers.end());
+        *mutedLayerIdentifiers = std::set<std::string>(newMutedLayers.begin(), newMutedLayers.end());
     }
 
     for (const auto& mutedLayer : newMutedLayers) {
-        _data->mutedLayerIdentifierToLayerStacks[mutedLayer]
-            .push_back(layerStackPtr);
+        _data->mutedLayerIdentifierToLayerStacks[mutedLayer].push_back(layerStackPtr);
     }
 }
 
-const PcpLayerStackIdentifier&
-Pcp_LayerStackRegistry::_GetRootLayerStackIdentifier() const
-{
+const PcpLayerStackIdentifier& Pcp_LayerStackRegistry::_GetRootLayerStackIdentifier() const {
     return _data->rootLayerStackId;
 }
 
-const std::string&
-Pcp_LayerStackRegistry::_GetFileFormatTarget() const
-{
+const std::string& Pcp_LayerStackRegistry::_GetFileFormatTarget() const {
     return _data->fileFormatTarget;
 }
 
-bool
-Pcp_LayerStackRegistry::_IsUsd() const
-{
+bool Pcp_LayerStackRegistry::_IsUsd() const {
     return _data->isUsd;
 }
 
-const Pcp_MutedLayers&
-Pcp_LayerStackRegistry::_GetMutedLayers() const
-{
+const Pcp_MutedLayers& Pcp_LayerStackRegistry::_GetMutedLayers() const {
     return _data->mutedLayers;
 }
 
 // ------------------------------------------------------------
 
-std::string 
-Pcp_MutedLayers::_GetCanonicalLayerId(const SdfLayerHandle& anchorLayer, 
-                                      const std::string& layerId) const
-{
+std::string Pcp_MutedLayers::_GetCanonicalLayerId(const SdfLayerHandle& anchorLayer, const std::string& layerId) const {
     // Split out any file format arguments embedded in layerId so we
     // can anchor the layer path separately.
     std::string layerPath;
@@ -402,17 +325,16 @@ Pcp_MutedLayers::_GetCanonicalLayerId(const SdfLayerHandle& anchorLayer,
     if (!SdfLayer::SplitIdentifier(layerId, &layerPath, &args)) {
         return std::string();
     }
-    
-    // XXX: 
+
+    // XXX:
     // We may ultimately want to use the resolved path here but that's
     // possibly a bigger change and there are questions about what happens if
     // the muted path doesn't resolve to an existing asset and how/when to
     // invalidate the resolved paths stored in the Pcp_MutedLayers object.
     const std::string anchoredPath =
-        SdfLayer::IsAnonymousLayerIdentifier(layerPath) ?
-        layerPath :
-        ArGetResolver().CreateIdentifier(
-            layerPath, anchorLayer->GetResolvedPath());
+            SdfLayer::IsAnonymousLayerIdentifier(layerPath)
+                    ? layerPath
+                    : ArGetResolver().CreateIdentifier(layerPath, anchorLayer->GetResolvedPath());
 
     if (anchoredPath.empty()) {
         return std::string();
@@ -428,33 +350,24 @@ Pcp_MutedLayers::_GetCanonicalLayerId(const SdfLayerHandle& anchorLayer,
     return SdfLayer::CreateIdentifier(anchoredPath, args);
 }
 
-Pcp_MutedLayers::Pcp_MutedLayers(const std::string& fileFormatTarget)
-    : _fileFormatTarget(fileFormatTarget)
-{
-}
+Pcp_MutedLayers::Pcp_MutedLayers(const std::string& fileFormatTarget) : _fileFormatTarget(fileFormatTarget) {}
 
-const std::vector<std::string>& 
-Pcp_MutedLayers::GetMutedLayers() const
-{
+const std::vector<std::string>& Pcp_MutedLayers::GetMutedLayers() const {
     return _layers;
 }
 
-void 
-Pcp_MutedLayers::MuteAndUnmuteLayers(const SdfLayerHandle& anchorLayer,
-                                     std::vector<std::string>* layersToMute,
-                                     std::vector<std::string>* layersToUnmute)
-{
+void Pcp_MutedLayers::MuteAndUnmuteLayers(const SdfLayerHandle& anchorLayer,
+                                          std::vector<std::string>* layersToMute,
+                                          std::vector<std::string>* layersToUnmute) {
     std::vector<std::string> mutedLayers, unmutedLayers;
 
     for (const auto& layerToMute : *layersToMute) {
-        const std::string canonicalId = 
-            _GetCanonicalLayerId(anchorLayer, layerToMute);
+        const std::string canonicalId = _GetCanonicalLayerId(anchorLayer, layerToMute);
         if (canonicalId.empty()) {
             continue;
         }
 
-        const auto layerIt = std::lower_bound(
-            _layers.begin(), _layers.end(), canonicalId);
+        const auto layerIt = std::lower_bound(_layers.begin(), _layers.end(), canonicalId);
         if (layerIt == _layers.end() || *layerIt != canonicalId) {
             _layers.insert(layerIt, canonicalId);
             mutedLayers.push_back(canonicalId);
@@ -462,14 +375,12 @@ Pcp_MutedLayers::MuteAndUnmuteLayers(const SdfLayerHandle& anchorLayer,
     }
 
     for (const auto& layerToUnmute : *layersToUnmute) {
-        const std::string canonicalId = 
-            _GetCanonicalLayerId(anchorLayer, layerToUnmute);
+        const std::string canonicalId = _GetCanonicalLayerId(anchorLayer, layerToUnmute);
         if (canonicalId.empty()) {
             continue;
         }
 
-        const auto layerIt = std::lower_bound(
-            _layers.begin(), _layers.end(), canonicalId);
+        const auto layerIt = std::lower_bound(_layers.begin(), _layers.end(), canonicalId);
         if (layerIt != _layers.end() && *layerIt == canonicalId) {
             _layers.erase(layerIt);
             unmutedLayers.push_back(canonicalId);
@@ -480,11 +391,9 @@ Pcp_MutedLayers::MuteAndUnmuteLayers(const SdfLayerHandle& anchorLayer,
     layersToUnmute->swap(unmutedLayers);
 }
 
-bool 
-Pcp_MutedLayers::IsLayerMuted(const SdfLayerHandle& anchorLayer,
-                              const std::string& layerId,
-                              std::string* canonicalLayerId) const
-{
+bool Pcp_MutedLayers::IsLayerMuted(const SdfLayerHandle& anchorLayer,
+                                   const std::string& layerId,
+                                   std::string* canonicalLayerId) const {
     if (_layers.empty()) {
         return false;
     }

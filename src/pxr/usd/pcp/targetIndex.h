@@ -44,13 +44,11 @@ struct PcpTargetIndex {
 /// Note that this function will skip the validation checks performed
 /// by PcpBuildFilteredTargetIndex. See documentation below for details.
 PCP_API
-void
-PcpBuildTargetIndex(
-    const PcpSite& propSite,
-    const PcpPropertyIndex& propIndex,
-    const SdfSpecType relOrAttrType,
-    PcpTargetIndex *targetIndex,
-    PcpErrorVector *allErrors);
+void PcpBuildTargetIndex(const PcpSite& propSite,
+                         const PcpPropertyIndex& propIndex,
+                         const SdfSpecType relOrAttrType,
+                         PcpTargetIndex* targetIndex,
+                         PcpErrorVector* allErrors);
 
 /// Like PcpBuildTargetIndex, but optionally filters the result by
 /// enforcing permissions restrictions and a stopProperty.
@@ -73,19 +71,17 @@ PcpBuildTargetIndex(
 /// \p allErrors will contain any errors encountered while
 /// performing this operation.
 PCP_API
-void
-PcpBuildFilteredTargetIndex(
-    const PcpSite& propSite,
-    const PcpPropertyIndex& propIndex,
-    const SdfSpecType relOrAttrType,
-    const bool localOnly,
-    const SdfSpecHandle &stopProperty,
-    const bool includeStopProperty,
-    PcpCache *cacheForValidation,
-    PcpTargetIndex *targetIndex,
-    SdfPathVector *deletedPaths,
-    PcpErrorVector *allErrors);
+void PcpBuildFilteredTargetIndex(const PcpSite& propSite,
+                                 const PcpPropertyIndex& propIndex,
+                                 const SdfSpecType relOrAttrType,
+                                 const bool localOnly,
+                                 const SdfSpecHandle& stopProperty,
+                                 const bool includeStopProperty,
+                                 PcpCache* cacheForValidation,
+                                 PcpTargetIndex* targetIndex,
+                                 SdfPathVector* deletedPaths,
+                                 PcpErrorVector* allErrors);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_TARGET_INDEX_H
+#endif  // PXR_USD_PCP_TARGET_INDEX_H

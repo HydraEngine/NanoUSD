@@ -28,18 +28,17 @@ SDF_DECLARE_HANDLES(SdfLayer);
 /// This is simply the layer the spec belongs to and the path to the spec.
 ///
 class Sdf_Identity {
-    Sdf_Identity(Sdf_Identity const &) = delete;
-    Sdf_Identity &operator=(Sdf_Identity const &) = delete;
+    Sdf_Identity(Sdf_Identity const&) = delete;
+    Sdf_Identity& operator=(Sdf_Identity const&) = delete;
+
 public:
     /// Returns the layer that this identity refers to.
     SDF_API
-    const SdfLayerHandle &GetLayer() const;
+    const SdfLayerHandle& GetLayer() const;
 
     /// Returns the path that this identity refers to.
-    const SdfPath &GetPath() const {
-        return _path;
-    }
-    
+    const SdfPath& GetPath() const { return _path; }
+
 private:
     // Ref-counting ops manage _refCount.
     friend void TfDelegatedCountIncrement(Sdf_Identity*);
@@ -48,17 +47,15 @@ private:
     friend class Sdf_IdentityRegistry;
     friend class Sdf_IdRegistryImpl;
 
-    Sdf_Identity(Sdf_IdRegistryImpl *regImpl, const SdfPath &path)
-        : _refCount(0), _path(path), _regImpl(regImpl) {}
-    
+    Sdf_Identity(Sdf_IdRegistryImpl* regImpl, const SdfPath& path) : _refCount(0), _path(path), _regImpl(regImpl) {}
+
     SDF_API
-    static void _UnregisterOrDelete(Sdf_IdRegistryImpl *reg, Sdf_Identity *id)
-    noexcept;
+    static void _UnregisterOrDelete(Sdf_IdRegistryImpl* reg, Sdf_Identity* id) noexcept;
     void _Forget();
 
     mutable std::atomic_int _refCount;
     SdfPath _path;
-    Sdf_IdRegistryImpl *_regImpl;
+    Sdf_IdRegistryImpl* _regImpl;
 };
 
 // Specialize TfDelegatedCountPtr operations.
@@ -70,8 +67,8 @@ inline void TfDelegatedCountDecrement(PXR_NS::Sdf_Identity* p) noexcept {
     // concurrently, by its owning registry if it happens to be doing a cleanup
     // pass.  Cache 'this' and the impl ptr in local variables so we have them
     // before decrementing the count.
-    Sdf_Identity *self = p;
-    Sdf_IdRegistryImpl *reg = p->_regImpl;
+    Sdf_Identity* self = p;
+    Sdf_IdRegistryImpl* reg = p->_regImpl;
     if (--p->_refCount == 0) {
         // Cannot use 'p' anymore here.
         Sdf_Identity::_UnregisterOrDelete(reg, self);
@@ -81,24 +78,23 @@ inline void TfDelegatedCountDecrement(PXR_NS::Sdf_Identity* p) noexcept {
 class Sdf_IdentityRegistry {
     Sdf_IdentityRegistry(const Sdf_IdentityRegistry&) = delete;
     Sdf_IdentityRegistry& operator=(const Sdf_IdentityRegistry&) = delete;
+
 public:
-    Sdf_IdentityRegistry(const SdfLayerHandle &layer);
+    Sdf_IdentityRegistry(const SdfLayerHandle& layer);
     ~Sdf_IdentityRegistry();
 
     /// Returns the layer that owns this registry.
-    const SdfLayerHandle &GetLayer() const {
-        return _layer;
-    }
+    const SdfLayerHandle& GetLayer() const { return _layer; }
 
     /// Return the identity associated with \a path, issuing a new
     /// one if necessary. The registry will track the identity
     /// and update it if the logical object it represents moves
     /// in namespace.
-    Sdf_IdentityRefPtr Identify(const SdfPath &path);
+    Sdf_IdentityRefPtr Identify(const SdfPath& path);
 
     /// Update identity in response to a namespace edit.
-    void MoveIdentity(const SdfPath &oldPath, const SdfPath &newPath);
-    
+    void MoveIdentity(const SdfPath& oldPath, const SdfPath& newPath);
+
 private:
     friend class Sdf_Identity;
 
@@ -119,4 +115,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_IDENTITY_H
+#endif  // PXR_USD_SDF_IDENTITY_H

@@ -32,24 +32,22 @@ class SdfValueTypeName;
 
 typedef TfToken NdrIdentifier;
 typedef TfToken::HashFunctor NdrIdentifierHashFunctor;
-inline const std::string&
-NdrGetIdentifierString(const NdrIdentifier& id) { return id.GetString(); }
+inline const std::string& NdrGetIdentifierString(const NdrIdentifier& id) {
+    return id.GetString();
+}
 typedef std::vector<NdrIdentifier> NdrIdentifierVec;
-typedef std::unordered_set<NdrIdentifier,
-                           NdrIdentifierHashFunctor> NdrIdentifierSet;
+typedef std::unordered_set<NdrIdentifier, NdrIdentifierHashFunctor> NdrIdentifierSet;
 
 // Token
 typedef std::vector<TfToken> NdrTokenVec;
-typedef std::unordered_map<TfToken, std::string,
-                           TfToken::HashFunctor> NdrTokenMap;
+typedef std::unordered_map<TfToken, std::string, TfToken::HashFunctor> NdrTokenMap;
 
 // Property
 typedef NdrProperty* NdrPropertyPtr;
 typedef NdrProperty const* NdrPropertyConstPtr;
 typedef std::unique_ptr<NdrProperty> NdrPropertyUniquePtr;
 typedef std::vector<NdrPropertyUniquePtr> NdrPropertyUniquePtrVec;
-typedef std::unordered_map<TfToken, NdrPropertyConstPtr,
-                           TfToken::HashFunctor> NdrPropertyPtrMap;
+typedef std::unordered_map<TfToken, NdrPropertyConstPtr, TfToken::HashFunctor> NdrPropertyPtrMap;
 
 // Node
 typedef NdrNode* NdrNodePtr;
@@ -71,7 +69,7 @@ public:
     NDR_API
     NdrVersion() = default;
     /// Create a version with the given major and minor numbers.
-    /// Numbers must be non-negative, and at least one must be non-zero.  
+    /// Numbers must be non-negative, and at least one must be non-zero.
     /// On failure generates an error and yields an invalid version.
     NDR_API
     NdrVersion(int major, int minor = 0);
@@ -83,10 +81,7 @@ public:
     /// Return an equal version marked as default.  It's permitted to mark
     /// an invalid version as the default.
     NDR_API
-    NdrVersion GetAsDefault() const
-    {
-        return NdrVersion(*this, true);
-    }
+    NdrVersion GetAsDefault() const { return NdrVersion(*this, true); }
 
     /// Return the major version number or zero for an invalid version.
     NDR_API
@@ -108,73 +103,48 @@ public:
 
     /// Return a hash for the version.
     NDR_API
-    std::size_t GetHash() const
-    {
-        return (static_cast<std::size_t>(_major) << 32) +
-                static_cast<std::size_t>(_minor);
-    }
+    std::size_t GetHash() const { return (static_cast<std::size_t>(_major) << 32) + static_cast<std::size_t>(_minor); }
 
     /// Return true iff the version is valid.
     NDR_API
-    explicit operator bool() const
-    {
-        return !!*this;
-    }
+    explicit operator bool() const { return !!*this; }
 
     /// Return true iff the version is invalid.
     NDR_API
-    bool operator!() const
-    {
-        return _major == 0 && _minor == 0;
-    }
+    bool operator!() const { return _major == 0 && _minor == 0; }
 
     /// Return true iff versions are equal.
     NDR_API
-    friend bool operator==(const NdrVersion& lhs, const NdrVersion& rhs)
-    {
+    friend bool operator==(const NdrVersion& lhs, const NdrVersion& rhs) {
         return lhs._major == rhs._major && lhs._minor == rhs._minor;
     }
 
     /// Return true iff versions are not equal.
     NDR_API
-    friend bool operator!=(const NdrVersion& lhs, const NdrVersion& rhs)
-    {
-        return !(lhs == rhs);
-    }
+    friend bool operator!=(const NdrVersion& lhs, const NdrVersion& rhs) { return !(lhs == rhs); }
 
     /// Return true iff the left side is less than the right side.
     NDR_API
-    friend bool operator<(const NdrVersion& lhs, const NdrVersion& rhs)
-    {
-        return lhs._major < rhs._major ||
-               (lhs._major == rhs._major && lhs._minor < rhs._minor);
+    friend bool operator<(const NdrVersion& lhs, const NdrVersion& rhs) {
+        return lhs._major < rhs._major || (lhs._major == rhs._major && lhs._minor < rhs._minor);
     }
 
     /// Return true iff the left side is less than or equal to the right side.
     NDR_API
-    friend bool operator<=(const NdrVersion& lhs, const NdrVersion& rhs)
-    {
-        return lhs._major < rhs._major ||
-               (lhs._major == rhs._major && lhs._minor <= rhs._minor);
+    friend bool operator<=(const NdrVersion& lhs, const NdrVersion& rhs) {
+        return lhs._major < rhs._major || (lhs._major == rhs._major && lhs._minor <= rhs._minor);
     }
 
     /// Return true iff the left side is greater than the right side.
     NDR_API
-    friend bool operator>(const NdrVersion& lhs, const NdrVersion& rhs)
-    {
-        return !(lhs <= rhs);
-    }
+    friend bool operator>(const NdrVersion& lhs, const NdrVersion& rhs) { return !(lhs <= rhs); }
 
     /// Return true iff the left side is greater than or equal to the right side.
     NDR_API
-    friend bool operator>=(const NdrVersion& lhs, const NdrVersion& rhs)
-    {
-        return !(lhs < rhs);
-    }
+    friend bool operator>=(const NdrVersion& lhs, const NdrVersion& rhs) { return !(lhs < rhs); }
 
 private:
-    NdrVersion(const NdrVersion& x, bool)
-        : _major(x._major), _minor(x._minor), _isDefault(true) { }
+    NdrVersion(const NdrVersion& x, bool) : _major(x._major), _minor(x._minor), _isDefault(true) {}
 
 private:
     int _major = 0, _minor = 0;
@@ -182,12 +152,8 @@ private:
 };
 
 /// Enumeration used to select nodes by version.
-enum NdrVersionFilter {
-    NdrVersionFilterDefaultOnly,
-    NdrVersionFilterAllVersions,
-    NdrNumVersionFilters
-};
+enum NdrVersionFilter { NdrVersionFilterDefaultOnly, NdrVersionFilterAllVersions, NdrNumVersionFilters };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_NDR_DECLARE_H
+#endif  // PXR_USD_NDR_DECLARE_H

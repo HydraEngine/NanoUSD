@@ -30,16 +30,17 @@ class PcpPropertyIndex;
 /// Object used to iterate over nodes in the prim index graph in strong-to-weak
 /// order.
 ///
-class PcpNodeIterator
-{
+class PcpNodeIterator {
     class _PtrProxy {
     public:
         PcpNodeRef* operator->() { return &_nodeRef; }
+
     private:
         friend class PcpNodeIterator;
         explicit _PtrProxy(const PcpNodeRef& nodeRef) : _nodeRef(nodeRef) {}
         PcpNodeRef _nodeRef;
     };
+
 public:
     using iterator_category = std::random_access_iterator_tag;
     using value_type = PcpNodeRef;
@@ -51,8 +52,7 @@ public:
     PcpNodeIterator() = default;
 
     // Returns a compressed Sd site.  For internal use only.
-    Pcp_CompressedSdSite GetCompressedSdSite(size_t layerIndex) const
-    {
+    Pcp_CompressedSdSite GetCompressedSdSite(size_t layerIndex) const {
         return Pcp_CompressedSdSite(_nodeIdx, layerIndex);
     }
 
@@ -64,9 +64,7 @@ public:
         return advanced.dereference();
     }
 
-    difference_type operator-(const PcpNodeIterator& other) const {
-        return -distance_to(other);
-    }
+    difference_type operator-(const PcpNodeIterator& other) const { return -distance_to(other); }
 
     PcpNodeIterator& operator++() {
         increment();
@@ -112,13 +110,9 @@ public:
         return *this;
     }
 
-    bool operator==(const PcpNodeIterator& other) const {
-        return equal(other);
-    }
+    bool operator==(const PcpNodeIterator& other) const { return equal(other); }
 
-    bool operator!=(const PcpNodeIterator& other) const {
-        return !equal(other);
-    }
+    bool operator!=(const PcpNodeIterator& other) const { return !equal(other); }
 
     bool operator<(const PcpNodeIterator& other) const {
         TF_DEV_AXIOM(_graph == other._graph);
@@ -142,8 +136,7 @@ public:
 
 private:
     friend class PcpPrimIndex;
-    PcpNodeIterator(PcpPrimIndex_Graph* graph, size_t nodeIdx) :
-        _graph(graph), _nodeIdx(nodeIdx) {}
+    PcpNodeIterator(PcpPrimIndex_Graph* graph, size_t nodeIdx) : _graph(graph), _nodeIdx(nodeIdx) {}
 
     void increment() { ++_nodeIdx; }
     void decrement() { --_nodeIdx; }
@@ -151,12 +144,8 @@ private:
     difference_type distance_to(const PcpNodeIterator& other) const {
         return (difference_type)(other._nodeIdx) - _nodeIdx;
     }
-    bool equal(const PcpNodeIterator& other) const {
-        return (_graph == other._graph) & (_nodeIdx == other._nodeIdx);
-    }
-    reference dereference() const {
-        return PcpNodeRef(_graph, _nodeIdx);
-    }
+    bool equal(const PcpNodeIterator& other) const { return (_graph == other._graph) & (_nodeIdx == other._nodeIdx); }
+    reference dereference() const { return PcpNodeRef(_graph, _nodeIdx); }
 
 private:
     PcpPrimIndex_Graph* _graph = nullptr;
@@ -168,30 +157,29 @@ private:
 /// Object used to iterate over nodes in the prim index graph in weak-to-strong
 /// order.
 ///
-class PcpNodeReverseIterator
-    : public Tf_ProxyReferenceReverseIterator<PcpNodeIterator>
-{
+class PcpNodeReverseIterator : public Tf_ProxyReferenceReverseIterator<PcpNodeIterator> {
 public:
-    PcpNodeReverseIterator() { }
+    PcpNodeReverseIterator() {}
     explicit PcpNodeReverseIterator(const PcpNodeIterator& iter)
         : Tf_ProxyReferenceReverseIterator<PcpNodeIterator>(iter) {}
 };
 
 /// \class PcpPrimIterator
 ///
-/// Object used to iterate over prim specs in the prim index graph in 
+/// Object used to iterate over prim specs in the prim index graph in
 /// strong-to-weak order.
 ///
-class PcpPrimIterator 
-{
+class PcpPrimIterator {
     class _PtrProxy {
     public:
         SdfSite* operator->() { return &_site; }
+
     private:
         friend class PcpPrimIterator;
         explicit _PtrProxy(const SdfSite& site) : _site(site) {}
         SdfSite _site;
     };
+
 public:
     using iterator_category = std::random_access_iterator_tag;
     using value_type = SdfSite;
@@ -225,9 +213,7 @@ public:
         return advanced.dereference();
     }
 
-    difference_type operator-(const PcpPrimIterator& other) const {
-        return -distance_to(other);
-    }
+    difference_type operator-(const PcpPrimIterator& other) const { return -distance_to(other); }
 
     PcpPrimIterator& operator++() {
         increment();
@@ -273,13 +259,9 @@ public:
         return *this;
     }
 
-    bool operator==(const PcpPrimIterator& other) const {
-        return equal(other);
-    }
+    bool operator==(const PcpPrimIterator& other) const { return equal(other); }
 
-    bool operator!=(const PcpPrimIterator& other) const {
-        return !equal(other);
-    }
+    bool operator!=(const PcpPrimIterator& other) const { return !equal(other); }
 
     bool operator<(const PcpPrimIterator& other) const {
         TF_DEV_AXIOM(_primIndex == other._primIndex);
@@ -322,25 +304,21 @@ private:
 
 /// \class PcpPrimReverseIterator
 ///
-/// Object used to iterate over prim specs in the prim index graph in 
+/// Object used to iterate over prim specs in the prim index graph in
 /// weak-to-strong order.
 ///
-class PcpPrimReverseIterator
-    : public Tf_ProxyReferenceReverseIterator<PcpPrimIterator>
-{
+class PcpPrimReverseIterator : public Tf_ProxyReferenceReverseIterator<PcpPrimIterator> {
 public:
-    PcpPrimReverseIterator() { }
+    PcpPrimReverseIterator() {}
     explicit PcpPrimReverseIterator(const PcpPrimIterator& iter)
-        : Tf_ProxyReferenceReverseIterator<PcpPrimIterator>(iter) { }
-        
-    PcpNodeRef GetNode() const
-    {
+        : Tf_ProxyReferenceReverseIterator<PcpPrimIterator>(iter) {}
+
+    PcpNodeRef GetNode() const {
         PcpPrimIterator tmp = base();
         return (--tmp).GetNode();
     }
 
-    Pcp_SdSiteRef _GetSiteRef() const
-    {
+    Pcp_SdSiteRef _GetSiteRef() const {
         PcpPrimIterator tmp = base();
         return (--tmp)._GetSiteRef();
     }
@@ -351,8 +329,7 @@ public:
 /// Object used to iterate over property specs in a property index in
 /// strong-to-weak order.
 ///
-class PcpPropertyIterator
-{
+class PcpPropertyIterator {
 public:
     using iterator_category = std::random_access_iterator_tag;
     using value_type = const SdfPropertySpecHandle;
@@ -386,9 +363,7 @@ public:
         return advanced.dereference();
     }
 
-    difference_type operator-(const PcpPropertyIterator& other) const {
-        return -distance_to(other);
-    }
+    difference_type operator-(const PcpPropertyIterator& other) const { return -distance_to(other); }
 
     PcpPropertyIterator& operator++() {
         increment();
@@ -434,13 +409,9 @@ public:
         return *this;
     }
 
-    bool operator==(const PcpPropertyIterator& other) const {
-        return equal(other);
-    }
+    bool operator==(const PcpPropertyIterator& other) const { return equal(other); }
 
-    bool operator!=(const PcpPropertyIterator& other) const {
-        return !equal(other);
-    }
+    bool operator!=(const PcpPropertyIterator& other) const { return !equal(other); }
 
     bool operator<(const PcpPropertyIterator& other) const {
         TF_DEV_AXIOM(_propertyIndex == other._propertyIndex);
@@ -486,22 +457,18 @@ private:
 /// Object used to iterate over property specs in a property index in
 /// weak-to-strong order.
 ///
-class PcpPropertyReverseIterator
-    : public std::reverse_iterator<PcpPropertyIterator>
-{
+class PcpPropertyReverseIterator : public std::reverse_iterator<PcpPropertyIterator> {
 public:
-    PcpPropertyReverseIterator() { }
+    PcpPropertyReverseIterator() {}
     explicit PcpPropertyReverseIterator(const PcpPropertyIterator& iter)
-        : std::reverse_iterator<PcpPropertyIterator>(iter) { }
-        
-    PcpNodeRef GetNode() const
-    {
+        : std::reverse_iterator<PcpPropertyIterator>(iter) {}
+
+    PcpNodeRef GetNode() const {
         PcpPropertyIterator tmp = base();
         return (--tmp).GetNode();
     }
 
-    bool IsLocal() const
-    {
+    bool IsLocal() const {
         PcpPropertyIterator tmp = base();
         return (--tmp).IsLocal();
     }
@@ -510,85 +477,102 @@ public:
 // Helper macro for defining iterator ranges, which are simply pairs of
 // iterators denoting the [start, end) of a series of values. These ranges
 // may be used with TF_FOR_ALL and TF_REVERSE_FOR_ALL.
-#define PCP_DEFINE_RANGE(Range, Iterator, ReverseIterator)              \
-    typedef std::pair<Iterator, Iterator> Range;                        \
-                                                                        \
-    inline Iterator begin(Range &range) { return range.first; }         \
-    inline Iterator begin(const Range &range) { return range.first; }   \
-    inline Iterator end(Range &range) { return range.second; }          \
-    inline Iterator end(const Range &range) { return range.second; }    \
-                                                                        \
-    template <>                                                         \
-    struct Tf_IteratorInterface<Range, false> {                         \
-        typedef Iterator IteratorType;                                  \
-        static IteratorType Begin(Range &c) { return c.first; }         \
-        static IteratorType End(Range &c) { return c.second; }          \
-    };                                                                  \
-                                                                        \
-    template <>                                                         \
-    struct Tf_IteratorInterface<const Range, false> {                   \
-        typedef Iterator IteratorType;                                  \
-        static IteratorType Begin(Range const &c) { return c.first; }   \
-        static IteratorType End(Range const &c) { return c.second; }    \
-    };                                                                  \
-                                                                        \
-    template <>                                                         \
-    struct Tf_IteratorInterface<Range, true> {                          \
-        typedef ReverseIterator IteratorType;                           \
-        static IteratorType Begin(Range &c)                             \
-            { return IteratorType(c.second); }                          \
-        static IteratorType End(Range &c)                               \
-            { return IteratorType(c.first); }                           \
-    };                                                                  \
-                                                                        \
-    template <>                                                         \
-    struct Tf_IteratorInterface<const Range, true> {                    \
-        typedef ReverseIterator IteratorType;                           \
-        static IteratorType Begin(Range const &c)                       \
-            { return IteratorType(c.second); }                          \
-        static IteratorType End(Range const &c)                         \
-            { return IteratorType(c.first); }                           \
-    };                                                                  \
-                                                                        \
-    template <>                                                         \
-    struct Tf_ShouldIterateOverCopy<Range> : std::true_type {};         \
-                                                                        \
-    template <>                                                         \
+#define PCP_DEFINE_RANGE(Range, Iterator, ReverseIterator)      \
+    typedef std::pair<Iterator, Iterator> Range;                \
+                                                                \
+    inline Iterator begin(Range& range) {                       \
+        return range.first;                                     \
+    }                                                           \
+    inline Iterator begin(const Range& range) {                 \
+        return range.first;                                     \
+    }                                                           \
+    inline Iterator end(Range& range) {                         \
+        return range.second;                                    \
+    }                                                           \
+    inline Iterator end(const Range& range) {                   \
+        return range.second;                                    \
+    }                                                           \
+                                                                \
+    template <>                                                 \
+    struct Tf_IteratorInterface<Range, false> {                 \
+        typedef Iterator IteratorType;                          \
+        static IteratorType Begin(Range& c) {                   \
+            return c.first;                                     \
+        }                                                       \
+        static IteratorType End(Range& c) {                     \
+            return c.second;                                    \
+        }                                                       \
+    };                                                          \
+                                                                \
+    template <>                                                 \
+    struct Tf_IteratorInterface<const Range, false> {           \
+        typedef Iterator IteratorType;                          \
+        static IteratorType Begin(Range const& c) {             \
+            return c.first;                                     \
+        }                                                       \
+        static IteratorType End(Range const& c) {               \
+            return c.second;                                    \
+        }                                                       \
+    };                                                          \
+                                                                \
+    template <>                                                 \
+    struct Tf_IteratorInterface<Range, true> {                  \
+        typedef ReverseIterator IteratorType;                   \
+        static IteratorType Begin(Range& c) {                   \
+            return IteratorType(c.second);                      \
+        }                                                       \
+        static IteratorType End(Range& c) {                     \
+            return IteratorType(c.first);                       \
+        }                                                       \
+    };                                                          \
+                                                                \
+    template <>                                                 \
+    struct Tf_IteratorInterface<const Range, true> {            \
+        typedef ReverseIterator IteratorType;                   \
+        static IteratorType Begin(Range const& c) {             \
+            return IteratorType(c.second);                      \
+        }                                                       \
+        static IteratorType End(Range const& c) {               \
+            return IteratorType(c.first);                       \
+        }                                                       \
+    };                                                          \
+                                                                \
+    template <>                                                 \
+    struct Tf_ShouldIterateOverCopy<Range> : std::true_type {}; \
+                                                                \
+    template <>                                                 \
     struct Tf_ShouldIterateOverCopy<const Range> : std::true_type {}
 
 PCP_DEFINE_RANGE(PcpNodeRange, PcpNodeIterator, PcpNodeReverseIterator);
 PCP_DEFINE_RANGE(PcpPrimRange, PcpPrimIterator, PcpPrimReverseIterator);
-PCP_DEFINE_RANGE(PcpPropertyRange, PcpPropertyIterator, 
-                 PcpPropertyReverseIterator);
+PCP_DEFINE_RANGE(PcpPropertyRange, PcpPropertyIterator, PcpPropertyReverseIterator);
 
 /// \class PcpIteratorTraits
 ///
 /// Traits class for retrieving useful characteristics about one of the
 /// Pcp iterator types above.
 ///
-template <class Iterator> struct PcpIteratorTraits;
+template <class Iterator>
+struct PcpIteratorTraits;
 
 template <>
-struct PcpIteratorTraits<PcpNodeIterator>
-{
+struct PcpIteratorTraits<PcpNodeIterator> {
     typedef PcpNodeRange RangeType;
     typedef PcpNodeReverseIterator ReverseIteratorType;
 };
 
 template <>
-struct PcpIteratorTraits<PcpPrimIterator>
-{
+struct PcpIteratorTraits<PcpPrimIterator> {
     typedef PcpPrimRange RangeType;
     typedef PcpPrimReverseIterator ReverseIteratorType;
 };
 
 template <>
-struct PcpIteratorTraits<PcpPropertyIterator>
-{
+struct PcpIteratorTraits<PcpPropertyIterator> {
     typedef PcpPropertyRange RangeType;
     typedef PcpPropertyReverseIterator ReverseIteratorType;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_ITERATOR_H
+#endif  // PXR_USD_PCP_ITERATOR_H

@@ -12,18 +12,17 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-NdrNode::NdrNode(
-    const NdrIdentifier& identifier,
-    const NdrVersion& version,
-    const std::string& name,
-    const TfToken& family,
-    const TfToken& context,
-    const TfToken& sourceType,
-    const std::string& definitionURI,
-    const std::string& implementationURI,
-    NdrPropertyUniquePtrVec&& properties,
-    const NdrTokenMap& metadata,
-    const std::string &sourceCode)
+NdrNode::NdrNode(const NdrIdentifier& identifier,
+                 const NdrVersion& version,
+                 const std::string& name,
+                 const TfToken& family,
+                 const TfToken& context,
+                 const TfToken& sourceType,
+                 const std::string& definitionURI,
+                 const std::string& implementationURI,
+                 NdrPropertyUniquePtrVec&& properties,
+                 const NdrTokenMap& metadata,
+                 const std::string& sourceCode)
     : _identifier(identifier),
       _version(version),
       _name(name),
@@ -34,8 +33,7 @@ NdrNode::NdrNode(
       _implementationURI(implementationURI),
       _properties(std::move(properties)),
       _metadata(metadata),
-      _sourceCode(sourceCode)
-{
+      _sourceCode(sourceCode) {
     // If the properties are not empty, that signifies that the node was parsed
     // successfully, and thus the node is valid.
     _isValid = !_properties.empty();
@@ -57,38 +55,27 @@ NdrNode::NdrNode(
     }
 }
 
-NdrNode::~NdrNode()
-{
+NdrNode::~NdrNode() {
     // nothing yet
 }
 
-std::string
-NdrNode::GetInfoString() const
-{
+std::string NdrNode::GetInfoString() const {
     return TfStringPrintf(
-        "%s (context: '%s', version: '%s', family: '%s'); definition URI: '%s';"
-        " implementation URI: '%s'",
-        NdrGetIdentifierString(_identifier).c_str(), _context.GetText(),
-        _version.GetString().c_str(), _family.GetText(), 
-        _definitionURI.c_str(), _implementationURI.c_str()
-    );
+            "%s (context: '%s', version: '%s', family: '%s'); definition URI: '%s';"
+            " implementation URI: '%s'",
+            NdrGetIdentifierString(_identifier).c_str(), _context.GetText(), _version.GetString().c_str(),
+            _family.GetText(), _definitionURI.c_str(), _implementationURI.c_str());
 }
 
-const NdrTokenVec&
-NdrNode::GetInputNames() const
-{
+const NdrTokenVec& NdrNode::GetInputNames() const {
     return _inputNames;
 }
 
-const NdrTokenVec&
-NdrNode::GetOutputNames() const
-{
+const NdrTokenVec& NdrNode::GetOutputNames() const {
     return _outputNames;
 }
 
-NdrPropertyConstPtr
-NdrNode::GetInput(const TfToken& inputName) const
-{
+NdrPropertyConstPtr NdrNode::GetInput(const TfToken& inputName) const {
     NdrPropertyPtrMap::const_iterator it = _inputs.find(inputName);
 
     if (it != _inputs.end()) {
@@ -98,9 +85,7 @@ NdrNode::GetInput(const TfToken& inputName) const
     return nullptr;
 }
 
-NdrPropertyConstPtr
-NdrNode::GetOutput(const TfToken& outputName) const
-{
+NdrPropertyConstPtr NdrNode::GetOutput(const TfToken& outputName) const {
     NdrPropertyPtrMap::const_iterator it = _outputs.find(outputName);
 
     if (it != _outputs.end()) {
@@ -110,9 +95,7 @@ NdrNode::GetOutput(const TfToken& outputName) const
     return nullptr;
 }
 
-const NdrTokenMap&
-NdrNode::GetMetadata() const
-{
+const NdrTokenMap& NdrNode::GetMetadata() const {
     return _metadata;
 }
 

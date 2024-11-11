@@ -26,14 +26,13 @@ class PcpCache;
 
 /// \class Pcp_PropertyInfo
 ///
-/// Private helper structure containing information about a property in the 
+/// Private helper structure containing information about a property in the
 /// property stack.
 ///
-struct Pcp_PropertyInfo
-{
-    Pcp_PropertyInfo() { }
-    Pcp_PropertyInfo(const SdfPropertySpecHandle& prop, const PcpNodeRef& node) 
-        : propertySpec(prop), originatingNode(node) { }
+struct Pcp_PropertyInfo {
+    Pcp_PropertyInfo() {}
+    Pcp_PropertyInfo(const SdfPropertySpecHandle& prop, const PcpNodeRef& node)
+        : propertySpec(prop), originatingNode(node) {}
 
     SdfPropertySpecHandle propertySpec;
     PcpNodeRef originatingNode;
@@ -45,8 +44,7 @@ struct Pcp_PropertyInfo
 /// contribute opinions to a specific property, under composition
 /// semantics.
 ///
-class PcpPropertyIndex
-{
+class PcpPropertyIndex {
 public:
     /// Construct an empty property index.
     PCP_API
@@ -54,7 +52,7 @@ public:
 
     /// Copy-construct a property index.
     PCP_API
-    PcpPropertyIndex(const PcpPropertyIndex &rhs);
+    PcpPropertyIndex(const PcpPropertyIndex& rhs);
 
     /// Swap the contents of this property index with \p index.
     PCP_API
@@ -67,7 +65,7 @@ public:
 
     /// Returns range of iterators that encompasses properties in this
     /// index's property stack.
-    /// 
+    ///
     /// By default, this returns a range encompassing all properties in the
     /// index. If \p localOnly is specified, the range will only include
     /// properties from local nodes in its owning prim's graph.
@@ -75,9 +73,7 @@ public:
     PcpPropertyRange GetPropertyRange(bool localOnly = false) const;
 
     /// Return the list of errors local to this property.
-    PcpErrorVector GetLocalErrors() const {
-        return _localErrors ? *_localErrors.get() : PcpErrorVector();
-    }
+    PcpErrorVector GetLocalErrors() const { return _localErrors ? *_localErrors.get() : PcpErrorVector(); }
 
     /// Returns the number of local properties in this prim index.
     PCP_API
@@ -100,22 +96,20 @@ private:
 /// internally computing and caching an owning prim index as necessary.
 /// \p allErrors will contain any errors encountered.
 PCP_API
-void
-PcpBuildPropertyIndex( const SdfPath& propertyPath, 
-                       PcpCache *cache,
-                       PcpPropertyIndex *propertyIndex,
-                       PcpErrorVector *allErrors );
+void PcpBuildPropertyIndex(const SdfPath& propertyPath,
+                           PcpCache* cache,
+                           PcpPropertyIndex* propertyIndex,
+                           PcpErrorVector* allErrors);
 
 /// Builds a prim property index for the property at \p propertyPath.
 /// \p allErrors will contain any errors encountered.
 PCP_API
-void
-PcpBuildPrimPropertyIndex( const SdfPath& propertyPath,
-                           const PcpCache& cache,
-                           const PcpPrimIndex& owningPrimIndex,
-                           PcpPropertyIndex *propertyIndex,
-                           PcpErrorVector *allErrors );
+void PcpBuildPrimPropertyIndex(const SdfPath& propertyPath,
+                               const PcpCache& cache,
+                               const PcpPrimIndex& owningPrimIndex,
+                               PcpPropertyIndex* propertyIndex,
+                               PcpErrorVector* allErrors);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_PROPERTY_INDEX_H
+#endif  // PXR_USD_PCP_PROPERTY_INDEX_H

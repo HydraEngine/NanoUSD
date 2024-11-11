@@ -16,7 +16,7 @@ namespace Sdf_PathParser {
 template <>
 struct Action<ReflexiveRelative> {
     template <class Input>
-    static void apply(Input const &in, PPContext &pp) {
+    static void apply(Input const& in, PPContext& pp) {
         pp.paths.back() = SdfPath::ReflexiveRelativePath();
     }
 };
@@ -24,7 +24,7 @@ struct Action<ReflexiveRelative> {
 template <>
 struct Action<AbsoluteRoot> {
     template <class Input>
-    static void apply(Input const &in, PPContext &pp) {
+    static void apply(Input const& in, PPContext& pp) {
         pp.paths.back() = SdfPath::AbsoluteRootPath();
     }
 };
@@ -32,7 +32,7 @@ struct Action<AbsoluteRoot> {
 template <>
 struct Action<DotDot> {
     template <class Input>
-    static void apply(Input const &in, PPContext &pp) {
+    static void apply(Input const& in, PPContext& pp) {
         if (pp.paths.back().IsEmpty()) {
             pp.paths.back() = SdfPath::ReflexiveRelativePath();
         }
@@ -43,7 +43,7 @@ struct Action<DotDot> {
 template <>
 struct Action<PrimName> {
     template <class Input>
-    static void apply(Input const &in, PPContext &pp) {
+    static void apply(Input const& in, PPContext& pp) {
         if (pp.paths.back().IsEmpty()) {
             pp.paths.back() = SdfPath::ReflexiveRelativePath();
         }
@@ -54,7 +54,7 @@ struct Action<PrimName> {
 template <>
 struct Action<VariantSetName> {
     template <class Input>
-    static void apply(Input const &in, PPContext &pp) {
+    static void apply(Input const& in, PPContext& pp) {
         pp.varSetName = in.string();
     }
 };
@@ -62,7 +62,7 @@ struct Action<VariantSetName> {
 template <>
 struct Action<VariantName> {
     template <class Input>
-    static void apply(Input const &in, PPContext &pp) {
+    static void apply(Input const& in, PPContext& pp) {
         pp.varName = in.string();
     }
 };
@@ -70,9 +70,8 @@ struct Action<VariantName> {
 template <>
 struct Action<VariantSelection> {
     template <class Input>
-    static void apply(Input const &in, PPContext &pp) {
-        pp.paths.back() =
-            pp.paths.back().AppendVariantSelection(pp.varSetName, pp.varName);
+    static void apply(Input const& in, PPContext& pp) {
+        pp.paths.back() = pp.paths.back().AppendVariantSelection(pp.varSetName, pp.varName);
         pp.varSetName.clear();
         pp.varName.clear();
     }
@@ -81,7 +80,7 @@ struct Action<VariantSelection> {
 template <>
 struct Action<PropertyName> {
     template <class Input>
-    static void apply(Input const &in, PPContext &pp) {
+    static void apply(Input const& in, PPContext& pp) {
         if (pp.paths.back().IsEmpty()) {
             pp.paths.back() = SdfPath::ReflexiveRelativePath();
         }
@@ -92,16 +91,15 @@ struct Action<PropertyName> {
 template <>
 struct Action<RelationalAttributeName> {
     template <class Input>
-    static void apply(Input const &in, PPContext &pp) {
-        pp.paths.back() =
-            pp.paths.back().AppendRelationalAttribute(GetToken(in));
+    static void apply(Input const& in, PPContext& pp) {
+        pp.paths.back() = pp.paths.back().AppendRelationalAttribute(GetToken(in));
     }
 };
 
 template <>
 struct Action<TargetPathOpen> {
     template <class Input>
-    static void apply(Input const &in, PPContext &pp) {
+    static void apply(Input const& in, PPContext& pp) {
         pp.paths.emplace_back();
     }
 };
@@ -109,7 +107,7 @@ struct Action<TargetPathOpen> {
 template <>
 struct Action<TargetPath> {
     template <class Input>
-    static void apply(Input const &in, PPContext &pp) {
+    static void apply(Input const& in, PPContext& pp) {
         pp.targetType = PPContext::IsTargetPath;
     }
 };
@@ -117,7 +115,7 @@ struct Action<TargetPath> {
 template <>
 struct Action<MapperPath> {
     template <class Input>
-    static void apply(Input const &in, PPContext &pp) {
+    static void apply(Input const& in, PPContext& pp) {
         pp.targetType = PPContext::IsMapperPath;
     }
 };
@@ -125,7 +123,7 @@ struct Action<MapperPath> {
 template <>
 struct Action<MapperArg> {
     template <class Input>
-    static void apply(Input const &in, PPContext &pp) {
+    static void apply(Input const& in, PPContext& pp) {
         pp.paths.back() = pp.paths.back().AppendMapperArg(GetToken(in));
     }
 };
@@ -133,16 +131,13 @@ struct Action<MapperArg> {
 template <>
 struct Action<TargetPathClose> {
     template <class Input>
-    static void apply(Input const &in, PPContext &pp) {
+    static void apply(Input const& in, PPContext& pp) {
         SdfPath targetPath = std::move(pp.paths.back());
         pp.paths.pop_back();
         if (pp.targetType == PPContext::IsTargetPath) {
-            pp.paths.back() =
-                pp.paths.back().AppendTarget(std::move(targetPath));
-        }
-        else {
-            pp.paths.back() =
-                pp.paths.back().AppendMapper(std::move(targetPath));
+            pp.paths.back() = pp.paths.back().AppendTarget(std::move(targetPath));
+        } else {
+            pp.paths.back() = pp.paths.back().AppendMapper(std::move(targetPath));
         }
     }
 };
@@ -150,35 +145,28 @@ struct Action<TargetPathClose> {
 template <>
 struct Action<Expression> {
     template <class Input>
-    static void apply(Input const &in, PPContext &pp) {
+    static void apply(Input const& in, PPContext& pp) {
         pp.paths.back() = pp.paths.back().AppendExpression();
     }
 };
 
-}
+}  // namespace Sdf_PathParser
 
-bool
-Sdf_ParsePath(std::string const &pathStr, SdfPath *path, std::string *errMsg)
-{
+bool Sdf_ParsePath(std::string const& pathStr, SdfPath* path, std::string* errMsg) {
     Sdf_PathParser::PPContext context;
     try {
-        if (!parse<must<Sdf_PathParser::Path, eolf>, Sdf_PathParser::Action>(
-                string_input<> { pathStr, "" }, context)) {
+        if (!parse<must<Sdf_PathParser::Path, eolf>, Sdf_PathParser::Action>(string_input<>{pathStr, ""}, context)) {
             if (errMsg) {
-                *errMsg = TfStringPrintf(
-                    "Ill-formed SdfPath with no exception parsing <%s>",
-                    pathStr.c_str());
+                *errMsg = TfStringPrintf("Ill-formed SdfPath with no exception parsing <%s>", pathStr.c_str());
             }
             if (path) {
                 *path = SdfPath();
             }
             return false;
         }
-    }
-    catch (parse_error const &err) {
+    } catch (parse_error const& err) {
         if (errMsg) {
-            *errMsg = TfStringPrintf(
-                "Ill-formed SdfPath <%s>: %s", pathStr.c_str(), err.what());
+            *errMsg = TfStringPrintf("Ill-formed SdfPath <%s>: %s", pathStr.c_str(), err.what());
         }
         if (path) {
             *path = SdfPath();

@@ -25,25 +25,18 @@ PXR_NAMESPACE_OPEN_SCOPE
 class SdfSpec;
 
 // ArWritableAsset implementation that writes to a std::ostream.
-class Sdf_StreamWritableAsset
-    : public ArWritableAsset
-{
+class Sdf_StreamWritableAsset : public ArWritableAsset {
 public:
-    explicit Sdf_StreamWritableAsset(std::ostream& out)
-        : _out(out)
-    {
-    }
+    explicit Sdf_StreamWritableAsset(std::ostream& out) : _out(out) {}
 
     virtual ~Sdf_StreamWritableAsset();
 
-    bool Close() override
-    {
+    bool Close() override {
         _out.flush();
         return true;
     }
 
-    size_t Write(const void* buffer, size_t count, size_t offset) override
-    {
+    size_t Write(const void* buffer, size_t count, size_t offset) override {
         // The offset is ignored as we assume this object will only be
         // used for sequential writes. This is a performance optimization,
         // since calling tellp repeatedly can be expensive.
@@ -60,22 +53,14 @@ private:
 };
 
 // Helper class for writing out strings for the text file format.
-class Sdf_TextOutput
-{
+class Sdf_TextOutput {
 public:
-    explicit Sdf_TextOutput(std::ostream& out)
-        : Sdf_TextOutput(std::make_shared<Sdf_StreamWritableAsset>(out))
-    { }
+    explicit Sdf_TextOutput(std::ostream& out) : Sdf_TextOutput(std::make_shared<Sdf_StreamWritableAsset>(out)) {}
 
     explicit Sdf_TextOutput(std::shared_ptr<ArWritableAsset>&& asset)
-        : _asset(std::move(asset))
-        , _offset(0)
-        , _buffer(new char[BUFFER_SIZE])
-        , _bufferPos(0)
-    { }
+        : _asset(std::move(asset)), _offset(0), _buffer(new char[BUFFER_SIZE]), _bufferPos(0) {}
 
-    ~Sdf_TextOutput()
-    {
+    ~Sdf_TextOutput() {
         if (_asset) {
             Close();
         }
@@ -85,8 +70,7 @@ public:
     const Sdf_TextOutput& operator=(const Sdf_TextOutput&) = delete;
 
     // Close the output, flushing contents to destination.
-    bool Close()
-    {
+    bool Close() {
         if (!_asset) {
             return true;
         }
@@ -97,20 +81,13 @@ public:
     }
 
     // Write given \p str to output.
-    bool Write(const std::string& str)
-    {
-        return _Write(str.c_str(), str.length());
-    }
+    bool Write(const std::string& str) { return _Write(str.c_str(), str.length()); }
 
     // Write NUL-terminated character string \p str to output.
-    bool Write(const char* str)
-    {
-        return _Write(str, strlen(str));
-    }
+    bool Write(const char* str) { return _Write(str, strlen(str)); }
 
 private:
-    bool _Write(const char* str, size_t strLength)
-    {
+    bool _Write(const char* str, size_t strLength) {
         // Much of the text format writing code writes small number of
         // characters at a time. Buffer writes to batch writes into larger
         // chunks.
@@ -129,18 +106,16 @@ private:
                 }
             }
         }
-        
+
         return true;
     }
 
-    bool _FlushBuffer()
-    {
+    bool _FlushBuffer() {
         if (_bufferPos == 0) {
             return true;
         }
 
-        const size_t nWritten = _asset->Write(
-            _buffer.get(), _bufferPos, _offset);
+        const size_t nWritten = _asset->Write(_buffer.get(), _bufferPos, _offset);
 
         if (nWritten != _bufferPos) {
             TF_RUNTIME_ERROR("Failed to write bytes");
@@ -160,19 +135,13 @@ private:
 };
 
 // Helper class for writing out strings for the text file format
-// into a single string. 
-class Sdf_StringOutput
-    : public Sdf_TextOutput
-{
+// into a single string.
+class Sdf_StringOutput : public Sdf_TextOutput {
 public:
-    explicit Sdf_StringOutput()
-        : Sdf_TextOutput(_str)
-    {
-    }
+    explicit Sdf_StringOutput() : Sdf_TextOutput(_str) {}
 
     // Closes the output and returns the text output as a string.
-    std::string GetString()
-    {
+    std::string GetString() {
         Close();
         return _str.str();
     }
@@ -182,7 +151,7 @@ private:
 };
 
 // Write the provided \a spec to \a out indented \a indent levels.
-bool Sdf_WriteToStream(const SdfSpec &spec, std::ostream& out, size_t indent);
+bool Sdf_WriteToStream(const SdfSpec& spec, std::ostream& out, size_t indent);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

@@ -35,8 +35,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// mapping operations and their inputs, so we can narrowly redo the
 /// computation when one of the inputs changes.
 ///
-class PcpMapExpression
-{
+class PcpMapExpression {
 public:
     /// The value type of PcpMapExpression is a PcpMapFunction.
     typedef PcpMapFunction Value;
@@ -46,7 +45,7 @@ public:
     /// The return value is a reference to the internal cached value.
     /// The cache is automatically invalidated as needed.
     PCP_API
-    const Value & Evaluate() const;
+    const Value& Evaluate() const;
 
     /// Default-construct a NULL expression.
     PcpMapExpression() noexcept = default;
@@ -54,14 +53,10 @@ public:
     ~PcpMapExpression() noexcept = default;
 
     /// Swap this expression with the other.
-    void Swap(PcpMapExpression &other) noexcept {
-        _node.swap(other._node);
-    }
+    void Swap(PcpMapExpression& other) noexcept { _node.swap(other._node); }
 
     /// Return true if this is a null expression.
-    bool IsNull() const noexcept {
-        return !_node;
-    }
+    bool IsNull() const noexcept { return !_node; }
 
     /// \name Creating expressions
     /// @{
@@ -72,22 +67,23 @@ public:
 
     /// Create a new constant.
     PCP_API
-    static PcpMapExpression Constant( const Value & constValue );
+    static PcpMapExpression Constant(const Value& constValue);
 
     /// A Variable is a mutable memory cell that holds a value.
     /// Changing a variable's value invalidates any expressions using
     /// that variable.
     class Variable {
-        Variable(Variable const &) = delete;
-        Variable &operator=(Variable const &) = delete;
+        Variable(Variable const&) = delete;
+        Variable& operator=(Variable const&) = delete;
+
     public:
         Variable() = default;
         virtual ~Variable();
         /// Return the current value.
-        virtual const Value & GetValue() const = 0;
+        virtual const Value& GetValue() const = 0;
         /// Mutate the variable to have the new value.
         /// This will also invalidate dependant expressions.
-        virtual void SetValue(Value && value) = 0;
+        virtual void SetValue(Value&& value) = 0;
         /// Return an expression representing the value of this variable.
         /// This lets you use the variable as a sub-term in other expressions.
         virtual PcpMapExpression GetExpression() const = 0;
@@ -103,12 +99,12 @@ public:
     /// will continue to be valid, but there will be no way to further
     /// change the value of the variable.
     PCP_API
-    static VariableUniquePtr NewVariable(Value && initialValue);
+    static VariableUniquePtr NewVariable(Value&& initialValue);
 
     /// Create a new PcpMapExpression representing the application of
     /// f's value, followed by the application of this expression's value.
     PCP_API
-    PcpMapExpression Compose(const PcpMapExpression &f) const;
+    PcpMapExpression Compose(const PcpMapExpression& f) const;
 
     /// Create a new PcpMapExpression representing the inverse of f.
     PCP_API
@@ -121,8 +117,7 @@ public:
 
     /// Return true if the map function is the constant identity function.
     bool IsConstantIdentity() const {
-        return _node && _node->key.op == _OpConstant &&
-            _node->key.valueForConstant.IsIdentity();
+        return _node && _node->key.op == _OpConstant && _node->key.valueForConstant.IsIdentity();
     }
 
     /// @}
@@ -134,32 +129,22 @@ public:
 
     /// Return true if the evaluated map function is the identity function.
     /// For identity, MapSourceToTarget() always returns the path unchanged.
-    bool IsIdentity() const {
-        return Evaluate().IsIdentity();
-    }
+    bool IsIdentity() const { return Evaluate().IsIdentity(); }
 
     /// Map a path in the source namespace to the target.
     /// If the path is not in the domain, returns an empty path.
-    SdfPath MapSourceToTarget(const SdfPath &path) const {
-        return Evaluate().MapSourceToTarget(path);
-    }
+    SdfPath MapSourceToTarget(const SdfPath& path) const { return Evaluate().MapSourceToTarget(path); }
 
     /// Map a path in the target namespace to the source.
     /// If the path is not in the co-domain, returns an empty path.
-    SdfPath MapTargetToSource(const SdfPath &path) const {
-        return Evaluate().MapTargetToSource(path);
-    }
+    SdfPath MapTargetToSource(const SdfPath& path) const { return Evaluate().MapTargetToSource(path); }
 
     /// The time offset of the mapping.
-    const SdfLayerOffset &GetTimeOffset() const {
-        return Evaluate().GetTimeOffset();
-    }
+    const SdfLayerOffset& GetTimeOffset() const { return Evaluate().GetTimeOffset(); }
 
     /// Returns a string representation of this mapping for debugging
     /// purposes.
-    std::string GetString() const {
-        return Evaluate().GetString();
-    }
+    std::string GetString() const { return Evaluate().GetString(); }
 
     /// @}
 
@@ -171,16 +156,10 @@ private:
     class _Node;
     using _NodeRefPtr = TfDelegatedCountPtr<_Node>;
 
-    explicit PcpMapExpression(const _NodeRefPtr & node) : _node(node) {}
+    explicit PcpMapExpression(const _NodeRefPtr& node) : _node(node) {}
 
-private: // data
-    enum _Op {
-        _OpConstant,
-        _OpVariable,
-        _OpInverse,
-        _OpCompose,
-        _OpAddRootIdentity
-    };
+private:  // data
+    enum _Op { _OpConstant, _OpVariable, _OpInverse, _OpCompose, _OpAddRootIdentity };
 
     class _Node {
         _Node(const _Node&) = delete;
@@ -190,6 +169,7 @@ private: // data
         // Need to friend them here to have access to _refCount.
         friend PCP_API void TfDelegatedCountIncrement(_Node*);
         friend PCP_API void TfDelegatedCountDecrement(_Node*) noexcept;
+
     public:
         // The Key holds all the state needed to uniquely identify
         // this (sub-)expression.
@@ -198,17 +178,10 @@ private: // data
             const _NodeRefPtr arg1, arg2;
             const Value valueForConstant;
 
-            Key( _Op op_,
-                 const _NodeRefPtr & arg1_,
-                 const _NodeRefPtr & arg2_,
-                 const Value & valueForConstant_ )
-                : op(op_)
-                , arg1(arg1_)
-                , arg2(arg2_)
-                , valueForConstant(valueForConstant_)
-            {}
+            Key(_Op op_, const _NodeRefPtr& arg1_, const _NodeRefPtr& arg2_, const Value& valueForConstant_)
+                : op(op_), arg1(arg1_), arg2(arg2_), valueForConstant(valueForConstant_) {}
             inline size_t GetHash() const;
-            bool operator==(const Key &key) const;
+            bool operator==(const Key& key) const;
         };
 
         // The Key of a node is const, and established when it is created.
@@ -219,26 +192,23 @@ private: // data
         const bool expressionTreeAlwaysHasIdentity;
 
         // Factory method to create new nodes.
-        static _NodeRefPtr
-        New( _Op op,
-             const _NodeRefPtr & arg1 = _NodeRefPtr(),
-             const _NodeRefPtr & arg2 = _NodeRefPtr(),
-             const Value & valueForConstant = Value() );
+        static _NodeRefPtr New(_Op op,
+                               const _NodeRefPtr& arg1 = _NodeRefPtr(),
+                               const _NodeRefPtr& arg2 = _NodeRefPtr(),
+                               const Value& valueForConstant = Value());
         ~_Node();
 
         // Evaluate (and internally cache) the value of this node.
-        const Value & EvaluateAndCache() const;
+        const Value& EvaluateAndCache() const;
 
         // For _OpVariable nodes, sets the variable's value.
-        void SetValueForVariable(Value &&newValue);
+        void SetValueForVariable(Value&& newValue);
 
         // For _OpVariable nodes, returns the variable's value.
-        const Value & GetValueForVariable() const {
-            return _valueForVariable;
-        }
+        const Value& GetValueForVariable() const { return _valueForVariable; }
 
     private:
-        explicit _Node( const Key &key_ );
+        explicit _Node(const Key& key_);
         void _Invalidate();
         Value _EvaluateUncached() const;
 
@@ -268,4 +238,4 @@ private: // data
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_MAP_EXPRESSION_H
+#endif  // PXR_USD_PCP_MAP_EXPRESSION_H

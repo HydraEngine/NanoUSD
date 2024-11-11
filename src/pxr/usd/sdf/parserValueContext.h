@@ -46,20 +46,20 @@ PXR_NAMESPACE_OPEN_SCOPE
 class Sdf_ParserValueContext {
 public:
     typedef Sdf_ParserHelpers::Value Value;
-    typedef std::function<void (const std::string &)> ErrorReporter;
+    typedef std::function<void(const std::string&)> ErrorReporter;
 
     Sdf_ParserValueContext();
 
     // Sets up this context to produce a value with C++ type determined by
-    // the given \p typeName. 
-    // 
+    // the given \p typeName.
+    //
     // Returns true if the given type is valid and recognized, false
     // otherwise. If false is returned, the context will be unable to
     // produce a value for this type.
-    bool SetupFactory(const std::string &typeName);
+    bool SetupFactory(const std::string& typeName);
 
     // Make a shaped value from parsed context.
-    VtValue ProduceValue(std::string *errStrPtr);
+    VtValue ProduceValue(std::string* errStrPtr);
 
     void Clear();
 
@@ -83,7 +83,7 @@ public:
     SdfTupleDimensions tupleDimensions;
     std::vector<Value> vars;
     std::vector<unsigned int> workingShape;
-    
+
     // The recorded dim at which we got our first AppendValue.
     // If we get subsequent pushes where dim != pushDim, it is an error
     // (eg [1, 2, [3, 4]]).  Initially it is -1 to indicate we have never
@@ -114,7 +114,7 @@ public:
     std::string GetRecordedString() const;
 
     // Hook to override the recorded text
-    void SetRecordedString(const std::string &text);
+    void SetRecordedString(const std::string& text);
 
 private:
     bool _needComma, _isRecordingString;
@@ -123,4 +123,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_PARSER_VALUE_CONTEXT_H
+#endif  // PXR_USD_SDF_PARSER_VALUE_CONTEXT_H

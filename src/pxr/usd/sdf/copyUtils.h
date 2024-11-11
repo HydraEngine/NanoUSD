@@ -50,7 +50,7 @@ SDF_DECLARE_HANDLES(SdfLayer);
 /// prim will be used.
 ///
 /// Attribute connections, relationship targets, inherit and specializes paths,
-/// and internal sub-root references that target an object beneath \p srcPath 
+/// and internal sub-root references that target an object beneath \p srcPath
 /// will be remapped to target objects beneath \p dstPath.
 ///
 /// If \p srcLayer and \p dstLayer are the same, and either \p srcPath or \p
@@ -60,10 +60,10 @@ SDF_DECLARE_HANDLES(SdfLayer);
 /// and copies the source to it.  Then it copies that temporary to the
 /// destination.
 SDF_API
-bool
-SdfCopySpec(
-    const SdfLayerHandle& srcLayer, const SdfPath& srcPath,
-    const SdfLayerHandle& dstLayer, const SdfPath& dstPath);
+bool SdfCopySpec(const SdfLayerHandle& srcLayer,
+                 const SdfPath& srcPath,
+                 const SdfLayerHandle& dstLayer,
+                 const SdfPath& dstPath);
 
 /// @}
 
@@ -75,42 +75,44 @@ SdfCopySpec(
 /// \p fieldInDst indicates whether the field has values at the source and
 /// destination specs. Return false otherwise.
 ///
-/// This function may modify the value that is copied by filling in 
+/// This function may modify the value that is copied by filling in
 /// \p valueToCopy with the desired value. \p valueToCopy may also be a
-/// SdfCopySpecsValueEdit that specifies an editing operation for this field. 
-/// If \p valueToCopy is not set, the field value from the source spec will be 
-/// used as-is. Setting \p valueToCopy to an empty VtValue indicates that the 
+/// SdfCopySpecsValueEdit that specifies an editing operation for this field.
+/// If \p valueToCopy is not set, the field value from the source spec will be
+/// used as-is. Setting \p valueToCopy to an empty VtValue indicates that the
 /// field should be removed from the destination spec, if it already exists.
 ///
 /// Note that if this function returns true and the source spec has no value
 /// for \p field (e.g., fieldInSrc == false), the field in the destination
 /// spec will also be set to no value.
-using SdfShouldCopyValueFn = std::function<
-    bool(SdfSpecType specType, const TfToken& field,
-         const SdfLayerHandle& srcLayer, const SdfPath& srcPath, bool fieldInSrc,
-         const SdfLayerHandle& dstLayer, const SdfPath& dstPath, bool fieldInDst,
-         std::optional<VtValue>* valueToCopy)>;
+using SdfShouldCopyValueFn = std::function<bool(SdfSpecType specType,
+                                                const TfToken& field,
+                                                const SdfLayerHandle& srcLayer,
+                                                const SdfPath& srcPath,
+                                                bool fieldInSrc,
+                                                const SdfLayerHandle& dstLayer,
+                                                const SdfPath& dstPath,
+                                                bool fieldInDst,
+                                                std::optional<VtValue>* valueToCopy)>;
 
 /// \class SdfCopySpecsValueEdit
 /// Value containing an editing operation for SdfCopySpecs.
 ///
 /// The SdfShouldCopyValueFn callback allows users to return a value to copy
 /// into the destination spec via the \p valueToCopy parameter. However, there
-/// may be cases where it would be more efficient to perform incremental edits 
+/// may be cases where it would be more efficient to perform incremental edits
 /// using specific SdfLayer API instead.
 ///
 /// To accommodate this, consumers may provide a callback that applies a
-/// scene description edit in \p valueToCopy via an SdfCopySpecsValueEdit 
-/// object. 
-class SdfCopySpecsValueEdit
-{
+/// scene description edit in \p valueToCopy via an SdfCopySpecsValueEdit
+/// object.
+class SdfCopySpecsValueEdit {
 public:
     /// Callback to apply a scene description edit to the specified layer and
     /// spec path.
-    using EditFunction = 
-        std::function<void(const SdfLayerHandle&, const SdfPath&)>;
+    using EditFunction = std::function<void(const SdfLayerHandle&, const SdfPath&)>;
 
-    explicit SdfCopySpecsValueEdit(const EditFunction& edit) : _edit(edit) { }
+    explicit SdfCopySpecsValueEdit(const EditFunction& edit) : _edit(edit) {}
     const EditFunction& GetEditFunction() const { return _edit; }
 
     /// SdfCopySpecsValueEdit objects are not comparable, but must provide
@@ -123,26 +125,29 @@ private:
 };
 
 /// Return true if \p childrenField and the child objects the field represents
-/// should be copied from the spec at \p srcPath in \p srcLayer to the spec at 
-/// \p dstPath in \p dstLayer. \p fieldInSrc and \p fieldInDst indicates 
-/// whether that field has values at the source and destination specs. 
+/// should be copied from the spec at \p srcPath in \p srcLayer to the spec at
+/// \p dstPath in \p dstLayer. \p fieldInSrc and \p fieldInDst indicates
+/// whether that field has values at the source and destination specs.
 /// Return false otherwise.
 ///
 /// This function may modify which children are copied by filling in
 /// \p srcChildren and \p dstChildren with the children to copy and their
 /// destination. Both of these values must be set, and must contain the same
 /// number of children.
-/// 
-/// Note that if this function returns true and the source spec has no value 
-/// for \p childrenField (e.g., fieldInSrc == false), the field in the 
+///
+/// Note that if this function returns true and the source spec has no value
+/// for \p childrenField (e.g., fieldInSrc == false), the field in the
 /// destination spec will also be set to no value, causing any existing children
 /// to be removed.
-using SdfShouldCopyChildrenFn = std::function<
-    bool(const TfToken& childrenField,
-         const SdfLayerHandle& srcLayer, const SdfPath& srcPath, bool fieldInSrc,
-         const SdfLayerHandle& dstLayer, const SdfPath& dstPath, bool fieldInDst,
-         std::optional<VtValue>* srcChildren,
-         std::optional<VtValue>* dstChildren)>;
+using SdfShouldCopyChildrenFn = std::function<bool(const TfToken& childrenField,
+                                                   const SdfLayerHandle& srcLayer,
+                                                   const SdfPath& srcPath,
+                                                   bool fieldInSrc,
+                                                   const SdfLayerHandle& dstLayer,
+                                                   const SdfPath& dstPath,
+                                                   bool fieldInDst,
+                                                   std::optional<VtValue>* srcChildren,
+                                                   std::optional<VtValue>* dstChildren)>;
 
 /// SdfShouldCopyValueFn used by the simple version of SdfCopySpec.
 ///
@@ -153,13 +158,17 @@ using SdfShouldCopyChildrenFn = std::function<
 /// source.  Any fields in the destination that aren't in the source will be
 /// cleared.
 SDF_API
-bool
-SdfShouldCopyValue(
-    const SdfPath& srcRootPath, const SdfPath& dstRootPath,
-    SdfSpecType specType, const TfToken& field,
-    const SdfLayerHandle& srcLayer, const SdfPath& srcPath, bool fieldInSrc,
-    const SdfLayerHandle& dstLayer, const SdfPath& dstPath, bool fieldInDst,
-    std::optional<VtValue>* valueToCopy);
+bool SdfShouldCopyValue(const SdfPath& srcRootPath,
+                        const SdfPath& dstRootPath,
+                        SdfSpecType specType,
+                        const TfToken& field,
+                        const SdfLayerHandle& srcLayer,
+                        const SdfPath& srcPath,
+                        bool fieldInSrc,
+                        const SdfLayerHandle& dstLayer,
+                        const SdfPath& dstPath,
+                        bool fieldInDst,
+                        std::optional<VtValue>* valueToCopy);
 
 /// SdfShouldCopyChildrenFn used by the simple version of SdfCopySpec.
 ///
@@ -170,14 +179,17 @@ SdfShouldCopyValue(
 /// source.  Any fields in the destination that aren't in the source will be
 /// cleared.
 SDF_API
-bool
-SdfShouldCopyChildren(
-    const SdfPath& srcRootPath, const SdfPath& dstRootPath,
-    const TfToken& childrenField,
-    const SdfLayerHandle& srcLayer, const SdfPath& srcPath, bool fieldInSrc,
-    const SdfLayerHandle& dstLayer, const SdfPath& dstPath, bool fieldInDst,
-    std::optional<VtValue>* srcChildren,
-    std::optional<VtValue>* dstChildren);
+bool SdfShouldCopyChildren(const SdfPath& srcRootPath,
+                           const SdfPath& dstRootPath,
+                           const TfToken& childrenField,
+                           const SdfLayerHandle& srcLayer,
+                           const SdfPath& srcPath,
+                           bool fieldInSrc,
+                           const SdfLayerHandle& dstLayer,
+                           const SdfPath& dstPath,
+                           bool fieldInDst,
+                           std::optional<VtValue>* srcChildren,
+                           std::optional<VtValue>* dstChildren);
 
 /// Utility function for copying spec data at \p srcPath in \p srcLayer to
 /// \p destPath in \p destLayer. Various behaviors (such as which parts of the
@@ -212,15 +224,15 @@ SdfShouldCopyChildren(
 /// shouldCopyChildrenFn will be called with the temporary source layer rather
 /// than the original source layer, but the source paths will be the same.
 SDF_API
-bool 
-SdfCopySpec(
-    const SdfLayerHandle& srcLayer, const SdfPath& srcPath,
-    const SdfLayerHandle& dstLayer, const SdfPath& dstPath,
-    const SdfShouldCopyValueFn& shouldCopyValueFn,
-    const SdfShouldCopyChildrenFn& shouldCopyChildrenFn);
+bool SdfCopySpec(const SdfLayerHandle& srcLayer,
+                 const SdfPath& srcPath,
+                 const SdfLayerHandle& dstLayer,
+                 const SdfPath& dstPath,
+                 const SdfShouldCopyValueFn& shouldCopyValueFn,
+                 const SdfShouldCopyChildrenFn& shouldCopyChildrenFn);
 
 /// @}
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_COPY_UTILS_H
+#endif  // PXR_USD_SDF_COPY_UTILS_H

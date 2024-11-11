@@ -24,13 +24,13 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 /// \class SdfListEditorProxy
 ///
-/// Represents a set of list editing operations. 
+/// Represents a set of list editing operations.
 ///
 /// An SdfListEditorProxy allows consumers to specify a transformation to be
-/// applied to a list via a set of list editing operations. Given a starting 
-/// ordered list, it can either replace the result with another ordered list 
+/// applied to a list via a set of list editing operations. Given a starting
+/// ordered list, it can either replace the result with another ordered list
 /// or apply a sequence of three operations:  deleting keys, then adding keys
-/// to the end (if they aren't already in the starting list), then reordering 
+/// to the end (if they aren't already in the starting list), then reordering
 /// keys.
 ///
 /// The type policy defines the value type that a particular proxy can operate
@@ -45,29 +45,21 @@ public:
     typedef std::vector<value_type> value_vector_type;
 
     // ApplyEdits types.
-    typedef std::function<std::optional<value_type>
-                        (SdfListOpType, const value_type&)> ApplyCallback;
+    typedef std::function<std::optional<value_type>(SdfListOpType, const value_type&)> ApplyCallback;
 
     // ModifyEdits types.
-    typedef std::function<std::optional<value_type>
-                        (const value_type&)> ModifyCallback;
+    typedef std::function<std::optional<value_type>(const value_type&)> ModifyCallback;
 
-    /// Creates a default proxy object. The object evaluates to \c false in a 
+    /// Creates a default proxy object. The object evaluates to \c false in a
     /// boolean context and all operations on this object have no effect.
-    SdfListEditorProxy()
-    {
-    }
+    SdfListEditorProxy() {}
 
     /// Creates a new proxy object backed by the supplied list editor.
-    explicit SdfListEditorProxy(
-        const std::shared_ptr<Sdf_ListEditor<TypePolicy> >& listEditor)
-        : _listEditor(listEditor)
-    {
-    }
+    explicit SdfListEditorProxy(const std::shared_ptr<Sdf_ListEditor<TypePolicy>>& listEditor)
+        : _listEditor(listEditor) {}
 
     /// Returns true if the list editor is expired.
-    bool IsExpired() const
-    {
+    bool IsExpired() const {
         if (!_listEditor) {
             return false;
         }
@@ -77,29 +69,19 @@ public:
 
     /// Returns \c true if the editor has an explicit list, \c false if
     /// it has list operations.
-    bool IsExplicit() const
-    {
-        return _Validate() ? _listEditor->IsExplicit() : true;
-    }
+    bool IsExplicit() const { return _Validate() ? _listEditor->IsExplicit() : true; }
 
     /// Returns \c true if the editor is not explicit and allows ordering
     /// only.
-    bool IsOrderedOnly() const
-    {
-        return _Validate() ? _listEditor->IsOrderedOnly() : false;
-    }
+    bool IsOrderedOnly() const { return _Validate() ? _listEditor->IsOrderedOnly() : false; }
 
     /// Returns \c true if the editor has an explicit list (even if it's
     /// empty) or it has any added, prepended, appended, deleted,
     /// or ordered keys.
-    bool HasKeys() const
-    {
-        return _Validate() ? _listEditor->HasKeys() : true;
-    }
+    bool HasKeys() const { return _Validate() ? _listEditor->HasKeys() : true; }
 
     /// Apply the edits to \p vec.
-    void ApplyEditsToList(value_vector_type* vec) const
-    {
+    void ApplyEditsToList(value_vector_type* vec) const {
         if (_Validate()) {
             _listEditor->ApplyEditsToList(vec, ApplyCallback());
         }
@@ -111,8 +93,7 @@ public:
     /// the returned key is applied, allowing callbacks to perform key
     /// translation.
     template <class CB>
-    void ApplyEditsToList(value_vector_type* vec, CB callback) const
-    {
+    void ApplyEditsToList(value_vector_type* vec, CB callback) const {
         if (_Validate()) {
             _listEditor->ApplyEditsToList(vec, ApplyCallback(callback));
         }
@@ -125,10 +106,8 @@ public:
     /// Not all list editors support changing their mode.  If the mode
     /// can't be changed to the mode of \p other then this does nothing
     /// and returns \c false, otherwise it returns \c true.
-    bool CopyItems(const This& other)
-    {
-        return _Validate() && other._Validate() ?
-            _listEditor->CopyEdits(*other._listEditor) : false;
+    bool CopyItems(const This& other) {
+        return _Validate() && other._Validate() ? _listEditor->CopyEdits(*other._listEditor) : false;
     }
 
     /// Removes all keys and changes the editor to have list operations.
@@ -136,27 +115,20 @@ public:
     /// Not all list editors support changing their mode.  If the mode
     /// can't be changed to the mode of \p other then this does nothing
     /// and returns \c false, otherwise it returns \c true.
-    bool ClearEdits()
-    {
-        return _Validate() ? _listEditor->ClearEdits() : false;
-    }
+    bool ClearEdits() { return _Validate() ? _listEditor->ClearEdits() : false; }
 
     /// Removes all keys and changes the editor to be explicit.
     ///
     /// Not all list editors support changing their mode.  If the mode
     /// can't be changed to the mode of \p other then this does nothing
     /// and returns \c false, otherwise it returns \c true.
-    bool ClearEditsAndMakeExplicit()
-    {
-        return _Validate() ? _listEditor->ClearEditsAndMakeExplicit() : false;
-    }
+    bool ClearEditsAndMakeExplicit() { return _Validate() ? _listEditor->ClearEditsAndMakeExplicit() : false; }
 
     /// \p callback is called for every key.  If the returned key is
     /// invalid then the key is removed, otherwise it's replaced with the
     /// returned key.
     template <class CB>
-    void ModifyItemEdits(CB callback)
-    {
+    void ModifyItemEdits(CB callback) {
         if (_Validate()) {
             _listEditor->ModifyItemEdits(ModifyCallback(callback));
         }
@@ -165,9 +137,7 @@ public:
     /// Check if the given item is explicit, added, prepended, appended,
     /// deleted, or ordered by this editor. If \p onlyAddOrExplicit is
     /// \c true we only check the added or explicit items.
-    bool ContainsItemEdit(const value_type& item,
-                          bool onlyAddOrExplicit = false) const
-    {
+    bool ContainsItemEdit(const value_type& item, bool onlyAddOrExplicit = false) const {
         if (_Validate()) {
             size_t i;
 
@@ -209,11 +179,10 @@ public:
 
     /// Remove all occurrences of the given item, regardless of whether
     /// the item is explicit, added, prepended, appended, deleted, or ordered.
-    void RemoveItemEdits(const value_type& item)
-    {
+    void RemoveItemEdits(const value_type& item) {
         if (_Validate()) {
             SdfChangeBlock block;
-            
+
             GetExplicitItems().Remove(item);
             GetAddedItems().Remove(item);
             GetPrependedItems().Remove(item);
@@ -226,11 +195,10 @@ public:
     /// Replace all occurrences of the given item, regardless of
     /// whether the item is explicit, added, prepended, appended,
     /// deleted or ordered.
-    void ReplaceItemEdits(const value_type& oldItem, const value_type& newItem)
-    {
+    void ReplaceItemEdits(const value_type& oldItem, const value_type& newItem) {
         if (_Validate()) {
             SdfChangeBlock block;
-            
+
             GetExplicitItems().Replace(oldItem, newItem);
             GetAddedItems().Replace(oldItem, newItem);
             GetPrependedItems().Replace(oldItem, newItem);
@@ -241,56 +209,34 @@ public:
     }
 
     /// Returns the explicitly set items.
-    ListProxy GetExplicitItems() const
-    {
-        return ListProxy(_listEditor, SdfListOpTypeExplicit);
-    }
+    ListProxy GetExplicitItems() const { return ListProxy(_listEditor, SdfListOpTypeExplicit); }
 
     /// Returns the items added by this list editor
-    ListProxy GetAddedItems() const
-    {
-        return ListProxy(_listEditor, SdfListOpTypeAdded);
-    }
+    ListProxy GetAddedItems() const { return ListProxy(_listEditor, SdfListOpTypeAdded); }
 
     /// Returns the items prepended by this list editor
-    ListProxy GetPrependedItems() const
-    {
-        return ListProxy(_listEditor, SdfListOpTypePrepended);
-    }
+    ListProxy GetPrependedItems() const { return ListProxy(_listEditor, SdfListOpTypePrepended); }
 
     /// Returns the items appended by this list editor
-    ListProxy GetAppendedItems() const
-    {
-        return ListProxy(_listEditor, SdfListOpTypeAppended);
-    }
+    ListProxy GetAppendedItems() const { return ListProxy(_listEditor, SdfListOpTypeAppended); }
 
     /// Returns the items deleted by this list editor
-    ListProxy GetDeletedItems() const
-    {
-        return ListProxy(_listEditor, SdfListOpTypeDeleted);
-    }
+    ListProxy GetDeletedItems() const { return ListProxy(_listEditor, SdfListOpTypeDeleted); }
 
     /// Returns the items reordered by this list editor
-    ListProxy GetOrderedItems() const
-    {
-        return ListProxy(_listEditor, SdfListOpTypeOrdered);
-    }
+    ListProxy GetOrderedItems() const { return ListProxy(_listEditor, SdfListOpTypeOrdered); }
 
     /// Deprecated.  Please use \ref GetAppliedItems
-    value_vector_type GetAddedOrExplicitItems() const
-    {
-        return GetAppliedItems();
-    }
+    value_vector_type GetAddedOrExplicitItems() const { return GetAppliedItems(); }
 
     /// Returns the effective list of items represented by the operations in
     /// this list op. This function should be used to determine the final list
     /// of items added instead of looking at the individual explicit, prepended,
-    /// and appended item lists. 
+    /// and appended item lists.
     ///
     /// This is equivalent to calling ApplyOperations on an empty item vector.
-    
-    value_vector_type GetAppliedItems() const
-    {
+
+    value_vector_type GetAppliedItems() const {
         value_vector_type result;
         if (_Validate()) {
             _listEditor->ApplyEditsToList(&result);
@@ -298,14 +244,12 @@ public:
         return result;
     }
 
-    void Add(const value_type& value)
-    {
+    void Add(const value_type& value) {
         if (_Validate()) {
             if (!_listEditor->IsOrderedOnly()) {
                 if (_listEditor->IsExplicit()) {
                     _AddOrReplace(SdfListOpTypeExplicit, value);
-                }
-                else {
+                } else {
                     GetDeletedItems().Remove(value);
                     _AddOrReplace(SdfListOpTypeAdded, value);
                 }
@@ -313,14 +257,12 @@ public:
         }
     }
 
-    void Prepend(const value_type& value)
-    {
+    void Prepend(const value_type& value) {
         if (_Validate()) {
             if (!_listEditor->IsOrderedOnly()) {
                 if (_listEditor->IsExplicit()) {
                     _Prepend(SdfListOpTypeExplicit, value);
-                }
-                else {
+                } else {
                     GetDeletedItems().Remove(value);
                     _Prepend(SdfListOpTypePrepended, value);
                 }
@@ -328,14 +270,12 @@ public:
         }
     }
 
-    void Append(const value_type& value)
-    {
+    void Append(const value_type& value) {
         if (_Validate()) {
             if (!_listEditor->IsOrderedOnly()) {
                 if (_listEditor->IsExplicit()) {
                     _Append(SdfListOpTypeExplicit, value);
-                }
-                else {
+                } else {
                     GetDeletedItems().Remove(value);
                     _Append(SdfListOpTypeAppended, value);
                 }
@@ -343,13 +283,11 @@ public:
         }
     }
 
-    void Remove(const value_type& value)
-    {
+    void Remove(const value_type& value) {
         if (_Validate()) {
             if (_listEditor->IsExplicit()) {
                 GetExplicitItems().Remove(value);
-            }
-            else if (!_listEditor->IsOrderedOnly()) {
+            } else if (!_listEditor->IsOrderedOnly()) {
                 GetAddedItems().Remove(value);
                 GetPrependedItems().Remove(value);
                 GetAppendedItems().Remove(value);
@@ -358,14 +296,12 @@ public:
         }
     }
 
-    void Erase(const value_type& value)
-    {
+    void Erase(const value_type& value) {
         if (_Validate()) {
             if (!_listEditor->IsOrderedOnly()) {
                 if (_listEditor->IsExplicit()) {
                     GetExplicitItems().Remove(value);
-                }
-                else {
+                } else {
                     GetAddedItems().Remove(value);
                     GetPrependedItems().Remove(value);
                     GetAppendedItems().Remove(value);
@@ -374,17 +310,13 @@ public:
         }
     }
 
-    /// Explicit bool conversion operator. A ListEditorProxy object 
-    /// converts to \c true iff the list editor is valid, converts to \c false 
+    /// Explicit bool conversion operator. A ListEditorProxy object
+    /// converts to \c true iff the list editor is valid, converts to \c false
     /// otherwise.
-    explicit operator bool() const
-    {
-        return _listEditor && _listEditor->IsValid();
-    }
+    explicit operator bool() const { return _listEditor && _listEditor->IsValid(); }
 
 private:
-    bool _Validate()
-    {
+    bool _Validate() {
         if (!_listEditor) {
             return false;
         }
@@ -396,8 +328,7 @@ private:
         return true;
     }
 
-    bool _Validate() const
-    {
+    bool _Validate() const {
         if (!_listEditor) {
             return false;
         }
@@ -409,8 +340,7 @@ private:
         return true;
     }
 
-    void _AddIfMissing(SdfListOpType op, const value_type& value)
-    {
+    void _AddIfMissing(SdfListOpType op, const value_type& value) {
         ListProxy proxy(_listEditor, op);
         size_t index = proxy.Find(value);
         if (index == size_t(-1)) {
@@ -418,20 +348,17 @@ private:
         }
     }
 
-    void _AddOrReplace(SdfListOpType op, const value_type& value)
-    {
+    void _AddOrReplace(SdfListOpType op, const value_type& value) {
         ListProxy proxy(_listEditor, op);
         size_t index = proxy.Find(value);
         if (index == size_t(-1)) {
             proxy.push_back(value);
-        }
-        else if (value != static_cast<value_type>(proxy[index])) {
+        } else if (value != static_cast<value_type>(proxy[index])) {
             proxy[index] = value;
         }
     }
 
-    void _Prepend(SdfListOpType op, const value_type& value)
-    {
+    void _Prepend(SdfListOpType op, const value_type& value) {
         ListProxy proxy(_listEditor, op);
         size_t index = proxy.Find(value);
         if (index != 0) {
@@ -442,11 +369,10 @@ private:
         }
     }
 
-    void _Append(SdfListOpType op, const value_type& value)
-    {
+    void _Append(SdfListOpType op, const value_type& value) {
         ListProxy proxy(_listEditor, op);
         size_t index = proxy.Find(value);
-        if (proxy.empty() || (index != proxy.size()-1)) {
+        if (proxy.empty() || (index != proxy.size() - 1)) {
             if (index != size_t(-1)) {
                 proxy.Erase(index);
             }
@@ -455,18 +381,19 @@ private:
     }
 
 private:
-    std::shared_ptr<Sdf_ListEditor<TypePolicy> > _listEditor;
+    std::shared_ptr<Sdf_ListEditor<TypePolicy>> _listEditor;
 
     friend class Sdf_ListEditorProxyAccess;
-    template <class T> friend class SdfPyWrapListEditorProxy;
+    template <class T>
+    friend class SdfPyWrapListEditorProxy;
 };
 
 // Cannot get from a VtValue except as the correct type.
 template <class TP>
-struct Vt_DefaultValueFactory<SdfListEditorProxy<TP> > {
+struct Vt_DefaultValueFactory<SdfListEditorProxy<TP>> {
     static Vt_DefaultValueHolder Invoke() = delete;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_LIST_EDITOR_PROXY_H
+#endif  // PXR_USD_SDF_LIST_EDITOR_PROXY_H

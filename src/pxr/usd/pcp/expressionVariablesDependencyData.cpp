@@ -14,37 +14,27 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class PcpExpressionVariablesDependencyData::_Data
-{
+class PcpExpressionVariablesDependencyData::_Data {
 public:
-    using LayerStackToExpressionVarsMap = std::unordered_map<
-        PcpLayerStackPtr, std::unordered_set<std::string>, TfHash>;
+    using LayerStackToExpressionVarsMap = std::unordered_map<PcpLayerStackPtr, std::unordered_set<std::string>, TfHash>;
     LayerStackToExpressionVarsMap layerStackToExpressionVars;
 };
 
-PcpExpressionVariablesDependencyData::PcpExpressionVariablesDependencyData()
-    = default;
+PcpExpressionVariablesDependencyData::PcpExpressionVariablesDependencyData() = default;
 
-PcpExpressionVariablesDependencyData::~PcpExpressionVariablesDependencyData()
-    = default;
+PcpExpressionVariablesDependencyData::~PcpExpressionVariablesDependencyData() = default;
 
-PcpExpressionVariablesDependencyData::PcpExpressionVariablesDependencyData(
-    PcpExpressionVariablesDependencyData&&) = default;
+PcpExpressionVariablesDependencyData::PcpExpressionVariablesDependencyData(PcpExpressionVariablesDependencyData&&) =
+        default;
 
-PcpExpressionVariablesDependencyData&
-PcpExpressionVariablesDependencyData::operator=(
-    PcpExpressionVariablesDependencyData&&) = default;
+PcpExpressionVariablesDependencyData& PcpExpressionVariablesDependencyData::operator=(
+        PcpExpressionVariablesDependencyData&&) = default;
 
-bool
-PcpExpressionVariablesDependencyData::IsEmpty() const
-{
+bool PcpExpressionVariablesDependencyData::IsEmpty() const {
     return !static_cast<bool>(_data);
 }
 
-void
-PcpExpressionVariablesDependencyData::AppendDependencyData(
-    PcpExpressionVariablesDependencyData&& other)
-{
+void PcpExpressionVariablesDependencyData::AppendDependencyData(PcpExpressionVariablesDependencyData&& other) {
     if (!other._data) {
         return;
     }
@@ -55,43 +45,31 @@ PcpExpressionVariablesDependencyData::AppendDependencyData(
     }
 }
 
-void 
-PcpExpressionVariablesDependencyData::AddDependencies(
-    const PcpLayerStackPtr& layerStack,
-    std::unordered_set<std::string>&& exprVarDependencies)
-{
+void PcpExpressionVariablesDependencyData::AddDependencies(const PcpLayerStackPtr& layerStack,
+                                                           std::unordered_set<std::string>&& exprVarDependencies) {
     if (exprVarDependencies.empty()) {
         return;
     }
 
     _Data& data = _GetWritableData();
 
-    std::unordered_set<std::string>& storedDeps = 
-        data.layerStackToExpressionVars[layerStack];
+    std::unordered_set<std::string>& storedDeps = data.layerStackToExpressionVars[layerStack];
 
     if (storedDeps.empty()) {
         storedDeps = std::move(exprVarDependencies);
-    }
-    else {
-        storedDeps.insert(
-            std::make_move_iterator(exprVarDependencies.begin()),
-            std::make_move_iterator(exprVarDependencies.end()));
+    } else {
+        storedDeps.insert(std::make_move_iterator(exprVarDependencies.begin()),
+                          std::make_move_iterator(exprVarDependencies.end()));
     }
 }
 
-const std::unordered_set<std::string>*
-PcpExpressionVariablesDependencyData::GetDependenciesForLayerStack(
-    const PcpLayerStackPtr& layerStack) const
-{
+const std::unordered_set<std::string>* PcpExpressionVariablesDependencyData::GetDependenciesForLayerStack(
+        const PcpLayerStackPtr& layerStack) const {
     const _Data* data = _GetData();
-    return data ? 
-        TfMapLookupPtr(data->layerStackToExpressionVars, layerStack) : nullptr;
+    return data ? TfMapLookupPtr(data->layerStackToExpressionVars, layerStack) : nullptr;
 }
 
-void
-PcpExpressionVariablesDependencyData::_ForEachDependency(
-    const _ForEachFunctionRef& fn) const
-{
+void PcpExpressionVariablesDependencyData::_ForEachDependency(const _ForEachFunctionRef& fn) const {
     const _Data* data = _GetData();
     if (!data) {
         return;
@@ -102,15 +80,11 @@ PcpExpressionVariablesDependencyData::_ForEachDependency(
     }
 }
 
-const PcpExpressionVariablesDependencyData::_Data*
-PcpExpressionVariablesDependencyData::_GetData() const
-{
+const PcpExpressionVariablesDependencyData::_Data* PcpExpressionVariablesDependencyData::_GetData() const {
     return _data.get();
 }
 
-PcpExpressionVariablesDependencyData::_Data&
-PcpExpressionVariablesDependencyData::_GetWritableData()
-{
+PcpExpressionVariablesDependencyData::_Data& PcpExpressionVariablesDependencyData::_GetWritableData() {
     if (!_data) {
         _data = std::make_unique<_Data>();
     }

@@ -6,5 +6,4 @@
 //
 /// \file PyListProxy.cpp
 
-
 #include "pxr/usd/sdf/pyListProxy.h"

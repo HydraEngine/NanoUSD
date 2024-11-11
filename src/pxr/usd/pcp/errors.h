@@ -107,9 +107,9 @@ public:
     PCP_API ~PcpErrorArcCycle() override;
     /// Converts error to string message.
     PCP_API std::string ToString() const override;
-    
+
     PcpSiteTracker cycle;
-    
+
 private:
     /// Constructor is private. Use New() instead.
     PcpErrorArcCycle();
@@ -119,8 +119,7 @@ private:
 
 // Forward declarations:
 class PcpErrorArcPermissionDenied;
-typedef std::shared_ptr<PcpErrorArcPermissionDenied> 
-    PcpErrorArcPermissionDeniedPtr;
+typedef std::shared_ptr<PcpErrorArcPermissionDenied> PcpErrorArcPermissionDeniedPtr;
 
 /// \class PcpErrorArcPermissionDenied
 ///
@@ -135,14 +134,14 @@ public:
     PCP_API ~PcpErrorArcPermissionDenied() override;
     /// Converts error to string message.
     PCP_API std::string ToString() const override;
-    
+
     /// The site where the invalid arc was expressed.
     PcpSite site;
     /// The private, invalid target of the arc.
     PcpSite privateSite;
     /// The type of arc.
     PcpArcType arcType;
-    
+
 private:
     /// Constructor is private. Use New() instead.
     PcpErrorArcPermissionDenied();
@@ -152,8 +151,7 @@ private:
 
 // Forward declarations:
 class PcpErrorArcToProhibitedChild;
-typedef std::shared_ptr<PcpErrorArcToProhibitedChild> 
-    PcpErrorArcToProhibitedChildPtr;
+typedef std::shared_ptr<PcpErrorArcToProhibitedChild> PcpErrorArcToProhibitedChildPtr;
 
 /// \class PcpErrorArcToProhibitedChild
 ///
@@ -168,7 +166,7 @@ public:
     PCP_API ~PcpErrorArcToProhibitedChild() override;
     /// Converts error to string message.
     PCP_API std::string ToString() const override;
-    
+
     /// The site where the invalid arc was expressed.
     PcpSite site;
     /// The target site of the invalid arc which is a prohibited child.
@@ -178,7 +176,7 @@ public:
     PcpSite relocationSourceSite;
     /// The type of arc.
     PcpArcType arcType;
-    
+
 private:
     /// Constructor is private. Use New() instead.
     PcpErrorArcToProhibitedChild();
@@ -202,7 +200,7 @@ public:
     PCP_API ~PcpErrorCapacityExceeded() override;
     /// Converts error to string message.
     PCP_API std::string ToString() const override;
-    
+
 private:
     /// Constructor is private. Use New() instead.
     PcpErrorCapacityExceeded(PcpErrorType errorType);
@@ -214,7 +212,7 @@ class PcpErrorInconsistentPropertyBase : public PcpErrorBase {
 public:
     /// Destructor.
     PCP_API ~PcpErrorInconsistentPropertyBase() override;
-    
+
     /// The identifier of the layer with the defining property spec.
     std::string definingLayerIdentifier;
     /// The path of the defining property spec.
@@ -224,7 +222,7 @@ public:
     std::string conflictingLayerIdentifier;
     /// The path of the conflicting property spec.
     SdfPath conflictingSpecPath;
-    
+
 protected:
     /// Constructor.
     PcpErrorInconsistentPropertyBase(PcpErrorType errorType);
@@ -234,15 +232,13 @@ protected:
 
 // Forward declarations:
 class PcpErrorInconsistentPropertyType;
-typedef std::shared_ptr<PcpErrorInconsistentPropertyType> 
-    PcpErrorInconsistentPropertyTypePtr;
+typedef std::shared_ptr<PcpErrorInconsistentPropertyType> PcpErrorInconsistentPropertyTypePtr;
 
 /// \class PcpErrorInconsistentPropertyType
 ///
 /// Properties that have specs with conflicting definitions.
 ///
-class PcpErrorInconsistentPropertyType : 
-    public PcpErrorInconsistentPropertyBase {
+class PcpErrorInconsistentPropertyType : public PcpErrorInconsistentPropertyBase {
 public:
     /// Returns a new error object.
     static PcpErrorInconsistentPropertyTypePtr New();
@@ -255,7 +251,7 @@ public:
     SdfSpecType definingSpecType;
     /// The type of the conflicting spec.
     SdfSpecType conflictingSpecType;
-    
+
 private:
     /// Constructor is private. Use New() instead.
     PcpErrorInconsistentPropertyType();
@@ -265,15 +261,13 @@ private:
 
 // Forward declarations:
 class PcpErrorInconsistentAttributeType;
-typedef std::shared_ptr<PcpErrorInconsistentAttributeType> 
-    PcpErrorInconsistentAttributeTypePtr;
+typedef std::shared_ptr<PcpErrorInconsistentAttributeType> PcpErrorInconsistentAttributeTypePtr;
 
 /// \class PcpErrorInconsistentAttributeType
 ///
 /// Attributes that have specs with conflicting definitions.
 ///
-class PcpErrorInconsistentAttributeType : 
-    public PcpErrorInconsistentPropertyBase {
+class PcpErrorInconsistentAttributeType : public PcpErrorInconsistentPropertyBase {
 public:
     /// Returns a new error object.
     static PcpErrorInconsistentAttributeTypePtr New();
@@ -296,15 +290,13 @@ private:
 
 // Forward declarations:
 class PcpErrorInconsistentAttributeVariability;
-typedef std::shared_ptr<PcpErrorInconsistentAttributeVariability> 
-    PcpErrorInconsistentAttributeVariabilityPtr;
+typedef std::shared_ptr<PcpErrorInconsistentAttributeVariability> PcpErrorInconsistentAttributeVariabilityPtr;
 
 /// \class PcpErrorInconsistentAttributeVariability
 ///
 /// Attributes that have specs with conflicting variability.
 ///
-class PcpErrorInconsistentAttributeVariability : 
-    public PcpErrorInconsistentPropertyBase {
+class PcpErrorInconsistentAttributeVariability : public PcpErrorInconsistentPropertyBase {
 public:
     /// Returns a new error object.
     static PcpErrorInconsistentAttributeVariabilityPtr New();
@@ -327,15 +319,14 @@ private:
 
 // Forward declarations:
 class PcpErrorInvalidPrimPath;
-typedef std::shared_ptr<PcpErrorInvalidPrimPath>
-    PcpErrorInvalidPrimPathPtr;
+typedef std::shared_ptr<PcpErrorInvalidPrimPath> PcpErrorInvalidPrimPathPtr;
 
 /// \class PcpErrorInvalidPrimPath
 ///
 /// Invalid prim paths used by references or payloads.
 ///
 class PcpErrorInvalidPrimPath : public PcpErrorBase {
-public:        
+public:
     /// Returns a new error object.
     static PcpErrorInvalidPrimPathPtr New();
     /// Destructor.
@@ -364,14 +355,13 @@ private:
 
 // Forward declarations:
 class PcpErrorInvalidAssetPathBase;
-typedef std::shared_ptr<PcpErrorInvalidAssetPathBase>
-    PcpErrorInvalidAssetPathBasePtr;
+typedef std::shared_ptr<PcpErrorInvalidAssetPathBase> PcpErrorInvalidAssetPathBasePtr;
 
 class PcpErrorInvalidAssetPathBase : public PcpErrorBase {
 public:
     /// Destructor.
     PCP_API ~PcpErrorInvalidAssetPathBase() override;
-    
+
     /// The site where the invalid arc was expressed.
     PcpSite site;
 
@@ -402,8 +392,7 @@ protected:
 
 // Forward declarations:
 class PcpErrorInvalidAssetPath;
-typedef std::shared_ptr<PcpErrorInvalidAssetPath>
-    PcpErrorInvalidAssetPathPtr;
+typedef std::shared_ptr<PcpErrorInvalidAssetPath> PcpErrorInvalidAssetPathPtr;
 
 /// \class PcpErrorInvalidAssetPath
 ///
@@ -427,8 +416,7 @@ private:
 
 // Forward declarations:
 class PcpErrorMutedAssetPath;
-typedef std::shared_ptr<PcpErrorMutedAssetPath>
-    PcpErrorMutedAssetPathPtr;
+typedef std::shared_ptr<PcpErrorMutedAssetPath> PcpErrorMutedAssetPathPtr;
 
 /// \class PcpErrorMutedAssetPath
 ///
@@ -452,8 +440,7 @@ private:
 
 // Forward declarations:
 class PcpErrorTargetPathBase;
-typedef std::shared_ptr<PcpErrorTargetPathBase>
-    PcpErrorTargetPathBasePtr;
+typedef std::shared_ptr<PcpErrorTargetPathBase> PcpErrorTargetPathBasePtr;
 
 /// \class PcpErrorTargetPathBase
 ///
@@ -487,8 +474,7 @@ protected:
 
 // Forward declarations:
 class PcpErrorInvalidInstanceTargetPath;
-typedef std::shared_ptr<PcpErrorInvalidInstanceTargetPath>
-    PcpErrorInvalidInstanceTargetPathPtr;
+typedef std::shared_ptr<PcpErrorInvalidInstanceTargetPath> PcpErrorInvalidInstanceTargetPathPtr;
 
 /// \class PcpErrorInvalidInstanceTargetPath
 ///
@@ -513,8 +499,7 @@ private:
 
 // Forward declarations:
 class PcpErrorInvalidExternalTargetPath;
-typedef std::shared_ptr<PcpErrorInvalidExternalTargetPath>
-    PcpErrorInvalidExternalTargetPathPtr;
+typedef std::shared_ptr<PcpErrorInvalidExternalTargetPath> PcpErrorInvalidExternalTargetPathPtr;
 
 /// \class PcpErrorInvalidExternalTargetPath
 ///
@@ -529,7 +514,7 @@ public:
     PCP_API ~PcpErrorInvalidExternalTargetPath() override;
     /// Converts error to string message.
     PCP_API std::string ToString() const override;
-    
+
     PcpArcType ownerArcType;
     SdfPath ownerIntroPath;
 
@@ -542,11 +527,10 @@ private:
 
 // Forward declarations:
 class PcpErrorInvalidTargetPath;
-typedef std::shared_ptr<PcpErrorInvalidTargetPath>
-    PcpErrorInvalidTargetPathPtr;
+typedef std::shared_ptr<PcpErrorInvalidTargetPath> PcpErrorInvalidTargetPathPtr;
 
 /// \class PcpErrorInvalidTargetPath
-/// 
+///
 /// Invalid target or connection path.
 ///
 class PcpErrorInvalidTargetPath : public PcpErrorTargetPathBase {
@@ -567,8 +551,7 @@ private:
 
 // Forward declarations:
 class PcpErrorInvalidSublayerOffset;
-typedef std::shared_ptr<PcpErrorInvalidSublayerOffset>
-    PcpErrorInvalidSublayerOffsetPtr;
+typedef std::shared_ptr<PcpErrorInvalidSublayerOffset> PcpErrorInvalidSublayerOffsetPtr;
 
 /// \class PcpErrorInvalidSublayerOffset
 ///
@@ -582,7 +565,7 @@ public:
     PCP_API ~PcpErrorInvalidSublayerOffset() override;
     /// Converts error to string message.
     PCP_API std::string ToString() const override;
-    
+
     SdfLayerHandle layer;
     SdfLayerHandle sublayer;
     SdfLayerOffset offset;
@@ -596,8 +579,7 @@ private:
 
 // Forward declarations:
 class PcpErrorInvalidReferenceOffset;
-typedef std::shared_ptr<PcpErrorInvalidReferenceOffset>
-    PcpErrorInvalidReferenceOffsetPtr;
+typedef std::shared_ptr<PcpErrorInvalidReferenceOffset> PcpErrorInvalidReferenceOffsetPtr;
 
 /// \class PcpErrorInvalidReferenceOffset
 ///
@@ -611,7 +593,7 @@ public:
     PCP_API ~PcpErrorInvalidReferenceOffset() override;
     /// Converts error to string message.
     PCP_API std::string ToString() const override;
-    
+
     /// The source layer of the spec that caused this arc to be introduced.
     SdfLayerHandle sourceLayer;
 
@@ -638,8 +620,7 @@ private:
 
 // Forward declarations:
 class PcpErrorInvalidSublayerOwnership;
-typedef std::shared_ptr<PcpErrorInvalidSublayerOwnership>
-    PcpErrorInvalidSublayerOwnershipPtr;
+typedef std::shared_ptr<PcpErrorInvalidSublayerOwnership> PcpErrorInvalidSublayerOwnershipPtr;
 
 /// \class PcpErrorInvalidSublayerOwnership
 ///
@@ -667,8 +648,7 @@ private:
 
 // Forward declarations:
 class PcpErrorInvalidSublayerPath;
-typedef std::shared_ptr<PcpErrorInvalidSublayerPath>
-    PcpErrorInvalidSublayerPathPtr;
+typedef std::shared_ptr<PcpErrorInvalidSublayerPath> PcpErrorInvalidSublayerPathPtr;
 
 /// \class PcpErrorInvalidSublayerPath
 ///
@@ -682,7 +662,7 @@ public:
     PCP_API ~PcpErrorInvalidSublayerPath() override;
     /// Converts error to string message.
     PCP_API std::string ToString() const override;
-    
+
     SdfLayerHandle layer;
     std::string sublayerPath;
     std::string messages;
@@ -696,8 +676,7 @@ private:
 
 // Forward declarations:
 class PcpErrorRelocationBase;
-typedef std::shared_ptr<PcpErrorRelocationBase>
-    PcpErrorRelocationBasePtr;
+typedef std::shared_ptr<PcpErrorRelocationBase> PcpErrorRelocationBasePtr;
 
 /// \class PcpErrorRelocationBase
 ///
@@ -716,8 +695,7 @@ protected:
 
 // Forward declarations:
 class PcpErrorInvalidAuthoredRelocation;
-typedef std::shared_ptr<PcpErrorInvalidAuthoredRelocation>
-    PcpErrorInvalidAuthoredRelocationPtr;
+typedef std::shared_ptr<PcpErrorInvalidAuthoredRelocation> PcpErrorInvalidAuthoredRelocationPtr;
 
 /// \class PcpErrorInvalidAuthoredRelocation
 ///
@@ -731,7 +709,7 @@ public:
     PCP_API ~PcpErrorInvalidAuthoredRelocation() override;
     /// Converts error to string message.
     PCP_API std::string ToString() const override;
-    
+
     /// The source path of the invalid relocation.
     SdfPath sourcePath;
     /// The target path of the invalid relocation.
@@ -752,8 +730,7 @@ private:
 
 // Forward declarations:
 class PcpErrorInvalidConflictingRelocation;
-typedef std::shared_ptr<PcpErrorInvalidConflictingRelocation>
-    PcpErrorInvalidConflictingRelocationPtr;
+typedef std::shared_ptr<PcpErrorInvalidConflictingRelocation> PcpErrorInvalidConflictingRelocationPtr;
 
 /// \class PcpErrorInvalidConflictingRelocation
 ///
@@ -786,7 +763,7 @@ public:
     /// The path to the prim where the relocation this conflicts with is authored.
     SdfPath conflictOwningPath;
 
-    /// Enumeration of reasons a relocate can be in conflict with another 
+    /// Enumeration of reasons a relocate can be in conflict with another
     /// relocate.
     enum class ConflictReason {
         TargetIsConflictSource,
@@ -806,8 +783,7 @@ private:
 
 // Forward declarations:
 class PcpErrorInvalidSameTargetRelocations;
-typedef std::shared_ptr<PcpErrorInvalidSameTargetRelocations>
-    PcpErrorInvalidSameTargetRelocationsPtr;
+typedef std::shared_ptr<PcpErrorInvalidSameTargetRelocations> PcpErrorInvalidSameTargetRelocationsPtr;
 
 /// \class PcpErrorInvalidSameTargetRelocations
 ///
@@ -846,8 +822,7 @@ private:
 
 // Forward declarations:
 class PcpErrorOpinionAtRelocationSource;
-typedef std::shared_ptr<PcpErrorOpinionAtRelocationSource>
-    PcpErrorOpinionAtRelocationSourcePtr;
+typedef std::shared_ptr<PcpErrorOpinionAtRelocationSource> PcpErrorOpinionAtRelocationSourcePtr;
 
 /// \class PcpErrorOpinionAtRelocationSource
 ///
@@ -861,7 +836,7 @@ public:
     PCP_API ~PcpErrorOpinionAtRelocationSource() override;
     /// Converts error to string message.
     PCP_API std::string ToString() const override;
-    
+
     SdfLayerHandle layer;
     SdfPath path;
 
@@ -874,8 +849,7 @@ private:
 
 // Forward declarations:
 class PcpErrorPrimPermissionDenied;
-typedef std::shared_ptr<PcpErrorPrimPermissionDenied>
-    PcpErrorPrimPermissionDeniedPtr;
+typedef std::shared_ptr<PcpErrorPrimPermissionDenied> PcpErrorPrimPermissionDeniedPtr;
 
 /// \class PcpErrorPrimPermissionDenied
 ///
@@ -889,7 +863,7 @@ public:
     PCP_API ~PcpErrorPrimPermissionDenied() override;
     /// Converts error to string message.
     PCP_API std::string ToString() const override;
-    
+
     /// The site where the invalid arc was expressed.
     PcpSite site;
     /// The private, invalid target of the arc.
@@ -904,8 +878,7 @@ private:
 
 // Forward declarations:
 class PcpErrorPropertyPermissionDenied;
-typedef std::shared_ptr<PcpErrorPropertyPermissionDenied>
-    PcpErrorPropertyPermissionDeniedPtr;
+typedef std::shared_ptr<PcpErrorPropertyPermissionDenied> PcpErrorPropertyPermissionDeniedPtr;
 
 /// \class PcpErrorPropertyPermissionDenied
 ///
@@ -919,7 +892,7 @@ public:
     PCP_API ~PcpErrorPropertyPermissionDenied() override;
     /// Converts error to string message.
     PCP_API std::string ToString() const override;
-    
+
     SdfPath propPath;
     SdfSpecType propType;
     std::string layerPath;
@@ -947,7 +920,7 @@ public:
     PCP_API ~PcpErrorSublayerCycle() override;
     /// Converts error to string message.
     PCP_API std::string ToString() const override;
-    
+
     SdfLayerHandle layer;
     SdfLayerHandle sublayer;
 
@@ -960,8 +933,7 @@ private:
 
 // Forward declarations:
 class PcpErrorTargetPermissionDenied;
-typedef std::shared_ptr<PcpErrorTargetPermissionDenied>
-    PcpErrorTargetPermissionDeniedPtr;
+typedef std::shared_ptr<PcpErrorTargetPermissionDenied> PcpErrorTargetPermissionDeniedPtr;
 
 /// \class PcpErrorTargetPermissionDenied
 ///
@@ -985,8 +957,7 @@ private:
 
 // Forward declarations:
 class PcpErrorUnresolvedPrimPath;
-typedef std::shared_ptr<PcpErrorUnresolvedPrimPath>
-    PcpErrorUnresolvedPrimPathPtr;
+typedef std::shared_ptr<PcpErrorUnresolvedPrimPath> PcpErrorUnresolvedPrimPathPtr;
 
 /// \class PcpErrorUnresolvedPrimPath
 ///
@@ -1000,14 +971,14 @@ public:
     PCP_API ~PcpErrorUnresolvedPrimPath() override;
     /// Converts error to string message.
     PCP_API std::string ToString() const override;
-    
+
     /// The site where the invalid arc was expressed.
     PcpSite site;
 
     /// The source layer of the spec that caused this arc to be introduced.
     /// This may be a sublayer of the site.
     SdfLayerHandle sourceLayer;
-    
+
     /// The target layer of the arc.
     SdfLayerHandle targetLayer;
 
@@ -1025,8 +996,7 @@ private:
 
 // Forward declarations:
 class PcpErrorVariableExpressionError;
-typedef std::shared_ptr<PcpErrorVariableExpressionError>
-    PcpErrorVariableExpressionErrorPtr;
+typedef std::shared_ptr<PcpErrorVariableExpressionError> PcpErrorVariableExpressionErrorPtr;
 
 /// \class PcpErrorVariableExpressionError
 ///
@@ -1066,8 +1036,8 @@ private:
 
 /// Raise the given errors as runtime errors.
 PCP_API
-void PcpRaiseErrors(const PcpErrorVector &errors);
+void PcpRaiseErrors(const PcpErrorVector& errors);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_ERRORS_H
+#endif  // PXR_USD_PCP_ERRORS_H

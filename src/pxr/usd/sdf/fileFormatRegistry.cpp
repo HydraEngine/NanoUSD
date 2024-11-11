@@ -28,24 +28,14 @@ using std::vector;
 PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_PRIVATE_TOKENS(_PlugInfoKeyTokens,
-    ((FormatId,   "formatId"))
-    ((Extensions, "extensions"))
-    ((Target,     "target"))
-    ((Primary,    "primary"))
-    ((SupportsReading, "supportsReading"))
-    ((SupportsWriting, "supportsWriting"))
-    ((SupportsEditing, "supportsEditing"))
-    );
+                         ((FormatId, "formatId"))((Extensions, "extensions"))((Target, "target"))((Primary, "primary"))(
+                                 (SupportsReading, "supportsReading"))((SupportsWriting, "supportsWriting"))(
+                                 (SupportsEditing, "supportsEditing")));
 
 // Searches plugin meta data to determine if a capability is supported for the
 // file format type.  All capabilities are enabled by default (for backwards
 // compatability) so the user must explicitly opt out in plugInfo.json
-static bool 
-_FormatCapabilityIsSupported(
-    PlugRegistry& reg,
-    TfType formatType,
-    const string& key)
-{
+static bool _FormatCapabilityIsSupported(PlugRegistry& reg, TfType formatType, const string& key) {
     JsValue capability = reg.GetDataFromPluginMetaData(formatType, key);
 
     if (capability.IsBool() && !capability.GetBool()) {
@@ -55,22 +45,16 @@ _FormatCapabilityIsSupported(
     return true;
 }
 
+SdfFileFormatRefPtr Sdf_FileFormatRegistry::_Info::GetFileFormat() const {
+    if (_hasFormat) return _format;
 
-SdfFileFormatRefPtr
-Sdf_FileFormatRegistry::_Info::GetFileFormat() const
-{
-    if (_hasFormat)
-        return _format;
-
-    if (_plugin)
-        _plugin->Load();
+    if (_plugin) _plugin->Load();
 
     SdfFileFormatRefPtr newFormat;
-    if (Sdf_FileFormatFactoryBase* factory =
-            type.GetFactory<Sdf_FileFormatFactoryBase>()) {
+    if (Sdf_FileFormatFactoryBase* factory = type.GetFactory<Sdf_FileFormatFactoryBase>()) {
         newFormat = factory->New();
     }
-    
+
     if (newFormat) {
         std::lock_guard<std::mutex> lock(_formatMutex);
         if (!_hasFormat) {
@@ -82,16 +66,11 @@ Sdf_FileFormatRegistry::_Info::GetFileFormat() const
     return _format;
 }
 
-Sdf_FileFormatRegistry::Sdf_FileFormatRegistry()
-    : _registeredFormatPlugins(false)
-{
+Sdf_FileFormatRegistry::Sdf_FileFormatRegistry() : _registeredFormatPlugins(false) {
     // Do Nothing.
 }
 
-SdfFileFormatConstPtr
-Sdf_FileFormatRegistry::FindById(
-    const TfToken& formatId)
-{
+SdfFileFormatConstPtr Sdf_FileFormatRegistry::FindById(const TfToken& formatId) {
     TRACE_FUNCTION();
 
     if (formatId.IsEmpty()) {
@@ -101,17 +80,12 @@ Sdf_FileFormatRegistry::FindById(
 
     _RegisterFormatPlugins();
     _FormatInfo::iterator it = _formatInfo.find(formatId);
-    if (it != _formatInfo.end())
-        return _GetFileFormat(it->second);
+    if (it != _formatInfo.end()) return _GetFileFormat(it->second);
 
     return TfNullPtr;
 }
 
-Sdf_FileFormatRegistry::_InfoSharedPtr 
-Sdf_FileFormatRegistry::_GetFormatInfo(
-    const string& s,
-    const string& target)
-{
+Sdf_FileFormatRegistry::_InfoSharedPtr Sdf_FileFormatRegistry::_GetFormatInfo(const string& s, const string& target) {
     _InfoSharedPtr formatInfo;
 
     if (s.empty()) {
@@ -120,8 +94,7 @@ Sdf_FileFormatRegistry::_GetFormatInfo(
     }
 
     // Convert to lowercase for lookup.
-    string ext = TfStringToLowerAscii(
-        SdfFileFormat::GetFileExtension(s));
+    string ext = TfStringToLowerAscii(SdfFileFormat::GetFileExtension(s));
     if (ext.empty()) {
         TF_CODING_ERROR("Unable to determine extension for '%s'", s.c_str());
         return formatInfo;
@@ -131,10 +104,8 @@ Sdf_FileFormatRegistry::_GetFormatInfo(
 
     if (target.empty()) {
         _ExtensionIndex::const_iterator it = _extensionIndex.find(ext);
-        if (it != _extensionIndex.end())
-            formatInfo = it->second;
-    }
-    else {
+        if (it != _extensionIndex.end()) formatInfo = it->second;
+    } else {
         _FullExtensionIndex::const_iterator it = _fullExtensionIndex.find(ext);
         if (it != _fullExtensionIndex.end()) {
             TF_FOR_ALL(infoIt, it->second) {
@@ -149,11 +120,7 @@ Sdf_FileFormatRegistry::_GetFormatInfo(
     return formatInfo;
 }
 
-SdfFileFormatConstPtr
-Sdf_FileFormatRegistry::FindByExtension(
-    const string& s,
-    const string& target)
-{
+SdfFileFormatConstPtr Sdf_FileFormatRegistry::FindByExtension(const string& s, const string& target) {
     TRACE_FUNCTION();
 
     _InfoSharedPtr formatInfo = _GetFormatInfo(s, target);
@@ -161,12 +128,10 @@ Sdf_FileFormatRegistry::FindByExtension(
     return formatInfo ? _GetFileFormat(formatInfo) : TfNullPtr;
 }
 
-std::set<std::string>
-Sdf_FileFormatRegistry::FindAllFileFormatExtensions()
-{
+std::set<std::string> Sdf_FileFormatRegistry::FindAllFileFormatExtensions() {
     _RegisterFormatPlugins();
 
-    std::set<std::string> result; 
+    std::set<std::string> result;
     for (const auto& p : _extensionIndex) {
         result.insert(p.first);
     }
@@ -174,23 +139,19 @@ Sdf_FileFormatRegistry::FindAllFileFormatExtensions()
     return result;
 }
 
-std::set<std::string>
-Sdf_FileFormatRegistry::FindAllDerivedFileFormatExtensions(
-    const TfType& baseType)
-{
+std::set<std::string> Sdf_FileFormatRegistry::FindAllDerivedFileFormatExtensions(const TfType& baseType) {
     TRACE_FUNCTION();
 
     _RegisterFormatPlugins();
 
     if (!baseType.IsA<SdfFileFormat>()) {
-        TF_CODING_ERROR("Type %s does not derive from SdfFileFormat",
-                        baseType.GetTypeName().c_str());
+        TF_CODING_ERROR("Type %s does not derive from SdfFileFormat", baseType.GetTypeName().c_str());
         return {};
     }
 
-    std::set<std::string> result; 
+    std::set<std::string> result;
     for (const auto& p : _fullExtensionIndex) {
-        for (const _InfoSharedPtr &info : p.second) {
+        for (const _InfoSharedPtr& info : p.second) {
             if (info->type.IsA(baseType)) {
                 result.insert(p.first);
             }
@@ -200,62 +161,45 @@ Sdf_FileFormatRegistry::FindAllDerivedFileFormatExtensions(
     return result;
 }
 
-TfToken
-Sdf_FileFormatRegistry::GetPrimaryFormatForExtension(
-    const std::string& ext)
-{
+TfToken Sdf_FileFormatRegistry::GetPrimaryFormatForExtension(const std::string& ext) {
     _RegisterFormatPlugins();
 
     // Case fold [A-Z] for lookup.
-    _ExtensionIndex::const_iterator it = _extensionIndex.find(
-        TfStringToLowerAscii(ext)
-    );
+    _ExtensionIndex::const_iterator it = _extensionIndex.find(TfStringToLowerAscii(ext));
     if (it != _extensionIndex.end()) {
         return it->second->formatId;
     }
-    
+
     return TfToken();
 }
 
-Sdf_FileFormatRegistry::_Info::Capabilities 
-Sdf_FileFormatRegistry::_ParseFormatCapabilities(
-    const TfType& formatType)
-{
+Sdf_FileFormatRegistry::_Info::Capabilities Sdf_FileFormatRegistry::_ParseFormatCapabilities(const TfType& formatType) {
     using UT = std::underlying_type<_Info::Capabilities>::type;
     using Capabilities = _Info::Capabilities;
 
     PlugRegistry& reg = PlugRegistry::GetInstance();
 
     _Info::Capabilities capabilities = Capabilities::None;
-    if (_FormatCapabilityIsSupported( 
-        reg, formatType, _PlugInfoKeyTokens->SupportsReading)) {
-        capabilities = static_cast<Capabilities>(
-            static_cast<UT>(capabilities) | 
-            static_cast<UT>(Capabilities::Reading));
+    if (_FormatCapabilityIsSupported(reg, formatType, _PlugInfoKeyTokens->SupportsReading)) {
+        capabilities =
+                static_cast<Capabilities>(static_cast<UT>(capabilities) | static_cast<UT>(Capabilities::Reading));
     }
 
-    if (_FormatCapabilityIsSupported( 
-        reg, formatType, _PlugInfoKeyTokens->SupportsWriting)) {
-        capabilities = static_cast<Capabilities>(
-            static_cast<UT>(capabilities) | 
-            static_cast<UT>(Capabilities::Writing));
+    if (_FormatCapabilityIsSupported(reg, formatType, _PlugInfoKeyTokens->SupportsWriting)) {
+        capabilities =
+                static_cast<Capabilities>(static_cast<UT>(capabilities) | static_cast<UT>(Capabilities::Writing));
     }
 
-    if (_FormatCapabilityIsSupported( 
-        reg, formatType, _PlugInfoKeyTokens->SupportsEditing)) {
-        capabilities = static_cast<Capabilities>(
-            static_cast<UT>(capabilities) | 
-            static_cast<UT>(Capabilities::Editing));
+    if (_FormatCapabilityIsSupported(reg, formatType, _PlugInfoKeyTokens->SupportsEditing)) {
+        capabilities =
+                static_cast<Capabilities>(static_cast<UT>(capabilities) | static_cast<UT>(Capabilities::Editing));
     }
 
     return capabilities;
 }
 
-void
-Sdf_FileFormatRegistry::_RegisterFormatPlugins()
-{
-    if (_registeredFormatPlugins)
-        return;
+void Sdf_FileFormatRegistry::_RegisterFormatPlugins() {
+    if (_registeredFormatPlugins) return;
 
     _FormatInfo formatInfo;
     _ExtensionIndex extensionIndex;
@@ -271,81 +215,79 @@ Sdf_FileFormatRegistry::_RegisterFormatPlugins()
 
     std::set<TfType> formatTypes;
     TfType formatBaseType = TfType::Find<SdfFileFormat>();
-    if (TF_VERIFY(!formatBaseType.IsUnknown()))
-        PlugRegistry::GetAllDerivedTypes(formatBaseType, &formatTypes);
+    if (TF_VERIFY(!formatBaseType.IsUnknown())) PlugRegistry::GetAllDerivedTypes(formatBaseType, &formatTypes);
 
     for (auto formatType : formatTypes) {
-
-        TF_DEBUG(SDF_FILE_FORMAT).Msg("_RegisterFormatPlugins: "
-            "Type '%s'\n", formatType.GetTypeName().c_str());
+        TF_DEBUG(SDF_FILE_FORMAT)
+                .Msg("_RegisterFormatPlugins: "
+                     "Type '%s'\n",
+                     formatType.GetTypeName().c_str());
 
         PlugPluginPtr plugin = reg.GetPluginForType(formatType);
-        if (!plugin)
-            continue;
+        if (!plugin) continue;
 
-        TF_DEBUG(SDF_FILE_FORMAT).Msg("_RegisterFormatPlugins: "
-            "  plugin '%s'\n", plugin->GetName().c_str());
+        TF_DEBUG(SDF_FILE_FORMAT)
+                .Msg("_RegisterFormatPlugins: "
+                     "  plugin '%s'\n",
+                     plugin->GetName().c_str());
 
-        JsValue aFormatId = reg.GetDataFromPluginMetaData(
-            formatType, _PlugInfoKeyTokens->FormatId);
+        JsValue aFormatId = reg.GetDataFromPluginMetaData(formatType, _PlugInfoKeyTokens->FormatId);
         if (aFormatId.IsNull()) {
-            TF_DEBUG(SDF_FILE_FORMAT).Msg("_RegisterFormatPlugins: "
-                "No format identifier for type '%s', skipping.",
-                formatType.GetTypeName().c_str());
+            TF_DEBUG(SDF_FILE_FORMAT)
+                    .Msg("_RegisterFormatPlugins: "
+                         "No format identifier for type '%s', skipping.",
+                         formatType.GetTypeName().c_str());
             continue;
         }
 
         if (!aFormatId.IsString()) {
-            TF_CODING_ERROR("Unexpected value type for key '%s' "
-                "in plugin meta data for file format type '%s'",
-                _PlugInfoKeyTokens->FormatId.GetText(),
-                formatType.GetTypeName().c_str());
+            TF_CODING_ERROR(
+                    "Unexpected value type for key '%s' "
+                    "in plugin meta data for file format type '%s'",
+                    _PlugInfoKeyTokens->FormatId.GetText(), formatType.GetTypeName().c_str());
             continue;
         }
 
         string formatId = aFormatId.GetString();
         if (formatId.empty()) {
-            TF_CODING_ERROR("File format '%s' plugin meta data '%s' is empty",
-                formatType.GetTypeName().c_str(),
-                _PlugInfoKeyTokens->FormatId.GetText());
+            TF_CODING_ERROR("File format '%s' plugin meta data '%s' is empty", formatType.GetTypeName().c_str(),
+                            _PlugInfoKeyTokens->FormatId.GetText());
             continue;
         }
 
-        TF_DEBUG(SDF_FILE_FORMAT).Msg("_RegisterFormatPlugins: "
-            "  formatId '%s'\n", formatId.c_str());
+        TF_DEBUG(SDF_FILE_FORMAT)
+                .Msg("_RegisterFormatPlugins: "
+                     "  formatId '%s'\n",
+                     formatId.c_str());
 
-        JsValue aExtensions = reg.GetDataFromPluginMetaData(
-            formatType, _PlugInfoKeyTokens->Extensions);
+        JsValue aExtensions = reg.GetDataFromPluginMetaData(formatType, _PlugInfoKeyTokens->Extensions);
         if (aExtensions.IsNull()) {
-            TF_DEBUG(SDF_FILE_FORMAT).Msg("_RegisterFormatPlugins: "
-                "No extensions registered for type '%s', skipping.",
-                formatType.GetTypeName().c_str());
+            TF_DEBUG(SDF_FILE_FORMAT)
+                    .Msg("_RegisterFormatPlugins: "
+                         "No extensions registered for type '%s', skipping.",
+                         formatType.GetTypeName().c_str());
             continue;
         }
 
         if (!aExtensions.IsArrayOf<string>()) {
-            TF_CODING_ERROR("Unexpected value type for key '%s' "
-                "in plugin meta data for file format type '%s'",
-                _PlugInfoKeyTokens->Extensions.GetText(),
-                formatType.GetTypeName().c_str());
+            TF_CODING_ERROR(
+                    "Unexpected value type for key '%s' "
+                    "in plugin meta data for file format type '%s'",
+                    _PlugInfoKeyTokens->Extensions.GetText(), formatType.GetTypeName().c_str());
             continue;
         }
 
         vector<string> extensions = aExtensions.GetArrayOf<string>();
         if (extensions.empty()) {
-            TF_CODING_ERROR("File format '%s' plugin meta data '%s' is empty",
-                formatType.GetTypeName().c_str(),
-                _PlugInfoKeyTokens->Extensions.GetText());
+            TF_CODING_ERROR("File format '%s' plugin meta data '%s' is empty", formatType.GetTypeName().c_str(),
+                            _PlugInfoKeyTokens->Extensions.GetText());
             continue;
         }
 
         // Case fold [A-Z] all 'extensions'.
-        std::transform(extensions.begin(), extensions.end(),
-                       extensions.begin(),
-                       [](std::string const &ext) {
-                            return TfStringToLowerAscii(ext);
-                       }
-        );
+        std::transform(extensions.begin(), extensions.end(), extensions.begin(), [](std::string const& ext) {
+            return TfStringToLowerAscii(ext);
+        });
 
         // The 'target' entry does not need to be specified in every
         // file format's plugin info. If it is not, then the value will be
@@ -355,70 +297,69 @@ Sdf_FileFormatRegistry::_RegisterFormatPlugins()
             std::vector<TfType> typeHierarchy;
             formatType.GetAllAncestorTypes(&typeHierarchy);
             TF_FOR_ALL(type, typeHierarchy) {
-                aTarget = reg.GetDataFromPluginMetaData(
-                    *type, _PlugInfoKeyTokens->Target);
+                aTarget = reg.GetDataFromPluginMetaData(*type, _PlugInfoKeyTokens->Target);
                 if (!aTarget.IsNull()) {
-                    TF_DEBUG(SDF_FILE_FORMAT).Msg("_RegisterFormatPlugins: "
-                        "    Found target for type '%s' from type '%s'\n",
-                        formatType.GetTypeName().c_str(),
-                        type->GetTypeName().c_str());
+                    TF_DEBUG(SDF_FILE_FORMAT)
+                            .Msg("_RegisterFormatPlugins: "
+                                 "    Found target for type '%s' from type '%s'\n",
+                                 formatType.GetTypeName().c_str(), type->GetTypeName().c_str());
                     break;
                 }
             }
         }
 
         if (aTarget.IsNull()) {
-            TF_DEBUG(SDF_FILE_FORMAT).Msg("_RegisterFormatPlugins: "
-                "No target for type '%s', skipping.\n",
-                formatType.GetTypeName().c_str());
+            TF_DEBUG(SDF_FILE_FORMAT)
+                    .Msg("_RegisterFormatPlugins: "
+                         "No target for type '%s', skipping.\n",
+                         formatType.GetTypeName().c_str());
             continue;
         }
 
         if (!aTarget.IsString()) {
-            TF_CODING_ERROR("Unexpected value type for key '%s' "
-                "in plugin meta data for file format type '%s'",
-                _PlugInfoKeyTokens->Target.GetText(),
-                formatType.GetTypeName().c_str());
+            TF_CODING_ERROR(
+                    "Unexpected value type for key '%s' "
+                    "in plugin meta data for file format type '%s'",
+                    _PlugInfoKeyTokens->Target.GetText(), formatType.GetTypeName().c_str());
             continue;
         }
 
         const string target = aTarget.GetString();
         if (target.empty()) {
-            TF_CODING_ERROR("File format '%s' plugin meta data '%s' is empty",
-                formatType.GetTypeName().c_str(),
-                _PlugInfoKeyTokens->Target.GetText());
+            TF_CODING_ERROR("File format '%s' plugin meta data '%s' is empty", formatType.GetTypeName().c_str(),
+                            _PlugInfoKeyTokens->Target.GetText());
             continue;
         }
 
         _Info::Capabilities capabilities = _ParseFormatCapabilities(formatType);
 
-        TF_DEBUG(SDF_FILE_FORMAT).Msg("_RegisterFormatPlugins: "
-            "  target '%s'\n", target.c_str());
+        TF_DEBUG(SDF_FILE_FORMAT)
+                .Msg("_RegisterFormatPlugins: "
+                     "  target '%s'\n",
+                     target.c_str());
 
         const TfToken formatIdToken(formatId, TfToken::Immortal);
 
         _InfoSharedPtr& info = formatInfo[formatIdToken];
         if (info) {
-            TF_CODING_ERROR("Duplicate registration for file format '%s'",
-                formatId.c_str());
+            TF_CODING_ERROR("Duplicate registration for file format '%s'", formatId.c_str());
             continue;
         }
-        info = std::make_shared<_Info>(
-            formatIdToken, formatType,
-            TfToken(target, TfToken::Immortal), plugin, capabilities);
+        info = std::make_shared<_Info>(formatIdToken, formatType, TfToken(target, TfToken::Immortal), plugin,
+                                       capabilities);
 
         // Record the extensions that this file format plugin can handle.
         // Note that an extension may be supported by multiple file format
         // plugins.
         for (auto ext : extensions) {
-            if (ext.empty())
-                continue;
+            if (ext.empty()) continue;
 
-            if (ext[0] == '.')
-                ext = ext.substr(1);
+            if (ext[0] == '.') ext = ext.substr(1);
 
-            TF_DEBUG(SDF_FILE_FORMAT).Msg("_RegisterFormatPlugins: "
-                "  extension '%s'\n", ext.c_str());
+            TF_DEBUG(SDF_FILE_FORMAT)
+                    .Msg("_RegisterFormatPlugins: "
+                         "  extension '%s'\n",
+                         ext.c_str());
 
             bool foundRegisteredInfoWithSameTarget = false;
 
@@ -432,11 +373,10 @@ Sdf_FileFormatRegistry::_RegisterFormatPlugins()
 
             if (foundRegisteredInfoWithSameTarget) {
                 TF_CODING_ERROR(
-                    "Multiple file formats with target '%s' "
-                    "registered for extension '%s', skipping.",
-                    info->target.GetText(), ext.c_str());
-            }
-            else {
+                        "Multiple file formats with target '%s' "
+                        "registered for extension '%s', skipping.",
+                        info->target.GetText(), ext.c_str());
+            } else {
                 infosForExt.push_back(info);
             }
         }
@@ -455,20 +395,18 @@ Sdf_FileFormatRegistry::_RegisterFormatPlugins()
         _InfoSharedPtr primaryFormatInfo;
         if (infos.size() == 1) {
             primaryFormatInfo = infos.front();
-        }
-        else {
+        } else {
             TF_FOR_ALL(infoIt, infos) {
-                const JsValue aPrimary = reg.GetDataFromPluginMetaData(
-                    (*infoIt)->type, _PlugInfoKeyTokens->Primary);
+                const JsValue aPrimary = reg.GetDataFromPluginMetaData((*infoIt)->type, _PlugInfoKeyTokens->Primary);
                 if (aPrimary.IsNull()) {
                     continue;
                 }
 
                 if (!aPrimary.IsBool()) {
-                    TF_CODING_ERROR("Unexpected value type for key '%s' "
-                        "in plugin meta data for file format type '%s'",
-                        _PlugInfoKeyTokens->Primary.GetText(),
-                        (*infoIt)->type.GetTypeName().c_str());
+                    TF_CODING_ERROR(
+                            "Unexpected value type for key '%s' "
+                            "in plugin meta data for file format type '%s'",
+                            _PlugInfoKeyTokens->Primary.GetText(), (*infoIt)->type.GetTypeName().c_str());
                     continue;
                 }
                 const bool isPrimary = aPrimary.GetBool();
@@ -480,13 +418,13 @@ Sdf_FileFormatRegistry::_RegisterFormatPlugins()
                         // finding the primary format; allow the loop to
                         // continue so we flag the error case where an
                         // extension has multiple primary formats.
-                    }
-                    else {
+                    } else {
                         primaryFormatInfo = _InfoSharedPtr();
                         if (errorExtensions.insert(ext).second) {
                             TF_CODING_ERROR(
-                                "Multiple primary file formats specified for "
-                                "extension '%s', skipping.", ext.c_str());
+                                    "Multiple primary file formats specified for "
+                                    "extension '%s', skipping.",
+                                    ext.c_str());
                         }
                         break;
                     }
@@ -495,8 +433,9 @@ Sdf_FileFormatRegistry::_RegisterFormatPlugins()
 
             if (!primaryFormatInfo && errorExtensions.insert(ext).second) {
                 TF_CODING_ERROR(
-                    "No primary file format specified for extension '%s', "
-                    "skipping.", ext.c_str());
+                        "No primary file format specified for extension '%s', "
+                        "skipping.",
+                        ext.c_str());
             }
         }
 
@@ -520,61 +459,37 @@ Sdf_FileFormatRegistry::_RegisterFormatPlugins()
 
         _registeredFormatPlugins = true;
     }
-
 }
 
-SdfFileFormatConstPtr
-Sdf_FileFormatRegistry::_GetFileFormat(
-    const _InfoSharedPtr& info)
-{
-    if (!TF_VERIFY(info))
-        return TfNullPtr;
+SdfFileFormatConstPtr Sdf_FileFormatRegistry::_GetFileFormat(const _InfoSharedPtr& info) {
+    if (!TF_VERIFY(info)) return TfNullPtr;
 
     return info->GetFileFormat();
 }
 
-bool 
-Sdf_FileFormatRegistry::FormatSupportsReading(
-    const std::string& extension,
-    const std::string& target)
-{
-    return _FormatSupportsCapability(extension, target, 
-        _Info::Capabilities::Reading);
+bool Sdf_FileFormatRegistry::FormatSupportsReading(const std::string& extension, const std::string& target) {
+    return _FormatSupportsCapability(extension, target, _Info::Capabilities::Reading);
 }
 
-bool 
-Sdf_FileFormatRegistry::FormatSupportsWriting(
-    const std::string& extension,
-    const std::string& target)
-{
-    return _FormatSupportsCapability(extension, target, 
-        _Info::Capabilities::Writing);
+bool Sdf_FileFormatRegistry::FormatSupportsWriting(const std::string& extension, const std::string& target) {
+    return _FormatSupportsCapability(extension, target, _Info::Capabilities::Writing);
 }
 
-bool 
-Sdf_FileFormatRegistry::FormatSupportsEditing(
-    const std::string& extension,
-    const std::string& target)
-{
-    return _FormatSupportsCapability(extension, target, 
-        _Info::Capabilities::Editing);
+bool Sdf_FileFormatRegistry::FormatSupportsEditing(const std::string& extension, const std::string& target) {
+    return _FormatSupportsCapability(extension, target, _Info::Capabilities::Editing);
 }
 
-bool 
-Sdf_FileFormatRegistry::_FormatSupportsCapability(
-    const std::string& path,
-    const std::string& target,
-    _Info::Capabilities capabilityFlag)
-{
+bool Sdf_FileFormatRegistry::_FormatSupportsCapability(const std::string& path,
+                                                       const std::string& target,
+                                                       _Info::Capabilities capabilityFlag) {
     using UT = std::underlying_type<_Info::Capabilities>::type;
     _InfoSharedPtr formatInfo = _GetFormatInfo(path, target);
-    
+
     if (!formatInfo) {
         return false;
     }
 
-    return static_cast<UT>(formatInfo->capabilities) & 
-        static_cast<UT>(capabilityFlag);
+    return static_cast<UT>(formatInfo->capabilities) & static_cast<UT>(capabilityFlag);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

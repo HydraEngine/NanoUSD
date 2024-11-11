@@ -6,5 +6,4 @@
 //
 /// \file MapEditProxy.cpp
 
-
 #include "pxr/usd/sdf/mapEditProxy.h"

@@ -24,14 +24,14 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 namespace Sdf_VariableExpressionImpl {
-    class Node;
+class Node;
 }
 
 /// \class SdfVariableExpression
 ///
 /// Class responsible for parsing and evaluating variable expressions.
 ///
-/// Variable expressions are written in a custom language and 
+/// Variable expressions are written in a custom language and
 /// represented in scene description as a string surrounded by backticks (`).
 /// These expressions may refer to "expression variables", which are key-value
 /// pairs provided by clients. For example, when evaluating an expression like:
@@ -44,7 +44,7 @@ namespace Sdf_VariableExpressionImpl {
 /// "NAME".
 ///
 /// Expression variables may be any of these supported types:
-/// 
+///
 /// - std::string
 /// - int64_t (int is accepted but coerced to int64_t)
 /// - bool
@@ -60,8 +60,7 @@ namespace Sdf_VariableExpressionImpl {
 /// See \ref Sdf_Page_VariableExpressions "Variable Expressions"
 /// or more information on the expression language and areas of the system
 /// where expressions may be used.
-class SdfVariableExpression
-{
+class SdfVariableExpression {
 public:
     /// Construct using the expression \p expr. If the expression cannot be
     /// parsed, this object represents an invalid expression. Parsing errors
@@ -119,11 +118,10 @@ public:
 
     /// \class EmptyList
     /// A result value representing an empty list.
-    class EmptyList { };
+    class EmptyList {};
 
     /// \class Result
-    class Result
-    {
+    class Result {
     public:
         /// The result of evaluating the expression. This value may be
         /// empty if the expression yielded no value. It may also be empty
@@ -191,16 +189,13 @@ public:
     /// ResultType must be one of the supported types listed in the
     /// class documentation.
     template <class ResultType>
-    Result EvaluateTyped(const VtDictionary& variables) const
-    {
+    Result EvaluateTyped(const VtDictionary& variables) const {
         Result r = Evaluate(variables);
 
         if (VtIsArray<ResultType>::value && r.value.IsHolding<EmptyList>()) {
             r.value = VtValue(ResultType());
-        }
-        else if (!r.value.IsEmpty() && !r.value.IsHolding<ResultType>()) {
-            r.errors.push_back(
-                _FormatUnexpectedTypeError(r.value, VtValue(ResultType())));
+        } else if (!r.value.IsEmpty() && !r.value.IsHolding<ResultType>()) {
+            r.errors.push_back(_FormatUnexpectedTypeError(r.value, VtValue(ResultType())));
             r.value = VtValue();
         }
         return r;
@@ -208,27 +203,18 @@ public:
 
 private:
     SDF_API
-    static std::string
-    _FormatUnexpectedTypeError(const VtValue& got, const VtValue& expected);
+    static std::string _FormatUnexpectedTypeError(const VtValue& got, const VtValue& expected);
 
     std::vector<std::string> _errors;
     std::shared_ptr<Sdf_VariableExpressionImpl::Node> _expression;
     std::string _expressionStr;
 };
 
-inline bool
-operator==(
-    const SdfVariableExpression::EmptyList&,
-    const SdfVariableExpression::EmptyList&)
-{
+inline bool operator==(const SdfVariableExpression::EmptyList&, const SdfVariableExpression::EmptyList&) {
     return true;
 }
 
-inline bool
-operator!=(
-    const SdfVariableExpression::EmptyList&,
-    const SdfVariableExpression::EmptyList&)
-{
+inline bool operator!=(const SdfVariableExpression::EmptyList&, const SdfVariableExpression::EmptyList&) {
     return false;
 }
 

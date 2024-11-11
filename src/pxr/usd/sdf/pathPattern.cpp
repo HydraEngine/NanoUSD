@@ -20,153 +20,117 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-SdfPathPattern::SdfPathPattern()
-    : _isProperty(false)
-{
-}
+SdfPathPattern::SdfPathPattern() : _isProperty(false) {}
 
-SdfPathPattern::SdfPathPattern(SdfPath &&prefix)
-{
+SdfPathPattern::SdfPathPattern(SdfPath&& prefix) {
     SetPrefix(std::move(prefix));
 }
 
-SdfPathPattern::SdfPathPattern(SdfPath const &prefix)
-    : SdfPathPattern(SdfPath(prefix))
-{
-}
+SdfPathPattern::SdfPathPattern(SdfPath const& prefix) : SdfPathPattern(SdfPath(prefix)) {}
 
 // private ctor, does no validation.
 SdfPathPattern::SdfPathPattern(SdfPath prefix,
-                               std::vector<Component> &&components,
-                               std::vector<SdfPredicateExpression> &&predExprs,
+                               std::vector<Component>&& components,
+                               std::vector<SdfPredicateExpression>&& predExprs,
                                bool isProperty)
-    : _prefix(std::move(prefix))
-    , _components(std::move(components))
-    , _predExprs(std::move(predExprs))
-    , _isProperty(isProperty)
-{
-}
+    : _prefix(std::move(prefix)),
+      _components(std::move(components)),
+      _predExprs(std::move(predExprs)),
+      _isProperty(isProperty) {}
 
-SdfPathPattern const &
-SdfPathPattern::Everything()
-{
-    static SdfPathPattern const *theEverything =
-        new SdfPathPattern(SdfPath::AbsoluteRootPath(), {{}}, {}, false);
+SdfPathPattern const& SdfPathPattern::Everything() {
+    static SdfPathPattern const* theEverything = new SdfPathPattern(SdfPath::AbsoluteRootPath(), {{}}, {}, false);
     return *theEverything;
 }
 
-SdfPathPattern const &
-SdfPathPattern::EveryDescendant()
-{
-    static SdfPathPattern const *theEveryDescendant =
-        new SdfPathPattern(SdfPath::ReflexiveRelativePath(), {{}}, {}, false);
+SdfPathPattern const& SdfPathPattern::EveryDescendant() {
+    static SdfPathPattern const* theEveryDescendant =
+            new SdfPathPattern(SdfPath::ReflexiveRelativePath(), {{}}, {}, false);
     return *theEveryDescendant;
 }
 
-static inline bool
-IsLiteralProperty(std::string const &text)
-{
+static inline bool IsLiteralProperty(std::string const& text) {
     return SdfPath::IsValidNamespacedIdentifier(text);
 }
 
-static inline bool
-IsLiteralPrim(std::string const &text)
-{
+static inline bool IsLiteralPrim(std::string const& text) {
     return SdfPath::IsValidIdentifier(text);
 }
 
-bool
-SdfPathPattern::CanAppendChild(std::string const &text,
-                               SdfPredicateExpression const &predExpr,
-                               std::string *reason) const
-{
-    auto setReason = [reason](auto ...args) {
-        if (reason) { *reason = TfStringPrintf(args...); }
+bool SdfPathPattern::CanAppendChild(std::string const& text,
+                                    SdfPredicateExpression const& predExpr,
+                                    std::string* reason) const {
+    auto setReason = [reason](auto... args) {
+        if (reason) {
+            *reason = TfStringPrintf(args...);
+        }
     };
-    
+
     if (_isProperty) {
-        setReason("Cannot append child '%s' to a property path pattern '%s'",
-                  text.c_str(), GetText().c_str());
+        setReason("Cannot append child '%s' to a property path pattern '%s'", text.c_str(), GetText().c_str());
         return false;
     }
 
     if (text.empty() && !predExpr && HasTrailingStretch()) {
-        setReason("Cannot append stretch to a path pattern that has trailing "
-                  "stretch '%s'", GetText().c_str());
+        setReason(
+                "Cannot append stretch to a path pattern that has trailing "
+                "stretch '%s'",
+                GetText().c_str());
         return false;
     }
 
     return true;
 }
 
-SdfPathPattern &
-SdfPathPattern::AppendChild(std::string const &text)
-{
+SdfPathPattern& SdfPathPattern::AppendChild(std::string const& text) {
     return AppendChild(text, {});
 }
 
-SdfPathPattern &
-SdfPathPattern::AppendChild(std::string const &text,
-                            SdfPredicateExpression const &predExpr)
-{
+SdfPathPattern& SdfPathPattern::AppendChild(std::string const& text, SdfPredicateExpression const& predExpr) {
     return AppendChild(text, SdfPredicateExpression(predExpr));
 }
 
-
-SdfPathPattern &
-SdfPathPattern::AppendChild(std::string const &text,
-                            SdfPredicateExpression &&predExpr)
-{
+SdfPathPattern& SdfPathPattern::AppendChild(std::string const& text, SdfPredicateExpression&& predExpr) {
     std::string reason;
     if (!CanAppendChild(text, predExpr, &reason)) {
         TF_WARN(reason);
         return *this;
     }
-                
+
     if (_prefix.IsEmpty()) {
         _prefix = SdfPath::ReflexiveRelativePath();
     }
-    
+
     bool isLiteral = IsLiteralPrim(text);
     if ((isLiteral || text == "..") && !predExpr && _components.empty()) {
         _prefix = _prefix.AppendChild(TfToken(text));
-    }
-    else {
+    } else {
         int predIndex = -1;
         if (predExpr) {
             predIndex = static_cast<int>(_predExprs.size());
             _predExprs.push_back(std::move(predExpr));
         }
-        _components.push_back({ text, predIndex, isLiteral });
+        _components.push_back({text, predIndex, isLiteral});
     }
     return *this;
 }
 
-SdfPathPattern &
-SdfPathPattern::AppendStretchIfPossible() {
+SdfPathPattern& SdfPathPattern::AppendStretchIfPossible() {
     if (CanAppendChild({})) {
         AppendChild({});
     }
     return *this;
 }
 
-bool
-SdfPathPattern::HasLeadingStretch() const
-{
-    return GetPrefix().IsAbsoluteRootPath() &&
-        !_components.empty() && _components.front().IsStretch();
+bool SdfPathPattern::HasLeadingStretch() const {
+    return GetPrefix().IsAbsoluteRootPath() && !_components.empty() && _components.front().IsStretch();
 }
 
-bool
-SdfPathPattern::HasTrailingStretch() const
-{
-    return !_isProperty &&
-        !_components.empty() && _components.back().IsStretch();
+bool SdfPathPattern::HasTrailingStretch() const {
+    return !_isProperty && !_components.empty() && _components.back().IsStretch();
 }
 
-SdfPathPattern &
-SdfPathPattern::RemoveTrailingStretch()
-{
+SdfPathPattern& SdfPathPattern::RemoveTrailingStretch() {
     if (HasTrailingStretch()) {
         // We don't have to do all the other work that RemoveTrailingComponent()
         // has to do, since a stretch component doesn't have a predicate, and
@@ -176,15 +140,12 @@ SdfPathPattern::RemoveTrailingStretch()
     return *this;
 }
 
-SdfPathPattern &
-SdfPathPattern::RemoveTrailingComponent()
-{
+SdfPathPattern& SdfPathPattern::RemoveTrailingComponent() {
     if (!_components.empty()) {
         // If this component has a predicate, it must be the last one.
         const int predIndex = _components.back().predicateIndex;
         if (predIndex >= 0) {
-            if (TF_VERIFY(
-                    static_cast<size_t>(predIndex) == _predExprs.size()-1)) {
+            if (TF_VERIFY(static_cast<size_t>(predIndex) == _predExprs.size() - 1)) {
                 _predExprs.pop_back();
             }
         }
@@ -198,47 +159,40 @@ SdfPathPattern::RemoveTrailingComponent()
     return *this;
 }
 
-bool
-SdfPathPattern::CanAppendProperty(std::string const &text,
-                                  SdfPredicateExpression const &predExpr,
-                                  std::string *reason) const
-{
-    auto setReason = [reason](auto ...args) {
-        if (reason) { *reason = TfStringPrintf(args...); }
+bool SdfPathPattern::CanAppendProperty(std::string const& text,
+                                       SdfPredicateExpression const& predExpr,
+                                       std::string* reason) const {
+    auto setReason = [reason](auto... args) {
+        if (reason) {
+            *reason = TfStringPrintf(args...);
+        }
     };
-    
+
     if (_isProperty) {
-        setReason("Cannot append additional property '%s' to property path "
-                  "pattern '%s'", text.c_str(), GetText().c_str());
+        setReason(
+                "Cannot append additional property '%s' to property path "
+                "pattern '%s'",
+                text.c_str(), GetText().c_str());
         return false;
     }
 
     if (text.empty() && !predExpr) {
-        setReason("Cannot append empty property element to path pattern '%s'",
-                  GetText().c_str());
+        setReason("Cannot append empty property element to path pattern '%s'", GetText().c_str());
         return false;
     }
 
     return true;
 }
 
-SdfPathPattern &
-SdfPathPattern::AppendProperty(std::string const &text)
-{
+SdfPathPattern& SdfPathPattern::AppendProperty(std::string const& text) {
     return AppendProperty(text, {});
 }
 
-SdfPathPattern &
-SdfPathPattern::AppendProperty(std::string const &text,
-                               SdfPredicateExpression const &predExpr)
-{
+SdfPathPattern& SdfPathPattern::AppendProperty(std::string const& text, SdfPredicateExpression const& predExpr) {
     return AppendProperty(text, SdfPredicateExpression(predExpr));
 }
 
-SdfPathPattern &
-SdfPathPattern::AppendProperty(std::string const &text,
-                               SdfPredicateExpression &&predExpr)
-{
+SdfPathPattern& SdfPathPattern::AppendProperty(std::string const& text, SdfPredicateExpression&& predExpr) {
     std::string reason;
     if (!CanAppendProperty(text, predExpr, &reason)) {
         TF_WARN(reason);
@@ -252,8 +206,7 @@ SdfPathPattern::AppendProperty(std::string const &text,
     bool isLiteral = IsLiteralProperty(text);
     if (isLiteral && !predExpr && _components.empty()) {
         _prefix = _prefix.AppendProperty(TfToken(text));
-    }
-    else {
+    } else {
         // If this path ends with a stretch component, we have to append a
         // wildcard prim child component first.  That is, AppendProperty('/x//',
         // 'foo') -> '/x//*.foo'.
@@ -265,29 +218,28 @@ SdfPathPattern::AppendProperty(std::string const &text,
             predIndex = static_cast<int>(_predExprs.size());
             _predExprs.push_back(std::move(predExpr));
         }
-        _components.push_back({ text, predIndex, isLiteral });
+        _components.push_back({text, predIndex, isLiteral});
     }
     _isProperty = true;
     return *this;
 }
 
-SdfPathPattern &
-SdfPathPattern::SetPrefix(SdfPath &&p)
-{
+SdfPathPattern& SdfPathPattern::SetPrefix(SdfPath&& p) {
     // If we have any components at all, then p must be a prim path or the
     // absolute root path.  Otherwise it can be a prim or prim property path.
     if (!_components.empty()) {
         if (!p.IsAbsoluteRootOrPrimPath()) {
             TF_WARN("Path patterns with match components require "
                     "prim paths or the absolute root path ('/') as a prefix: "
-                    "<%s> -- ignoring.", p.GetAsString().c_str());
+                    "<%s> -- ignoring.",
+                    p.GetAsString().c_str());
             return *this;
         }
-    }
-    else {
-        if (!(p.IsAbsoluteRootOrPrimPath() || p.IsPrimPropertyPath())) { 
+    } else {
+        if (!(p.IsAbsoluteRootOrPrimPath() || p.IsPrimPropertyPath())) {
             TF_WARN("Path pattern prefixes must be prim paths or prim-property "
-                    "paths: <%s> -- ignoring.", p.GetAsString().c_str());
+                    "paths: <%s> -- ignoring.",
+                    p.GetAsString().c_str());
             return *this;
         }
     }
@@ -298,9 +250,7 @@ SdfPathPattern::SetPrefix(SdfPath &&p)
     return *this;
 }
 
-std::string
-SdfPathPattern::GetText() const
-{
+std::string SdfPathPattern::GetText() const {
     std::string result;
 
     if (_prefix == SdfPath::ReflexiveRelativePath()) {
@@ -309,8 +259,7 @@ SdfPathPattern::GetText() const
             // emit a leading '.', otherwise nothing.
             result = ".";
         }
-    }
-    else {
+    } else {
         result = _prefix.GetAsString();
     }
 
@@ -322,14 +271,12 @@ SdfPathPattern::GetText() const
         }
         if ((i + 1 == end) && _isProperty) {
             result.push_back('.');
-        }
-        else if (!result.empty() && result.back() != '/') {
+        } else if (!result.empty() && result.back() != '/') {
             result.push_back('/');
         }
         result += _components[i].text;
         if (_components[i].predicateIndex != -1) {
-            result += "{" + _predExprs[
-                _components[i].predicateIndex].GetText() + "}";
+            result += "{" + _predExprs[_components[i].predicateIndex].GetText() + "}";
         }
     }
     return result;

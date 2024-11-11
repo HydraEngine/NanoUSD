@@ -6,5 +6,4 @@
 //
 /// \file PyMapEditProxy.cpp
 
-
 #include "pxr/usd/sdf/pyMapEditProxy.h"

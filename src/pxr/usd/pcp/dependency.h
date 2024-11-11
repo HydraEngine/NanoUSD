@@ -70,22 +70,15 @@ enum PcpDependencyType {
 
     /// Combined mask value representing both pure and partly direct
     /// deps.
-    PcpDependencyTypeDirect =
-        PcpDependencyTypePartlyDirect
-        | PcpDependencyTypePurelyDirect,
+    PcpDependencyTypeDirect = PcpDependencyTypePartlyDirect | PcpDependencyTypePurelyDirect,
 
     /// Combined mask value representing any kind of dependency,
     /// except virtual ones.
     PcpDependencyTypeAnyNonVirtual =
-        PcpDependencyTypeRoot
-        | PcpDependencyTypeDirect
-        | PcpDependencyTypeAncestral
-        | PcpDependencyTypeNonVirtual,
+            PcpDependencyTypeRoot | PcpDependencyTypeDirect | PcpDependencyTypeAncestral | PcpDependencyTypeNonVirtual,
 
     /// Combined mask value representing any kind of dependency.
-    PcpDependencyTypeAnyIncludingVirtual =
-        PcpDependencyTypeAnyNonVirtual
-        | PcpDependencyTypeVirtual,
+    PcpDependencyTypeAnyIncludingVirtual = PcpDependencyTypeAnyNonVirtual | PcpDependencyTypeVirtual,
 };
 
 /// A typedef for a bitmask of flags from PcpDependencyType.
@@ -102,14 +95,10 @@ struct PcpDependency {
     /// The map function that applies to values from the site.
     PcpMapFunction mapFunc;
 
-    bool operator==(const PcpDependency &rhs) const {
-        return indexPath == rhs.indexPath &&
-            sitePath == rhs.sitePath &&
-            mapFunc == rhs.mapFunc;
+    bool operator==(const PcpDependency& rhs) const {
+        return indexPath == rhs.indexPath && sitePath == rhs.sitePath && mapFunc == rhs.mapFunc;
     }
-    bool operator!=(const PcpDependency &rhs) const {
-        return !(*this == rhs);
-    }
+    bool operator!=(const PcpDependency& rhs) const { return !(*this == rhs); }
 };
 
 using PcpDependencyVector = std::vector<PcpDependency>;
@@ -118,8 +107,7 @@ using PcpDependencyVector = std::vector<PcpDependency>;
 /// prim index. Since this dependency does not have a node in the prim index,
 /// this struct stores additional information needed to represent the
 /// dependency.
-struct PcpCulledDependency
-{
+struct PcpCulledDependency {
     /// Flag representing the type of dependency.
     PcpDependencyFlags flags = PcpDependencyTypeNone;
     /// Arc type for this dependency.
@@ -142,17 +130,17 @@ using PcpCulledDependencyVector = std::vector<PcpCulledDependency>;
 /// PcpClassifyNodeDependency(n) != PcpDependencyTypeNone, but
 /// is faster.
 PCP_API
-bool PcpNodeIntroducesDependency(const PcpNodeRef &n);
+bool PcpNodeIntroducesDependency(const PcpNodeRef& n);
 
 /// Classify the dependency represented by a node, by analyzing
 /// its structural role in its PcpPrimIndex.  Returns a
 /// bitmask of flags from PcpDependencyType.
 PCP_API
-PcpDependencyFlags PcpClassifyNodeDependency(const PcpNodeRef &n);
+PcpDependencyFlags PcpClassifyNodeDependency(const PcpNodeRef& n);
 
 PCP_API
 std::string PcpDependencyFlagsToString(const PcpDependencyFlags flags);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_DEPENDENCY_H
+#endif  // PXR_USD_PCP_DEPENDENCY_H

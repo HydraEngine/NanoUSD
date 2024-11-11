@@ -10,15 +10,14 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-TF_WRAP_MODULE
-{
-    TF_WRAP( Declare );
-    TF_WRAP( DiscoveryPlugin );
-    TF_WRAP( FilesystemDiscovery );
-    TF_WRAP( FilesystemDiscoveryHelpers );
-    TF_WRAP( Node );
-    TF_WRAP( NodeDiscoveryResult );
-    TF_WRAP( Property );
-    TF_WRAP( Registry );
-    TF_WRAP( SdfTypeIndicator );
+TF_WRAP_MODULE {
+    TF_WRAP(Declare);
+    TF_WRAP(DiscoveryPlugin);
+    TF_WRAP(FilesystemDiscovery);
+    TF_WRAP(FilesystemDiscoveryHelpers);
+    TF_WRAP(Node);
+    TF_WRAP(NodeDiscoveryResult);
+    TF_WRAP(Property);
+    TF_WRAP(Registry);
+    TF_WRAP(SdfTypeIndicator);
 }

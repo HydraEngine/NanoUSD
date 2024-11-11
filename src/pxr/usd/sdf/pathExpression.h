@@ -51,11 +51,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// These building blocks may be joined as mentioned above, with `+`, `-`, `&`,
 /// or whitespace, and may be complemented with `~`, and grouped with `(` and
 /// `)`.
-class SdfPathExpression
-{
+class SdfPathExpression {
 public:
     using PathPattern = SdfPathPattern;
-    
+
     /// \class ExpressionReference
     ///
     /// Objects of this class represent references to other path expressions,
@@ -67,32 +66,28 @@ public:
         /// SdfPathExpression is "%_".  An ExpressionReference represents this
         /// as the empty \p path, and the name "_".
         SDF_API
-        static ExpressionReference const &Weaker();
-        
+        static ExpressionReference const& Weaker();
+
         // Optional path reference, can be empty for "weaker" references (name
         // is "_") or for references to local or otherwise "named" collections.
         SdfPath path;
-        
+
         // Name is either a property name, or "_" (meaning the weaker
         // collection).  If the name is "_", the path must be empty.
         std::string name;
 
         template <class HashState>
-        friend void TfHashAppend(HashState &h, ExpressionReference const &er) {
+        friend void TfHashAppend(HashState& h, ExpressionReference const& er) {
             h.Append(er.path, er.name);
         }
 
-        friend bool
-        operator==(ExpressionReference const &l, ExpressionReference const &r) {
+        friend bool operator==(ExpressionReference const& l, ExpressionReference const& r) {
             return std::tie(l.path, l.name) == std::tie(r.path, r.name);
         }
-        
-        friend bool
-        operator!=(ExpressionReference const &l, ExpressionReference const &r) {
-            return !(l == r);
-        }
 
-        friend void swap(ExpressionReference &l, ExpressionReference &r) {
+        friend bool operator!=(ExpressionReference const& l, ExpressionReference const& r) { return !(l == r); }
+
+        friend void swap(ExpressionReference& l, ExpressionReference& r) {
             auto lt = std::tie(l.path, l.name);
             auto rt = std::tie(r.path, r.name);
             swap(lt, rt);
@@ -122,37 +117,34 @@ public:
     /// GetParseError().  See the class documentation for details on expression
     /// syntax.
     SDF_API
-    explicit SdfPathExpression(std::string const &expr,
-                               std::string const &parseContext = {});
+    explicit SdfPathExpression(std::string const& expr, std::string const& parseContext = {});
 
     /// Return the expression "//" which matches all paths.
     SDF_API
-    static SdfPathExpression const &Everything();
+    static SdfPathExpression const& Everything();
 
     /// Return the relative expression ".//" which matches all paths descendant
     /// to an anchor path.
     SDF_API
-    static SdfPathExpression const &EveryDescendant();
+    static SdfPathExpression const& EveryDescendant();
 
     /// Return the empty expression which matches no paths.  This is the same as
     /// a default-constructed SdfPathExpression.
     SDF_API
-    static SdfPathExpression const &Nothing();
+    static SdfPathExpression const& Nothing();
 
     /// Return the expression "%_", consisting solely of a reference to the
     /// "weaker" path expression, to be resolved by ComposeOver() or
     /// ResolveReferences()
     SDF_API
-    static SdfPathExpression const &WeakerRef();
-    
+    static SdfPathExpression const& WeakerRef();
+
     /// Produce a new expression representing the set-complement of \p right.
     SDF_API
-    static SdfPathExpression
-    MakeComplement(SdfPathExpression &&right);
+    static SdfPathExpression MakeComplement(SdfPathExpression&& right);
 
     /// \overload
-    static SdfPathExpression
-    MakeComplement(SdfPathExpression const &right) {
+    static SdfPathExpression MakeComplement(SdfPathExpression const& right) {
         return MakeComplement(SdfPathExpression(right));
     }
 
@@ -160,50 +152,32 @@ public:
     /// with operands \p left and \p right.  The \p op must be one of
     /// ImpliedUnion, Union, Intersection, or Difference.
     SDF_API
-    static SdfPathExpression
-    MakeOp(Op op, SdfPathExpression &&left, SdfPathExpression &&right);
+    static SdfPathExpression MakeOp(Op op, SdfPathExpression&& left, SdfPathExpression&& right);
 
     /// \overload
-    static SdfPathExpression
-    MakeOp(Op op,
-           SdfPathExpression const &left,
-           SdfPathExpression const &right) {
+    static SdfPathExpression MakeOp(Op op, SdfPathExpression const& left, SdfPathExpression const& right) {
         return MakeOp(op, SdfPathExpression(left), SdfPathExpression(right));
     }
 
     /// Produce a new expression containing only the reference \p ref.
     SDF_API
-    static SdfPathExpression
-    MakeAtom(ExpressionReference &&ref);
+    static SdfPathExpression MakeAtom(ExpressionReference&& ref);
 
     /// \overload
-    static SdfPathExpression
-    MakeAtom(ExpressionReference const &ref) {
-        return MakeAtom(ExpressionReference(ref));
-    }
+    static SdfPathExpression MakeAtom(ExpressionReference const& ref) { return MakeAtom(ExpressionReference(ref)); }
 
     /// Produce a new expression containing only the pattern \p pattern.
     SDF_API
-    static SdfPathExpression
-    MakeAtom(PathPattern &&pattern);
+    static SdfPathExpression MakeAtom(PathPattern&& pattern);
 
     /// \overload
-    static SdfPathExpression
-    MakeAtom(PathPattern const &pattern) {
-        return MakeAtom(PathPattern(pattern));
-    }
+    static SdfPathExpression MakeAtom(PathPattern const& pattern) { return MakeAtom(PathPattern(pattern)); }
 
     /// Produce a new expression that matches \p path exactly.
-    static SdfPathExpression
-    MakeAtom(SdfPath const &path) {
-        return MakeAtom(PathPattern(path));
-    }
+    static SdfPathExpression MakeAtom(SdfPath const& path) { return MakeAtom(PathPattern(path)); }
 
     /// \overload
-    static SdfPathExpression
-    MakeAtom(SdfPath &&path) {
-        return MakeAtom(PathPattern(path));
-    }
+    static SdfPathExpression MakeAtom(SdfPath&& path) { return MakeAtom(PathPattern(path)); }
 
     /// Walk this expression's syntax tree in depth-first order, calling \p
     /// pattern with the current PathPattern when one is encountered, \p ref
@@ -237,11 +211,11 @@ public:
     /// ref(%_)
     /// logic(ImpliedUnion, 2)
     /// logic(Intersection, 2)
-    /// 
+    ///
     SDF_API
-    void Walk(TfFunctionRef<void (Op, int)> logic,
-              TfFunctionRef<void (ExpressionReference const &)> ref,
-              TfFunctionRef<void (PathPattern const &)> pattern) const;
+    void Walk(TfFunctionRef<void(Op, int)> logic,
+              TfFunctionRef<void(ExpressionReference const&)> ref,
+              TfFunctionRef<void(PathPattern const&)> pattern) const;
 
     /// Equivalent to Walk(), except that the \p logic function is called with a
     /// const reference to the current Op stack instead of just the top of it.
@@ -249,25 +223,20 @@ public:
     /// the processing code needs to understand the context in which an Op
     /// appears.
     SDF_API
-    void WalkWithOpStack(
-        TfFunctionRef<void (std::vector<std::pair<Op, int>> const &)> logic,
-        TfFunctionRef<void (ExpressionReference const &)> ref,
-        TfFunctionRef<void (PathPattern const &)> pattern) const;
+    void WalkWithOpStack(TfFunctionRef<void(std::vector<std::pair<Op, int>> const&)> logic,
+                         TfFunctionRef<void(ExpressionReference const&)> ref,
+                         TfFunctionRef<void(PathPattern const&)> pattern) const;
 
     /// Return a new expression created by replacing literal path prefixes that
     /// start with \p oldPrefix with \p newPrefix.
-    SdfPathExpression
-    ReplacePrefix(SdfPath const &oldPrefix,
-                  SdfPath const &newPrefix) const & {
+    SdfPathExpression ReplacePrefix(SdfPath const& oldPrefix, SdfPath const& newPrefix) const& {
         return SdfPathExpression(*this).ReplacePrefix(oldPrefix, newPrefix);
     }
 
     /// Return a new expression created by replacing literal path prefixes that
     /// start with \p oldPrefix with \p newPrefix.
     SDF_API
-    SdfPathExpression
-    ReplacePrefix(SdfPath const &oldPrefix,
-                  SdfPath const &newPrefix) &&;
+    SdfPathExpression ReplacePrefix(SdfPath const& oldPrefix, SdfPath const& newPrefix) &&;
 
     /// Return true if all contained pattern prefixes are absolute, false
     /// otherwise.  Call MakeAbsolute() to anchor any relative paths and make
@@ -277,22 +246,18 @@ public:
 
     /// Return a new expression created by making any relative path prefixes in
     /// this expression absolute by SdfPath::MakeAbsolutePath().
-    SdfPathExpression
-    MakeAbsolute(SdfPath const &anchor) const & {
+    SdfPathExpression MakeAbsolute(SdfPath const& anchor) const& {
         return SdfPathExpression(*this).MakeAbsolute(anchor);
     }
 
     /// Return a new expression created by making any relative path prefixes in
     /// this expression absolute by SdfPath::MakeAbsolutePath().
     SDF_API
-    SdfPathExpression
-    MakeAbsolute(SdfPath const &anchor) &&;
+    SdfPathExpression MakeAbsolute(SdfPath const& anchor) &&;
 
     /// Return true if this expression contains any references to other
     /// collections.
-    bool ContainsExpressionReferences() const {
-        return !_refs.empty();
-    }
+    bool ContainsExpressionReferences() const { return !_refs.empty(); }
 
     /// Return true if this expression contains one or more "weaker" expression
     /// references, expressed as '%_' in the expression language.  Return false
@@ -305,35 +270,27 @@ public:
     /// subexpression from a "%" ExpressionReference. To leave an expression
     /// reference unchanged, return an expression containing the passed argument
     /// by calling MakeAtom().
-    SdfPathExpression
-    ResolveReferences(
-        TfFunctionRef<SdfPathExpression (
-                          ExpressionReference const &)> resolve) const & {
+    SdfPathExpression ResolveReferences(TfFunctionRef<SdfPathExpression(ExpressionReference const&)> resolve) const& {
         return SdfPathExpression(*this).ResolveReferences(resolve);
     }
 
     /// \overload
     SDF_API
-    SdfPathExpression
-    ResolveReferences(
-        TfFunctionRef<SdfPathExpression (
-                          ExpressionReference const &)> resolve) &&;
-    
+    SdfPathExpression ResolveReferences(TfFunctionRef<SdfPathExpression(ExpressionReference const&)> resolve) &&;
+
     /// Return a new expression created by replacing references to the "weaker
     /// expression" (i.e. "%_") in this expression with \p weaker.  This is a
     /// restricted form of ResolveReferences() that only resolves "weaker"
     /// references, replacing them by \p weaker, leaving other references
     /// unmodified.  As a special case, if this expression IsEmpty(), return \p
     /// weaker.
-    SdfPathExpression
-    ComposeOver(SdfPathExpression const &weaker) const & {
+    SdfPathExpression ComposeOver(SdfPathExpression const& weaker) const& {
         return SdfPathExpression(*this).ComposeOver(weaker);
     }
 
     /// \overload
     SDF_API
-    SdfPathExpression
-    ComposeOver(SdfPathExpression const &weaker) &&;
+    SdfPathExpression ComposeOver(SdfPathExpression const& weaker) &&;
 
     /// Return true if this expression is considered "complete".  Here, complete
     /// means that the expression has all absolute paths, and contains no
@@ -345,9 +302,7 @@ public:
     ///
     /// To complete an expression, call MakeAbsolute(), ResolveReferences()
     /// and/or ComposeOver().
-    bool IsComplete() const {
-        return !ContainsExpressionReferences() && IsAbsolute();
-    }
+    bool IsComplete() const { return !ContainsExpressionReferences() && IsAbsolute(); }
 
     /// Return a text representation of this expression that parses to the same
     /// expression.
@@ -356,43 +311,32 @@ public:
 
     /// Return true if this is the empty expression; i.e. default-constructed or
     /// constructed from a string with invalid syntax.
-    bool IsEmpty() const {
-        return _ops.empty();
-    }
-    
+    bool IsEmpty() const { return _ops.empty(); }
+
     /// Return true if this expression contains any operations, false otherwise.
-    explicit operator bool() const {
-        return !IsEmpty();
-    }
+    explicit operator bool() const { return !IsEmpty(); }
 
     /// Return parsing errors as a string if this function was constructed from
     /// a string and parse errors were encountered.
-    std::string const &GetParseError() const & {
-        return _parseError;
-    }
+    std::string const& GetParseError() const& { return _parseError; }
 
 private:
     template <class HashState>
-    friend void TfHashAppend(HashState &h, SdfPathExpression const &expr) {
+    friend void TfHashAppend(HashState& h, SdfPathExpression const& expr) {
         h.Append(expr._ops, expr._refs, expr._patterns, expr._parseError);
     }
 
     SDF_API
-    friend std::ostream &
-    operator<<(std::ostream &, SdfPathExpression const &);
+    friend std::ostream& operator<<(std::ostream&, SdfPathExpression const&);
 
-    friend bool
-    operator==(SdfPathExpression const &l, SdfPathExpression const &r) {
+    friend bool operator==(SdfPathExpression const& l, SdfPathExpression const& r) {
         return std::tie(l._ops, l._refs, l._patterns, l._parseError) ==
                std::tie(r._ops, r._refs, r._patterns, r._parseError);
     }
 
-    friend bool
-    operator!=(SdfPathExpression const &l, SdfPathExpression const &r) {
-        return !(l == r);
-    }
+    friend bool operator!=(SdfPathExpression const& l, SdfPathExpression const& r) { return !(l == r); }
 
-    friend void swap(SdfPathExpression &l, SdfPathExpression &r) {
+    friend void swap(SdfPathExpression& l, SdfPathExpression& r) {
         auto lt = std::tie(l._ops, l._refs, l._patterns, l._parseError);
         auto rt = std::tie(r._ops, r._refs, r._patterns, r._parseError);
         swap(lt, rt);
@@ -407,7 +351,6 @@ private:
     std::string _parseError;
 };
 
-
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_PATH_EXPRESSION_H
+#endif  // PXR_USD_SDF_PATH_EXPRESSION_H

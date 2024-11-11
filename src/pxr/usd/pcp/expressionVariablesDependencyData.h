@@ -21,25 +21,22 @@ PXR_NAMESPACE_OPEN_SCOPE
 TF_DECLARE_WEAK_PTRS(PcpLayerStack);
 
 /// \class PcpExpressionVariablesDependencyData
-/// 
+///
 /// Captures the expression variables used by an associated prim index
 /// during composition.
-class PcpExpressionVariablesDependencyData
-{
+class PcpExpressionVariablesDependencyData {
 public:
     PCP_API
     PcpExpressionVariablesDependencyData();
 
     PCP_API
-    PcpExpressionVariablesDependencyData(
-        PcpExpressionVariablesDependencyData&&);
+    PcpExpressionVariablesDependencyData(PcpExpressionVariablesDependencyData&&);
 
     PCP_API
     ~PcpExpressionVariablesDependencyData();
 
     PCP_API
-    PcpExpressionVariablesDependencyData& operator=(
-        PcpExpressionVariablesDependencyData&&);
+    PcpExpressionVariablesDependencyData& operator=(PcpExpressionVariablesDependencyData&&);
 
     /// Returns true if any dependencies have been recorded, false otherwise.
     PCP_API
@@ -53,20 +50,17 @@ public:
     /// Adds dependencies on the expression variables in \p exprVarDependencies
     /// from \p layerStack.
     PCP_API
-    void AddDependencies(
-        const PcpLayerStackPtr& layerStack,
-        std::unordered_set<std::string>&& exprVarDependencies);
+    void AddDependencies(const PcpLayerStackPtr& layerStack, std::unordered_set<std::string>&& exprVarDependencies);
 
     /// Runs the given \p callback on all of the dependencies in this object.
-    /// \p callback must have the signature: 
-    /// 
+    /// \p callback must have the signature:
+    ///
     /// void(const PcpLayerStack&, const std::unordered_set<std::string>&)
     ///
     /// The first argument is the layer stack associated with the expression
     /// variables in the second argument.
     template <class Callback>
-    void ForEachDependency(const Callback& callback) const
-    {
+    void ForEachDependency(const Callback& callback) const {
         _ForEachFunctionRef fn(callback);
         _ForEachDependency(fn);
     }
@@ -75,12 +69,10 @@ public:
     /// \p layerStack. If no such dependencies have been added, returns
     /// nullptr.
     PCP_API
-    const std::unordered_set<std::string>*
-    GetDependenciesForLayerStack(const PcpLayerStackPtr& layerStack) const;
+    const std::unordered_set<std::string>* GetDependenciesForLayerStack(const PcpLayerStackPtr& layerStack) const;
 
 private:
-    using _ForEachFunctionRef = TfFunctionRef<void(
-        const PcpLayerStackPtr&, const std::unordered_set<std::string>&)>;
+    using _ForEachFunctionRef = TfFunctionRef<void(const PcpLayerStackPtr&, const std::unordered_set<std::string>&)>;
 
     PCP_API
     void _ForEachDependency(const _ForEachFunctionRef& fn) const;

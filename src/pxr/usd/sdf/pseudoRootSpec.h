@@ -17,11 +17,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 SDF_DECLARE_HANDLES(SdfPseudoRootSpec);
 
-class SdfPseudoRootSpec : public SdfPrimSpec
-{
+class SdfPseudoRootSpec : public SdfPrimSpec {
     SDF_DECLARE_SPEC(SdfPseudoRootSpec, SdfPrimSpec);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_PSEUDO_ROOT_SPEC_H
+#endif  // PXR_USD_SDF_PSEUDO_ROOT_SPEC_H

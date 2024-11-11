@@ -31,8 +31,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// values that describe the relationship.  For example, point weights are
 /// commonly expressed as relational attributes.
 ///
-class SdfRelationshipSpec : public SdfPropertySpec
-{
+class SdfRelationshipSpec : public SdfPropertySpec {
     SDF_DECLARE_SPEC(SdfRelationshipSpec, SdfPropertySpec);
 
 public:
@@ -48,11 +47,10 @@ public:
     /// Creates and returns a new relationship for the given prim.
     /// The \p owner will own the newly created relationship.
     SDF_API
-    static SdfRelationshipSpecHandle
-    New(const SdfPrimSpecHandle& owner,
-        const std::string& name,
-        bool custom = true,
-        SdfVariability variability = SdfVariabilityUniform);
+    static SdfRelationshipSpecHandle New(const SdfPrimSpecHandle& owner,
+                                         const std::string& name,
+                                         bool custom = true,
+                                         SdfVariability variability = SdfVariabilityUniform);
 
     /// @}
 
@@ -118,4 +116,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_RELATIONSHIP_SPEC_H
+#endif  // PXR_USD_SDF_RELATIONSHIP_SPEC_H

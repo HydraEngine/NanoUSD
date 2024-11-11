@@ -29,13 +29,12 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Base class for all Sdf spec classes.
 ///
-class SdfSpec 
-{
+class SdfSpec {
     SDF_DECLARE_BASE_SPEC(SdfSpec);
 
 public:
     SDF_API
-    SdfSpec &operator=(const SdfSpec &other);
+    SdfSpec& operator=(const SdfSpec& other);
 
     SDF_API
     ~SdfSpec();
@@ -77,7 +76,7 @@ public:
     /// Returns the list of metadata info keys for this object.
     ///
     /// This is not the complete list of keys, it is only those that
-    /// should be considered to be metadata by inspectors or other 
+    /// should be considered to be metadata by inspectors or other
     /// presentation UI.
     ///
     /// This is interim API which is likely to change.  Only editors with
@@ -88,14 +87,14 @@ public:
     /// Returns this metadata key's displayGroup.
     ///
     SDF_API
-    TfToken GetMetaDataDisplayGroup(TfToken const &key) const;
+    TfToken GetMetaDataDisplayGroup(TfToken const& key) const;
 
     /// Gets the value for the given metadata key.
     ///
     /// This is interim API which is likely to change.  Only editors with
     /// an immediate specific need (like the Inspector) should use this API.
     SDF_API
-    VtValue GetInfo(const TfToken &key) const;
+    VtValue GetInfo(const TfToken& key) const;
 
     /// Sets the value for the given metadata key.
     ///
@@ -105,15 +104,14 @@ public:
     /// This is interim API which is likely to change.  Only editors with
     /// an immediate specific need (like the Inspector) should use this API.
     SDF_API
-    void SetInfo(const TfToken &key, const VtValue &value);
+    void SetInfo(const TfToken& key, const VtValue& value);
 
-    /// Sets the value for \p entryKey to \p value within the dictionary 
+    /// Sets the value for \p entryKey to \p value within the dictionary
     ///        with the given metadata key \p dictionaryKey
     SDF_API
-    void SetInfoDictionaryValue(const TfToken &dictionaryKey, 
-                                const TfToken &entryKey, const VtValue &value);
+    void SetInfoDictionaryValue(const TfToken& dictionaryKey, const TfToken& entryKey, const VtValue& value);
 
-    /// Returns whether there is a setting for the scene spec info 
+    /// Returns whether there is a setting for the scene spec info
     /// with the given key.
     ///
     /// When asked for a value for one of its scene spec info, a valid value
@@ -130,7 +128,7 @@ public:
     /// This is interim API which is likely to change.  Only editors with
     /// an immediate specific need (like the Inspector) should use this API.
     SDF_API
-    bool HasInfo(const TfToken &key) const;
+    bool HasInfo(const TfToken& key) const;
 
     /// Clears the value for scene spec info with the given \a key.
     ///
@@ -141,15 +139,15 @@ public:
     /// This is interim API which is likely to change.  Only editors with
     /// an immediate specific need (like the Inspector) should use this API.
     SDF_API
-    void ClearInfo(const TfToken &key);
+    void ClearInfo(const TfToken& key);
 
     /// Returns the data type for the info with the given \a key.
     SDF_API
-    TfType GetTypeForInfo(const TfToken &key) const;
+    TfType GetTypeForInfo(const TfToken& key) const;
 
     /// Returns the fallback for the info with the given \a key.
     SDF_API
-    const VtValue& GetFallbackForInfo(const TfToken &key) const;
+    const VtValue& GetFallbackForInfo(const TfToken& key) const;
 
     /// Writes this spec to the given stream.
     SDF_API
@@ -162,7 +160,7 @@ public:
     /// prim or property spec), it will be considered significant even if
     /// those child objects are not.
     /// However, if \p ignoreChildren is \c true, these child objects
-    /// will be ignored. 
+    /// will be ignored.
     SDF_API
     bool IsInert(bool ignoreChildren = false) const;
 
@@ -178,52 +176,48 @@ public:
     /// Returns \c true if the spec has a non-empty value with field
     /// name \p name.
     SDF_API
-    bool HasField(const TfToken &name) const;
+    bool HasField(const TfToken& name) const;
 
     /// Returns \c true if the object has a non-empty value with name
     /// \p name and type \p T.  If value ptr is provided, returns the
     /// value found.
     template <class T>
-    bool HasField(const TfToken &name, T* value) const
-    {
+    bool HasField(const TfToken& name, T* value) const {
         if (!value) {
             return HasField(name);
         }
-        
+
         SdfAbstractDataTypedValue<T> outValue(value);
         return _HasField(name, &outValue);
     }
 
     /// Returns a field value by name.
     SDF_API
-    VtValue GetField(const TfToken &name) const;
+    VtValue GetField(const TfToken& name) const;
 
     /// Returns a field value by name.  If the object is invalid, or the
     /// value doesn't exist, isn't set, or isn't of the given type then
     /// returns defaultValue.
     template <typename T>
-    T GetFieldAs(const TfToken & name, const T& defaultValue = T()) const
-    {
+    T GetFieldAs(const TfToken& name, const T& defaultValue = T()) const {
         VtValue v = GetField(name);
-        if (v.IsEmpty() || !v.IsHolding<T>())
-            return defaultValue;
+        if (v.IsEmpty() || !v.IsHolding<T>()) return defaultValue;
         return v.UncheckedGet<T>();
     }
 
     /// Sets a field value as a boxed VtValue.
     SDF_API
-    bool SetField(const TfToken & name, const VtValue& value);
+    bool SetField(const TfToken& name, const VtValue& value);
 
     /// Sets a field value of type T.
     template <typename T>
-    bool SetField(const TfToken & name, const T& value)
-    {
+    bool SetField(const TfToken& name, const T& value) {
         return SetField(name, VtValue(value));
     }
 
     /// Clears a field.
     SDF_API
-    bool ClearField(const TfToken & name);
+    bool ClearField(const TfToken& name);
 
     /// @}
 
@@ -237,29 +231,29 @@ public:
 
     /// Hash.
     template <class HashState>
-    friend void TfHashAppend(HashState &h, const SdfSpec& x);
+    friend void TfHashAppend(HashState& h, const SdfSpec& x);
 
 private:
     SDF_API
     bool _HasField(const TfToken& name, SdfAbstractDataValue* value) const;
 
 protected:
-    bool _MoveSpec(const SdfPath &oldPath, const SdfPath &newPath) const;
-    bool _DeleteSpec(const SdfPath &path);
+    bool _MoveSpec(const SdfPath& oldPath, const SdfPath& newPath) const;
+    bool _DeleteSpec(const SdfPath& path);
 
 private:
     Sdf_IdentityRefPtr _id;
 };
 
 template <class HashState>
-void TfHashAppend(HashState &h, const SdfSpec& x) {
+void TfHashAppend(HashState& h, const SdfSpec& x) {
     h.Append(x._id.get());
 }
 
-inline size_t hash_value(const SdfSpec &x) {
+inline size_t hash_value(const SdfSpec& x) {
     return TfHash()(x);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_SPEC_H
+#endif  // PXR_USD_SDF_SPEC_H

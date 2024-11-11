@@ -34,7 +34,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-
 // Contains symbolic names for states the parser can
 // be in when traversing the scene hierarchy during
 // a parse run such that simple values can be
@@ -98,7 +97,7 @@ public:
     // Constructor.
     SDF_API
     Sdf_TextParserContext();
-    
+
     std::string magicIdentifierToken;
     std::string versionString;
     std::string fileContext;
@@ -119,7 +118,7 @@ public:
     std::string dictionaryTypeName;
     std::string symmetryFunctionName;
 
-    // state for various parsing contexts 
+    // state for various parsing contexts
     std::vector<Sdf_TextParserCurrentParsingContext> parsingContext;
 
     // String list currently being built
@@ -175,7 +174,7 @@ public:
     // Last parsed value
     VtValue currentValue;
 
-    // Vector of dictionaries used to parse nested dictionaries.  
+    // Vector of dictionaries used to parse nested dictionaries.
     // The first element in the vector contains the last parsed dictionary.
     std::vector<VtDictionary> currentDictionaries;
     std::vector<std::string> currentDictionaryKey;
@@ -197,16 +196,16 @@ public:
     //    names of the root prims
     //    names of A's children
     //    names of B's children.
-    std::vector<std::vector<TfToken> > nameChildrenStack;
+    std::vector<std::vector<TfToken>> nameChildrenStack;
 
     // Stack for the property names of all the objects currently being parsed
-    std::vector<std::vector<TfToken> > propertiesStack;
+    std::vector<std::vector<TfToken>> propertiesStack;
 
     // Stack of names of variant sets  being built.
     std::vector<std::string> currentVariantSetNames;
 
     // Stack of names of variants for the variant sets being built
-    std::vector<std::vector<std::string> > currentVariantNames;
+    std::vector<std::vector<std::string>> currentVariantNames;
 
     // Working state for splines.
     bool splineValid;
@@ -226,4 +225,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_TEXT_PARSER_CONTEXT_H
+#endif  // PXR_USD_SDF_TEXT_PARSER_CONTEXT_H

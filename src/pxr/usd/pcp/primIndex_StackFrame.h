@@ -21,21 +21,20 @@ class PcpPrimIndex;
 /// Internal helper class for tracking recursive invocations of
 /// the prim indexing algorithm.
 ///
-class PcpPrimIndex_StackFrame
-{
+class PcpPrimIndex_StackFrame {
 public:
-    PcpPrimIndex_StackFrame(PcpLayerStackSite const &requestedSite,
-                            PcpNodeRef const &parentNode,
-                            PcpArc *arcToParent,
-                            PcpPrimIndex_StackFrame *previousFrame,
-                            PcpPrimIndex const *originatingIndex,
+    PcpPrimIndex_StackFrame(PcpLayerStackSite const& requestedSite,
+                            PcpNodeRef const& parentNode,
+                            PcpArc* arcToParent,
+                            PcpPrimIndex_StackFrame* previousFrame,
+                            PcpPrimIndex const* originatingIndex,
                             bool skipDuplicateNodes)
-        : previousFrame(previousFrame)
-        , requestedSite(requestedSite)
-        , parentNode(parentNode)
-        , arcToParent(arcToParent)
-        , originatingIndex(originatingIndex)
-        , skipDuplicateNodes(skipDuplicateNodes) {}
+        : previousFrame(previousFrame),
+          requestedSite(requestedSite),
+          parentNode(parentNode),
+          arcToParent(arcToParent),
+          originatingIndex(originatingIndex),
+          skipDuplicateNodes(skipDuplicateNodes) {}
 
     /// Link to the previous recursive invocation.
     PcpPrimIndex_StackFrame* previousFrame;
@@ -44,7 +43,7 @@ public:
     /// call to Pcp_BuildPrimIndex.
     PcpLayerStackSite requestedSite;
 
-    /// The node in the parent graph that will be the parent of the prim index 
+    /// The node in the parent graph that will be the parent of the prim index
     /// being built by this recursive call.
     PcpNodeRef parentNode;
 
@@ -54,7 +53,7 @@ public:
 
     /// The outer-most index whose computation originated this recursive chain.
     /// This is meant for debugging support.
-    PcpPrimIndex const *originatingIndex;
+    PcpPrimIndex const* originatingIndex;
 
     /// Whether the prim index being built by this recursive call should
     /// skip adding nodes if another node exists with the same site.
@@ -66,22 +65,15 @@ public:
 /// Iterator for walking up a node's ancestors while potentially crossing
 /// stack frames.
 ///
-class PcpPrimIndex_StackFrameIterator
-{
+class PcpPrimIndex_StackFrameIterator {
 public:
     PcpNodeRef node;
     PcpPrimIndex_StackFrame* previousFrame;
 
-    PcpPrimIndex_StackFrameIterator(
-        const PcpNodeRef& n, PcpPrimIndex_StackFrame* f)
-        : node(n)
-        , previousFrame(f)
-    {
-    }
+    PcpPrimIndex_StackFrameIterator(const PcpNodeRef& n, PcpPrimIndex_StackFrame* f) : node(n), previousFrame(f) {}
 
     /// Step to the next parent node.
-    void Next() 
-    {
+    void Next() {
         if (node.GetArcType() != PcpArcTypeRoot) {
             // Step to the next parent within this graph.
             node = node.GetParentNode();
@@ -98,20 +90,17 @@ public:
     }
 
     /// Step to the first parent node in the next recursive call.
-    void NextFrame() 
-    {
+    void NextFrame() {
         if (previousFrame) {
             node = previousFrame->parentNode;
             previousFrame = previousFrame->previousFrame;
-        }
-        else {
+        } else {
             node = PcpNodeRef();
         }
     }
 
     /// Get the type of arc connecting the current node with its parent.
-    PcpArcType GetArcType() 
-    {
+    PcpArcType GetArcType() {
         if (node.GetArcType() != PcpArcTypeRoot) {
             // Use the current node's arc type.
             return node.GetArcType();
@@ -128,4 +117,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_PRIM_INDEX_STACK_FRAME_H
+#endif  // PXR_USD_PCP_PRIM_INDEX_STACK_FRAME_H

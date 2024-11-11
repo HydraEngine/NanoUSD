@@ -27,6 +27,7 @@ class TfType;
 class Sdf_ValueTypeRegistry {
     Sdf_ValueTypeRegistry(const Sdf_ValueTypeRegistry&) = delete;
     Sdf_ValueTypeRegistry& operator=(const Sdf_ValueTypeRegistry&) = delete;
+
 public:
     Sdf_ValueTypeRegistry();
     ~Sdf_ValueTypeRegistry();
@@ -36,22 +37,20 @@ public:
 
     /// Returns a value type name by name.
     SdfValueTypeName FindType(const TfToken& name) const;
-    SdfValueTypeName FindType(const char *name) const;
-    SdfValueTypeName FindType(const std::string &name) const;
+    SdfValueTypeName FindType(const char* name) const;
+    SdfValueTypeName FindType(const std::string& name) const;
 
     /// Returns the value type name for the type and role if any, otherwise
     /// returns the invalid value type name.  This returns the first
     /// registered value type name for a given type/role pair if there are
     /// aliases
-    SdfValueTypeName FindType(const TfType& type,
-                              const TfToken& role = TfToken()) const;
+    SdfValueTypeName FindType(const TfType& type, const TfToken& role = TfToken()) const;
 
     /// Returns the value type name for the held value and given role if
     /// any, otherwise returns the invalid value type.  This returns the
     /// first registered name for a given type/role pair if there are
     /// aliases.
-    SdfValueTypeName FindType(const VtValue& value,
-                              const TfToken& role = TfToken()) const;
+    SdfValueTypeName FindType(const VtValue& value, const TfToken& role = TfToken()) const;
 
     /// Returns a value type name by name.  If a type with that name is
     /// registered it returns the object for that name.  Otherwise a
@@ -65,38 +64,26 @@ public:
     /// \class Type
     /// Named parameter object for specifying an SdfValueTypeName to
     /// be added to the registry.
-    class Type
-    {
+    class Type {
     public:
         // Specify a type with the given name, default value, and default
         // array value.
-        Type(const TfToken& name, 
-             const VtValue& defaultValue, 
-             const VtValue& defaultArrayValue)
-            : _name(name)
-            , _defaultValue(defaultValue)
-            , _defaultArrayValue(defaultArrayValue)
-        { }
+        Type(const TfToken& name, const VtValue& defaultValue, const VtValue& defaultArrayValue)
+            : _name(name), _defaultValue(defaultValue), _defaultArrayValue(defaultArrayValue) {}
 
         // Specify a type with the given name, default value, and default
         // array value of VtArray<T>.
         template <class T>
-        Type(char const *name, const T& defaultValue)
-            : Type(TfToken(name, TfToken::Immortal),
-                   VtValue(defaultValue), VtValue(VtArray<T>()))
-        { }
+        Type(char const* name, const T& defaultValue)
+            : Type(TfToken(name, TfToken::Immortal), VtValue(defaultValue), VtValue(VtArray<T>())) {}
 
         // Specify a type with the given name and underlying C++ type.
         // No default value or array value will be registered.
-        Type(const TfToken& name, const TfType& type)
-            : _name(name)
-            , _type(type)
-        { }
+        Type(const TfToken& name, const TfType& type) : _name(name), _type(type) {}
 
         // Set C++ type name string for this type. Defaults to type name
         // from TfType.
-        Type& CPPTypeName(const std::string& cppTypeName)
-        {
+        Type& CPPTypeName(const std::string& cppTypeName) {
             _cppTypeName = cppTypeName;
             if (!_defaultArrayValue.IsEmpty()) {
                 _arrayCppTypeName = "VtArray<" + cppTypeName + ">";
@@ -105,21 +92,28 @@ public:
         }
 
         // Set shape for this type. Defaults to shapeless.
-        Type& Dimensions(const SdfTupleDimensions& dims)
-        { _dimensions = dims; return *this; }
+        Type& Dimensions(const SdfTupleDimensions& dims) {
+            _dimensions = dims;
+            return *this;
+        }
 
         // Set default unit for this type. Defaults to dimensionless unit.
-        Type& DefaultUnit(TfEnum unit) { _unit = unit; return *this; }
+        Type& DefaultUnit(TfEnum unit) {
+            _unit = unit;
+            return *this;
+        }
 
         // Set role for this type. Defaults to no role.
-        Type& Role(const TfToken& role) { _role = role; return *this; }
+        Type& Role(const TfToken& role) {
+            _role = role;
+            return *this;
+        }
 
         // Indicate that arrays of this type are not supported.
-        Type& NoArrays() 
-        { 
-            _defaultArrayValue = VtValue(); 
+        Type& NoArrays() {
+            _defaultArrayValue = VtValue();
             _arrayCppTypeName = std::string();
-            return *this; 
+            return *this;
         }
 
     private:
@@ -142,18 +136,23 @@ public:
     void AddType(const TfToken& name,
                  const VtValue& defaultValue,
                  const VtValue& defaultArrayValue,
-                 const std::string& cppName, const std::string& cppArrayName,
-                 TfEnum defaultUnit, const TfToken& role,
+                 const std::string& cppName,
+                 const std::string& cppArrayName,
+                 TfEnum defaultUnit,
+                 const TfToken& role,
                  const SdfTupleDimensions& dimensions);
 
     /// Register a value type and it's corresponding array value type.
-    /// In this case the default values are empty.  This is useful for types 
-    /// provided by plugins;  you don't need to load the plugin just to 
+    /// In this case the default values are empty.  This is useful for types
+    /// provided by plugins;  you don't need to load the plugin just to
     /// register the type.  However, there is no default value.
     void AddType(const TfToken& name,
-                 const TfType& type, const TfType& arrayType,
-                 const std::string& cppName, const std::string& cppArrayName,
-                 TfEnum defaultUnit, const TfToken& role,
+                 const TfType& type,
+                 const TfType& arrayType,
+                 const std::string& cppName,
+                 const std::string& cppArrayName,
+                 TfEnum defaultUnit,
+                 const TfToken& role,
                  const SdfTupleDimensions& dimensions);
 
     /// Empties out the registry.  Any existing types, roles or their names
@@ -167,4 +166,4 @@ private:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_VALUE_TYPE_REGISTRY_H
+#endif  // PXR_USD_SDF_VALUE_TYPE_REGISTRY_H

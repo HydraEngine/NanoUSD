@@ -31,20 +31,17 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// In almost all cases, this class will not be used directly. More specialized
 /// properties can be created that derive from `NdrProperty`; those specialized
 /// properties can add their own domain-specific data and methods.
-class NdrProperty
-{
+class NdrProperty {
 public:
     /// Constructor.
     NDR_API
-    NdrProperty(
-        const TfToken& name,
-        const TfToken& type,
-        const VtValue& defaultValue,
-        bool isOutput,
-        size_t arraySize,
-        bool isDynamicArray,
-        const NdrTokenMap& metadata
-    );
+    NdrProperty(const TfToken& name,
+                const TfToken& type,
+                const VtValue& defaultValue,
+                bool isOutput,
+                size_t arraySize,
+                bool isDynamicArray,
+                const NdrTokenMap& metadata);
 
     /// Destructor.
     NDR_API
@@ -63,7 +60,7 @@ public:
 
     /// Gets this property's default value associated with the type of the
     /// property.
-    /// 
+    ///
     /// \sa GetType()
     NDR_API
     const VtValue& GetDefaultValue() const { return _defaultValue; }
@@ -98,7 +95,6 @@ public:
 
     /// @}
 
-
     /// \name Metadata
     /// The metadata returned here is a direct result of what the parser plugin
     /// is able to determine about the node. See the documentation for a
@@ -112,7 +108,6 @@ public:
 
     /// @}
 
-
     /// \name Connection Information
     /// @{
 
@@ -125,7 +120,6 @@ public:
     virtual bool CanConnectTo(const NdrProperty& other) const;
 
     /// @}
-
 
     /// \name Utilities
     /// @{
@@ -148,9 +142,9 @@ public:
     NDR_API
     virtual NdrSdfTypeIndicator GetTypeAsSdfType() const;
 
-    /// Provides default value corresponding to the SdfValueTypeName returned 
-    /// by GetTypeAsSdfType. 
-    /// 
+    /// Provides default value corresponding to the SdfValueTypeName returned
+    /// by GetTypeAsSdfType.
+    ///
     /// Derived classes providing an implementation for GetTypeAsSdfType should
     /// also provide an implementation for this.
     ///
@@ -175,4 +169,4 @@ protected:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_NDR_PROPERTY_H
+#endif  // PXR_USD_NDR_PROPERTY_H

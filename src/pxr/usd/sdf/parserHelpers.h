@@ -23,13 +23,12 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool Sdf_BoolFromString(const std::string &, bool *parseOk);
+bool Sdf_BoolFromString(const std::string&, bool* parseOk);
 
 namespace Sdf_ParserHelpers {
 
 // Internal variant type.
-using _Variant = std::variant<uint64_t, int64_t, double,
-                              std::string, TfToken, SdfAssetPath>;
+using _Variant = std::variant<uint64_t, int64_t, double, std::string, TfToken, SdfAssetPath>;
 
 ////////////////////////////////////////////////////////////////////////
 // Utilities that implement the Sdf_ParserHelpers::Value::Get<T>() method.  The
@@ -39,12 +38,9 @@ using _Variant = std::variant<uint64_t, int64_t, double,
 
 // General Get case, requires exact match.
 template <class T, class Enable = void>
-struct _GetImpl
-{
-    typedef const T &ResultType;
-    static const T &Visit(_Variant const &variant) {
-        return std::get<T>(variant);
-    }
+struct _GetImpl {
+    typedef const T& ResultType;
+    static const T& Visit(_Variant const& variant) { return std::get<T>(variant); }
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -52,18 +48,16 @@ struct _GetImpl
 // throw bad_variant_access for non-finite doubles.  Throw bad_variant_access
 // for out-of-range integral values.
 template <class T>
-struct _GetImpl<
-    T, std::enable_if_t<std::is_integral<T>::value>>
-{
+struct _GetImpl<T, std::enable_if_t<std::is_integral<T>::value>> {
     typedef T ResultType;
 
-    T Visit(_Variant const &variant) {
-        return std::visit(*this, variant);
-    }
+    T Visit(_Variant const& variant) { return std::visit(*this, variant); }
 
     // Fallback case: throw bad_variant_access.
     template <class Held>
-    T operator()(Held held) { throw std::bad_variant_access(); }
+    T operator()(Held held) {
+        throw std::bad_variant_access();
+    }
 
     // Attempt to cast unsigned and signed int64_t.
     T operator()(uint64_t in) { return _Cast(in); }
@@ -71,8 +65,7 @@ struct _GetImpl<
 
     // Attempt to cast finite doubles, throw otherwise.
     T operator()(double in) {
-        if (std::isfinite(in))
-            return _Cast(in);
+        if (std::isfinite(in)) return _Cast(in);
         throw std::bad_variant_access();
     }
 
@@ -81,7 +74,7 @@ private:
     T _Cast(In in) {
         try {
             return GfNumericCast<T>(in).value();
-        } catch (const std::bad_optional_access &) {
+        } catch (const std::bad_optional_access&) {
             throw std::bad_variant_access();
         }
     }
@@ -93,37 +86,32 @@ private:
 // Also handles strings like "inf", "-inf", and "nan" to produce +/- infinity
 // and a quiet NaN.
 template <class T>
-struct _GetImpl<
-    T, std::enable_if_t<std::is_floating_point<T>::value>>
-{
+struct _GetImpl<T, std::enable_if_t<std::is_floating_point<T>::value>> {
     typedef T ResultType;
 
-    T Visit(_Variant const &variant) {
-        return std::visit(*this, variant);
-    }
+    T Visit(_Variant const& variant) { return std::visit(*this, variant); }
 
     // Fallback case: throw bad_variant_access.
     template <class Held>
-    T operator()(Held held) { throw std::bad_variant_access(); }
+    T operator()(Held held) {
+        throw std::bad_variant_access();
+    }
 
     // For numeric types, attempt to cast.
     T operator()(uint64_t in) { return _Cast(in); }
     T operator()(int64_t in) { return _Cast(in); }
     T operator()(double in) { return static_cast<T>(in); }
-    
+
     // Convert special strings if possible.
-    T operator()(const std::string &str) { return _FromString(str); }
-    T operator()(const TfToken &tok) { return _FromString(tok.GetString()); }
+    T operator()(const std::string& str) { return _FromString(str); }
+    T operator()(const TfToken& tok) { return _FromString(tok.GetString()); }
 
 private:
-    T _FromString(const std::string &str) const {
+    T _FromString(const std::string& str) const {
         // Special case the strings 'inf', '-inf' and 'nan'.
-        if (str == "inf") 
-            return std::numeric_limits<T>::infinity();
-        if (str == "-inf")
-            return -std::numeric_limits<T>::infinity();
-        if (str == "nan")
-            return std::numeric_limits<T>::quiet_NaN();
+        if (str == "inf") return std::numeric_limits<T>::infinity();
+        if (str == "-inf") return -std::numeric_limits<T>::infinity();
+        if (str == "nan") return std::numeric_limits<T>::quiet_NaN();
         throw std::bad_variant_access();
     }
 
@@ -131,25 +119,22 @@ private:
     T _Cast(In in) {
         try {
             return GfNumericCast<T>(in).value();
-        } catch (const std::bad_optional_access &) {
+        } catch (const std::bad_optional_access&) {
             throw std::bad_variant_access();
         }
     }
 };
-
 
 ////////////////////////////////////////////////////////////////////////
 
 // Get an asset path: converts string to asset path, otherwise throw
 // bad_variant_access.
 template <>
-struct _GetImpl<SdfAssetPath>
-{
+struct _GetImpl<SdfAssetPath> {
     typedef SdfAssetPath ResultType;
 
-    SdfAssetPath Visit(_Variant const &variant) {
-        if (std::string const *str = std::get_if<std::string>(&variant))
-            return SdfAssetPath(*str);
+    SdfAssetPath Visit(_Variant const& variant) {
+        if (std::string const* str = std::get_if<std::string>(&variant)) return SdfAssetPath(*str);
         return std::get<SdfAssetPath>(variant);
     }
 };
@@ -158,37 +143,33 @@ struct _GetImpl<SdfAssetPath>
 // Strings and tokens get parsed via Sdf_BoolFromString.  Otherwise throw
 // bad_variant_access.
 template <>
-struct _GetImpl<bool>
-{
+struct _GetImpl<bool> {
     typedef bool ResultType;
-    
-    bool Visit(_Variant const &variant) {
-        return std::visit(*this, variant);
-    }
+
+    bool Visit(_Variant const& variant) { return std::visit(*this, variant); }
 
     // Parse string via Sdf_BoolFromString.
-    bool operator()(const std::string &str) {
+    bool operator()(const std::string& str) {
         bool parseOK = false;
         bool result = Sdf_BoolFromString(str, &parseOK);
-        if (!parseOK)
-            throw std::bad_variant_access();
+        if (!parseOK) throw std::bad_variant_access();
         return result;
     }
 
     // Treat tokens as strings.
-    bool operator()(const TfToken &tok) { return (*this)(tok.GetString()); }
+    bool operator()(const TfToken& tok) { return (*this)(tok.GetString()); }
 
     // For numbers, return true if not zero.
     template <class Number>
-    std::enable_if_t<std::is_arithmetic<Number>::value, bool>
-    operator()(Number val) {
+    std::enable_if_t<std::is_arithmetic<Number>::value, bool> operator()(Number val) {
         return val != static_cast<Number>(0);
     }
 
     // For anything else, throw bad_variant_access().
     template <class T>
-    std::enable_if_t<!std::is_arithmetic<T>::value, bool>
-    operator()(T) { throw std::bad_variant_access(); }
+    std::enable_if_t<!std::is_arithmetic<T>::value, bool> operator()(T) {
+        throw std::bad_variant_access();
+    }
 };
 
 // A parser value.  This is used as the fundamental value object in the text
@@ -215,38 +196,36 @@ struct _GetImpl<bool>
 // and so on.  As a special case of this, '-0' is stored as a double, since it
 // is the only way to preserve a signed zero (integral types have no signed
 // zero).
-struct Value
-{
+struct Value {
     // Default constructor leaves the value in an undefined state.
     Value() {}
-    
+
     // Construct and implicitly convert from an integral type \p Int.  If \p Int
     // is signed, the resulting value holds an 'int64_t' internally.  If \p Int
     // is unsigned, the result value holds an 'uint64_t'.
     template <class Int>
-    Value(Int in, std::enable_if_t<std::is_integral<Int>::value> * = 0) {
+    Value(Int in, std::enable_if_t<std::is_integral<Int>::value>* = 0) {
         if (std::is_signed<Int>::value) {
             _variant = static_cast<int64_t>(in);
         } else {
             _variant = static_cast<uint64_t>(in);
         }
     }
-    
+
     // Construct and implicitly convert from a floating point type \p Flt.  The
     // resulting value holds a double internally.
     template <class Flt>
-    Value(Flt in, std::enable_if_t<std::is_floating_point<Flt>::value> * = 0) :
-        _variant(static_cast<double>(in)) {}
-    
+    Value(Flt in, std::enable_if_t<std::is_floating_point<Flt>::value>* = 0) : _variant(static_cast<double>(in)) {}
+
     // Construct and implicitly convert from std::string.
-    Value(const std::string &in) : _variant(in) {}
+    Value(const std::string& in) : _variant(in) {}
 
     // Construct and implicitly convert from TfToken.
-    Value(const TfToken &in) : _variant(in) {}
+    Value(const TfToken& in) : _variant(in) {}
 
     // Construct and implicitly convert from SdfAssetPath.
-    Value(const SdfAssetPath &in) : _variant(in) {}
-    
+    Value(const SdfAssetPath& in) : _variant(in) {}
+
     // Attempt to get a value of type T from this Value, applying appropriate
     // conversions.  If this value cannot be converted to T, throw
     // std::bad_variant_access.
@@ -258,26 +237,22 @@ struct Value
     // Hopefully short-lived API that applies an external visitor to the held
     // variant type.
     template <class Visitor>
-    auto
-    ApplyVisitor(const Visitor &visitor) {
+    auto ApplyVisitor(const Visitor& visitor) {
         return std::visit(visitor, _variant);
     }
 
     template <class Visitor>
-    auto
-    ApplyVisitor(Visitor &visitor) {
+    auto ApplyVisitor(Visitor& visitor) {
         return std::visit(visitor, _variant);
     }
 
     template <class Visitor>
-    auto
-    ApplyVisitor(const Visitor &visitor) const {
+    auto ApplyVisitor(const Visitor& visitor) const {
         return std::visit(visitor, _variant);
     }
 
     template <class Visitor>
-    auto
-    ApplyVisitor(Visitor &visitor) const {
+    auto ApplyVisitor(Visitor& visitor) const {
         return std::visit(visitor, _variant);
     }
 
@@ -285,19 +260,14 @@ private:
     _Variant _variant;
 };
 
-typedef std::function<VtValue (std::vector<unsigned int> const &,
-                               std::vector<Value> const &,
-                               size_t &, std::string *)> ValueFactoryFunc;
+typedef std::function<VtValue(std::vector<unsigned int> const&, std::vector<Value> const&, size_t&, std::string*)>
+        ValueFactoryFunc;
 
 struct ValueFactory {
     ValueFactory() {}
 
-    ValueFactory(std::string typeName_, SdfTupleDimensions dimensions_,
-                 bool isShaped_, ValueFactoryFunc func_)
-        : typeName(typeName_),
-          dimensions(dimensions_),
-          isShaped(isShaped_),
-          func(func_) {}
+    ValueFactory(std::string typeName_, SdfTupleDimensions dimensions_, bool isShaped_, ValueFactoryFunc func_)
+        : typeName(typeName_), dimensions(dimensions_), isShaped(isShaped_), func(func_) {}
 
     std::string typeName;
     SdfTupleDimensions dimensions;
@@ -305,9 +275,8 @@ struct ValueFactory {
     ValueFactoryFunc func;
 };
 
-ValueFactory const &GetValueFactoryForMenvaName(std::string const &name,
-                                                bool *found);
-}
+ValueFactory const& GetValueFactoryForMenvaName(std::string const& name, bool* found);
+}  // namespace Sdf_ParserHelpers
 
 /// Converts a string to a bool.
 /// Accepts case insensitive "yes", "no", "false", true", "0", "1".
@@ -315,14 +284,13 @@ ValueFactory const &GetValueFactoryForMenvaName(std::string const &name,
 ///
 /// If parseOK is supplied, the pointed-to bool will be set to indicate
 /// whether the parse was successful.
-bool Sdf_BoolFromString(const std::string &s, bool *parseOk = NULL);
+bool Sdf_BoolFromString(const std::string& s, bool* parseOk = NULL);
 
 // Read the quoted string at [x..x+n], trimming 'trimBothSides' number
 // of chars from either side, and evaluating any embedded escaped characters.
 // If numLines is given, it will be populated with the number of newline
 // characters present in the original string.
-std::string Sdf_EvalQuotedString(const char* x, size_t n, size_t trimBothSides,
-                                 unsigned int* numLines = NULL);
+std::string Sdf_EvalQuotedString(const char* x, size_t n, size_t trimBothSides, unsigned int* numLines = NULL);
 
 // Read the string representing an asset path at [x..x+n]. If tripleDelimited
 // is true, the string is assumed to have 3 delimiters on both sides of the
@@ -331,4 +299,4 @@ std::string Sdf_EvalAssetPath(const char* x, size_t n, bool tripleDelimited);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_PARSER_HELPERS_H
+#endif  // PXR_USD_SDF_PARSER_HELPERS_H

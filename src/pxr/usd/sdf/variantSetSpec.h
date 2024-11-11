@@ -23,7 +23,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-/// \class SdfVariantSetSpec 
+/// \class SdfVariantSetSpec
 ///
 /// Represents a coherent set of alternate representations for part of a
 /// scene.
@@ -33,17 +33,16 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// An SdfVariantSetSpec object contains one or more named SdfVariantSpec
 /// objects. It may also define the name of one of its variants to be used by
-/// default. 
+/// default.
 ///
 /// When a prim references another prim, the referencing prim may specify
 /// one of the variants from each of the variant sets of the target prim.
 /// The chosen variant from each set (or the default variant from those sets
-/// that the referencing prim does not explicitly specify) is composited 
-/// over the target prim, and then the referencing prim is composited over 
+/// that the referencing prim does not explicitly specify) is composited
+/// over the target prim, and then the referencing prim is composited over
 /// the result.
 ///
-class SdfVariantSetSpec : public SdfSpec
-{
+class SdfVariantSetSpec : public SdfSpec {
     SDF_DECLARE_SPEC(SdfVariantSetSpec, SdfSpec);
 
 public:
@@ -53,13 +52,11 @@ public:
 
     /// Constructs a new instance.
     SDF_API
-    static SdfVariantSetSpecHandle
-    New(const SdfPrimSpecHandle& prim, const std::string& name);
+    static SdfVariantSetSpecHandle New(const SdfPrimSpecHandle& prim, const std::string& name);
 
     /// Constructs a new instance.
     SDF_API
-    static SdfVariantSetSpecHandle
-    New(const SdfVariantSpecHandle& prim, const std::string& name);
+    static SdfVariantSetSpecHandle New(const SdfVariantSpecHandle& prim, const std::string& name);
 
     /// @}
 
@@ -106,4 +103,4 @@ public:
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // SD_VARIANTSETSPEC_H
+#endif  // SD_VARIANTSETSPEC_H

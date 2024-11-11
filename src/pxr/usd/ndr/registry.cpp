@@ -27,40 +27,37 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_ENV_SETTING(
-    PXR_NDR_SKIP_DISCOVERY_PLUGIN_DISCOVERY, 0,
-    "The auto-discovery of discovery plugins in ndr can be skipped. "
-    "This is used mostly for testing purposes.");
+TF_DEFINE_ENV_SETTING(PXR_NDR_SKIP_DISCOVERY_PLUGIN_DISCOVERY,
+                      0,
+                      "The auto-discovery of discovery plugins in ndr can be skipped. "
+                      "This is used mostly for testing purposes.");
 
-TF_DEFINE_ENV_SETTING(
-    PXR_NDR_SKIP_PARSER_PLUGIN_DISCOVERY, 0,
-    "The auto-discovery of parser plugins in ndr can be skipped. "
-    "This is used mostly for testing purposes.");
+TF_DEFINE_ENV_SETTING(PXR_NDR_SKIP_PARSER_PLUGIN_DISCOVERY,
+                      0,
+                      "The auto-discovery of parser plugins in ndr can be skipped. "
+                      "This is used mostly for testing purposes.");
 
-TF_DEFINE_ENV_SETTING(
-    PXR_NDR_DISABLE_PLUGINS, "",
-    "Comma separated list of Ndr plugins to disable.  Note that disabling plugins may cause "
-    "shaders in your scenes to malfunction.");
+TF_DEFINE_ENV_SETTING(PXR_NDR_DISABLE_PLUGINS,
+                      "",
+                      "Comma separated list of Ndr plugins to disable.  Note that disabling plugins may cause "
+                      "shaders in your scenes to malfunction.");
 
-// This function is used for property validation. It explictly is validating 
+// This function is used for property validation. It explictly is validating
 // that the sdfType and sdfTypeDefaultValue have the same type. Note how it is
-// calling the methods GetTypeAsSdfType() and GetDefaultValueAsSdfType() 
-// explicitly as opposed to GetType() and GetDefaultValue(). Thus, if one 
-// starts using this functionality in a another derived class of NdrProperty, 
-// then without implementation of GetDefaultValueAsSdfType(), that method will 
+// calling the methods GetTypeAsSdfType() and GetDefaultValueAsSdfType()
+// explicitly as opposed to GetType() and GetDefaultValue(). Thus, if one
+// starts using this functionality in a another derived class of NdrProperty,
+// then without implementation of GetDefaultValueAsSdfType(), that method will
 // always return an empty VtValue.
 //
 // This function is written as a non-static freestanding function so that we can
 // exercise it in a test without needing to expose it in the header file.  It is
-// also written without using unique pointers for ease of python wrapping and 
+// also written without using unique pointers for ease of python wrapping and
 // testability.
 NDR_API
-bool
-NdrRegistry_ValidateProperty(
-    const NdrNodeConstPtr& node,
-    const NdrPropertyConstPtr& property,
-    std::string* errorMessage)
-{
+bool NdrRegistry_ValidateProperty(const NdrNodeConstPtr& node,
+                                  const NdrPropertyConstPtr& property,
+                                  std::string* errorMessage) {
     const VtValue& defaultValue = property->GetDefaultValueAsSdfType();
     const NdrSdfTypeIndicator sdfTypeIndicator = property->GetTypeAsSdfType();
     const SdfValueTypeName sdfType = sdfTypeIndicator.GetSdfType();
@@ -70,21 +67,18 @@ NdrRegistry_ValidateProperty(
     // for the property.
     if (!defaultValue.IsEmpty()) {
         if (defaultValue.GetType() != sdfType.GetType()) {
-
             if (errorMessage) {
                 *errorMessage = TfStringPrintf(
-                    "Default value type does not match specified type for "
-                    "property.\n"
-                    "Node identifier: %s\n"
-                    "Source type: %s\n"
-                    "Property name: %s.\n"
-                    "Type from SdfType: %s.\n"
-                    "Type from default value: %s.\n",
-                    node->GetIdentifier().GetString().c_str(),
-                    node->GetSourceType().GetString().c_str(),
-                    property->GetName().GetString().c_str(),
-                    sdfType.GetType().GetTypeName().c_str(),
-                    defaultValue.GetType().GetTypeName().c_str());
+                        "Default value type does not match specified type for "
+                        "property.\n"
+                        "Node identifier: %s\n"
+                        "Source type: %s\n"
+                        "Property name: %s.\n"
+                        "Type from SdfType: %s.\n"
+                        "Type from default value: %s.\n",
+                        node->GetIdentifier().GetString().c_str(), node->GetSourceType().GetString().c_str(),
+                        property->GetName().GetString().c_str(), sdfType.GetType().GetTypeName().c_str(),
+                        defaultValue.GetType().GetTypeName().c_str());
             }
 
             return false;
@@ -97,14 +91,17 @@ namespace {
 
 // Helpers to allow template functions to treat discovery results and
 // nodes equally.
-template <typename T> struct _NdrObjectAccess { };
-template <> struct _NdrObjectAccess<NdrNodeDiscoveryResult> {
+template <typename T>
+struct _NdrObjectAccess {};
+template <>
+struct _NdrObjectAccess<NdrNodeDiscoveryResult> {
     typedef NdrNodeDiscoveryResult Type;
     static const std::string& GetName(const Type& x) { return x.name; }
     static const TfToken& GetFamily(const Type& x) { return x.family; }
     static NdrVersion GetVersion(const Type& x) { return x.version; }
 };
-template <> struct _NdrObjectAccess<NdrNodeUniquePtr> {
+template <>
+struct _NdrObjectAccess<NdrNodeUniquePtr> {
     typedef NdrNodeUniquePtr Type;
     static const std::string& GetName(const Type& x) { return x->GetName(); }
     static const TfToken& GetFamily(const Type& x) { return x->GetFamily(); }
@@ -112,13 +109,7 @@ template <> struct _NdrObjectAccess<NdrNodeUniquePtr> {
 };
 
 template <typename T>
-static
-bool
-_MatchesFamilyAndFilter(
-    const T& object,
-    const TfToken& family,
-    NdrVersionFilter filter)
-{
+static bool _MatchesFamilyAndFilter(const T& object, const TfToken& family, NdrVersionFilter filter) {
     using Access = _NdrObjectAccess<T>;
 
     // Check the family.
@@ -128,53 +119,41 @@ _MatchesFamilyAndFilter(
 
     // Check the filter.
     switch (filter) {
-    case NdrVersionFilterDefaultOnly:
-        if (!Access::GetVersion(object).IsDefault()) {
-            return false;
-        }
-        break;
+        case NdrVersionFilterDefaultOnly:
+            if (!Access::GetVersion(object).IsDefault()) {
+                return false;
+            }
+            break;
 
-    default:
-        break;
+        default:
+            break;
     }
 
     return true;
 }
 
-static NdrIdentifier
-_GetIdentifierForAsset(const SdfAssetPath &asset,
-                       const NdrTokenMap &metadata,
-                       const TfToken &subIdentifier,
-                       const TfToken &sourceType)
-{
+static NdrIdentifier _GetIdentifierForAsset(const SdfAssetPath& asset,
+                                            const NdrTokenMap& metadata,
+                                            const TfToken& subIdentifier,
+                                            const TfToken& sourceType) {
     size_t h = TfHash()(asset);
-    for (const auto &i : metadata) {
+    for (const auto& i : metadata) {
         h = TfHash::Combine(h, i.first.GetString(), i.second);
     }
 
-    return NdrIdentifier(TfStringPrintf(
-        "%s<%s><%s>",
-        std::to_string(h).c_str(),
-        subIdentifier.GetText(),
-        sourceType.GetText()));
+    return NdrIdentifier(
+            TfStringPrintf("%s<%s><%s>", std::to_string(h).c_str(), subIdentifier.GetText(), sourceType.GetText()));
 }
 
-static NdrIdentifier 
-_GetIdentifierForSourceCode(const std::string &sourceCode, 
-                            const NdrTokenMap &metadata) 
-{
+static NdrIdentifier _GetIdentifierForSourceCode(const std::string& sourceCode, const NdrTokenMap& metadata) {
     size_t h = TfHash()(sourceCode);
-    for (const auto &i : metadata) {
+    for (const auto& i : metadata) {
         h = TfHash::Combine(h, i.first.GetString(), i.second);
     }
     return NdrIdentifier(std::to_string(h));
 }
 
-static bool
-_ValidateProperty(
-    const NdrNodeConstPtr& node,
-    const NdrPropertyConstPtr& property)
-{
+static bool _ValidateProperty(const NdrNodeConstPtr& node, const NdrPropertyConstPtr& property) {
     std::string errorMessage;
     if (!NdrRegistry_ValidateProperty(node, property, &errorMessage)) {
         // This warning may eventually want to be a runtime error and return
@@ -185,44 +164,30 @@ _ValidateProperty(
     return true;
 }
 
-static
-bool
-_ValidateNode(const NdrNodeUniquePtr &newNode, 
-              const NdrNodeDiscoveryResult &dr)
-{
-    // Validate the node.                                                                                                                                                                                                                                                                                                                                                                                            
+static bool _ValidateNode(const NdrNodeUniquePtr& newNode, const NdrNodeDiscoveryResult& dr) {
+    // Validate the node.
     if (!newNode) {
-        TF_RUNTIME_ERROR("Parser for asset @%s@ of type %s returned null",
-            dr.resolvedUri.c_str(), dr.discoveryType.GetText());
+        TF_RUNTIME_ERROR("Parser for asset @%s@ of type %s returned null", dr.resolvedUri.c_str(),
+                         dr.discoveryType.GetText());
         return false;
     }
-    
+
     // The node is invalid; continue without further error checking.
-    // 
+    //
     // XXX -- WBN if these were just automatically copied and parser plugins
     //        didn't have to deal with them.
-    if (newNode->IsValid() &&
-        !(newNode->GetIdentifier() == dr.identifier &&
-          newNode->GetName() == dr.name &&
-          newNode->GetVersion() == dr.version &&
-          newNode->GetFamily() == dr.family &&
-          newNode->GetSourceType() == dr.sourceType)) {
+    if (newNode->IsValid() && !(newNode->GetIdentifier() == dr.identifier && newNode->GetName() == dr.name &&
+                                newNode->GetVersion() == dr.version && newNode->GetFamily() == dr.family &&
+                                newNode->GetSourceType() == dr.sourceType)) {
         TF_RUNTIME_ERROR(
-               "Parsed node %s:%s:%s:%s:%s doesn't match discovery result "
-               "created for asset @%s@ - "
-               "%s:%s:%s:%s:%s (identifier:version:name:family:source type); "
-               "discarding.",
-               NdrGetIdentifierString(newNode->GetIdentifier()).c_str(),
-               newNode->GetVersion().GetString().c_str(),
-               newNode->GetName().c_str(),
-               newNode->GetFamily().GetText(),
-               newNode->GetSourceType().GetText(),
-               dr.resolvedUri.c_str(),
-               NdrGetIdentifierString(dr.identifier).c_str(),
-               dr.version.GetString().c_str(),
-               dr.name.c_str(),
-               dr.family.GetText(),
-               dr.sourceType.GetText());
+                "Parsed node %s:%s:%s:%s:%s doesn't match discovery result "
+                "created for asset @%s@ - "
+                "%s:%s:%s:%s:%s (identifier:version:name:family:source type); "
+                "discarding.",
+                NdrGetIdentifierString(newNode->GetIdentifier()).c_str(), newNode->GetVersion().GetString().c_str(),
+                newNode->GetName().c_str(), newNode->GetFamily().GetText(), newNode->GetSourceType().GetText(),
+                dr.resolvedUri.c_str(), NdrGetIdentifierString(dr.identifier).c_str(), dr.version.GetString().c_str(),
+                dr.name.c_str(), dr.family.GetText(), dr.sourceType.GetText());
         return false;
     }
 
@@ -247,15 +212,14 @@ _ValidateNode(const NdrNodeUniquePtr &newNode,
     return valid;
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
 class NdrRegistry::_DiscoveryContext : public NdrDiscoveryPluginContext {
 public:
-    _DiscoveryContext(const NdrRegistry& registry) : _registry(registry) { }
+    _DiscoveryContext(const NdrRegistry& registry) : _registry(registry) {}
     ~_DiscoveryContext() override = default;
 
-    TfToken GetSourceType(const TfToken& discoveryType) const override
-    {
+    TfToken GetSourceType(const TfToken& discoveryType) const override {
         auto parser = _registry._GetParserForDiscoveryType(discoveryType);
         return parser ? parser->GetSourceType() : TfToken();
     }
@@ -264,22 +228,18 @@ private:
     const NdrRegistry& _registry;
 };
 
-NdrRegistry::NdrRegistry()
-{
+NdrRegistry::NdrRegistry() {
     TRACE_FUNCTION();
     _FindAndInstantiateParserPlugins();
     _FindAndInstantiateDiscoveryPlugins();
     _RunDiscoveryPlugins(_discoveryPlugins);
 }
 
-NdrRegistry::~NdrRegistry()
-{
+NdrRegistry::~NdrRegistry() {
     // nothing yet
 }
 
-void
-NdrRegistry::SetExtraDiscoveryPlugins(DiscoveryPluginRefPtrVec plugins)
-{
+void NdrRegistry::SetExtraDiscoveryPlugins(DiscoveryPluginRefPtrVec plugins) {
     {
         std::lock_guard<std::mutex> nmLock(_nodeMapMutex);
 
@@ -287,29 +247,25 @@ NdrRegistry::SetExtraDiscoveryPlugins(DiscoveryPluginRefPtrVec plugins)
         // operations simpler, and it "just makes sense" to have all plugins
         // run before asking for information from the registry.
         if (!_nodeMap.empty()) {
-            TF_CODING_ERROR("SetExtraDiscoveryPlugins() cannot be called after"
-                            " nodes have been parsed; ignoring.");
+            TF_CODING_ERROR(
+                    "SetExtraDiscoveryPlugins() cannot be called after"
+                    " nodes have been parsed; ignoring.");
             return;
         }
     }
 
     _RunDiscoveryPlugins(plugins);
 
-    _discoveryPlugins.insert(_discoveryPlugins.end(),
-                             std::make_move_iterator(plugins.begin()),
+    _discoveryPlugins.insert(_discoveryPlugins.end(), std::make_move_iterator(plugins.begin()),
                              std::make_move_iterator(plugins.end()));
 }
 
-void
-NdrRegistry::SetExtraDiscoveryPlugins(const std::vector<TfType>& pluginTypes)
-{
+void NdrRegistry::SetExtraDiscoveryPlugins(const std::vector<TfType>& pluginTypes) {
     // Validate the types and remove duplicates.
     std::set<TfType> discoveryPluginTypes;
     auto& discoveryPluginType = TfType::Find<NdrDiscoveryPlugin>();
-    for (auto&& type: pluginTypes) {
-        if (!TF_VERIFY(type.IsA(discoveryPluginType),
-                       "Type %s is not a %s",
-                       type.GetTypeName().c_str(),
+    for (auto&& type : pluginTypes) {
+        if (!TF_VERIFY(type.IsA(discoveryPluginType), "Type %s is not a %s", type.GetTypeName().c_str(),
                        discoveryPluginType.GetTypeName().c_str())) {
             return;
         }
@@ -319,8 +275,7 @@ NdrRegistry::SetExtraDiscoveryPlugins(const std::vector<TfType>& pluginTypes)
     // Instantiate any discovery plugins that were found
     DiscoveryPluginRefPtrVec discoveryPlugins;
     for (const TfType& discoveryPluginType : discoveryPluginTypes) {
-        NdrDiscoveryPluginFactoryBase* pluginFactory =
-            discoveryPluginType.GetFactory<NdrDiscoveryPluginFactoryBase>();
+        NdrDiscoveryPluginFactoryBase* pluginFactory = discoveryPluginType.GetFactory<NdrDiscoveryPluginFactoryBase>();
 
         if (TF_VERIFY(pluginFactory)) {
             discoveryPlugins.emplace_back(pluginFactory->New());
@@ -331,23 +286,19 @@ NdrRegistry::SetExtraDiscoveryPlugins(const std::vector<TfType>& pluginTypes)
     SetExtraDiscoveryPlugins(std::move(discoveryPlugins));
 }
 
-void NdrRegistry::AddDiscoveryResult(NdrNodeDiscoveryResult&& discoveryResult)
-{
+void NdrRegistry::AddDiscoveryResult(NdrNodeDiscoveryResult&& discoveryResult) {
     std::lock_guard<std::mutex> drLock(_discoveryResultMutex);
     _AddDiscoveryResultNoLock(std::move(discoveryResult));
 }
 
-void NdrRegistry::AddDiscoveryResult(const NdrNodeDiscoveryResult& discoveryResult)
-{
+void NdrRegistry::AddDiscoveryResult(const NdrNodeDiscoveryResult& discoveryResult) {
     // Explicitly create a copy, otherwise this method will recurse
     // into itself.
     NdrNodeDiscoveryResult result = discoveryResult;
     AddDiscoveryResult(std::move(result));
 }
 
-void
-NdrRegistry::SetExtraParserPlugins(const std::vector<TfType>& pluginTypes)
-{
+void NdrRegistry::SetExtraParserPlugins(const std::vector<TfType>& pluginTypes) {
     {
         std::lock_guard<std::mutex> nmLock(_nodeMapMutex);
 
@@ -355,8 +306,9 @@ NdrRegistry::SetExtraParserPlugins(const std::vector<TfType>& pluginTypes)
         // operations simpler, and it "just makes sense" to have all plugins
         // run before asking for information from the registry.
         if (!_nodeMap.empty()) {
-            TF_CODING_ERROR("SetExtraParserPlugins() cannot be called after"
-                            " nodes have been parsed; ignoring.");
+            TF_CODING_ERROR(
+                    "SetExtraParserPlugins() cannot be called after"
+                    " nodes have been parsed; ignoring.");
             return;
         }
     }
@@ -364,10 +316,8 @@ NdrRegistry::SetExtraParserPlugins(const std::vector<TfType>& pluginTypes)
     // Validate the types and remove duplicates.
     std::set<TfType> parserPluginTypes;
     auto& parserPluginType = TfType::Find<NdrParserPlugin>();
-    for (auto&& type: pluginTypes) {
-        if (!TF_VERIFY(type.IsA(parserPluginType),
-                       "Type %s is not a %s",
-                       type.GetTypeName().c_str(),
+    for (auto&& type : pluginTypes) {
+        if (!TF_VERIFY(type.IsA(parserPluginType), "Type %s is not a %s", type.GetTypeName().c_str(),
                        parserPluginType.GetTypeName().c_str())) {
             return;
         }
@@ -377,129 +327,112 @@ NdrRegistry::SetExtraParserPlugins(const std::vector<TfType>& pluginTypes)
     _InstantiateParserPlugins(parserPluginTypes);
 }
 
-NdrNodeConstPtr 
-NdrRegistry::GetNodeFromAsset(const SdfAssetPath &asset,
-                              const NdrTokenMap &metadata,
-                              const TfToken &subIdentifier,
-                              const TfToken &sourceType)
-{
+NdrNodeConstPtr NdrRegistry::GetNodeFromAsset(const SdfAssetPath& asset,
+                                              const NdrTokenMap& metadata,
+                                              const TfToken& subIdentifier,
+                                              const TfToken& sourceType) {
     // Ensure there is a parser plugin that can handle this asset.
     TfToken discoveryType(ArGetResolver().GetExtension(asset.GetAssetPath()));
     auto parserIt = _parserPluginMap.find(discoveryType);
 
-    // Ensure that there is a parser registered corresponding to the 
+    // Ensure that there is a parser registered corresponding to the
     // discoveryType of the asset.
     if (parserIt == _parserPluginMap.end()) {
-        TF_DEBUG(NDR_PARSING).Msg("Encountered a asset @%s@ of type [%s], but "
-                                  "a parser for the type could not be found; "
-                                  "ignoring.\n", asset.GetAssetPath().c_str(),
-                                  discoveryType.GetText());
+        TF_DEBUG(NDR_PARSING)
+                .Msg("Encountered a asset @%s@ of type [%s], but "
+                     "a parser for the type could not be found; "
+                     "ignoring.\n",
+                     asset.GetAssetPath().c_str(), discoveryType.GetText());
         return nullptr;
     }
 
-    NdrIdentifier identifier =
-        _GetIdentifierForAsset(asset, metadata, subIdentifier, sourceType);
+    NdrIdentifier identifier = _GetIdentifierForAsset(asset, metadata, subIdentifier, sourceType);
 
     // Use given sourceType if there is one, else use sourceType from the parser
     // plugin.
-    const TfToken &thisSourceType = (!sourceType.IsEmpty()) ? sourceType :
-        parserIt->second->GetSourceType();
+    const TfToken& thisSourceType = (!sourceType.IsEmpty()) ? sourceType : parserIt->second->GetSourceType();
     _NodeMapKey key{identifier, thisSourceType};
 
     // Return the existing node in the map if an entry for the identifier and
-    // sourceType already exists. Note that the existing node may not yet be 
-    // parsed, so this will parse and return the node if it should exist 
+    // sourceType already exists. Note that the existing node may not yet be
+    // parsed, so this will parse and return the node if it should exist
     // already.
-    if (NdrNodeConstPtr node = 
-            GetNodeByIdentifierAndType(identifier, sourceType)) {
+    if (NdrNodeConstPtr node = GetNodeByIdentifierAndType(identifier, sourceType)) {
         return node;
     }
 
-    // Construct a NdrNodeDiscoveryResult object to pass into the parser 
+    // Construct a NdrNodeDiscoveryResult object to pass into the parser
     // plugin's Parse() method.
     // XXX: Should we try resolving the assetPath if the resolved path is empty.
-    std::string resolvedUri = asset.GetResolvedPath().empty() ? 
-        asset.GetAssetPath() : asset.GetResolvedPath();
+    std::string resolvedUri = asset.GetResolvedPath().empty() ? asset.GetAssetPath() : asset.GetResolvedPath();
 
-    NdrNodeDiscoveryResult dr(identifier,
-                              NdrVersion(), /* use an invalid version */
+    NdrNodeDiscoveryResult dr(identifier, NdrVersion(), /* use an invalid version */
                               /* name */ TfGetBaseName(resolvedUri),
-                              /*family*/ TfToken(), 
-                              discoveryType, 
+                              /*family*/ TfToken(), discoveryType,
                               /* sourceType */ thisSourceType,
-                              /* uri */ asset.GetAssetPath(),
-                              resolvedUri, 
-                              /* sourceCode */ "",
-                              metadata,
+                              /* uri */ asset.GetAssetPath(), resolvedUri,
+                              /* sourceCode */ "", metadata,
                               /* blindData */ "",
                               /* subIdentifier */ subIdentifier);
 
     return _ParseNodeFromAssetOrSourceCode(*(parserIt->second), std::move(dr));
 }
 
-NdrNodeConstPtr 
-NdrRegistry::GetNodeFromSourceCode(const std::string &sourceCode,
-                                   const TfToken &sourceType,
-                                   const NdrTokenMap &metadata)
-{
-    // Ensure that there is a parser registered corresponding to the 
+NdrNodeConstPtr NdrRegistry::GetNodeFromSourceCode(const std::string& sourceCode,
+                                                   const TfToken& sourceType,
+                                                   const NdrTokenMap& metadata) {
+    // Ensure that there is a parser registered corresponding to the
     // given sourceType.
-    NdrParserPlugin *parserForSourceType = nullptr;
-    for (const auto &parserIt : _parserPlugins) {
+    NdrParserPlugin* parserForSourceType = nullptr;
+    for (const auto& parserIt : _parserPlugins) {
         if (parserIt->GetSourceType() == sourceType) {
             parserForSourceType = parserIt.get();
         }
     }
 
     if (!parserForSourceType) {
-        // XXX: Should we try looking for sourceType in _parserPluginMap, 
+        // XXX: Should we try looking for sourceType in _parserPluginMap,
         // in case it corresponds to a discovery type in Ndr?
-       
-        TF_DEBUG(NDR_PARSING).Msg("Encountered source code of type [%s], but "
-                                  "a parser for the type could not be found; "
-                                  "ignoring.\n", sourceType.GetText());
+
+        TF_DEBUG(NDR_PARSING)
+                .Msg("Encountered source code of type [%s], but "
+                     "a parser for the type could not be found; "
+                     "ignoring.\n",
+                     sourceType.GetText());
         return nullptr;
     }
 
-    NdrIdentifier identifier = _GetIdentifierForSourceCode(sourceCode, 
-            metadata);
+    NdrIdentifier identifier = _GetIdentifierForSourceCode(sourceCode, metadata);
 
     // Return the existing node in the map if an entry for the identifier and
-    // sourceType already exists. Note that the existing node may not yet be 
-    // parsed, so this will parse and return the node if it should exist 
+    // sourceType already exists. Note that the existing node may not yet be
+    // parsed, so this will parse and return the node if it should exist
     // already.
-    if (NdrNodeConstPtr node = 
-            GetNodeByIdentifierAndType(identifier, sourceType)) {
+    if (NdrNodeConstPtr node = GetNodeByIdentifierAndType(identifier, sourceType)) {
         return node;
     }
 
-    NdrNodeDiscoveryResult dr(identifier, 
-                              NdrVersion(), /* use an invalid version */
-                              /* name */ identifier, 
-                              /*family*/ TfToken(), 
+    NdrNodeDiscoveryResult dr(identifier, NdrVersion(), /* use an invalid version */
+                              /* name */ identifier,
+                              /*family*/ TfToken(),
                               // XXX: Setting discoveryType also to sourceType.
                               // Do ParserPlugins rely on it? If yes, should they?
-                              /* discoveryType */ sourceType, 
-                              sourceType, 
+                              /* discoveryType */ sourceType, sourceType,
                               /* uri */ "",
-                              /* resolvedUri */ "",
-                               sourceCode,
-                               metadata);
+                              /* resolvedUri */ "", sourceCode, metadata);
 
-    NdrNodeConstPtr node = 
-        _ParseNodeFromAssetOrSourceCode(*parserForSourceType, std::move(dr));
+    NdrNodeConstPtr node = _ParseNodeFromAssetOrSourceCode(*parserForSourceType, std::move(dr));
     if (!node) {
-        TF_RUNTIME_ERROR("Could not create node for the given source code of "
-            "source type '%s'.", sourceType.GetText());
+        TF_RUNTIME_ERROR(
+                "Could not create node for the given source code of "
+                "source type '%s'.",
+                sourceType.GetText());
         return nullptr;
     }
     return node;
 }
 
-NdrNodeConstPtr 
-NdrRegistry::_ParseNodeFromAssetOrSourceCode(
-    NdrParserPlugin &parser, NdrNodeDiscoveryResult &&dr)
-{
+NdrNodeConstPtr NdrRegistry::_ParseNodeFromAssetOrSourceCode(NdrParserPlugin& parser, NdrNodeDiscoveryResult&& dr) {
     NdrNodeUniquePtr newNode = parser.Parse(dr);
 
     if (!_ValidateNode(newNode, dr)) {
@@ -512,7 +445,7 @@ NdrRegistry::_ParseNodeFromAssetOrSourceCode(
     // Move the discovery result into _discoveryResults so the node can be found
     // in the Get*() methods. Note that we keep this locked while caching the
     // node itself so that in the extraordinarily unlikely case that another
-    // thread tries to add a node with the same identifier and sourceType 
+    // thread tries to add a node with the same identifier and sourceType
     // through this code path, that THIS node is the one that ends up cached.
     std::lock_guard<std::mutex> drLock(_discoveryResultMutex);
     _AddDiscoveryResultNoLock(std::move(dr));
@@ -520,26 +453,19 @@ NdrRegistry::_ParseNodeFromAssetOrSourceCode(
     return _InsertNodeInCache(std::move(key), std::move(newNode));
 }
 
-NdrStringVec
-NdrRegistry::GetSearchURIs() const
-{
+NdrStringVec NdrRegistry::GetSearchURIs() const {
     NdrStringVec searchURIs;
 
     for (const NdrDiscoveryPluginRefPtr& dp : _discoveryPlugins) {
         NdrStringVec uris = dp->GetSearchURIs();
 
-        searchURIs.insert(searchURIs.end(),
-                          std::make_move_iterator(uris.begin()),
-                          std::make_move_iterator(uris.end()));
+        searchURIs.insert(searchURIs.end(), std::make_move_iterator(uris.begin()), std::make_move_iterator(uris.end()));
     }
 
     return searchURIs;
 }
 
-NdrIdentifierVec
-NdrRegistry::GetNodeIdentifiers(
-    const TfToken& family, NdrVersionFilter filter) const
-{
+NdrIdentifierVec NdrRegistry::GetNodeIdentifiers(const TfToken& family, NdrVersionFilter filter) const {
     //
     // This should not trigger a parse because node names come directly from
     // the discovery process.
@@ -556,7 +482,7 @@ NdrRegistry::GetNodeIdentifiers(
             // Since the discovery results are keyed by identifier in a
             // multimap, any duplicate idenitfiers will show up in order so we
             // only have to check the last identifier we added to avoid
-            // duplicates. 
+            // duplicates.
             if (result.empty() || result.back() != dr.identifier) {
                 result.push_back(dr.identifier);
             }
@@ -566,9 +492,7 @@ NdrRegistry::GetNodeIdentifiers(
     return result;
 }
 
-NdrStringVec
-NdrRegistry::GetNodeNames(const TfToken& family) const
-{
+NdrStringVec NdrRegistry::GetNodeNames(const TfToken& family) const {
     //
     // This should not trigger a parse because node names come directly from
     // the discovery process.
@@ -584,7 +508,7 @@ NdrRegistry::GetNodeNames(const TfToken& family) const
         if (family.IsEmpty() || dr.family == family) {
             // Since the discovery results are keyed by name in a multimap, any
             // duplicate names will show up in order so we only have to check
-            // the last name we added to avoid duplicates. 
+            // the last name we added to avoid duplicates.
             if (nodeNames.empty() || nodeNames.back() != dr.name) {
                 nodeNames.push_back(dr.name);
             }
@@ -594,17 +518,14 @@ NdrRegistry::GetNodeNames(const TfToken& family) const
     return nodeNames;
 }
 
-NdrNodeConstPtr
-NdrRegistry::GetNodeByIdentifier(
-    const NdrIdentifier& identifier, const NdrTokenVec& sourceTypePriority)
-{
+NdrNodeConstPtr NdrRegistry::GetNodeByIdentifier(const NdrIdentifier& identifier,
+                                                 const NdrTokenVec& sourceTypePriority) {
     TRACE_FUNCTION();
     std::lock_guard<std::mutex> drLock(_discoveryResultMutex);
 
     // There can be multiple discovery results for different source types for a
-    // single identifier so get the range of results for the identifier. 
-    const _DiscoveryResultsByIdentifierRange range = 
-        _discoveryResultsByIdentifier.equal_range(identifier);
+    // single identifier so get the range of results for the identifier.
+    const _DiscoveryResultsByIdentifierRange range = _discoveryResultsByIdentifier.equal_range(identifier);
     if (range.first == range.second) {
         return nullptr;
     }
@@ -618,11 +539,10 @@ NdrRegistry::GetNodeByIdentifier(
             }
         }
     } else {
-        // Otherwise we attempt to get a node for matching the identifier for 
+        // Otherwise we attempt to get a node for matching the identifier for
         // each source type in priority order.
         for (const TfToken& sourceType : sourceTypePriority) {
-            if (NdrNodeConstPtr node = _GetNodeInIdentifierRangeWithSourceType(
-                    range, sourceType)) {
+            if (NdrNodeConstPtr node = _GetNodeInIdentifierRangeWithSourceType(range, sourceType)) {
                 return node;
             }
         }
@@ -631,33 +551,27 @@ NdrRegistry::GetNodeByIdentifier(
     return nullptr;
 }
 
-NdrNodeConstPtr
-NdrRegistry::GetNodeByIdentifierAndType(
-    const NdrIdentifier& identifier, const TfToken& sourceType)
-{
+NdrNodeConstPtr NdrRegistry::GetNodeByIdentifierAndType(const NdrIdentifier& identifier, const TfToken& sourceType) {
     TRACE_FUNCTION();
     std::lock_guard<std::mutex> drLock(_discoveryResultMutex);
 
     // There can be multiple discovery results for different source types for a
-    // single identifier so get the range of results for the identifier. 
-    const _DiscoveryResultsByIdentifierRange range = 
-        _discoveryResultsByIdentifier.equal_range(identifier);
+    // single identifier so get the range of results for the identifier.
+    const _DiscoveryResultsByIdentifierRange range = _discoveryResultsByIdentifier.equal_range(identifier);
     if (range.first == range.second) {
         return nullptr;
     }
     return _GetNodeInIdentifierRangeWithSourceType(range, sourceType);
 }
 
-NdrNodeConstPtr 
-NdrRegistry::_GetNodeInIdentifierRangeWithSourceType(
-    _DiscoveryResultsByIdentifierRange range, const TfToken& sourceType)
-{
+NdrNodeConstPtr NdrRegistry::_GetNodeInIdentifierRangeWithSourceType(_DiscoveryResultsByIdentifierRange range,
+                                                                     const TfToken& sourceType) {
     // Return the first node that we can successfully find or parse with the
-    // given source type. We expect there to be at most a few (and frequently 
-    // just one) source types for a particular identifier so there should be 
+    // given source type. We expect there to be at most a few (and frequently
+    // just one) source types for a particular identifier so there should be
     // little impact from this linear search.
-    for (auto it = range.first; it != range.second; ++ it) {
-        const NdrNodeDiscoveryResult &dr = it->second;
+    for (auto it = range.first; it != range.second; ++it) {
+        const NdrNodeDiscoveryResult& dr = it->second;
         if (dr.sourceType != sourceType) {
             continue;
         }
@@ -668,19 +582,15 @@ NdrRegistry::_GetNodeInIdentifierRangeWithSourceType(
     return nullptr;
 }
 
-NdrNodeConstPtr
-NdrRegistry::GetNodeByName(
-    const std::string& name,
-    const NdrTokenVec& sourceTypePriority,
-    NdrVersionFilter filter)
-{
+NdrNodeConstPtr NdrRegistry::GetNodeByName(const std::string& name,
+                                           const NdrTokenVec& sourceTypePriority,
+                                           NdrVersionFilter filter) {
     TRACE_FUNCTION();
     std::lock_guard<std::mutex> drLock(_discoveryResultMutex);
 
-    // There can be multiple discovery results with the same name so get the 
-    // range of results with the given name. 
-    const _DiscoveryResultPtrsByNameRange range = 
-        _discoveryResultPtrsByName.equal_range(name);
+    // There can be multiple discovery results with the same name so get the
+    // range of results with the given name.
+    const _DiscoveryResultPtrsByNameRange range = _discoveryResultPtrsByName.equal_range(name);
     if (range.first == range.second) {
         return nullptr;
     }
@@ -690,8 +600,8 @@ NdrRegistry::GetNodeByName(
     if (sourceTypePriority.empty()) {
         // If the type priority specifier is empty, pick the first valid node
         // that passes the version filter regardless of source type.
-        for (auto it = range.first; it != range.second; ++ it) {
-            const NdrNodeDiscoveryResult &dr = *(it->second);
+        for (auto it = range.first; it != range.second; ++it) {
+            const NdrNodeDiscoveryResult& dr = *(it->second);
             if (!_MatchesFamilyAndFilter(dr, TfToken(), filter)) {
                 continue;
             }
@@ -700,11 +610,10 @@ NdrRegistry::GetNodeByName(
             }
         }
     } else {
-        // Otherwise we attempt to get a node that passes the version filter for 
+        // Otherwise we attempt to get a node that passes the version filter for
         // each source type in priority order.
         for (const TfToken& sourceType : sourceTypePriority) {
-            if (NdrNodeConstPtr node = _GetNodeInNameRangeWithSourceType(
-                    range, sourceType, filter)) {
+            if (NdrNodeConstPtr node = _GetNodeInNameRangeWithSourceType(range, sourceType, filter)) {
                 return node;
             }
         }
@@ -713,31 +622,27 @@ NdrRegistry::GetNodeByName(
     return nullptr;
 }
 
-NdrNodeConstPtr
-NdrRegistry::GetNodeByNameAndType(
-    const std::string& name, const TfToken& sourceType, NdrVersionFilter filter)
-{
+NdrNodeConstPtr NdrRegistry::GetNodeByNameAndType(const std::string& name,
+                                                  const TfToken& sourceType,
+                                                  NdrVersionFilter filter) {
     TRACE_FUNCTION();
     std::lock_guard<std::mutex> drLock(_discoveryResultMutex);
 
-    // There can be multiple discovery results with the same name so get the 
-    // range of results with the given name. 
-    const _DiscoveryResultPtrsByNameRange range = 
-        _discoveryResultPtrsByName.equal_range(name);
+    // There can be multiple discovery results with the same name so get the
+    // range of results with the given name.
+    const _DiscoveryResultPtrsByNameRange range = _discoveryResultPtrsByName.equal_range(name);
     if (range.first == range.second) {
         return nullptr;
     }
-    
+
     return _GetNodeInNameRangeWithSourceType(range, sourceType, filter);
 }
 
-NdrNodeConstPtr 
-NdrRegistry::_GetNodeInNameRangeWithSourceType(
-    _DiscoveryResultPtrsByNameRange range, const TfToken& sourceType,
-    NdrVersionFilter filter)
-{
-    for (auto it = range.first; it != range.second; ++ it) {
-        const NdrNodeDiscoveryResult &dr = *(it->second);
+NdrNodeConstPtr NdrRegistry::_GetNodeInNameRangeWithSourceType(_DiscoveryResultPtrsByNameRange range,
+                                                               const TfToken& sourceType,
+                                                               NdrVersionFilter filter) {
+    for (auto it = range.first; it != range.second; ++it) {
+        const NdrNodeDiscoveryResult& dr = *(it->second);
         if (dr.sourceType != sourceType) {
             continue;
         }
@@ -751,15 +656,12 @@ NdrRegistry::_GetNodeInNameRangeWithSourceType(
     return nullptr;
 }
 
-NdrNodeConstPtrVec
-NdrRegistry::GetNodesByIdentifier(const NdrIdentifier& identifier)
-{
+NdrNodeConstPtrVec NdrRegistry::GetNodesByIdentifier(const NdrIdentifier& identifier) {
     TRACE_FUNCTION();
     std::lock_guard<std::mutex> drLock(_discoveryResultMutex);
     NdrNodeConstPtrVec parsedNodes;
 
-    const _DiscoveryResultsByIdentifierRange range = 
-        _discoveryResultsByIdentifier.equal_range(identifier);
+    const _DiscoveryResultsByIdentifierRange range = _discoveryResultsByIdentifier.equal_range(identifier);
     if (range.first == range.second) {
         return parsedNodes;
     }
@@ -773,21 +675,18 @@ NdrRegistry::GetNodesByIdentifier(const NdrIdentifier& identifier)
     return parsedNodes;
 }
 
-NdrNodeConstPtrVec
-NdrRegistry::GetNodesByName(const std::string& name, NdrVersionFilter filter)
-{
+NdrNodeConstPtrVec NdrRegistry::GetNodesByName(const std::string& name, NdrVersionFilter filter) {
     TRACE_FUNCTION();
     std::lock_guard<std::mutex> drLock(_discoveryResultMutex);
     NdrNodeConstPtrVec parsedNodes;
 
-    const _DiscoveryResultPtrsByNameRange range = 
-        _discoveryResultPtrsByName.equal_range(name);
+    const _DiscoveryResultPtrsByNameRange range = _discoveryResultPtrsByName.equal_range(name);
     if (range.first == range.second) {
         return parsedNodes;
     }
 
-    for (auto it = range.first; it != range.second; ++ it) {
-        const NdrNodeDiscoveryResult &dr = *(it->second);
+    for (auto it = range.first; it != range.second; ++it) {
+        const NdrNodeDiscoveryResult& dr = *(it->second);
         if (!_MatchesFamilyAndFilter(dr, TfToken(), filter)) {
             continue;
         }
@@ -799,9 +698,7 @@ NdrRegistry::GetNodesByName(const std::string& name, NdrVersionFilter filter)
     return parsedNodes;
 }
 
-NdrNodeConstPtrVec
-NdrRegistry::GetNodesByFamily(const TfToken& family, NdrVersionFilter filter)
-{
+NdrNodeConstPtrVec NdrRegistry::GetNodesByFamily(const TfToken& family, NdrVersionFilter filter) {
     // Locking the discovery results for the entire duration of the parse is a
     // bit heavy-handed, but it needs to be 100% guaranteed that the results are
     // not modified while they are being iterated over.
@@ -820,7 +717,7 @@ NdrRegistry::GetNodesByFamily(const TfToken& family, NdrVersionFilter filter)
     // (_FindOrParseNodeInCache() will guard against nodes of the same name and
     // type from being cached).
 
-    // Skip parsing if a parse was already completed for all nodes    
+    // Skip parsing if a parse was already completed for all nodes
     if (_nodeMap.size() != _discoveryResultsByIdentifier.size()) {
         // We unlock the node map so we can parse and insert nodes in parallel.
         nmLock.unlock();
@@ -834,15 +731,13 @@ NdrRegistry::GetNodesByFamily(const TfToken& family, NdrVersionFilter filter)
         TF_PY_ALLOW_THREADS_IN_SCOPE();
 
         WorkWithScopedParallelism([&]() {
-            WorkParallelForEach(_discoveryResultsByIdentifier.begin(),
-                                _discoveryResultsByIdentifier.end(),
-                [&](const _DiscoveryResultsByIdentifier::value_type &val) {
-                    if (_MatchesFamilyAndFilter(val.second, family, filter)) {
-                        _FindOrParseNodeInCache(val.second);
-                    }
-                });
-            }
-        );
+            WorkParallelForEach(_discoveryResultsByIdentifier.begin(), _discoveryResultsByIdentifier.end(),
+                                [&](const _DiscoveryResultsByIdentifier::value_type& val) {
+                                    if (_MatchesFamilyAndFilter(val.second, family, filter)) {
+                                        _FindOrParseNodeInCache(val.second);
+                                    }
+                                });
+        });
 
         nmLock.lock();
     }
@@ -858,9 +753,7 @@ NdrRegistry::GetNodesByFamily(const TfToken& family, NdrVersionFilter filter)
     return nodeVec;
 }
 
-NdrTokenVec
-NdrRegistry::GetAllNodeSourceTypes() const 
-{
+NdrTokenVec NdrRegistry::GetAllNodeSourceTypes() const {
     // We're using the _discoveryResultMutex because we populate/udpate the
     // _allSourceTypes in tandem with the population of the discovery results
     // structures.
@@ -873,9 +766,7 @@ NdrRegistry::GetAllNodeSourceTypes() const
     return NdrTokenVec(_allSourceTypes.begin(), _allSourceTypes.end());
 }
 
-void
-NdrRegistry::_FindAndInstantiateDiscoveryPlugins()
-{
+void NdrRegistry::_FindAndInstantiateDiscoveryPlugins() {
     // The auto-discovery of discovery plugins can be skipped. This is mostly
     // for testing purposes.
     if (TfGetEnvSetting(PXR_NDR_SKIP_DISCOVERY_PLUGIN_DISCOVERY)) {
@@ -884,8 +775,7 @@ NdrRegistry::_FindAndInstantiateDiscoveryPlugins()
 
     // Find all of the available discovery plugins
     std::set<TfType> discoveryPluginTypes;
-    PlugRegistry::GetInstance().GetAllDerivedTypes<NdrDiscoveryPlugin>(
-        &discoveryPluginTypes);
+    PlugRegistry::GetInstance().GetAllDerivedTypes<NdrDiscoveryPlugin>(&discoveryPluginTypes);
 
     // Allow plugins to be disabled.
     const std::string disabledPluginsStr = TfGetEnvSetting(PXR_NDR_DISABLE_PLUGINS);
@@ -895,18 +785,14 @@ NdrRegistry::_FindAndInstantiateDiscoveryPlugins()
     for (const TfType& discoveryPluginType : discoveryPluginTypes) {
         const std::string& pluginName = discoveryPluginType.GetTypeName();
         if (disabledPlugins.find(pluginName) != disabledPlugins.end()) {
-            TF_DEBUG(NDR_DISCOVERY).Msg(
-                "[PXR_NDR_DISABLE_PLUGINS] Disabled NdrDiscoveryPlugin '%s'\n",
-                pluginName.c_str());
+            TF_DEBUG(NDR_DISCOVERY)
+                    .Msg("[PXR_NDR_DISABLE_PLUGINS] Disabled NdrDiscoveryPlugin '%s'\n", pluginName.c_str());
             continue;
         }
 
-        TF_DEBUG(NDR_DISCOVERY).Msg(
-            "Found NdrDiscoveryPlugin '%s'\n", 
-            discoveryPluginType.GetTypeName().c_str());
+        TF_DEBUG(NDR_DISCOVERY).Msg("Found NdrDiscoveryPlugin '%s'\n", discoveryPluginType.GetTypeName().c_str());
 
-        NdrDiscoveryPluginFactoryBase* pluginFactory =
-            discoveryPluginType.GetFactory<NdrDiscoveryPluginFactoryBase>();
+        NdrDiscoveryPluginFactoryBase* pluginFactory = discoveryPluginType.GetFactory<NdrDiscoveryPluginFactoryBase>();
 
         if (TF_VERIFY(pluginFactory)) {
             _discoveryPlugins.emplace_back(pluginFactory->New());
@@ -914,9 +800,7 @@ NdrRegistry::_FindAndInstantiateDiscoveryPlugins()
     }
 }
 
-void
-NdrRegistry::_FindAndInstantiateParserPlugins()
-{
+void NdrRegistry::_FindAndInstantiateParserPlugins() {
     // The auto-discovery of parser plugins can be skipped. This is mostly
     // for testing purposes.
     if (TfGetEnvSetting(PXR_NDR_SKIP_PARSER_PLUGIN_DISCOVERY)) {
@@ -925,16 +809,12 @@ NdrRegistry::_FindAndInstantiateParserPlugins()
 
     // Find all of the available parser plugins
     std::set<TfType> parserPluginTypes;
-    PlugRegistry::GetInstance().GetAllDerivedTypes<NdrParserPlugin>(
-        &parserPluginTypes);
+    PlugRegistry::GetInstance().GetAllDerivedTypes<NdrParserPlugin>(&parserPluginTypes);
 
     _InstantiateParserPlugins(parserPluginTypes);
 }
 
-void
-NdrRegistry::_InstantiateParserPlugins(
-    const std::set<TfType>& parserPluginTypes)
-{
+void NdrRegistry::_InstantiateParserPlugins(const std::set<TfType>& parserPluginTypes) {
     // Allow plugins to be disabled.
     const std::string disabledPluginsStr = TfGetEnvSetting(PXR_NDR_DISABLE_PLUGINS);
     const std::set<std::string> disabledPlugins = TfStringTokenizeToSet(disabledPluginsStr, ",");
@@ -942,27 +822,23 @@ NdrRegistry::_InstantiateParserPlugins(
     // Ensure this list is in a consistent order to ensure stable behavior.
     // TfType's operator< is not stable across runs, so we sort based on
     // typename instead.
-    std::vector<TfType> orderedPluginTypes {parserPluginTypes.begin(), parserPluginTypes.end()};
-    std::sort(orderedPluginTypes.begin(), orderedPluginTypes.end(),
-        [](const TfType& a, const TfType& b) {
-            return a.GetTypeName() < b.GetTypeName();
-        });
+    std::vector<TfType> orderedPluginTypes{parserPluginTypes.begin(), parserPluginTypes.end()};
+    std::sort(orderedPluginTypes.begin(), orderedPluginTypes.end(), [](const TfType& a, const TfType& b) {
+        return a.GetTypeName() < b.GetTypeName();
+    });
 
     // Instantiate any parser plugins that were found
     for (const TfType& parserPluginType : orderedPluginTypes) {
         const std::string& pluginName = parserPluginType.GetTypeName();
         if (disabledPlugins.find(pluginName) != disabledPlugins.end()) {
-            TF_DEBUG(NDR_DISCOVERY).Msg(
-                "[PXR_NDR_DISABLE_PLUGINS] Disabled NdrParserPlugin '%s'\n",
-                pluginName.c_str());
+            TF_DEBUG(NDR_DISCOVERY)
+                    .Msg("[PXR_NDR_DISABLE_PLUGINS] Disabled NdrParserPlugin '%s'\n", pluginName.c_str());
             continue;
         }
-        TF_DEBUG(NDR_DISCOVERY).Msg(
-            "Found NdrParserPlugin '%s' for discovery types:\n", 
-            parserPluginType.GetTypeName().c_str());
+        TF_DEBUG(NDR_DISCOVERY)
+                .Msg("Found NdrParserPlugin '%s' for discovery types:\n", parserPluginType.GetTypeName().c_str());
 
-        NdrParserPluginFactoryBase* pluginFactory =
-            parserPluginType.GetFactory<NdrParserPluginFactoryBase>();
+        NdrParserPluginFactoryBase* pluginFactory = parserPluginType.GetFactory<NdrParserPluginFactoryBase>();
 
         if (!TF_VERIFY(pluginFactory)) {
             continue;
@@ -975,21 +851,19 @@ NdrRegistry::_InstantiateParserPlugins(
             TF_DEBUG(NDR_DISCOVERY).Msg("  - %s\n", discoveryType.GetText());
 
             auto i = _parserPluginMap.insert({discoveryType, parserPlugin});
-            if (!i.second){
+            if (!i.second) {
                 const TfType otherType = TfType::Find(*i.first->second);
-                TF_CODING_ERROR("Plugin type %s claims discovery type '%s' "
-                                "but that's already claimed by type %s",
-                                parserPluginType.GetTypeName().c_str(),
-                                discoveryType.GetText(),
-                                otherType.GetTypeName().c_str());
+                TF_CODING_ERROR(
+                        "Plugin type %s claims discovery type '%s' "
+                        "but that's already claimed by type %s",
+                        parserPluginType.GetTypeName().c_str(), discoveryType.GetText(),
+                        otherType.GetTypeName().c_str());
             }
         }
     }
 }
 
-void
-NdrRegistry::_RunDiscoveryPlugins(const DiscoveryPluginRefPtrVec& discoveryPlugins)
-{
+void NdrRegistry::_RunDiscoveryPlugins(const DiscoveryPluginRefPtrVec& discoveryPlugins) {
     size_t num_plugins = discoveryPlugins.size();
     std::vector<NdrNodeDiscoveryResultVec> results_vec(num_plugins);
 
@@ -1003,44 +877,34 @@ NdrRegistry::_RunDiscoveryPlugins(const DiscoveryPluginRefPtrVec& discoveryPlugi
     TF_PY_ALLOW_THREADS_IN_SCOPE();
 
     WorkWithScopedParallelism([&]() {
-        WorkParallelForN(
-            num_plugins,
-            [&](size_t start, size_t end) {
-                for (size_t i = start; i < end; i++) {
-                    results_vec[i] = discoveryPlugins[i]->DiscoverNodes(
-                        _DiscoveryContext(*this));
-                }
-            });
-        }
-    );
+        WorkParallelForN(num_plugins, [&](size_t start, size_t end) {
+            for (size_t i = start; i < end; i++) {
+                results_vec[i] = discoveryPlugins[i]->DiscoverNodes(_DiscoveryContext(*this));
+            }
+        });
+    });
 
     std::lock_guard<std::mutex> drLock(_discoveryResultMutex);
-    for (NdrNodeDiscoveryResultVec &results : results_vec) {
-        for (NdrNodeDiscoveryResult &dr : results) {
+    for (NdrNodeDiscoveryResultVec& results : results_vec) {
+        for (NdrNodeDiscoveryResult& dr : results) {
             _AddDiscoveryResultNoLock(std::move(dr));
         }
     }
 }
 
-void 
-NdrRegistry::_AddDiscoveryResultNoLock(NdrNodeDiscoveryResult&& drMoved)
-{
+void NdrRegistry::_AddDiscoveryResultNoLock(NdrNodeDiscoveryResult&& drMoved) {
     // The "by identifier" map holds discovery result itself
-    const auto it = _discoveryResultsByIdentifier.emplace(
-        drMoved.identifier, std::move(drMoved));
+    const auto it = _discoveryResultsByIdentifier.emplace(drMoved.identifier, std::move(drMoved));
 
-    const NdrNodeDiscoveryResult &dr = it->second;
-    // The "by name" map holds a pointer to each discovery result in the 
+    const NdrNodeDiscoveryResult& dr = it->second;
+    // The "by name" map holds a pointer to each discovery result in the
     // "by identifier" map.
     _discoveryResultPtrsByName.emplace(dr.name, &dr);
     // All possible source types are determined by all available discoveries.
     _allSourceTypes.insert(dr.sourceType);
-
 }
 
-NdrNodeConstPtr 
-NdrRegistry::_FindNodeInCache(const _NodeMapKey &key) const
-{
+NdrNodeConstPtr NdrRegistry::_FindNodeInCache(const _NodeMapKey& key) const {
     // Return an existing node in the node map if there's one that matches the
     // node unique key (identifier AND source type).
     std::lock_guard<std::mutex> nmLock(_nodeMapMutex);
@@ -1052,9 +916,7 @@ NdrRegistry::_FindNodeInCache(const _NodeMapKey &key) const
     return nullptr;
 }
 
-NdrNodeConstPtr 
-NdrRegistry::_InsertNodeInCache(_NodeMapKey &&key, NdrNodeUniquePtr &&node)
-{
+NdrNodeConstPtr NdrRegistry::_InsertNodeInCache(_NodeMapKey&& key, NdrNodeUniquePtr&& node) {
     std::lock_guard<std::mutex> nmLock(_nodeMapMutex);
     const auto result = _nodeMap.emplace(std::move(key), std::move(node));
 
@@ -1062,9 +924,7 @@ NdrRegistry::_InsertNodeInCache(_NodeMapKey &&key, NdrNodeUniquePtr &&node)
     return result.first->second.get();
 }
 
-NdrNodeConstPtr
-NdrRegistry::_FindOrParseNodeInCache(const NdrNodeDiscoveryResult& dr)
-{
+NdrNodeConstPtr NdrRegistry::_FindOrParseNodeInCache(const NdrNodeDiscoveryResult& dr) {
     // Return an existing node in the map if it already exists.
     _NodeMapKey key{dr.identifier, dr.sourceType};
     if (NdrNodeConstPtr node = _FindNodeInCache(key)) {
@@ -1074,10 +934,11 @@ NdrRegistry::_FindOrParseNodeInCache(const NdrNodeDiscoveryResult& dr)
     // Ensure there is a parser plugin that can handle this node
     auto i = _parserPluginMap.find(dr.discoveryType);
     if (i == _parserPluginMap.end()) {
-        TF_DEBUG(NDR_PARSING).Msg("Encountered a node of type [%s], "
-                                  "with name [%s], but a parser for that type "
-                                  "could not be found; ignoring.\n", 
-                                  dr.discoveryType.GetText(),  dr.name.c_str());
+        TF_DEBUG(NDR_PARSING)
+                .Msg("Encountered a node of type [%s], "
+                     "with name [%s], but a parser for that type "
+                     "could not be found; ignoring.\n",
+                     dr.discoveryType.GetText(), dr.name.c_str());
         return nullptr;
     }
 
@@ -1087,14 +948,12 @@ NdrRegistry::_FindOrParseNodeInCache(const NdrNodeDiscoveryResult& dr)
     if (!_ValidateNode(newNode, dr)) {
         return nullptr;
     }
-    
+
     // Cache the node and return the cached node.
     return _InsertNodeInCache(std::move(key), std::move(newNode));
 }
 
-NdrParserPlugin*
-NdrRegistry::_GetParserForDiscoveryType(const TfToken& discoveryType) const
-{
+NdrParserPlugin* NdrRegistry::_GetParserForDiscoveryType(const TfToken& discoveryType) const {
     auto i = _parserPluginMap.find(discoveryType);
     return i == _parserPluginMap.end() ? nullptr : i->second;
 }

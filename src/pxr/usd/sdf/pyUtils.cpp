@@ -12,12 +12,9 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-bool
-SdfFileFormatArgumentsFromPython(
-    const pxr_boost::python::dict& dict,
-    SdfLayer::FileFormatArguments* args,
-    std::string* errMsg)
-{
+bool SdfFileFormatArgumentsFromPython(const pxr_boost::python::dict& dict,
+                                      SdfLayer::FileFormatArguments* args,
+                                      std::string* errMsg) {
     SdfLayer::FileFormatArguments argsMap;
     typedef SdfLayer::FileFormatArguments::key_type ArgKeyType;
     typedef SdfLayer::FileFormatArguments::mapped_type ArgValueType;
@@ -39,7 +36,7 @@ SdfFileFormatArgumentsFromPython(
             }
             return false;
         }
-            
+
         argsMap[keyExtractor()] = valueExtractor();
     }
 

@@ -27,8 +27,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Object used to iterate over child nodes (not all descendant nodes) of a
 /// node in the prim index graph in strong-to-weak order.
 ///
-class PcpNodeRef_PrivateChildrenConstIterator
-{
+class PcpNodeRef_PrivateChildrenConstIterator {
 public:
     using iterator_category = std::forward_iterator_tag;
     using value_type = const PcpNodeRef;
@@ -41,14 +40,10 @@ public:
 
     /// Constructs an iterator pointing to \p node's first or past its
     /// last child.
-    PcpNodeRef_PrivateChildrenConstIterator(const PcpNodeRef& node,
-                                            bool end = false) :
-        _node(node),
-        _nodes(&_node._graph->_GetNode(0))
-    {
-        _node._nodeIdx = end
-            ? PcpPrimIndex_Graph::_Node::_invalidNodeIndex
-            : _nodes[_node._nodeIdx].indexes.firstChildIndex;
+    PcpNodeRef_PrivateChildrenConstIterator(const PcpNodeRef& node, bool end = false)
+        : _node(node), _nodes(&_node._graph->_GetNode(0)) {
+        _node._nodeIdx =
+                end ? PcpPrimIndex_Graph::_Node::_invalidNodeIndex : _nodes[_node._nodeIdx].indexes.firstChildIndex;
     }
 
     reference operator*() const { return dereference(); }
@@ -65,31 +60,16 @@ public:
         return result;
     }
 
-    bool operator==(
-        const PcpNodeRef_PrivateChildrenConstIterator& other) const {
-        return equal(other);
-    }
+    bool operator==(const PcpNodeRef_PrivateChildrenConstIterator& other) const { return equal(other); }
 
-    bool operator!=(
-        const PcpNodeRef_PrivateChildrenConstIterator& other) const {
-        return !equal(other);
-    }
+    bool operator!=(const PcpNodeRef_PrivateChildrenConstIterator& other) const { return !equal(other); }
 
 private:
-    void increment()
-    {
-        _node._nodeIdx = _nodes[_node._nodeIdx].indexes.nextSiblingIndex;
-    }
+    void increment() { _node._nodeIdx = _nodes[_node._nodeIdx].indexes.nextSiblingIndex; }
 
-    bool equal(const PcpNodeRef_PrivateChildrenConstIterator& other) const
-    {
-        return _node == other._node;
-    }
+    bool equal(const PcpNodeRef_PrivateChildrenConstIterator& other) const { return _node == other._node; }
 
-    reference dereference() const
-    {
-        return _node;
-    }
+    reference dereference() const { return _node; }
 
 private:
     // Current graph node this iterator is pointing at.
@@ -102,8 +82,7 @@ private:
 /// Object used to iterate over child nodes (not all descendant nodes) of a
 /// node in the prim index graph in weak-to-strong order.
 ///
-class PcpNodeRef_PrivateChildrenConstReverseIterator
-{
+class PcpNodeRef_PrivateChildrenConstReverseIterator {
 public:
     using iterator_category = std::forward_iterator_tag;
     using value_type = const PcpNodeRef;
@@ -116,14 +95,10 @@ public:
 
     /// Constructs an iterator pointing to \p node's first or past its
     /// last child.
-    PcpNodeRef_PrivateChildrenConstReverseIterator(const PcpNodeRef& node,
-                                                   bool end = false) :
-        _node(node),
-        _nodes(&_node._graph->_GetNode(0))
-    {
-        _node._nodeIdx = end
-            ? PcpPrimIndex_Graph::_Node::_invalidNodeIndex
-            : _nodes[_node._nodeIdx].indexes.lastChildIndex;
+    PcpNodeRef_PrivateChildrenConstReverseIterator(const PcpNodeRef& node, bool end = false)
+        : _node(node), _nodes(&_node._graph->_GetNode(0)) {
+        _node._nodeIdx =
+                end ? PcpPrimIndex_Graph::_Node::_invalidNodeIndex : _nodes[_node._nodeIdx].indexes.lastChildIndex;
     }
 
     reference operator*() const { return dereference(); }
@@ -140,31 +115,16 @@ public:
         return result;
     }
 
-    bool operator==(
-        const PcpNodeRef_PrivateChildrenConstReverseIterator& other) const {
-        return equal(other);
-    }
+    bool operator==(const PcpNodeRef_PrivateChildrenConstReverseIterator& other) const { return equal(other); }
 
-    bool operator!=(
-        const PcpNodeRef_PrivateChildrenConstReverseIterator& other) const {
-        return !equal(other);
-    }
+    bool operator!=(const PcpNodeRef_PrivateChildrenConstReverseIterator& other) const { return !equal(other); }
 
 private:
-    void increment()
-    {
-        _node._nodeIdx = _nodes[_node._nodeIdx].indexes.prevSiblingIndex;
-    }
+    void increment() { _node._nodeIdx = _nodes[_node._nodeIdx].indexes.prevSiblingIndex; }
 
-    bool equal(const PcpNodeRef_PrivateChildrenConstReverseIterator& other)const
-    {
-        return _node == other._node;
-    }
+    bool equal(const PcpNodeRef_PrivateChildrenConstReverseIterator& other) const { return _node == other._node; }
 
-    reference dereference() const
-    {
-        return _node;
-    }
+    reference dereference() const { return _node; }
 
 private:
     // Current graph node this iterator is pointing at.
@@ -175,7 +135,7 @@ private:
 // Wrapper type for TF_FOR_ALL().
 class PcpNodeRef_PrivateChildrenConstRange {
 public:
-    PcpNodeRef_PrivateChildrenConstRange(const PcpNodeRef& node_):node(node_){}
+    PcpNodeRef_PrivateChildrenConstRange(const PcpNodeRef& node_) : node(node_) {}
     PcpNodeRef node;
 };
 
@@ -184,56 +144,35 @@ template <>
 struct Tf_IteratorInterface<PcpNodeRef_PrivateChildrenConstRange, false> {
     typedef PcpNodeRef_PrivateChildrenConstRange RangeType;
     typedef PcpNodeRef_PrivateChildrenConstIterator IteratorType;
-    static IteratorType Begin(RangeType const &c)
-    {
-        return IteratorType(c.node, /* end = */ false);
-    }
-    static IteratorType End(RangeType const &c)
-    {
-        return IteratorType(c.node, /* end = */ true);
-    }
+    static IteratorType Begin(RangeType const& c) { return IteratorType(c.node, /* end = */ false); }
+    static IteratorType End(RangeType const& c) { return IteratorType(c.node, /* end = */ true); }
 };
 template <>
 struct Tf_IteratorInterface<PcpNodeRef_PrivateChildrenConstRange, true> {
     typedef PcpNodeRef_PrivateChildrenConstRange RangeType;
     typedef PcpNodeRef_PrivateChildrenConstReverseIterator IteratorType;
-    static IteratorType Begin(RangeType const &c)
-    {
-        return IteratorType(c.node, /* end = */ false);
-    }
-    static IteratorType End(RangeType const &c)
-    {
-        return IteratorType(c.node, /* end = */ true);
-    }
+    static IteratorType Begin(RangeType const& c) { return IteratorType(c.node, /* end = */ false); }
+    static IteratorType End(RangeType const& c) { return IteratorType(c.node, /* end = */ true); }
 };
 template <>
-struct Tf_ShouldIterateOverCopy<PcpNodeRef_PrivateChildrenConstRange> :
-    std::true_type {};
+struct Tf_ShouldIterateOverCopy<PcpNodeRef_PrivateChildrenConstRange> : std::true_type {};
 
 // Wrap a node for use by TF_FOR_ALL().
-inline
-PcpNodeRef_PrivateChildrenConstRange
-Pcp_GetChildrenRange(const PcpNodeRef& node)
-{
+inline PcpNodeRef_PrivateChildrenConstRange Pcp_GetChildrenRange(const PcpNodeRef& node) {
     return PcpNodeRef_PrivateChildrenConstRange(node);
 }
 
 // Return all of a node's children, strong-to-weak.
-inline
-PcpNodeRefVector
-Pcp_GetChildren(const PcpNodeRef& node)
-{
+inline PcpNodeRefVector Pcp_GetChildren(const PcpNodeRef& node) {
     typedef PcpNodeRef_PrivateChildrenConstIterator IteratorType;
-    return PcpNodeRefVector(IteratorType(node, /* end = */ false),
-                            IteratorType(node, /* end = */ true));
+    return PcpNodeRefVector(IteratorType(node, /* end = */ false), IteratorType(node, /* end = */ true));
 }
 
 /// \class PcpNodeRef_PrivateSubtreeConstIterator
 ///
 /// Object used to iterate over all nodes in a subtree rooted at a
 /// given node in the prim index graph in strong-to-weak order.
-class PcpNodeRef_PrivateSubtreeConstIterator
-{
+class PcpNodeRef_PrivateSubtreeConstIterator {
 public:
     using iterator_category = std::forward_iterator_tag;
     using value_type = const PcpNodeRef;
@@ -248,27 +187,20 @@ public:
     /// next weakest node after the subtree of nodes starting at \p node.
     /// This may be an invalid node if \p node is the root node.
     PcpNodeRef_PrivateSubtreeConstIterator(const PcpNodeRef& node, bool end)
-        : _node(node)
-        , _nodes(&_node._graph->_GetNode(0))
-        , _pruneChildren(false)
-    {
+        : _node(node), _nodes(&_node._graph->_GetNode(0)), _pruneChildren(false) {
         if (end) {
             _MoveToNext();
         }
     }
-    
+
     /// Causes the next increment of this iterator to ignore
     /// descendants of the current node.
-    void PruneChildren()
-    {
-        _pruneChildren = true;
-    }
+    void PruneChildren() { _pruneChildren = true; }
 
     reference operator*() const { return _node; }
     pointer operator->() const { return &_node; }
 
-    PcpNodeRef_PrivateSubtreeConstIterator& operator++()
-    {
+    PcpNodeRef_PrivateSubtreeConstIterator& operator++() {
         if (_pruneChildren || !_MoveToFirstChild()) {
             _MoveToNext();
         }
@@ -276,24 +208,20 @@ public:
         return *this;
     }
 
-    PcpNodeRef_PrivateSubtreeConstIterator operator++(int)
-    {
+    PcpNodeRef_PrivateSubtreeConstIterator operator++(int) {
         PcpNodeRef_PrivateSubtreeConstIterator result(*this);
         ++(*this);
         return result;
     }
 
-    bool operator==(const PcpNodeRef_PrivateSubtreeConstIterator& other) const
-    { return _node == other._node; }
+    bool operator==(const PcpNodeRef_PrivateSubtreeConstIterator& other) const { return _node == other._node; }
 
-    bool operator!=(const PcpNodeRef_PrivateSubtreeConstIterator& other) const
-    { return !(*this == other); }
+    bool operator!=(const PcpNodeRef_PrivateSubtreeConstIterator& other) const { return !(*this == other); }
 
 private:
     // If the current node has child nodes, move this iterator to the
     // first child and return true. Otherwise return false.
-    bool _MoveToFirstChild()
-    {
+    bool _MoveToFirstChild() {
         auto& curNodeIdx = _node._nodeIdx;
         const auto& nodeIndexes = _nodes[curNodeIdx].indexes;
         const auto& invalid = PcpPrimIndex_Graph::_Node::_invalidNodeIndex;
@@ -310,8 +238,7 @@ private:
     // the nearest ancestor node with siblings. If no such node exists,
     // (i.e., the current node is the weakest node in the index), this
     // iterator will point to an invalid node.
-    void _MoveToNext()
-    {
+    void _MoveToNext() {
         auto& curNodeIdx = _node._nodeIdx;
         const PcpPrimIndex_Graph::_Node::_Indexes* nodeIndexes = nullptr;
         const auto& invalid = PcpPrimIndex_Graph::_Node::_invalidNodeIndex;
@@ -336,13 +263,10 @@ private:
 };
 
 // Wrapper type for range-based for loops.
-class PcpNodeRef_PrivateSubtreeConstRange
-{
+class PcpNodeRef_PrivateSubtreeConstRange {
 public:
     PcpNodeRef_PrivateSubtreeConstRange(const PcpNodeRef& node)
-        : _begin(node, /* end = */ false)
-        , _end(node, /* end = */ true)
-    { }
+        : _begin(node, /* end = */ false), _end(node, /* end = */ true) {}
 
     PcpNodeRef_PrivateSubtreeConstIterator begin() const { return _begin; }
     PcpNodeRef_PrivateSubtreeConstIterator end() const { return _end; }
@@ -352,13 +276,10 @@ private:
 };
 
 /// Return node range for subtree rooted at the given \p node.
-inline
-PcpNodeRef_PrivateSubtreeConstRange
-Pcp_GetSubtreeRange(const PcpNodeRef& node)
-{
+inline PcpNodeRef_PrivateSubtreeConstRange Pcp_GetSubtreeRange(const PcpNodeRef& node) {
     return PcpNodeRef_PrivateSubtreeConstRange(node);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_NODE_ITERATOR_H
+#endif  // PXR_USD_PCP_NODE_ITERATOR_H

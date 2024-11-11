@@ -1,43 +1,26 @@
-set(PXR_PREFIX pxr/usd)
-set(PXR_PACKAGE kind)
+#  Copyright (c) 2023 Feng Yang
+#
+#  I am making my contributions/submissions to this project solely in my
+#  personal capacity and am not conveying any rights to any intellectual
+#  property of any third parties.
 
-pxr_library(kind
-    LIBRARIES
-        tf
-        plug
+# create sample app project
+project(kind LANGUAGES C CXX)
 
-    PUBLIC_CLASSES
-        registry
-        
-    PUBLIC_HEADERS
-        api.h
-
-    PYTHON_CPPFILES
-        moduleDeps.cpp
-
-    PYMODULE_CPPFILES
-        module.cpp
-        wrapRegistry.cpp
-        wrapTokens.cpp
-
-    PYMODULE_FILES 
-        __init__.py
-
-    DOXYGEN_FILES
-        overview.dox
+set(SRC_FILES
+        registry.cpp
 )
 
-pxr_test_scripts(
-    testenv/testKindRegistry.py
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+        ${PXR_INCLUDE_PATH}
 )
 
-pxr_install_test_dir(
-    SRC testenv/testKindRegistry
-    DEST testKindRegistry
+target_link_libraries(${PROJECT_NAME} PUBLIC
+        fmt::fmt
+        Eigen3::Eigen
+        TBB::tbb
 )
 
-pxr_register_test(testKindRegistry
-    PYTHON
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testKindRegistry"
-    EXPECTED_RETURN_CODE 0
-)
+set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)

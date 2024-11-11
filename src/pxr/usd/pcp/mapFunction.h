@@ -61,8 +61,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// values in namespace (and time).
 ///
 ///
-class PcpMapFunction
-{
+class PcpMapFunction {
 public:
     /// A mapping from path to path.
     typedef std::map<SdfPath, SdfPath, SdfPath::FastLessThan> PathMap;
@@ -79,30 +78,28 @@ public:
     /// \param offset The time offset to apply from source to target.
     ///
     PCP_API
-    static PcpMapFunction 
-    Create(const PathMap &sourceToTargetMap,
-           const SdfLayerOffset &offset);
+    static PcpMapFunction Create(const PathMap& sourceToTargetMap, const SdfLayerOffset& offset);
 
     /// Construct an identity map function.
     PCP_API
-    static const PcpMapFunction &Identity();
+    static const PcpMapFunction& Identity();
 
     /// Returns an identity path mapping.
     PCP_API
-    static const PathMap &IdentityPathMap();
-    
+    static const PathMap& IdentityPathMap();
+
     /// Swap the contents of this map function with \p map.
     PCP_API
-    void Swap(PcpMapFunction &map);
-    void swap(PcpMapFunction &map) { Swap(map); }
+    void Swap(PcpMapFunction& map);
+    void swap(PcpMapFunction& map) { Swap(map); }
 
     /// Equality.
     PCP_API
-    bool operator==(const PcpMapFunction &map) const;
+    bool operator==(const PcpMapFunction& map) const;
 
     /// Inequality.
     PCP_API
-    bool operator!=(const PcpMapFunction &map) const;
+    bool operator!=(const PcpMapFunction& map) const;
 
     /// Return true if this map function is the null function.
     /// For a null function, MapSourceToTarget() always returns an empty path.
@@ -113,7 +110,7 @@ public:
     /// The identity function has an identity path mapping and time offset.
     PCP_API
     bool IsIdentity() const;
-    
+
     /// Return true if the map function uses the identity path mapping.
     /// If true, MapSourceToTarget() always returns the path unchanged.
     /// However, this map function may have a non-identity time offset.
@@ -127,12 +124,12 @@ public:
     /// Map a path in the source namespace to the target.
     /// If the path is not in the domain, returns an empty path.
     PCP_API
-    SdfPath MapSourceToTarget(const SdfPath &path) const;
+    SdfPath MapSourceToTarget(const SdfPath& path) const;
 
     /// Map a path in the target namespace to the source.
     /// If the path is not in the co-domain, returns an empty path.
     PCP_API
-    SdfPath MapTargetToSource(const SdfPath &path) const;
+    SdfPath MapTargetToSource(const SdfPath& path) const;
 
     /// Map all path pattern prefix paths and expression reference paths in the
     /// source namespace to the target.  For any references or patterns with
@@ -148,14 +145,10 @@ public:
     /// are populated with those patterns & references that could not be
     /// translated and were replaced with SdfPathPattern::Nothing().
     PCP_API
-    SdfPathExpression
-    MapSourceToTarget(
-        const SdfPathExpression &pathExpr,
-        std::vector<SdfPathExpression::PathPattern>
-            *unmappedPatterns = nullptr,
-        std::vector<SdfPathExpression::ExpressionReference>
-            *unmappedRefs = nullptr
-        ) const;
+    SdfPathExpression MapSourceToTarget(
+            const SdfPathExpression& pathExpr,
+            std::vector<SdfPathExpression::PathPattern>* unmappedPatterns = nullptr,
+            std::vector<SdfPathExpression::ExpressionReference>* unmappedRefs = nullptr) const;
 
     /// Map all path pattern prefix paths and expression reference paths in the
     /// target namespace to the source.  For any references or patterns with
@@ -171,26 +164,22 @@ public:
     /// are populated with those patterns & references that could not be
     /// translated and were replaced with SdfPathPattern::Nothing().
     PCP_API
-    SdfPathExpression
-    MapTargetToSource(
-        const SdfPathExpression &pathExpr,
-        std::vector<SdfPathExpression::PathPattern>
-            *unmappedPatterns = nullptr,
-        std::vector<SdfPathExpression::ExpressionReference>
-            *unmappedRefs = nullptr
-        ) const;
-    
+    SdfPathExpression MapTargetToSource(
+            const SdfPathExpression& pathExpr,
+            std::vector<SdfPathExpression::PathPattern>* unmappedPatterns = nullptr,
+            std::vector<SdfPathExpression::ExpressionReference>* unmappedRefs = nullptr) const;
+
     /// Compose this map over the given map function.
     /// The result will represent the application of f followed by
     /// the application of this function.
     PCP_API
-    PcpMapFunction Compose(const PcpMapFunction &f) const;
+    PcpMapFunction Compose(const PcpMapFunction& f) const;
 
     /// Compose this map function over a hypothetical map function that has an
     /// identity path mapping and \p offset.  This is equivalent to building
     /// such a map function and invoking Compose(), but is faster.
     PCP_API
-    PcpMapFunction ComposeOffset(const SdfLayerOffset &newOffset) const;
+    PcpMapFunction ComposeOffset(const SdfLayerOffset& newOffset) const;
 
     /// Return the inverse of this map function.
     /// This returns a true inverse \p inv: for any path p in this function's
@@ -203,7 +192,7 @@ public:
     PathMap GetSourceToTargetMap() const;
 
     /// The time offset of the mapping.
-    const SdfLayerOffset &GetTimeOffset() const { return _offset; }
+    const SdfLayerOffset& GetTimeOffset() const { return _offset; }
 
     /// Returns a string representation of this mapping for debugging
     /// purposes.
@@ -215,81 +204,63 @@ public:
     size_t Hash() const;
 
 private:
-
     PCP_API
-    PcpMapFunction(PathPair const *sourceToTargetBegin,
-                   PathPair const *sourceToTargetEnd,
+    PcpMapFunction(PathPair const* sourceToTargetBegin,
+                   PathPair const* sourceToTargetEnd,
                    SdfLayerOffset offset,
                    bool hasRootIdentity);
 
     PCP_API
-    SdfPathExpression
-    _MapPathExpressionImpl(
-        bool invert,
-        const SdfPathExpression &pathExpr,
-        std::vector<SdfPathExpression::PathPattern> *unmappedPatterns,
-        std::vector<SdfPathExpression::ExpressionReference> *unmappedRefs
-        ) const;
+    SdfPathExpression _MapPathExpressionImpl(bool invert,
+                                             const SdfPathExpression& pathExpr,
+                                             std::vector<SdfPathExpression::PathPattern>* unmappedPatterns,
+                                             std::vector<SdfPathExpression::ExpressionReference>* unmappedRefs) const;
 
 private:
-    friend PcpMapFunction *Pcp_MakeIdentity();
+    friend PcpMapFunction* Pcp_MakeIdentity();
 
     static const int _MaxLocalPairs = 2;
     struct _Data final {
         _Data() {};
 
-        _Data(PathPair const *begin, PathPair const *end, bool hasRootIdentity)
-            : numPairs(end-begin)
-            , hasRootIdentity(hasRootIdentity) {
-            if (numPairs == 0)
-                return;
+        _Data(PathPair const* begin, PathPair const* end, bool hasRootIdentity)
+            : numPairs(end - begin), hasRootIdentity(hasRootIdentity) {
+            if (numPairs == 0) return;
             if (numPairs <= _MaxLocalPairs) {
                 std::uninitialized_copy(begin, end, localPairs);
-            }
-            else {
-                new (&remotePairs) std::shared_ptr<PathPair>(
-                    new PathPair[numPairs], std::default_delete<PathPair[]>());
+            } else {
+                new (&remotePairs) std::shared_ptr<PathPair>(new PathPair[numPairs], std::default_delete<PathPair[]>());
                 std::copy(begin, end, remotePairs.get());
             }
         }
-        
-        _Data(_Data const &other)
-            : numPairs(other.numPairs)
-            , hasRootIdentity(other.hasRootIdentity) {
+
+        _Data(_Data const& other) : numPairs(other.numPairs), hasRootIdentity(other.hasRootIdentity) {
             if (numPairs <= _MaxLocalPairs) {
-                std::uninitialized_copy(
-                    other.localPairs,
-                    other.localPairs + other.numPairs, localPairs);
-            }
-            else {
+                std::uninitialized_copy(other.localPairs, other.localPairs + other.numPairs, localPairs);
+            } else {
                 new (&remotePairs) std::shared_ptr<PathPair>(other.remotePairs);
             }
         }
-        _Data(_Data &&other)
-            : numPairs(other.numPairs)
-            , hasRootIdentity(other.hasRootIdentity) {
+        _Data(_Data&& other) : numPairs(other.numPairs), hasRootIdentity(other.hasRootIdentity) {
             if (numPairs <= _MaxLocalPairs) {
-                PathPair *dst = localPairs;
-                PathPair *src = other.localPairs;
-                PathPair *srcEnd = other.localPairs + other.numPairs;
+                PathPair* dst = localPairs;
+                PathPair* src = other.localPairs;
+                PathPair* srcEnd = other.localPairs + other.numPairs;
                 for (; src != srcEnd; ++src, ++dst) {
-                    ::new (static_cast<void*>(std::addressof(*dst)))
-                        PathPair(std::move(*src));
+                    ::new (static_cast<void*>(std::addressof(*dst))) PathPair(std::move(*src));
                 }
-            }
-            else {
-                new (&remotePairs)
-                    std::shared_ptr<PathPair>(std::move(other.remotePairs));
+            } else {
+                new (&remotePairs) std::shared_ptr<PathPair>(std::move(other.remotePairs));
             }
         }
-        _Data &operator=(_Data const &other) {
+        _Data& operator=(_Data const& other) {
             if (this != &other) {
                 this->~_Data();
                 new (this) _Data(other);
             }
             return *this;
         }
-        _Data &operator=(_Data &&other) {
+        _Data& operator=(_Data&& other) {
             if (this != &other) {
                 this->~_Data();
                 new (this) _Data(std::move(other));
@@ -298,39 +269,29 @@ private:
         }
         ~_Data() {
             if (numPairs <= _MaxLocalPairs) {
-                for (PathPair *p = localPairs; numPairs--; ++p) {
+                for (PathPair* p = localPairs; numPairs--; ++p) {
                     p->~PathPair();
                 }
-            }
-            else {
+            } else {
                 remotePairs.~shared_ptr<PathPair>();
             }
         }
 
-        bool IsNull() const {
-            return numPairs == 0 && !hasRootIdentity;
+        bool IsNull() const { return numPairs == 0 && !hasRootIdentity; }
+
+        PathPair const* begin() const { return numPairs <= _MaxLocalPairs ? localPairs : remotePairs.get(); }
+
+        PathPair const* end() const { return begin() + numPairs; }
+
+        bool operator==(_Data const& other) const {
+            return numPairs == other.numPairs && hasRootIdentity == other.hasRootIdentity &&
+                   std::equal(begin(), end(), other.begin());
         }
 
-        PathPair const *begin() const {
-            return numPairs <= _MaxLocalPairs ? localPairs : remotePairs.get();
-        }
-
-        PathPair const *end() const {
-            return begin() + numPairs;
-        }
-
-        bool operator==(_Data const &other) const {
-            return numPairs == other.numPairs &&
-                hasRootIdentity == other.hasRootIdentity &&
-                std::equal(begin(), end(), other.begin());
-        }
-
-        bool operator!=(_Data const &other) const {
-            return !(*this == other);
-        }
+        bool operator!=(_Data const& other) const { return !(*this == other); }
 
         template <class HashState>
-        friend void TfHashAppend(HashState &h, _Data const &data){
+        friend void TfHashAppend(HashState& h, _Data const& data) {
             h.Append(data.hasRootIdentity);
             h.Append(data.numPairs);
             h.AppendRange(std::begin(data), std::end(data));
@@ -347,8 +308,7 @@ private:
 
     // Specialize TfHashAppend for PcpMapFunction.
     template <typename HashState>
-    friend inline
-    void TfHashAppend(HashState& h, const PcpMapFunction& x){
+    friend inline void TfHashAppend(HashState& h, const PcpMapFunction& x) {
         h.Append(x._data);
         h.Append(x._offset);
     }
@@ -358,12 +318,10 @@ private:
 };
 
 // Specialize hash_value for PcpMapFunction.
-inline
-size_t hash_value(const PcpMapFunction& x)
-{
+inline size_t hash_value(const PcpMapFunction& x) {
     return TfHash{}(x);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_MAP_FUNCTION_H
+#endif  // PXR_USD_PCP_MAP_FUNCTION_H

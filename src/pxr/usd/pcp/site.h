@@ -25,8 +25,7 @@ class PcpLayerStackSite;
 ///
 /// A site specifies a path in a layer stack of scene description.
 ///
-class PcpSite
-{
+class PcpSite {
 public:
     PcpLayerStackIdentifier layerStackIdentifier;
     SdfPath path;
@@ -35,39 +34,31 @@ public:
     PcpSite();
 
     PCP_API
-    PcpSite( const PcpLayerStackIdentifier &, const SdfPath & path );
+    PcpSite(const PcpLayerStackIdentifier&, const SdfPath& path);
     PCP_API
-    PcpSite( const PcpLayerStackPtr &, const SdfPath & path );
+    PcpSite(const PcpLayerStackPtr&, const SdfPath& path);
     PCP_API
-    PcpSite( const SdfLayerHandle &, const SdfPath & path );
+    PcpSite(const SdfLayerHandle&, const SdfPath& path);
     PCP_API
-    PcpSite( const PcpLayerStackSite & );
+    PcpSite(const PcpLayerStackSite&);
 
     PCP_API
-    bool operator==(const PcpSite &rhs) const;
+    bool operator==(const PcpSite& rhs) const;
 
-    bool operator!=(const PcpSite &rhs) const {
-        return !(*this == rhs);
-    }
-    
+    bool operator!=(const PcpSite& rhs) const { return !(*this == rhs); }
+
     PCP_API
-    bool operator<(const PcpSite &rhs) const;
+    bool operator<(const PcpSite& rhs) const;
 
-    bool operator<=(const PcpSite &rhs) const {
-        return !(rhs < *this);
-    }
+    bool operator<=(const PcpSite& rhs) const { return !(rhs < *this); }
 
-    bool operator>(const PcpSite &rhs) const {
-        return rhs < *this;
-    }
+    bool operator>(const PcpSite& rhs) const { return rhs < *this; }
 
-    bool operator>=(const PcpSite &rhs) const {
-        return !(*this < rhs);
-    }
+    bool operator>=(const PcpSite& rhs) const { return !(*this < rhs); }
 
     struct Hash {
         PCP_API
-        size_t operator()(const PcpSite &) const;
+        size_t operator()(const PcpSite&) const;
     };
 };
 
@@ -75,8 +66,7 @@ public:
 ///
 /// A site specifies a path in a layer stack of scene description.
 ///
-class PcpLayerStackSite
-{
+class PcpLayerStackSite {
 public:
     PcpLayerStackRefPtr layerStack;
     SdfPath path;
@@ -85,34 +75,25 @@ public:
     PcpLayerStackSite();
 
     PCP_API
-    PcpLayerStackSite( const PcpLayerStackRefPtr &, const SdfPath & path );
+    PcpLayerStackSite(const PcpLayerStackRefPtr&, const SdfPath& path);
 
     PCP_API
-    bool operator==(const PcpLayerStackSite &rhs) const;
+    bool operator==(const PcpLayerStackSite& rhs) const;
 
-    bool operator!=(const PcpLayerStackSite &rhs) const {
-        return !(*this == rhs);
-    }
+    bool operator!=(const PcpLayerStackSite& rhs) const { return !(*this == rhs); }
 
     PCP_API
-    bool operator<(const PcpLayerStackSite &rhs) const;
+    bool operator<(const PcpLayerStackSite& rhs) const;
 
-    bool operator<=(const PcpLayerStackSite &rhs) const {
-        return !(rhs < *this);
-    }
+    bool operator<=(const PcpLayerStackSite& rhs) const { return !(rhs < *this); }
 
-    bool operator>(const PcpLayerStackSite &rhs) const {
-        return rhs < *this;
-    }
+    bool operator>(const PcpLayerStackSite& rhs) const { return rhs < *this; }
 
-    bool operator>=(const PcpLayerStackSite &rhs) const {
-        return !(*this < rhs);
-    }
-
+    bool operator>=(const PcpLayerStackSite& rhs) const { return !(*this < rhs); }
 
     struct Hash {
         PCP_API
-        size_t operator()(const PcpLayerStackSite &) const;
+        size_t operator()(const PcpLayerStackSite&) const;
     };
 };
 
@@ -121,20 +102,14 @@ std::ostream& operator<<(std::ostream&, const PcpSite&);
 PCP_API
 std::ostream& operator<<(std::ostream&, const PcpLayerStackSite&);
 
-static inline
-size_t
-hash_value(const PcpSite& site)
-{
+static inline size_t hash_value(const PcpSite& site) {
     return PcpSite::Hash()(site);
 }
 
-static inline
-size_t
-hash_value(const PcpLayerStackSite& site)
-{
+static inline size_t hash_value(const PcpLayerStackSite& site) {
     return PcpLayerStackSite::Hash()(site);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_PCP_SITE_H
+#endif  // PXR_USD_PCP_SITE_H

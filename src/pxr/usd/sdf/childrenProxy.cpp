@@ -6,5 +6,4 @@
 //
 /// \file ChildrenProxy.cpp
 
-
 #include "pxr/usd/sdf/childrenProxy.h"

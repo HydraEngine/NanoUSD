@@ -23,20 +23,18 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// Register a discovery plugin (`DiscoveryPluginClass`) with the plugin system.
 /// If registered, the discovery plugin will execute its discovery process when
 /// the registry is instantiated.
-#define NDR_REGISTER_DISCOVERY_PLUGIN(DiscoveryPluginClass)                   \
-TF_REGISTRY_FUNCTION(TfType)                                                  \
-{                                                                             \
-    TfType::Define<DiscoveryPluginClass, TfType::Bases<NdrDiscoveryPlugin>>() \
-        .SetFactory<NdrDiscoveryPluginFactory<DiscoveryPluginClass>>();       \
-}
+#define NDR_REGISTER_DISCOVERY_PLUGIN(DiscoveryPluginClass)                       \
+    TF_REGISTRY_FUNCTION(TfType) {                                                \
+        TfType::Define<DiscoveryPluginClass, TfType::Bases<NdrDiscoveryPlugin>>() \
+                .SetFactory<NdrDiscoveryPluginFactory<DiscoveryPluginClass>>();   \
+    }
 
 TF_DECLARE_WEAK_AND_REF_PTRS(NdrDiscoveryPluginContext);
 
 /// A context for discovery.  Discovery plugins can use this to get
 /// a limited set of non-local information without direct coupling
 /// between plugins.
-class NdrDiscoveryPluginContext : public TfRefBase, public TfWeakBase
-{
+class NdrDiscoveryPluginContext : public TfRefBase, public TfWeakBase {
 public:
     NDR_API
     virtual ~NdrDiscoveryPluginContext() = default;
@@ -123,8 +121,7 @@ TF_DECLARE_WEAK_AND_REF_PTRS(NdrDiscoveryPlugin);
 ///     </li>
 /// </ul>
 ///
-class NdrDiscoveryPlugin : public TfRefBase, public TfWeakBase
-{
+class NdrDiscoveryPlugin : public TfRefBase, public TfWeakBase {
 public:
     using Context = NdrDiscoveryPluginContext;
 
@@ -143,29 +140,23 @@ public:
     virtual const NdrStringVec& GetSearchURIs() const = 0;
 };
 
-
 /// \cond
 /// Factory classes should be hidden from the documentation.
 
-class NdrDiscoveryPluginFactoryBase : public TfType::FactoryBase
-{
+class NdrDiscoveryPluginFactoryBase : public TfType::FactoryBase {
 public:
     NDR_API
     virtual NdrDiscoveryPluginRefPtr New() const = 0;
 };
 
 template <class T>
-class NdrDiscoveryPluginFactory : public NdrDiscoveryPluginFactoryBase
-{
+class NdrDiscoveryPluginFactory : public NdrDiscoveryPluginFactoryBase {
 public:
-    NdrDiscoveryPluginRefPtr New() const override
-    {
-        return TfCreateRefPtr(new T);
-    }
+    NdrDiscoveryPluginRefPtr New() const override { return TfCreateRefPtr(new T); }
 };
 
 /// \endcond
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_NDR_DISCOVERY_PLUGIN_H
+#endif  // PXR_USD_NDR_DISCOVERY_PLUGIN_H

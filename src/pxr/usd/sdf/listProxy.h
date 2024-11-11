@@ -29,9 +29,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 ///
 /// Represents a single list of list editing operations.
 ///
-/// An SdfListProxy represents a single list of list editing operations, making 
+/// An SdfListProxy represents a single list of list editing operations, making
 /// it look like an STL vector (modeling a random access container and back
-/// insertion sequence). 
+/// insertion sequence).
 ///
 template <class _TypePolicy>
 class SdfListProxy {
@@ -42,16 +42,14 @@ public:
     typedef std::vector<value_type> value_vector_type;
 
     /// Returned from \ref Find when a value could not be located in the
-    /// list of operations. 
+    /// list of operations.
     static const size_t invalidIndex = -1;
 
 private:
     // Proxies an item in a list editor list.
     class _ItemProxy {
     public:
-        explicit _ItemProxy(This* owner, size_t index) :
-            _owner(owner), _index(index)
-        {
+        explicit _ItemProxy(This* owner, size_t index) : _owner(owner), _index(index) {
             // Do nothing
         }
 
@@ -65,35 +63,21 @@ private:
             return *this;
         }
 
-        operator value_type() const {
-            return _owner->_Get(_index);
-        }
+        operator value_type() const { return _owner->_Get(_index); }
 
         // Operators rely on implicit conversion to value_type
         // for comparing two _ItemProxy instances
-        bool operator==(const value_type& x) const {
-            return _owner->_Get(_index) == x;
-        }
+        bool operator==(const value_type& x) const { return _owner->_Get(_index) == x; }
 
-        bool operator!=(const value_type& x) const {
-            return !(*this == x);
-        }
+        bool operator!=(const value_type& x) const { return !(*this == x); }
 
-        bool operator<(const value_type& x) const {
-            return _owner->_Get(_index) < x;
-        }
+        bool operator<(const value_type& x) const { return _owner->_Get(_index) < x; }
 
-        bool operator>(const value_type& x) const {
-            return x < value_type(*this);
-        }
+        bool operator>(const value_type& x) const { return x < value_type(*this); }
 
-        bool operator>=(const value_type& x) const {
-            return !(*this < x);
-        }
+        bool operator>=(const value_type& x) const { return !(*this < x); }
 
-        bool operator<=(const value_type& x) const {
-            return !(x < value_type(*this));
-        }
+        bool operator<=(const value_type& x) const { return !(x < value_type(*this)); }
 
     private:
         This* _owner;
@@ -105,17 +89,13 @@ private:
     public:
         typedef _ItemProxy result_type;
 
-        result_type operator()(This* owner, size_t index) const {
-            return _ItemProxy(owner, index);
-        }
+        result_type operator()(This* owner, size_t index) const { return _ItemProxy(owner, index); }
     };
     class _ConstGetHelper {
     public:
         typedef value_type result_type;
 
-        result_type operator()(const This* owner, size_t index) const {
-            return owner->_Get(index);
-        }
+        result_type operator()(const This* owner, size_t index) const { return owner->_Get(index); }
     };
     friend class _GetHelper;
     friend class _ConstGetHelper;
@@ -124,26 +104,19 @@ private:
     class _Iterator {
         class _PtrProxy {
         public:
-            std::add_pointer_t<typename GetItem::result_type> operator->() {
-                return std::addressof(_result);
-            }
+            std::add_pointer_t<typename GetItem::result_type> operator->() { return std::addressof(_result); }
+
         private:
             friend class _Iterator;
-            explicit _PtrProxy(
-                std::add_const_t<
-                    std::add_lvalue_reference_t<
-                        typename GetItem::result_type>
-                > result) : _result(result) {}
+            explicit _PtrProxy(std::add_const_t<std::add_lvalue_reference_t<typename GetItem::result_type>> result)
+                : _result(result) {}
             typename GetItem::result_type _result;
         };
+
     public:
         using This = _Iterator<Owner, GetItem>;
         using iterator_category = std::random_access_iterator_tag;
-        using value_type = std::remove_cv_t<
-                std::remove_reference_t<
-                    typename GetItem::result_type
-                >
-            >;
+        using value_type = std::remove_cv_t<std::remove_reference_t<typename GetItem::result_type>>;
         using reference = typename GetItem::result_type;
         using pointer = _PtrProxy;
         using difference_type = std::ptrdiff_t;
@@ -154,8 +127,7 @@ private:
 
         _Iterator() = default;
 
-        _Iterator(Owner owner, size_t index) : _owner(owner), _index(index)
-        {
+        _Iterator(Owner owner, size_t index) : _owner(owner), _index(index) {
             // Do nothing
         }
 
@@ -167,9 +139,7 @@ private:
             return advanced.dereference();
         }
 
-        difference_type operator-(const This& other) const {
-            return -distance_to(other);
-        }
+        difference_type operator-(const This& other) const { return -distance_to(other); }
 
         This& operator++() {
             increment();
@@ -215,13 +185,9 @@ private:
             return *this;
         }
 
-        bool operator==(const This& other) const {
-            return equal(other);
-        }
+        bool operator==(const This& other) const { return equal(other); }
 
-        bool operator!=(const This& other) const {
-            return !equal(other);
-        }
+        bool operator!=(const This& other) const { return !equal(other); }
 
         bool operator<(const This& other) const {
             TF_DEV_AXIOM(_owner == other._owner);
@@ -244,35 +210,25 @@ private:
         }
 
     private:
-
-        reference dereference() const {
-            return _getItem(_owner, _index);
-        }
+        reference dereference() const { return _getItem(_owner, _index); }
 
         bool equal(const This& other) const {
             if (_owner != other._owner) {
-                TF_CODING_ERROR("Comparing SdfListProxy iterators from "
-                                "different proxies!");
+                TF_CODING_ERROR(
+                        "Comparing SdfListProxy iterators from "
+                        "different proxies!");
                 return false;
             }
             return _index == other._index;
         }
 
-        void increment() {
-            ++_index;
-        }
+        void increment() { ++_index; }
 
-        void decrement() {
-            --_index;
-        }
+        void decrement() { --_index; }
 
-        void advance(difference_type n) {
-            _index += n;
-        }
+        void advance(difference_type n) { _index += n; }
 
-        difference_type distance_to(const This& other) const {
-            return other._index - _index;
-        }
+        difference_type distance_to(const This& other) const { return other._index - _index; }
 
     private:
         GetItem _getItem;
@@ -290,106 +246,63 @@ public:
     /// Creates a default list proxy object for list operation vector specified
     /// \p op. This object evaluates to false in a boolean context and all
     /// operations on this object have no effect.
-    SdfListProxy(SdfListOpType op) :
-        _op(op)
-    {
-    }
+    SdfListProxy(SdfListOpType op) : _op(op) {}
 
     /// Create a new proxy wrapping the list operation vector specified by
     /// \p op in the underlying \p listEditor.
-    SdfListProxy(const std::shared_ptr<Sdf_ListEditor<TypePolicy> >& editor,
-                SdfListOpType op) :
-        _listEditor(editor),
-        _op(op)
-    {
-    }
+    SdfListProxy(const std::shared_ptr<Sdf_ListEditor<TypePolicy>>& editor, SdfListOpType op)
+        : _listEditor(editor), _op(op) {}
 
     /// Return an iterator to the start of the sequence.
-    iterator begin() {
-        return iterator(_GetThis(), 0);
-    }
+    iterator begin() { return iterator(_GetThis(), 0); }
     /// Return an iterator to the end of the sequence.
-    iterator end() {
-        return iterator(_GetThis(), _GetSize());
-    }
+    iterator end() { return iterator(_GetThis(), _GetSize()); }
 
     /// Return a reverse iterator to the last item of the sequence.
-    reverse_iterator rbegin() {
-        return reverse_iterator(end());
-    }
+    reverse_iterator rbegin() { return reverse_iterator(end()); }
     /// Return a reverse iterator past the start item of the sequence.
-    reverse_iterator rend() {
-        return reverse_iterator(begin());
-    }
+    reverse_iterator rend() { return reverse_iterator(begin()); }
 
     /// Return a const iterator to the start of the sequence.
-    const_iterator begin() const {
-        return const_iterator(_GetThis(), 0);
-    }
+    const_iterator begin() const { return const_iterator(_GetThis(), 0); }
     /// Return a const iterator to the end of the sequence.
-    const_iterator end() const {
-        return const_iterator(_GetThis(), _GetSize());
-    }
+    const_iterator end() const { return const_iterator(_GetThis(), _GetSize()); }
 
     /// Return a const reverse iterator to the last item of the sequence.
-    const_reverse_iterator rbegin() const {
-        return const_reverse_iterator(end());
-    }
+    const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
     /// Return a const reverse iterator past the start item of the
     /// sequence.
-    const_reverse_iterator rend() const {
-        return const_reverse_iterator(begin());
-    }
+    const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
     /// Return the size of the sequence.
-    size_t size() const {
-        return _Validate() ? _GetSize() : 0;
-    }
+    size_t size() const { return _Validate() ? _GetSize() : 0; }
 
     /// Return true if size() == 0.
-    bool empty() const { 
-        return size() == 0;
-    }
+    bool empty() const { return size() == 0; }
 
     /// Return a \p reference to the item at index \p n.
-    reference operator[](size_t n) {
-        return reference(_GetThis(), n);
-    }
+    reference operator[](size_t n) { return reference(_GetThis(), n); }
 
     /// Return a copy of the item at index \p n.
-    value_type operator[](size_t n) const {
-        return _Get(n);
-    }
+    value_type operator[](size_t n) const { return _Get(n); }
 
     /// Return a \p reference to the item at the front of the sequence.
-    reference front() {
-        return reference(_GetThis(), 0);
-    }
+    reference front() { return reference(_GetThis(), 0); }
 
     /// Return a \p reference to the item at the back of the sequence.
-    reference back() {
-        return reference(_GetThis(), _GetSize() - 1);
-    }
+    reference back() { return reference(_GetThis(), _GetSize() - 1); }
 
     /// Return a copy of the item at the front of the sequence.
-    value_type front() const {
-        return _Get(0);
-    }
+    value_type front() const { return _Get(0); }
 
     /// Return a copy of the item at the back of the sequence.
-    value_type back() const {
-        return _Get(_GetSize() - 1);
-    }
+    value_type back() const { return _Get(_GetSize() - 1); }
 
     /// Append \p elem to this sequence.
-    void push_back(const value_type& elem) {
-        _Edit(_GetSize(), 0, value_vector_type(1, elem));
-    }
+    void push_back(const value_type& elem) { _Edit(_GetSize(), 0, value_vector_type(1, elem)); }
 
     /// Remove the last element from this sequence.
-    void pop_back() {
-        _Edit(_GetSize() - 1, 1, value_vector_type());
-    }
+    void pop_back() { _Edit(_GetSize() - 1, 1, value_vector_type()); }
 
     /// Insert \p x into this sequence at position \p pos.
     iterator insert(iterator pos, const value_type& x) {
@@ -405,21 +318,15 @@ public:
     }
 
     /// Erase the element at \p pos.
-    void erase(iterator pos) {
-        _Edit(pos - iterator(this, 0), 1, value_vector_type());
-    }
+    void erase(iterator pos) { _Edit(pos - iterator(this, 0), 1, value_vector_type()); }
 
     /// Erase all the elements in the range [\p f, \p l).
-    void erase(iterator f, iterator l) {
-        _Edit(f - iterator(this, 0), l - f, value_vector_type());
-    }
+    void erase(iterator f, iterator l) { _Edit(f - iterator(this, 0), l - f, value_vector_type()); }
 
     /// Clear the contents of the sequence.
-    void clear() {
-        _Edit(0, _GetSize(), value_vector_type());
-    }
+    void clear() { _Edit(0, _GetSize(), value_vector_type()); }
 
-    /// Resize the contents of the sequence. 
+    /// Resize the contents of the sequence.
     ///
     /// Inserts or erases copies of \p t at the end
     /// such that the size becomes \p n.
@@ -427,16 +334,13 @@ public:
         size_t s = _GetSize();
         if (n > s) {
             _Edit(s, 0, value_vector_type(n - s, t));
-        }
-        else if (n < s) {
+        } else if (n < s) {
             _Edit(n, s - n, value_vector_type());
         }
     }
 
     /// Produce a copy of the contents of this sequence into a vector.
-    operator value_vector_type() const {
-        return _listEditor ? _listEditor->GetVector(_op) : value_vector_type();
-    }
+    operator value_vector_type() const { return _listEditor ? _listEditor->GetVector(_op) : value_vector_type(); }
 
     /// Replace all elements in this sequence with the elements in
     /// the \p other sequence.
@@ -496,160 +400,108 @@ public:
     }
 
     /// Equality comparison.
-    bool operator==(const value_vector_type& y) const {
-        return value_vector_type(*this) == y;
-    }
+    bool operator==(const value_vector_type& y) const { return value_vector_type(*this) == y; }
 
     /// Equality comparision
-    friend bool operator==(const value_vector_type& x, const SdfListProxy& y) {
-        return y == x;
-    }
+    friend bool operator==(const value_vector_type& x, const SdfListProxy& y) { return y == x; }
 
     /// Inequality comparison.
-    bool operator!=(const value_vector_type& y) const {
-        return !(*this == y);
-    }
+    bool operator!=(const value_vector_type& y) const { return !(*this == y); }
 
     /// Inequality comparision
-    friend bool operator!=(const value_vector_type& x, const SdfListProxy& y) {
-        return y != x;
-    }
+    friend bool operator!=(const value_vector_type& x, const SdfListProxy& y) { return y != x; }
 
     /// Less-than comparison.
-    bool operator<(const value_vector_type& y) const {
-        return value_vector_type(*this) < y;
-    }
+    bool operator<(const value_vector_type& y) const { return value_vector_type(*this) < y; }
 
     /// Less-than comparison
-    friend bool operator<(const value_vector_type& x, const SdfListProxy& y) {
-        return x < value_vector_type(y);
-    }
+    friend bool operator<(const value_vector_type& x, const SdfListProxy& y) { return x < value_vector_type(y); }
 
     /// Greater-than comparison.
-    bool operator>(const value_vector_type& y) const {
-        return value_vector_type(*this) > y;
-    }
+    bool operator>(const value_vector_type& y) const { return value_vector_type(*this) > y; }
 
     /// Greater-than comparison.
-    friend bool operator>(const value_vector_type& x, const SdfListProxy& y) {
-        return x > value_vector_type(y);
-    }
+    friend bool operator>(const value_vector_type& x, const SdfListProxy& y) { return x > value_vector_type(y); }
 
     /// Less-than or equal to comparison.
-    bool operator<=(const value_vector_type& y) const {
-        return !(*this > y);
-    }
+    bool operator<=(const value_vector_type& y) const { return !(*this > y); }
 
     /// Less-than or equal to comparison.
-    friend bool operator<=(const value_vector_type& x, const SdfListProxy& y) {
-        return x <= value_vector_type(y);
-    }
+    friend bool operator<=(const value_vector_type& x, const SdfListProxy& y) { return x <= value_vector_type(y); }
 
     /// Greater-than or equal to comparison.
-    bool operator>=(const value_vector_type& y) const {
-        return !(*this < y);
-    }
+    bool operator>=(const value_vector_type& y) const { return !(*this < y); }
 
     /// Greater-than or equal to comparison.
-    friend bool operator>=(const value_vector_type& x, const SdfListProxy& y) {
-        return x >= value_vector_type(y);
-    }
+    friend bool operator>=(const value_vector_type& x, const SdfListProxy& y) { return x >= value_vector_type(y); }
 
-    /// Explicit bool conversion operator. The list proxy object converts to 
+    /// Explicit bool conversion operator. The list proxy object converts to
     /// \c true if the list editor is valid, \c false otherwise.
-    explicit operator bool() const
-    {
-        return _listEditor && _listEditor->IsValid() && _IsRelevant();
-    }
+    explicit operator bool() const { return _listEditor && _listEditor->IsValid() && _IsRelevant(); }
 
     // Extensions
 
     /// Returns the layer that this list editor belongs to.
-    SdfLayerHandle GetLayer() const
-    {
-        return _listEditor ? _listEditor->GetLayer() : SdfLayerHandle();
-    }
+    SdfLayerHandle GetLayer() const { return _listEditor ? _listEditor->GetLayer() : SdfLayerHandle(); }
 
     /// Returns the path to this list editor's value.
-    SdfPath GetPath() const
-    {
-        return _listEditor ? _listEditor->GetPath() : SdfPath();
-    }
+    SdfPath GetPath() const { return _listEditor ? _listEditor->GetPath() : SdfPath(); }
 
     /// Returns true if the list editor is expired.
-    bool IsExpired() const
-    {
-        return _listEditor && _listEditor->IsExpired();
-    }
+    bool IsExpired() const { return _listEditor && _listEditor->IsExpired(); }
 
-    size_t Count(const value_type& value) const
-    {
-        return (_Validate() ? _listEditor->Count(_op, value) : 0);
-    }
+    size_t Count(const value_type& value) const { return (_Validate() ? _listEditor->Count(_op, value) : 0); }
 
     /// Returns the index of \p value in the list of operations.  If \p value
     /// is not found, then \ref invalidIndex is returned instead.
-    size_t Find(const value_type& value) const
-    {
-        return (_Validate() ? _listEditor->Find(_op, value) : invalidIndex);
-    }
+    size_t Find(const value_type& value) const { return (_Validate() ? _listEditor->Find(_op, value) : invalidIndex); }
 
-    void Insert(int index, const value_type& value)
-    {
+    void Insert(int index, const value_type& value) {
         if (index == -1) {
             index = static_cast<int>(_GetSize());
         }
         _Edit(index, 0, value_vector_type(1, value));
     }
 
-    void Remove(const value_type& value)
-    {
+    void Remove(const value_type& value) {
         size_t index = Find(value);
         if (index != invalidIndex) {
             Erase(index);
-        }
-        else {
+        } else {
             // Allow policy to raise an error even though we're not
             // doing anything.
             _Edit(_GetSize(), 0, value_vector_type());
         }
     }
 
-    void Replace(const value_type& oldValue, const value_type& newValue)
-    {
+    void Replace(const value_type& oldValue, const value_type& newValue) {
         size_t index = Find(oldValue);
         if (index != size_t(-1)) {
             _Edit(index, 1, value_vector_type(1, newValue));
-        }
-        else {
+        } else {
             // Allow policy to raise an error even though we're not
             // doing anything.
             _Edit(_GetSize(), 0, value_vector_type());
         }
     }
 
-    void Erase(size_t index)
-    {
-        _Edit(index, 1, value_vector_type());
-    }
+    void Erase(size_t index) { _Edit(index, 1, value_vector_type()); }
 
     /// Applies the edits in the given list to this one.
-    void ApplyList(const SdfListProxy &list) 
-    {
+    void ApplyList(const SdfListProxy& list) {
         if (_Validate() && list._Validate()) {
             _listEditor->ApplyList(_op, *list._listEditor);
         }
     }
 
     /// Apply the edits in this list to the given \p vec.
-    void ApplyEditsToList(value_vector_type* vec)
-    {
+    void ApplyEditsToList(value_vector_type* vec) {
         if (_Validate()) {
             _listEditor->ApplyEditsToList(vec);
         }
     }
 
-    /// Modify all edits in this list. 
+    /// Modify all edits in this list.
     ///
     /// \p callback must be a callable that accepts an argument of type
     /// value_type and returns a std::optional<value_type>.
@@ -660,16 +512,14 @@ public:
     /// item that was previously returned, the returned item will be
     /// removed.
     template <class CB>
-    void ModifyItemEdits(CB callback)
-    {
+    void ModifyItemEdits(CB callback) {
         if (_Validate()) {
             _listEditor->ModifyItemEdits(std::forward<CB>(callback));
         }
     }
 
 private:
-    bool _Validate()
-    {
+    bool _Validate() {
         if (!_listEditor) {
             return false;
         }
@@ -681,8 +531,7 @@ private:
         return true;
     }
 
-    bool _Validate() const
-    {
+    bool _Validate() const {
         if (!_listEditor) {
             return false;
         }
@@ -694,55 +543,37 @@ private:
         return true;
     }
 
-    This* _GetThis()
-    {
-        return _Validate() ? this : NULL;
-    }
+    This* _GetThis() { return _Validate() ? this : NULL; }
 
-    const This* _GetThis() const
-    {
-        return _Validate() ? this : NULL;
-    }
+    const This* _GetThis() const { return _Validate() ? this : NULL; }
 
-    bool _IsRelevant() const
-    {
+    bool _IsRelevant() const {
         if (_listEditor->IsExplicit()) {
             return _op == SdfListOpTypeExplicit;
-        }
-        else if (_listEditor->IsOrderedOnly()) {
+        } else if (_listEditor->IsOrderedOnly()) {
             return _op == SdfListOpTypeOrdered;
-        }
-        else {
+        } else {
             return _op != SdfListOpTypeExplicit;
         }
     }
 
-    size_t _GetSize() const
-    {
-        return _listEditor ? _listEditor->GetSize(_op) : 0;
-    }
+    size_t _GetSize() const { return _listEditor ? _listEditor->GetSize(_op) : 0; }
 
-    value_type _Get(size_t n) const
-    {
-        return _Validate() ? _listEditor->Get(_op, n) : value_type();
-    }
+    value_type _Get(size_t n) const { return _Validate() ? _listEditor->Get(_op, n) : value_type(); }
 
-    void _Edit(size_t index, size_t n, const value_vector_type& elems)
-    {
+    void _Edit(size_t index, size_t n, const value_vector_type& elems) {
         if (_Validate()) {
             // Allow policy to raise an error even if we're not
             // doing anything.
             if (n == 0 && elems.empty()) {
                 SdfAllowed canEdit = _listEditor->PermissionToEdit(_op);
                 if (!canEdit) {
-                    TF_CODING_ERROR("Editing list: %s", 
-                                    canEdit.GetWhyNot().c_str());
+                    TF_CODING_ERROR("Editing list: %s", canEdit.GetWhyNot().c_str());
                 }
                 return;
             }
 
-            bool valid = 
-                _listEditor->ReplaceEdits(_op, index, n, elems);
+            bool valid = _listEditor->ReplaceEdits(_op, index, n, elems);
             if (!valid) {
                 TF_CODING_ERROR("Inserting invalid value into list editor");
             }
@@ -750,18 +581,17 @@ private:
     }
 
 private:
-    std::shared_ptr<Sdf_ListEditor<TypePolicy> > _listEditor;
+    std::shared_ptr<Sdf_ListEditor<TypePolicy>> _listEditor;
     SdfListOpType _op;
 
-    template <class> friend class SdfPyWrapListProxy;
+    template <class>
+    friend class SdfPyWrapListProxy;
 };
 
 // Allow TfIteration over list proxies.
 template <typename T>
-struct Tf_ShouldIterateOverCopy<SdfListProxy<T> > : std::true_type
-{
-};
+struct Tf_ShouldIterateOverCopy<SdfListProxy<T>> : std::true_type {};
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // PXR_USD_SDF_LIST_PROXY_H
+#endif  // PXR_USD_SDF_LIST_PROXY_H
